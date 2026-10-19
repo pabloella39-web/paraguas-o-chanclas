@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 from datetime import date
 from pathlib import Path
 
@@ -126,7 +127,11 @@ def main():
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
     meta = construir(hoy, Path(a.salida), demo=a.demo)
 
-    if a.publicar:
+    faltan = [v for v in ("TIKTOK_CLIENT_KEY", "TIKTOK_CLIENT_SECRET", "TIKTOK_REFRESH_TOKEN") if not os.environ.get(v)]
+    if a.publicar and faltan:
+        log.warning("No se publica: faltan los secretos %s. El vídeo queda como artefacto de la ejecución.",
+                    ", ".join(faltan))
+    elif a.publicar:
         from .tiktok import publicar
         if a.esperar:
             esperar_hasta_publicacion()
