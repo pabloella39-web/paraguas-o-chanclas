@@ -35,7 +35,9 @@ if __name__ == "__main__":
     if not entrada:
         sys.exit("Pasa la URL de callback.html o el código")
     ck = os.environ.get("TIKTOK_CLIENT_KEY", "")
-    print(f"Client key en GitHub: {ck.strip()!r} (longitud {len(ck)}; con espacios extra: {ck != ck.strip()})")
+    # GitHub oculta el valor completo de los secretos; se muestra solo el principio para comprobarlo
+    print(f"Client key en GitHub empieza por: {ck.strip()[:6]!r} (longitud {len(ck.strip())}; "
+          f"espacios extra: {ck != ck.strip()}). La sandbox empieza por 'sbawoa' y mide 18.")
     print(f"Client secret: longitud {len(os.environ.get('TIKTOK_CLIENT_SECRET', '').strip())}")
     res = canjear_codigo(extraer_codigo(entrada), REDIRECT_URI)
     print(f"✅ TikTok autorizado. Permisos: {res['scope']}. Validez: {res['dias_validez']} días.")
