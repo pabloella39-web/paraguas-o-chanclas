@@ -102,7 +102,8 @@ def _info_creador(token: str) -> dict:
 
 
 def _trozos(tam: int):
-    if tam < 5 * MB:
+    """Hasta 64 MB se sube de una vez (TikTok lo exige por debajo de 5 MB y lo permite hasta 64 MB)."""
+    if tam <= 64 * MB:
         return tam, 1
     chunk = 10 * MB
     return chunk, tam // chunk  # el último trozo absorbe el resto

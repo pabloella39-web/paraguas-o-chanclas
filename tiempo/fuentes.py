@@ -21,7 +21,7 @@ SOL, SOL_NUBES, NUBES, LLUVIA, CHUBASCOS, TORMENTA, NIEVE, NIEBLA = (
 
 
 # ---------------------------------------------------------------- AEMET
-def _aemet_get(ruta: str, clave: str, intentos: int = 4):
+def _aemet_get(ruta: str, clave: str, intentos: int = 5):
     """AEMET responde en dos pasos: una URL de 'datos' y luego el contenido (ISO-8859-15)."""
     ultimo = None
     for i in range(intentos):
@@ -30,6 +30,8 @@ def _aemet_get(ruta: str, clave: str, intentos: int = 4):
                              timeout=30)
             meta = r.json()
             if meta.get("estado") == 429 or r.status_code == 429:
+                log.info("AEMET pide esperar (límite de peticiones); reintento en %d s", 20 * (i + 1))
+                time.sleep(20 * (i + 1))
                 raise RuntimeError("AEMET: límite de peticiones")
             if meta.get("estado") != 200:
                 raise RuntimeError(f"AEMET {ruta}: {meta.get('descripcion')}")
@@ -276,7 +278,7 @@ def obtener_previsiones(hoy: date) -> tuple[list[dict], str]:
                 ae = aemet_ciudad(c, clave_aemet, hoy)
             except Exception as e:  # noqa: BLE001
                 log.warning("AEMET %s: %s", c["nombre"], e)
-            time.sleep(1.2)  # AEMET limita las peticiones por minuto
+            time.sleep(2.5)  # AEMET limita las peticiones por minuto (cada ciudad son 2)
         if clave_google:
             try:
                 go = google_ciudad(c, clave_google)
