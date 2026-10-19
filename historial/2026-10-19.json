@@ -1,0 +1,21 @@
+{
+ "fecha": "2026-10-19",
+ "duracion": 66.93,
+ "caption": "¿Paraguas o chanclas? El tiempo en España hoy, lunes 19 de octubre ☀️🌧️ #eltiempo #AEMET #meteo #tiempoespaña #paraguasochanclas",
+ "portada_ms": 9407,
+ "origen_guion": "plantilla",
+ "guion": {
+  "intro": "¡Buenos días! Es lunes 19 de octubre. ¿Hoy toca paraguas o chanclas?",
+  "general": "Lo más caluroso, Santa Cruz de Tenerife con 26 grados, y lo más frío al amanecer, Salamanca con 3. De lluvia, poca cosa.",
+  "norte": "Empezamos por el norte, lluvia y máximas entre los 11 grados de Pamplona y los 18 de A Coruña. Hoy no tiendas la ropa.",
+  "interior": "En el interior, lluvia y máximas entre los 14 grados de Valladolid y los 19 de Toledo. El paraguas, de copiloto.",
+  "mediterraneo": "En el Mediterráneo, lluvia y máximas entre los 19 grados de Valencia y los 24 de Alicante. El paraguas, de copiloto.",
+  "sur": "En el sur, posibles tormentas y máximas entre los 20 grados de Granada y los 25 de Badajoz. Mejor planes bajo techo.",
+  "islas": "Y en las islas, chubascos a ratos y máximas entre los 25 grados de Palma y los 26 de Santa Cruz de Tenerife. Chaparrones de ahora sí, ahora no.",
+  "cierre": "Y hasta aquí el parte. Sigue a Paraguas o Chanclas y mañana a las siete y media te cuento si toca abrigo o chanclas. ¡Pásaselo a quien siempre sale sin chaqueta!"
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7698467940173121558",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
