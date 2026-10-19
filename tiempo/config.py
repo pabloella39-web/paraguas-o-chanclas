@@ -98,6 +98,6 @@ SEGMENTOS = ["intro", "general", "norte", "interior", "mediterraneo", "sur", "is
 
 # Voz
 VOZ_EDGE = "es-ES-AlvaroNeural"
-VELOCIDAD_EDGE = "+6%"
+VELOCIDAD_EDGE = "+15%"  # punto de partida; se ajusta solo para cuadrar la duración
 
 MODELO_CLAUDE = "claude-sonnet-5-5"

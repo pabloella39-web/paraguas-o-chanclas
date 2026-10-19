@@ -18,9 +18,9 @@ DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "doming
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
          "octubre", "noviembre", "diciembre"]
 
-# Palabras objetivo por bloque (≈170 palabras ≈ 62 s de locución)
-PALABRAS = {"intro": 14, "general": 30, "norte": 24, "interior": 22, "mediterraneo": 22,
-            "sur": 22, "islas": 20, "cierre": 16}
+# Palabras objetivo por bloque (≈170 palabras ≈ 63 s a ritmo ágil; la velocidad de la voz se ajusta sola)
+PALABRAS = {"intro": 12, "general": 26, "norte": 24, "interior": 22, "mediterraneo": 22,
+            "sur": 22, "islas": 22, "cierre": 18}
 
 
 def fecha_larga(d: date) -> str:
@@ -52,7 +52,10 @@ Texto de AEMET para hoy (contexto, puede venir vacío):
 Escribe la locución en castellano de España, para leer en voz alta por una voz sintética:
 - Escribe los números en cifras seguidos de la palabra "grados" o "por ciento" (ej. "24 grados"). Nada de
   símbolos (°, %), emojis, abreviaturas ni siglas raras. "AEMET" se puede decir.
-- Frases cortas y naturales. Menciona las ciudades por su nombre (S.C. Tenerife = Santa Cruz de Tenerife).
+- Ritmo ágil y conversacional, como un presentador joven: frases que fluyan, conectadas con "y", "mientras
+  que", "eso sí". NUNCA enumeres ciudades con dos puntos ni listas largas de números; agrúpalas
+  ("Bilbao y Santander rondarán los 16 grados") y destaca solo lo interesante. Evita paréntesis y guiones.
+- Menciona las ciudades por su nombre (S.C. Tenerife = Santa Cruz de Tenerife).
 - Un chiste o comentario gracioso por bloque como mucho; que el dato vaya primero.
 - Si una ciudad tiene "discrepancia_tmax" de 3 o más, puedes bromear con que AEMET y los modelos no se ponen de acuerdo.
 - Longitud EXACTA aproximada por bloque (palabras): {palabras}. Total ≈ {total} palabras. Es crucial respetarlo.
@@ -136,33 +139,60 @@ def _ciudades_txt(lista):
     return ", ".join(partes[:-1]) + f" y {partes[-1]} grados" if len(partes) > 1 else f"{partes[0]} grados"
 
 
+def _nombre(p):
+    return p["nombre"].replace("S.C. Tenerife", "Santa Cruz de Tenerife")
+
+
+def _frase_ciudades(lista):
+    """'máximas entre los 15 grados de Oviedo y los 18 de Pamplona' en vez de enumerar todas."""
+    lista = sorted(lista, key=lambda p: p["tmax"])
+    lo, hi = lista[0], lista[-1]
+    if lo["tmax"] == hi["tmax"]:
+        return f"máximas de {hi['tmax']} grados"
+    return f"máximas entre los {lo['tmax']} grados de {_nombre(lo)} y los {hi['tmax']} de {_nombre(hi)}"
+
+
+CIELO = {"sol": "cielo despejado", "sol_nubes": "sol con alguna nube", "nubes": "cielo nuboso",
+         "lluvia": "lluvia", "chubascos": "chubascos a ratos", "tormenta": "posibles tormentas",
+         "nieve": "nieve", "niebla": "nieblas por la mañana"}
+
+
 def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
-    """Guion sin IA (respaldo). factor < 1 quita chistes; factor > 1 añade alguno."""
+    """Guion sin IA (respaldo). factor < 0.85 quita los comentarios; > 1.1 añade uno al cierre."""
     rnd = random.Random(hoy.toordinal())
     reg = _resumen_datos(prev)
     caliente = max(prev, key=lambda p: p["tmax"])
     fria = min(prev, key=lambda p: p["tmin"])
-    con_chiste = {"norte", "mediterraneo", "islas"} if factor < 0.92 else (
-        {"norte", "interior", "mediterraneo", "sur", "islas"})
-    if factor < 0.8:
+    lluviosas = [_nombre(p) for p in prev if p["lluvia"] >= 50]
+    # Con factor 1 hay comentario en 3 regiones; si hay que alargar, en todas; si acortar, en ninguna
+    con_chiste = {"norte", "mediterraneo", "islas"}
+    if factor > 1.1:
+        con_chiste = {"norte", "interior", "mediterraneo", "sur", "islas"}
+    elif factor < 0.9:
         con_chiste = set()
     seg = {
-        "intro": f"Buenos días, es {fecha_larga(hoy)} y este es el tiempo en España.",
-        "general": (f"Lo más caluroso hoy, {caliente['nombre']} con {caliente['tmax']} grados. "
-                    f"Lo más frío al amanecer, {fria['nombre']} con {fria['tmin']}."),
+        "intro": f"¡Buenos días! Es {fecha_larga(hoy)}. ¿Hoy toca paraguas o chanclas?",
+        "general": (f"Lo más caluroso, {_nombre(caliente)} con {caliente['tmax']} grados, y lo más frío al "
+                    f"amanecer, {_nombre(fria)} con {fria['tmin']}. "
+                    + (f"Ojo con la lluvia en {' y '.join(lluviosas[:2])}." if lluviosas
+                       else "De lluvia, poca cosa.")),
     }
-    nombres = {"norte": "En el norte", "interior": "En el interior", "mediterraneo": "En el Mediterráneo",
-               "sur": "En el sur", "islas": "En las islas"}
+    intros = {"norte": "Empezamos por el norte", "interior": "En el interior",
+              "mediterraneo": "En el Mediterráneo", "sur": "En el sur", "islas": "Y en las islas"}
     for r in ("norte", "interior", "mediterraneo", "sur", "islas"):
         lista = reg.get(r, [])
         if not lista:
             seg[r] = ""
             continue
-        chiste = f" {rnd.choice(FRASES[_icono_dominante(lista)])}" if r in con_chiste else ""
-        lluvia = " Ojo, que puede llover." if max(p["lluvia"] for p in lista) >= 50 else ""
-        seg[r] = f"{nombres[r]}.{chiste} Máximas: {_ciudades_txt(lista)}.{lluvia}"
-    seg["cierre"] = "Esto es todo. Sigue a Paraguas o Chanclas y mañana a las 7 y media, otro parte."
-    if factor > 1.08:
-        seg["cierre"] += " Y pásaselo a quien siempre sale sin chaqueta."
-    caption = f"¿Paraguas o chanclas? El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ #eltiempo #AEMET #meteo #tiempoespaña #paraguasochanclas"
+        dom = _icono_dominante(lista)
+        chiste = f" {rnd.choice(FRASES[dom])}" if r in con_chiste else ""
+        aviso = " Lluvia muy probable." if max(p["lluvia"] for p in lista) >= 50 and dom not in (
+            "lluvia", "chubascos", "tormenta") else ""
+        seg[r] = f"{intros[r]}, {CIELO[dom]} y {_frase_ciudades(lista)}.{chiste}{aviso}"
+    seg["cierre"] = ("Y hasta aquí el parte. Sigue a Paraguas o Chanclas y mañana a las siete y media "
+                     "te cuento si toca abrigo o chanclas.")
+    if factor > 1.2:
+        seg["cierre"] += " ¡Pásaselo a quien siempre sale sin chaqueta!"
+    caption = (f"¿Paraguas o chanclas? El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ "
+               "#eltiempo #AEMET #meteo #tiempoespaña #paraguasochanclas")
     return {"segmentos": seg, "caption": caption}

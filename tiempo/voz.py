@@ -28,16 +28,21 @@ def duracion(ruta: Path) -> float:
     return float(out.strip())
 
 
-def _edge(texto: str, ruta: Path):
+def velocidad_base() -> int:
+    """Velocidad de la voz en % sobre la normal (p. ej. 15 = un 15 % más rápida)."""
+    return int(str(os.environ.get("VELOCIDAD_EDGE", VELOCIDAD_EDGE)).replace("%", "").replace("+", ""))
+
+
+def _edge(texto: str, ruta: Path, velocidad: int):
     import edge_tts  # se instala en GitHub Actions (requirements.txt)
 
     async def _run():
         await edge_tts.Communicate(texto, os.environ.get("VOZ_EDGE", VOZ_EDGE),
-                                   rate=os.environ.get("VELOCIDAD_EDGE", VELOCIDAD_EDGE)).save(str(ruta))
+                                   rate=f"{velocidad:+d}%").save(str(ruta))
     asyncio.run(_run())
 
 
-def _google_tts(texto: str, ruta: Path):
+def _google_tts(texto: str, ruta: Path, velocidad: int):
     clave = os.environ.get("GOOGLE_TTS_API_KEY") or os.environ.get("GOOGLE_WEATHER_API_KEY")
     if not clave:
         raise RuntimeError("Sin clave para Google TTS")
@@ -46,23 +51,25 @@ def _google_tts(texto: str, ruta: Path):
         voz["name"] = os.environ["GOOGLE_TTS_VOICE"]
     r = requests.post(f"https://texttospeech.googleapis.com/v1/text:synthesize?key={clave}", json={
         "input": {"text": texto}, "voice": voz,
-        "audioConfig": {"audioEncoding": "MP3", "speakingRate": 1.05}}, timeout=60)
+        "audioConfig": {"audioEncoding": "MP3", "speakingRate": round(1 + velocidad / 100, 2)}}, timeout=60)
     r.raise_for_status()
     ruta.write_bytes(base64.b64decode(r.json()["audioContent"]))
 
 
-def sintetizar(texto: str, ruta_mp3: Path, demo: bool = False) -> Path:
+def sintetizar(texto: str, ruta_mp3: Path, demo: bool = False, velocidad: int | None = None) -> Path:
     """Devuelve un WAV mono 48 kHz con la locución del bloque."""
     wav = ruta_mp3.with_suffix(".wav")
     if demo:
         # Sin voz: silencio con la duración estimada (≈2,75 palabras/segundo)
-        seg = max(1.5, len(texto.split()) / 2.75)
+        v = velocidad if velocidad is not None else velocidad_base()
+        seg = max(1.5, len(texto.split()) / (2.6 * (1 + v / 100)))
         _ffmpeg("-f", "lavfi", "-i", f"anullsrc=r={SR}:cl=mono", "-t", f"{seg:.2f}", str(wav))
         return wav
+    velocidad = velocidad if velocidad is not None else velocidad_base()
     errores = []
     for motor in (_edge, _google_tts):
         try:
-            motor(texto, ruta_mp3)
+            motor(texto, ruta_mp3, velocidad)
             if ruta_mp3.exists() and ruta_mp3.stat().st_size > 1000:
                 break
         except Exception as e:  # noqa: BLE001
@@ -70,10 +77,10 @@ def sintetizar(texto: str, ruta_mp3: Path, demo: bool = False) -> Path:
             log.warning("TTS %s falló: %s", motor.__name__, e)
     else:
         raise RuntimeError(f"Ningún motor de voz funcionó: {errores}")
-    # Recorta silencios de los extremos para que el ritmo sea ágil
-    _ffmpeg("-i", str(ruta_mp3), "-af",
-             "silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
-             "silenceremove=start_periods=1:start_threshold=-45dB,areverse",
+    # Recorta solo el silencio sobrante de los extremos, dejando 60 ms para no comerse el arranque
+    # de las palabras (recortar más fuerte hacía que la voz sonara "trabada")
+    recorte = "silenceremove=start_periods=1:start_threshold=-55dB:start_silence=0.06"
+    _ffmpeg("-i", str(ruta_mp3), "-af", f"{recorte},areverse,{recorte},areverse",
              "-ar", str(SR), "-ac", "1", str(wav))
     return wav
 

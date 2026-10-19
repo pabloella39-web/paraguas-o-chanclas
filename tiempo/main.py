@@ -24,54 +24,63 @@ from .video import Compositor, renderizar
 log = logging.getLogger("tiempo")
 
 INICIO = 0.45      # la voz arranca tras el golpe de título
-PAUSA = 0.30       # silencio entre bloques
-COLA = 1.2         # tras la despedida (tarjeta de "sígueme")
-TEMPO_MAX = 1.22   # aceleración máxima de la voz que sigue sonando natural
-HABLA_MIN, HABLA_MAX = 55.0, 64.0
+PAUSA = 0.35       # respiración entre bloques (fija: ya no se estira para rellenar)
+COLA_MIN = 1.2     # tras la despedida (tarjeta de "sígueme")
+VEL_MIN, VEL_MAX = 5, 35   # rango de velocidad de la voz (%) que sigue sonando natural
+
+
+def _habla_objetivo(n_bloques: int) -> float:
+    return DURACION_OBJETIVO - INICIO - PAUSA * (n_bloques - 1) - COLA_MIN - 0.3
 
 
 def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool):
+    """Genera la voz y ajusta su VELOCIDAD (no las pausas) para que encaje en 65-70 s."""
     factor, mejor = 1.0, None
     for intento in range(3):
         guion = g.guion_plantilla(prev, hoy, factor) if demo else g.escribir_guion(prev, hoy, texto_aemet, factor)
         bloques = [s for s in SEGMENTOS if guion["segmentos"].get(s, "").strip()]
-        wavs = [voz.sintetizar(guion["segmentos"][s], trabajo / f"{intento}_{s}.mp3", demo) for s in bloques]
-        durs = [voz.duracion(w) for w in wavs]
-        habla = sum(durs)
-        log.info("Intento %d (%s): %d palabras, %.1f s de voz", intento + 1, guion.get("origen", "plantilla"),
-                 sum(len(guion["segmentos"][s].split()) for s in bloques), habla)
-        mejor = (guion, bloques, wavs, durs)
-        if HABLA_MIN <= habla <= HABLA_MAX:
-            break
-        factor *= ((HABLA_MIN + HABLA_MAX) / 2) / habla  # pide un guion más corto/largo
+        objetivo = _habla_objetivo(len(bloques))
+        vel = voz.velocidad_base()
+        for ajuste in range(3):
+            wavs = [voz.sintetizar(guion["segmentos"][s], trabajo / f"{intento}_{ajuste}_{s}.mp3", demo, vel)
+                    for s in bloques]
+            durs = [voz.duracion(w) for w in wavs]
+            habla = sum(durs)
+            log.info("Guion %d (%s), velocidad %+d%%: %d palabras, %.1f s de voz (objetivo %.1f s)",
+                     intento + 1, guion.get("origen", "plantilla"), vel,
+                     sum(len(guion["segmentos"][s].split()) for s in bloques), habla, objetivo)
+            mejor = (guion, bloques, wavs, durs)
+            if abs(habla - objetivo) <= 1.0:
+                return mejor
+            # La duración es inversamente proporcional a la velocidad
+            nueva = round((1 + vel / 100) * habla / objetivo * 100 - 100)
+            if not VEL_MIN <= nueva <= VEL_MAX:
+                break  # haría falta una voz demasiado lenta o rápida: se cambia la longitud del guion
+            vel = nueva
+        # Guion demasiado corto o largo para una velocidad natural: se pide otro de distinta longitud
+        factor *= objetivo * (1 + vel / 100) / (habla * (1 + voz.velocidad_base() / 100))
     return mejor
 
 
 def planificar(bloques, wavs, durs):
-    """Calcula tiempos para que el total quede SIEMPRE entre 65 y 70 segundos."""
+    """Coloca los bloques con pausas fijas y garantiza que el total quede entre 65 y 70 s."""
     n = len(bloques)
-    fijo = INICIO + PAUSA * (n - 1) + COLA
     habla = sum(durs)
+    fijo = INICIO + PAUSA * (n - 1) + COLA_MIN
     limite = DURACION_MAX - 0.8
-    if habla + fijo > limite:
+    if habla + fijo > limite:  # último recurso: acelerar un poco sin cambiar el tono
         tempo = habla / (limite - fijo)
-        if tempo > TEMPO_MAX:
-            raise RuntimeError(f"La locución dura {habla:.1f} s: demasiado larga incluso acelerada")
+        if tempo > 1.12:
+            raise RuntimeError(f"La locución dura {habla:.1f} s: demasiado larga")
         log.info("Acelerando la voz x%.3f para no pasar de %.0f s", tempo, DURACION_MAX)
         wavs = [voz.acelerar(w, tempo) for w in wavs]
         durs = [voz.duracion(w) for w in wavs]
-        habla = sum(durs)
-    pausa, cola = PAUSA, COLA
-    falta = DURACION_OBJETIVO - (habla + fijo)
-    if falta > 0:
-        extra_pausa = min(0.45, falta * 0.6 / max(1, n - 1))
-        pausa += extra_pausa
-        cola += falta - extra_pausa * (n - 1)
     plan, t = [], INICIO
     for s, w, d in zip(bloques, wavs, durs):
         plan.append({"seg": s, "inicio": t, "fin": t + d, "wav": w})
-        t += d + pausa
-    total = plan[-1]["fin"] + cola
+        t += d + PAUSA
+    # Lo que sobre se queda al final, con la tarjeta de "¡Sígueme!" y la música
+    total = max(plan[-1]["fin"] + COLA_MIN, DURACION_MIN + 0.5)
     total = round(total * FPS) / FPS
     if not DURACION_MIN + 0.2 <= total <= DURACION_MAX - 0.2:
         raise RuntimeError(f"Duración fuera de rango: {total:.2f} s")
