@@ -21,6 +21,7 @@ ANCHO, ALTO, FPS = 1080, 1920, 30
 # Atribuciones obligatorias (el texto de Google NO se puede traducir ni partir en dos líneas)
 ATRIBUCION_AEMET = "Fuente: AEMET"
 ATRIBUCION_GOOGLE = "Source: Includes weather data from Google"
+ATRIBUCION_OPENMETEO = "Weather data by Open-Meteo.com (CC BY 4.0)"
 
 # Ciudades: código INE de municipio (AEMET), coordenadas (Google) y región
 CIUDADES = [

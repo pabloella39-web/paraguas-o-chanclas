@@ -43,7 +43,7 @@ sin política y sin burlarte de nadie. La información meteorológica debe ser e
 que te doy (no inventes temperaturas, lluvias ni avisos).
 
 Hoy es {fecha}. Datos por región (temperaturas en grados, lluvia = probabilidad en %, viento en km/h;
-icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuentes: AEMET y Google.
+icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuentes: AEMET (oficial) y Open-Meteo (consenso de varios modelos: europeo, alemán, francés y americano).
 {datos}
 
 Texto de AEMET para hoy (contexto, puede venir vacío):
@@ -54,7 +54,7 @@ Escribe la locución en castellano de España, para leer en voz alta por una voz
   símbolos (°, %), emojis, abreviaturas ni siglas raras. "AEMET" se puede decir.
 - Frases cortas y naturales. Menciona las ciudades por su nombre (S.C. Tenerife = Santa Cruz de Tenerife).
 - Un chiste o comentario gracioso por bloque como mucho; que el dato vaya primero.
-- Si una ciudad tiene "discrepancia_tmax" de 3 o más, puedes bromear con que AEMET y Google no se ponen de acuerdo.
+- Si una ciudad tiene "discrepancia_tmax" de 3 o más, puedes bromear con que AEMET y los modelos no se ponen de acuerdo.
 - Longitud EXACTA aproximada por bloque (palabras): {palabras}. Total ≈ {total} palabras. Es crucial respetarlo.
 
 Bloques:

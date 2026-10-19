@@ -2,7 +2,7 @@
 
 Cada mañana, GitHub Actions:
 
-1. Descarga la previsión del día de **AEMET OpenData** y **Google Weather API** para 22 ciudades y las fusiona (media de temperaturas y lluvia; el estado del cielo oficial de AEMET manda).
+1. Descarga la previsión del día de **AEMET OpenData** y de **Open-Meteo** (mediana de 4 modelos: ECMWF, ICON, Météo-France y GFS) para 22 ciudades y las fusiona con media ponderada (AEMET 50 %, Open-Meteo 30 %; si añades `GOOGLE_WEATHER_API_KEY`, Google entra con un 20 %). El estado del cielo oficial de AEMET manda.
 2. Escribe un guion con **humor ligero** (Claude; si falla, una plantilla propia).
 3. Genera la **voz IA en español** (Microsoft Edge TTS, voz `es-ES-AlvaroNeural`; respaldo: Google Text-to-Speech).
 4. Monta un vídeo vertical 1080×1920 con el **mapa de España**, iconos, tarjetas por región, subtítulos y música de fondo original.
@@ -18,7 +18,8 @@ Cada mañana, GitHub Actions:
 | Secreto | Dónde se consigue | Coste |
 |---|---|---|
 | `AEMET_API_KEY` | https://opendata.aemet.es/centrodedescargas/altaUsuario (llega por email) | Gratis |
-| `GOOGLE_WEATHER_API_KEY` | Google Cloud Console → crea proyecto → activa **Weather API** → Credenciales → Clave de API (restríngela a Weather API) | ~660 llamadas/mes, dentro del tramo gratuito |
+| `GOOGLE_WEATHER_API_KEY` (opcional) | Google Cloud Console (exige facturación) → activa **Weather API** → Clave de API | ~660 llamadas/mes, dentro del tramo gratuito |
+| — | Open-Meteo no necesita clave | Gratis (uso no comercial) |
 | `ANTHROPIC_API_KEY` | https://console.anthropic.com (opcional; sin ella se usa la plantilla) | Céntimos al mes |
 | `TIKTOK_CLIENT_KEY` / `TIKTOK_CLIENT_SECRET` | Tu app en https://developers.tiktok.com | Gratis |
 | `TIKTOK_REFRESH_TOKEN` | Con `scripts/obtener_token_tiktok.py` (paso 3) | — |
@@ -74,7 +75,8 @@ Cada día se guarda `historial/AAAA-MM-DD.json` con el guion: eso además evita 
 ## Atribuciones y normas
 
 - AEMET permite reutilizar sus datos citando la fuente: el vídeo muestra siempre "Fuente: AEMET".
-- Google exige el texto exacto, sin traducir ni partir: "Source: Includes weather data from Google" (visible en todo el vídeo). Revisa los términos de Google Maps Platform si cambias el uso.
+- Open-Meteo (CC BY 4.0): el vídeo muestra "Weather data by Open-Meteo.com". Su API gratuita es para uso no comercial: si el canal empieza a ganar dinero, contrata su plan comercial.
+- Si usas Google, exige el texto exacto, sin traducir ni partir: "Source: Includes weather data from Google" (visible en todo el vídeo). Revisa los términos de Google Maps Platform si cambias el uso.
 - El post se marca como contenido generado con IA (`is_aigc`), como pide TikTok.
 - Mapa: provincias de España (click_that_hood, basado en datos públicos). Tipografía Inter (licencia OFL, en `assets/fonts`).
 - Edge TTS es un servicio no oficial de Microsoft: si deja de funcionar, el sistema pasa automáticamente a Google TTS (necesita la API activada).

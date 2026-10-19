@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from . import mapa
-from .config import (ALTO, ANCHO, ATRIBUCION_AEMET, ATRIBUCION_GOOGLE, FPS, NOMBRE_CANAL, REGIONES,
+from .config import (ALTO, ANCHO, ATRIBUCION_AEMET, ATRIBUCION_GOOGLE, ATRIBUCION_OPENMETEO, FPS, NOMBRE_CANAL, REGIONES,
                      VISTA_GENERAL)
 from .mapa import fuente
 
@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 MAPA_Y0, MAPA_Y1 = 360, 1400
 MAPA_H = MAPA_Y1 - MAPA_Y0
 AREA_MARCADORES = (24, 20, 930, MAPA_H - 10)  # relativo al mapa; x<930 deja libre la columna de botones de TikTok
-SUB_Y = 1490
+SUB_Y = 1515
 TRANSICION = 0.6
 ACENTO = (255, 196, 45)
 
@@ -124,9 +124,12 @@ class Compositor:
         return im
 
     def _atribucion(self, d):
-        f = fuente("SemiBold", 24)
-        for i, txt in enumerate((ATRIBUCION_AEMET, ATRIBUCION_GOOGLE)):
-            d.text((ANCHO / 2, MAPA_Y1 + 12 + i * 32), txt, font=f, fill=(225, 232, 245), anchor="ma")
+        fnt = fuente("SemiBold", 22)
+        usadas = {x for c in self.prev for x in c.get("fuentes", [])}
+        lineas = [txt for nombre, txt in (("AEMET", ATRIBUCION_AEMET), ("Open-Meteo", ATRIBUCION_OPENMETEO),
+                                          ("Google", ATRIBUCION_GOOGLE)) if nombre in usadas or "demo" in usadas]
+        for i, txt in enumerate(lineas):
+            d.text((ANCHO / 2, MAPA_Y1 + 8 + i * 28), txt, font=fnt, fill=(225, 232, 245), anchor="ma")
 
     def mapa_estatico(self, seg):
         clave = (vista_de(seg), foco_de(seg))

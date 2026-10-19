@@ -1,4 +1,4 @@
-"""Descarga y fusión de datos: AEMET OpenData + Google Weather API."""
+"""Descarga y fusión de datos: AEMET OpenData + Open-Meteo (multimodelo) + Google Weather (opcional)."""
 from __future__ import annotations
 
 import logging
@@ -149,39 +149,125 @@ def google_ciudad(ciudad: dict, clave: str) -> dict:
     }
 
 
+# ---------------------------------------------------------------- Open-Meteo (sin clave)
+OPENMETEO_URL = "https://api.open-meteo.com/v1/forecast"
+# Varios modelos numéricos; se usa la mediana entre ellos (consenso)
+MODELOS = ["ecmwf_ifs025", "icon_seamless", "meteofrance_seamless", "gfs_seamless"]
+_WMO = {0: SOL, 1: SOL, 2: SOL_NUBES, 3: NUBES, 45: NIEBLA, 48: NIEBLA,
+        51: LLUVIA, 53: LLUVIA, 55: LLUVIA, 56: LLUVIA, 57: LLUVIA, 61: LLUVIA, 63: LLUVIA, 65: LLUVIA,
+        66: LLUVIA, 67: LLUVIA, 71: NIEVE, 73: NIEVE, 75: NIEVE, 77: NIEVE, 80: CHUBASCOS, 81: CHUBASCOS,
+        82: CHUBASCOS, 85: NIEVE, 86: NIEVE, 95: TORMENTA, 96: TORMENTA, 99: TORMENTA}
+_VARS = ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max", "precipitation_sum",
+         "weather_code", "wind_speed_10m_max", "wind_gusts_10m_max"]
+
+
+def _mediana(vals):
+    vals = sorted(v for v in vals if v is not None)
+    if not vals:
+        return None
+    n = len(vals)
+    return vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
+
+
+def openmeteo_todas(ciudades: list[dict], hoy: date) -> dict[str, dict]:
+    """Una sola petición para todas las ciudades y todos los modelos."""
+    r = requests.get(OPENMETEO_URL, params={
+        "latitude": ",".join(str(c["lat"]) for c in ciudades),
+        "longitude": ",".join(str(c["lon"]) for c in ciudades),
+        "daily": ",".join(_VARS), "models": ",".join(MODELOS),
+        "timezone": "Europe/Madrid", "start_date": hoy.isoformat(), "end_date": hoy.isoformat(),
+        "wind_speed_unit": "kmh",
+    }, timeout=60)
+    r.raise_for_status()
+    datos = r.json()
+    if isinstance(datos, dict):
+        datos = [datos]
+    out = {}
+    for c, d in zip(ciudades, datos):
+        dia = d.get("daily", {})
+
+        def serie(var):
+            vals = []
+            for m in MODELOS:
+                v = dia.get(f"{var}_{m}", dia.get(var) if len(MODELOS) == 1 else None)
+                if isinstance(v, list) and v and v[0] is not None:
+                    vals.append(v[0])
+            return vals
+
+        codigos = serie("weather_code")
+        # Icono: el código más "severo" que den al menos la mitad de los modelos
+        icono = None
+        if codigos:
+            codigos.sort(reverse=True)
+            icono = _WMO.get(int(codigos[len(codigos) // 2]))
+        lluvia_mm = _mediana(serie("precipitation_sum"))
+        prob = _mediana(serie("precipitation_probability_max"))
+        if prob is None and lluvia_mm is not None:
+            # Probabilidad aproximada: % de modelos que dan al menos 1 mm
+            mm = serie("precipitation_sum")
+            prob = round(100 * sum(1 for v in mm if v >= 1) / len(mm)) if mm else None
+        out[c["id"]] = {
+            "tmax": _mediana(serie("temperature_2m_max")),
+            "tmin": _mediana(serie("temperature_2m_min")),
+            "lluvia": prob,
+            "lluvia_mm": lluvia_mm,
+            "viento": _mediana(serie("wind_speed_10m_max")),
+            "racha": _mediana(serie("wind_gusts_10m_max")),
+            "icono": icono,
+            "modelos": len(serie("temperature_2m_max")),
+        }
+    return out
+
+
 # ---------------------------------------------------------------- Fusión
-def _media(a, b):
-    vals = [v for v in (a, b) if v is not None]
-    return round(sum(vals) / len(vals)) if vals else None
+# Peso de cada fuente: AEMET (oficial, con predictores humanos) pesa más
+PESOS = {"AEMET": 0.5, "Open-Meteo": 0.3, "Google": 0.2}
 
 
-def fusionar(ciudad: dict, ae: dict | None, go: dict | None) -> dict:
-    ae, go = ae or {}, go or {}
-    if not ae and not go:
+def _ponderada(valores: dict):
+    vals = {k: v for k, v in valores.items() if v is not None}
+    if not vals:
+        return None
+    tot = sum(PESOS[k] for k in vals)
+    return round(sum(PESOS[k] * v for k, v in vals.items()) / tot)
+
+
+def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
+    f = {k: v for k, v in fuentes_.items() if v}
+    if not f:
         raise RuntimeError(f"Sin datos para {ciudad['nombre']}")
-    icono = ae.get("icono") or go.get("icono") or SOL_NUBES
-    # Si Google ve tormenta probable y AEMET solo lluvia, se respeta la oficial (AEMET)
+
+    def campo(nombre):
+        return _ponderada({k: d.get(nombre) for k, d in f.items()})
+
+    # Icono: AEMET manda; si no hay, Open-Meteo; luego Google
+    icono = next((f[k]["icono"] for k in ("AEMET", "Open-Meteo", "Google") if k in f and f[k].get("icono")),
+                 SOL_NUBES)
+    tmaxes = [d["tmax"] for d in f.values() if d.get("tmax") is not None]
     res = {
         **{k: ciudad[k] for k in ("id", "nombre", "lat", "lon", "region")},
-        "tmax": _media(ae.get("tmax"), go.get("tmax")),
-        "tmin": _media(ae.get("tmin"), go.get("tmin")),
-        "lluvia": _media(ae.get("lluvia"), go.get("lluvia")) or 0,
-        "viento": _media(ae.get("viento"), go.get("viento")),
-        "racha": go.get("racha"),
+        "tmax": campo("tmax"), "tmin": campo("tmin"),
+        "lluvia": campo("lluvia") or 0, "viento": campo("viento"),
+        "racha": _ponderada({k: d.get("racha") for k, d in f.items() if k != "AEMET"}),
         "icono": icono,
-        "cielo": ae.get("cielo") or go.get("cielo"),
-        "fuentes": [n for n, d in (("AEMET", ae), ("Google", go)) if d],
+        "cielo": next((f[k].get("cielo") for k in ("AEMET", "Google") if k in f and f[k].get("cielo")), None),
+        "fuentes": list(f),
     }
-    if ae.get("tmax") is not None and go.get("tmax") is not None:
-        res["discrepancia_tmax"] = round(abs(ae["tmax"] - go["tmax"]))
+    if len(tmaxes) >= 2:
+        res["discrepancia_tmax"] = round(max(tmaxes) - min(tmaxes))
     return res
 
 
 def obtener_previsiones(hoy: date) -> tuple[list[dict], str]:
     clave_aemet = os.environ.get("AEMET_API_KEY", "")
     clave_google = os.environ.get("GOOGLE_WEATHER_API_KEY", "")
-    if not clave_aemet and not clave_google:
-        raise RuntimeError("Faltan AEMET_API_KEY y GOOGLE_WEATHER_API_KEY")
+    try:
+        om = openmeteo_todas(CIUDADES, hoy)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Open-Meteo falló: %s", e)
+        om = {}
+    if not clave_aemet and not om:
+        raise RuntimeError("Sin AEMET_API_KEY y Open-Meteo no responde")
     resultado, fallos = [], []
     for c in CIUDADES:
         ae = go = None
@@ -197,11 +283,13 @@ def obtener_previsiones(hoy: date) -> tuple[list[dict], str]:
             except Exception as e:  # noqa: BLE001
                 log.warning("Google %s: %s", c["nombre"], e)
         try:
-            resultado.append(fusionar(c, ae, go))
+            resultado.append(fusionar(c, {"AEMET": ae, "Open-Meteo": om.get(c["id"]), "Google": go}))
         except RuntimeError as e:
             fallos.append(str(e))
     if len(resultado) < len(CIUDADES) * 0.75:
         raise RuntimeError(f"Demasiadas ciudades sin datos: {fallos}")
+    usadas = sorted({f for r in resultado for f in r["fuentes"]})
+    log.info("Fuentes usadas: %s", ", ".join(usadas))
     texto = aemet_texto_nacional(clave_aemet) if clave_aemet else ""
     return resultado, texto
 
