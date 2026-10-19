@@ -139,6 +139,11 @@ def main():
         res = publicar(Path(meta["video"]), meta["caption"], meta["portada_ms"])
         meta["tiktok"] = res
         log.info("Publicado en TikTok: %s", res)
+    if os.environ.get("GITHUB_STEP_SUMMARY"):
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+            f.write(f"## Parte del {hoy.isoformat()} ({meta['duracion']} s)\n\n"
+                    f"**Texto para el post de TikTok** (cópialo al publicar):\n\n```\n{meta['caption']}\n```\n\n"
+                    f"Guion: {meta.get('origen_guion')}\n")
     hist = RAIZ / "historial" / f"{hoy.isoformat()}.json"
     if not a.demo:
         hist.parent.mkdir(exist_ok=True)
