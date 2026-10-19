@@ -259,12 +259,16 @@ class Compositor:
         s = _ease_back((dt - 0.4) / 0.4)
         if s <= 0.02:
             return
-        w, h = 760 * s, 230 * s
-        cx, cy = ANCHO / 2, MAPA_Y0 + MAPA_H - 190
+        w, h = 800 * s, 300 * s
+        cx, cy = ANCHO / 2, MAPA_Y0 + MAPA_H - 220
         d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=36 * s, fill=ACENTO)
         if s > 0.8:
-            d.text((cx, cy - 40), "¡SÍGUEME!", font=fuente("Black", 84), fill=(15, 25, 50), anchor="mm")
-            d.text((cx, cy + 52), "Cada mañana a las 7:30", font=fuente("ExtraBold", 40), fill=(15, 25, 50),
+            oscuro = (15, 25, 50)
+            d.text((cx, cy - 78), "¿PARAGUAS O CHANCLAS?", font=fuente("Black", 50), fill=oscuro, anchor="mm")
+            d.text((cx, cy - 18), "¡Dímelo en comentarios!", font=fuente("ExtraBold", 42),
+                   fill=oscuro, anchor="mm")
+            d.line([(cx - 300, cy + 26), (cx + 300, cy + 26)], fill=(15, 25, 50, 90), width=3)
+            d.text((cx, cy + 74), "Sígueme · cada mañana a las 7:30", font=fuente("ExtraBold", 38), fill=oscuro,
                    anchor="mm")
 
     def _subtitulo(self, img, d, t):

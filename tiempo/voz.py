@@ -28,6 +28,14 @@ def duracion(ruta: Path) -> float:
     return float(out.strip())
 
 
+_VOZ = {"edge": None, "google": "MALE"}
+
+
+def elegir_voz(datos: dict):
+    """Fija la voz para todas las síntesis de esta ejecución."""
+    _VOZ.update({"edge": datos["edge"], "google": datos["google"]})
+
+
 def velocidad_base() -> int:
     """Velocidad de la voz en % sobre la normal (p. ej. 15 = un 15 % más rápida)."""
     return int(str(os.environ.get("VELOCIDAD_EDGE", VELOCIDAD_EDGE)).replace("%", "").replace("+", ""))
@@ -37,7 +45,7 @@ def _edge(texto: str, ruta: Path, velocidad: int):
     import edge_tts  # se instala en GitHub Actions (requirements.txt)
 
     async def _run():
-        await edge_tts.Communicate(texto, os.environ.get("VOZ_EDGE", VOZ_EDGE),
+        await edge_tts.Communicate(texto, os.environ.get("VOZ_EDGE") or _VOZ["edge"] or VOZ_EDGE,
                                    rate=f"{velocidad:+d}%").save(str(ruta))
     asyncio.run(_run())
 
@@ -46,7 +54,7 @@ def _google_tts(texto: str, ruta: Path, velocidad: int):
     clave = os.environ.get("GOOGLE_TTS_API_KEY") or os.environ.get("GOOGLE_WEATHER_API_KEY")
     if not clave:
         raise RuntimeError("Sin clave para Google TTS")
-    voz = {"languageCode": "es-ES", "ssmlGender": "MALE"}
+    voz = {"languageCode": "es-ES", "ssmlGender": _VOZ["google"]}
     if os.environ.get("GOOGLE_TTS_VOICE"):
         voz["name"] = os.environ["GOOGLE_TTS_VOICE"]
     r = requests.post(f"https://texttospeech.googleapis.com/v1/text:synthesize?key={clave}", json={

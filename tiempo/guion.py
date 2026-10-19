@@ -49,6 +49,17 @@ icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuent
 Texto de AEMET para hoy (contexto, puede venir vacío):
 {texto_aemet}
 
+Hoy la locución la lee {presenta}: usa la concordancia de género correcta si hablas de ti.
+
+INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
+- Habla de tú al espectador todo el rato ("si hoy sales a correr...", "tú que estás en Málaga...").
+- En la intro, un gancho directo que obligue a quedarse o a responder (una pregunta o un reto).
+- En al menos dos bloques regionales, interpela a la gente de una ciudad concreta ("Si eres de Bilbao,
+  hoy...", "Gente de Sevilla, ...").
+- En el cierre, una pregunta concreta para que comenten (varía cada día: ¿paraguas o chanclas?, ¿desde
+  qué ciudad nos ves?, ¿qué plan tienes con este tiempo?, ¿acerté ayer?...) y pide que sigan la cuenta.
+  De vez en cuando, que etiqueten a alguien ("etiqueta a ese amigo que siempre va en manga corta").
+
 Escribe la locución en castellano de España, para leer en voz alta por una voz sintética:
 - Escribe los números en cifras seguidos de la palabra "grados" o "por ciento" (ej. "24 grados"). Nada de
   símbolos (°, %), emojis, abreviaturas ni siglas raras. "AEMET" se puede decir.
@@ -68,7 +79,8 @@ Bloques:
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
 
 Además escribe "caption": el texto del post de TikTok (máx. 150 caracteres + 5 hashtags en español,
-incluye #eltiempo y #AEMET; puedes usar 1 o 2 emojis aquí).
+incluye #eltiempo y #AEMET; puedes usar 1 o 2 emojis aquí). Que termine con una pregunta al público
+para provocar comentarios.
 
 Responde SOLO con JSON válido con esta forma:
 {{"segmentos": {{"intro": "...", "general": "...", "norte": "...", "interior": "...", "mediterraneo": "...",
@@ -94,14 +106,15 @@ def _claude(prompt: str, clave: str) -> dict:
     return data
 
 
-def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: float = 1.0) -> dict:
+def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: float = 1.0,
+                   presenta: str = "un presentador") -> dict:
     """factor < 1 pide un guion más corto; > 1 más largo (para ajustar la duración)."""
     palabras = {k: max(6, round(v * factor)) for k, v in PALABRAS.items()}
     clave = os.environ.get("ANTHROPIC_API_KEY", "")
     if clave:
         prompt = PROMPT.format(fecha=fecha_larga(hoy), datos=json.dumps(_resumen_datos(prev), ensure_ascii=False),
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
-                               palabras=json.dumps(palabras), total=sum(palabras.values()))
+                               palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta)
         for intento in range(2):
             try:
                 g = _claude(prompt, clave)
@@ -152,6 +165,22 @@ def _frase_ciudades(lista):
     return f"máximas entre los {lo['tmax']} grados de {_nombre(lo)} y los {hi['tmax']} de {_nombre(hi)}"
 
 
+def _aludir(p, rnd) -> str:
+    """Frase dirigida a la gente de una ciudad concreta, según su tiempo."""
+    n = _nombre(p)
+    if p["lluvia"] >= 50:
+        return rnd.choice([f"Si eres de {n}, ni se te ocurra salir sin paraguas.",
+                           f"Gente de {n}, hoy toca chubasquero."])
+    if p["tmax"] >= 25:
+        return rnd.choice([f"Si eres de {n}, hoy las chanclas están justificadas.",
+                           f"Gente de {n}, día de terraza, ¿o no?"])
+    if p["tmin"] <= 8:
+        return rnd.choice([f"Si eres de {n}, por la mañana abrígate bien.",
+                           f"Gente de {n}, chaqueta a primera hora."])
+    return rnd.choice([f"Si eres de {n}, día tranquilo para lo que tengas en mente.",
+                       f"Gente de {n}, hoy el tiempo no os pone excusas."])
+
+
 CIELO = {"sol": "cielo despejado", "sol_nubes": "sol con alguna nube", "nubes": "cielo nuboso",
          "lluvia": "lluvia", "chubascos": "chubascos a ratos", "tormenta": "posibles tormentas",
          "nieve": "nieve", "niebla": "nieblas por la mañana"}
@@ -166,12 +195,17 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
     lluviosas = [_nombre(p) for p in prev if p["lluvia"] >= 50]
     # Con factor 1 hay comentario en 3 regiones; si hay que alargar, en todas; si acortar, en ninguna
     con_chiste = {"norte", "mediterraneo", "islas"}
+    con_alusion = {"interior", "sur"}
     if factor > 1.1:
         con_chiste = {"norte", "interior", "mediterraneo", "sur", "islas"}
     elif factor < 0.9:
-        con_chiste = set()
+        con_chiste = {"norte"}
     seg = {
-        "intro": f"¡Buenos días! Es {fecha_larga(hoy)}. ¿Hoy toca paraguas o chanclas?",
+        "intro": rnd.choice([
+            f"¡Buenos días! Es {fecha_larga(hoy)}. Quédate hasta el final, que hoy te toca elegir: ¿paraguas o chanclas?",
+            f"¡Buenos días! Es {fecha_larga(hoy)}. Antes de salir de casa, mira esto, que te ahorro un disgusto.",
+            f"¡Buenos días! Es {fecha_larga(hoy)}. Dime desde dónde nos ves, que hoy hay de todo en España.",
+        ]),
         "general": (f"Lo más caluroso, {_nombre(caliente)} con {caliente['tmax']} grados, y lo más frío al "
                     f"amanecer, {_nombre(fria)} con {fria['tmin']}. "
                     + (f"Ojo con la lluvia en {' y '.join(lluviosas[:2])}." if lluviosas
@@ -188,11 +222,21 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
         chiste = f" {rnd.choice(FRASES[dom])}" if r in con_chiste else ""
         aviso = " Lluvia muy probable." if max(p["lluvia"] for p in lista) >= 50 and dom not in (
             "lluvia", "chubascos", "tormenta") else ""
-        seg[r] = f"{intros[r]}, {CIELO[dom]} y {_frase_ciudades(lista)}.{chiste}{aviso}"
-    seg["cierre"] = ("Y hasta aquí el parte. Sigue a Paraguas o Chanclas y mañana a las siete y media "
-                     "te cuento si toca abrigo o chanclas.")
+        alusion = ""
+        if r in con_alusion:
+            ciudad = max(lista, key=lambda p: (p["lluvia"], p["tmax"]))
+            alusion = " " + _aludir(ciudad, rnd)
+        seg[r] = f"{intros[r]}, {CIELO[dom]} y {_frase_ciudades(lista)}.{chiste}{alusion}{aviso}"
+    pregunta = rnd.choice([
+        "Y tú, ¿hoy eres de paraguas o de chanclas? Te leo en comentarios.",
+        "¿Desde qué ciudad nos ves? Dímelo en comentarios.",
+        "¿Qué plan tienes con este tiempo? Cuéntamelo abajo.",
+        "Etiqueta a ese amigo que siempre sale en manga corta.",
+    ])
+    seg["cierre"] = (f"{pregunta} Y sigue a Paraguas o Chanclas, que mañana a las siete y media "
+                     "vuelvo con el parte.")
     if factor > 1.2:
         seg["cierre"] += " ¡Pásaselo a quien siempre sale sin chaqueta!"
-    caption = (f"¿Paraguas o chanclas? El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ "
+    caption = (f"El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ ¿Tú hoy eres de paraguas o de chanclas? 👇 "
                "#eltiempo #AEMET #meteo #tiempoespaña #paraguasochanclas")
     return {"segmentos": seg, "caption": caption}

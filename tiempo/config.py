@@ -97,7 +97,17 @@ VISTA_GENERAL = (-12.8, 4.6, 34.0, 44.1)
 SEGMENTOS = ["intro", "general", "norte", "interior", "mediterraneo", "sur", "islas", "cierre"]
 
 # Voz
-VOZ_EDGE = "es-ES-AlvaroNeural"
+VOZ_EDGE = "es-ES-AlvaroNeural"  # voz por defecto (se sustituye por la del día)
+# Alternancia diaria: un día voz masculina y al siguiente femenina
+VOCES = {
+    "masculina": {"edge": "es-ES-AlvaroNeural", "google": "MALE", "presenta": "un presentador"},
+    "femenina": {"edge": "es-ES-ElviraNeural", "google": "FEMALE", "presenta": "una presentadora"},
+}
+
+
+def voz_del_dia(fecha) -> str:
+    """Días pares (contando desde el año 1) voz masculina, impares femenina."""
+    return "masculina" if fecha.toordinal() % 2 == 0 else "femenina"
 VELOCIDAD_EDGE = "+15%"  # punto de partida; se ajusta solo para cuadrar la duración
 
 MODELO_CLAUDE = "claude-sonnet-5-5"

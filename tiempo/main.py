@@ -16,7 +16,8 @@ from pathlib import Path
 
 from . import guion as g
 from . import musica, voz
-from .config import DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, FPS, RAIZ, SEGMENTOS
+from .config import (DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, FPS, RAIZ, SEGMENTOS, VOCES,
+                     voz_del_dia)
 from .fuentes import obtener_previsiones, previsiones_demo
 from .horario import ahora, esperar_hasta_publicacion
 from .video import Compositor, renderizar
@@ -33,11 +34,12 @@ def _habla_objetivo(n_bloques: int) -> float:
     return DURACION_OBJETIVO - INICIO - PAUSA * (n_bloques - 1) - COLA_MIN - 0.3
 
 
-def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool):
+def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool, tipo_voz: str = "masculina"):
     """Genera la voz y ajusta su VELOCIDAD (no las pausas) para que encaje en 65-70 s."""
     factor, mejor = 1.0, None
     for intento in range(3):
-        guion = g.guion_plantilla(prev, hoy, factor) if demo else g.escribir_guion(prev, hoy, texto_aemet, factor)
+        guion = (g.guion_plantilla(prev, hoy, factor) if demo
+                 else g.escribir_guion(prev, hoy, texto_aemet, factor, VOCES[tipo_voz]["presenta"]))
         bloques = [s for s in SEGMENTOS if guion["segmentos"].get(s, "").strip()]
         objetivo = _habla_objetivo(len(bloques))
         vel = voz.velocidad_base()
@@ -94,7 +96,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     prev, texto_aemet = previsiones_demo() if demo else obtener_previsiones(hoy)
     (salida / "datos.json").write_text(json.dumps(prev, ensure_ascii=False, indent=1), encoding="utf-8")
 
-    guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo)
+    tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
+    voz.elegir_voz(VOCES[tipo_voz])
+    log.info("Voz del día: %s (%s)", tipo_voz, VOCES[tipo_voz]["edge"])
+    guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz)
     plan, total = planificar(bloques, wavs, durs)
     for p in plan:
         p["texto"] = guion["segmentos"][p["seg"]]
@@ -117,6 +122,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         caption += " #AEMET"
     meta = {"fecha": hoy.isoformat(), "duracion": round(real, 2), "video": str(video), "caption": caption,
             "portada_ms": int((general["inicio"] + 2.5) * 1000), "origen_guion": guion.get("origen"),
+            "voz": tipo_voz,
             "guion": {p["seg"]: p["texto"] for p in plan}}
     (salida / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     log.info("Vídeo listo: %s (%.2f s)", video, real)
