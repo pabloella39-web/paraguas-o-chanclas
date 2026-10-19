@@ -1,0 +1,89 @@
+name: Parte diario del tiempo
+
+on:
+  schedule:
+    # GitHub solo usa UTC. Se programa dos veces y el paso "horario" deja pasar solo la buena:
+    - cron: "45 4 * * *"   # 06:45 en Madrid con horario de verano (CEST)
+    - cron: "45 5 * * *"   # 06:45 en Madrid con horario de invierno (CET)
+  workflow_dispatch:
+    inputs:
+      publicar:
+        description: "Publicar en TikTok"
+        type: boolean
+        default: false
+      esperar:
+        description: "Esperar a las 7:30 antes de publicar"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: parte-diario
+  cancel-in-progress: false
+
+jobs:
+  parte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar horario de Madrid
+        id: horario
+        run: python3 -m tiempo.horario "${{ github.event_name }}" "${{ github.event.schedule }}"
+
+      - uses: actions/setup-python@v5
+        if: steps.horario.outputs.ejecutar == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        if: steps.horario.outputs.ejecutar == 'true'
+        run: |
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          pip install -r requirements.txt
+
+      - name: Generar vídeo y publicar
+        if: steps.horario.outputs.ejecutar == 'true'
+        env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+          GOOGLE_WEATHER_API_KEY: ${{ secrets.GOOGLE_WEATHER_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'directo' }}
+          TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="--publicar --esperar"
+          else
+            [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
+            [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
+          fi
+          python -m tiempo.main $ARGS
+
+      - name: Guardar el vídeo como artefacto
+        if: always() && steps.horario.outputs.ejecutar == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: parte-${{ github.run_id }}
+          path: |
+            salida/*.mp4
+            salida/meta.json
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Guardar historial (mantiene vivo el cron del repositorio)
+        if: success() && steps.horario.outputs.ejecutar == 'true'
+        run: |
+          git config user.name "parte-bot"
+          git config user.email "parte-bot@users.noreply.github.com"
+          git add historial/
+          git diff --cached --quiet || git commit -m "Parte del $(date +%F)"
+          git push || true
