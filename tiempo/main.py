@@ -26,7 +26,7 @@ log = logging.getLogger("tiempo")
 INICIO = 0.45      # la voz arranca tras el golpe de título
 PAUSA = 0.35       # respiración entre bloques (fija: ya no se estira para rellenar)
 COLA_MIN = 1.2     # tras la despedida (tarjeta de "sígueme")
-VEL_MIN, VEL_MAX = 5, 35   # rango de velocidad de la voz (%) que sigue sonando natural
+VEL_MIN, VEL_MAX = 10, 35  # nunca más lenta de +10 %: si sobra tiempo, se alarga el guion
 
 
 def _habla_objetivo(n_bloques: int) -> float:
