@@ -78,9 +78,9 @@ Bloques:
 - cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para el parte de mañana a las 7 y media.
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
 
-Además escribe "caption": el texto del post de TikTok (máx. 150 caracteres + 5 hashtags en español,
-incluye #eltiempo y #AEMET; puedes usar 1 o 2 emojis aquí). Que termine con una pregunta al público
-para provocar comentarios.
+Además escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), que
+interpele al público con una pregunta o reto relacionado con el tiempo de hoy, con 1 o 2 emojis y SIN
+hashtags (los hashtags y el resumen se añaden automáticamente).
 
 Responde SOLO con JSON válido con esta forma:
 {{"segmentos": {{"intro": "...", "general": "...", "norte": "...", "interior": "...", "mediterraneo": "...",

@@ -14,6 +14,7 @@ import os
 from datetime import date
 from pathlib import Path
 
+from . import descripcion
 from . import guion as g
 from . import musica, voz
 from .config import (DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, FPS, RAIZ, SEGMENTOS, VOCES,
@@ -117,9 +118,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     if not DURACION_MIN <= real <= DURACION_MAX:
         raise RuntimeError(f"El vídeo final dura {real:.2f} s (debe estar entre 65 y 70)")
     general = next((p for p in plan if p["seg"] == "general"), plan[0])
-    caption = guion["caption"].strip()
-    if "AEMET" not in caption:
-        caption += " #AEMET"
+    caption = descripcion.construir(prev, hoy, guion["caption"] if guion.get("origen") == "claude" else None)
     meta = {"fecha": hoy.isoformat(), "duracion": round(real, 2), "video": str(video), "caption": caption,
             "portada_ms": int((general["inicio"] + 2.5) * 1000), "origen_guion": guion.get("origen"),
             "voz": tipo_voz,
@@ -159,6 +158,11 @@ def main():
             f.write(f"## Parte del {hoy.isoformat()} ({meta['duracion']} s)\n\n"
                     f"**Texto para el post de TikTok** (cópialo al publicar):\n\n```\n{meta['caption']}\n```\n\n"
                     f"Guion: {meta.get('origen_guion')}\n")
+    if not a.demo:
+        # Página del móvil con la descripción lista para copiar (docs/hoy.html la lee)
+        (RAIZ / "docs" / "hoy.json").write_text(json.dumps(
+            {"fecha": hoy.isoformat(), "caption": meta["caption"], "voz": meta.get("voz"),
+             "duracion": meta["duracion"]}, ensure_ascii=False, indent=1), encoding="utf-8")
     hist = RAIZ / "historial" / f"{hoy.isoformat()}.json"
     if not a.demo:
         hist.parent.mkdir(exist_ok=True)
