@@ -29,33 +29,70 @@ def _comprobar(r: requests.Response) -> dict:
     return j.get("data", j)
 
 
-def refrescar_token() -> str:
-    """Obtiene un access_token nuevo (dura 24 h) a partir del refresh_token (dura 365 días)."""
+# El refresh_token se guarda CIFRADO en el repositorio (estado/tiktok_token.enc) con la clave del
+# secreto TIKTOK_CIFRADO. Así se puede renovar cada día sin tocar los secretos de GitHub.
+ESTADO = Path(__file__).resolve().parent.parent / "estado" / "tiktok_token.enc"
+
+
+def _openssl(args: list[str], datos: bytes) -> bytes:
+    clave = os.environ.get("TIKTOK_CIFRADO")
+    if not clave:
+        raise ErrorTikTok("Falta el secreto TIKTOK_CIFRADO")
+    r = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-pbkdf2", "-iter", "200000", "-a", "-A",
+                        *args, "-pass", "env:TIKTOK_CIFRADO"], input=datos, capture_output=True)
+    if r.returncode != 0:
+        raise ErrorTikTok(f"openssl: {r.stderr.decode()[:200]}")
+    return r.stdout
+
+
+def guardar_refresh_token(token: str):
+    ESTADO.parent.mkdir(exist_ok=True)
+    ESTADO.write_bytes(_openssl(["-salt"], token.encode()) + b"\n")
+    log.info("refresh_token de TikTok guardado cifrado en %s", ESTADO.name)
+
+
+def leer_refresh_token() -> str:
+    if ESTADO.exists() and os.environ.get("TIKTOK_CIFRADO"):
+        return _openssl(["-d"], ESTADO.read_bytes().strip()).decode().strip()
+    if os.environ.get("TIKTOK_REFRESH_TOKEN"):
+        return os.environ["TIKTOK_REFRESH_TOKEN"]
+    raise ErrorTikTok("No hay refresh_token: ejecuta el workflow 'Autorizar TikTok'")
+
+
+def hay_credenciales() -> list[str]:
+    """Devuelve lo que falta para poder publicar (lista vacía = todo listo)."""
+    faltan = [v for v in ("TIKTOK_CLIENT_KEY", "TIKTOK_CLIENT_SECRET") if not os.environ.get(v)]
+    if not os.environ.get("TIKTOK_REFRESH_TOKEN") and not (ESTADO.exists() and os.environ.get("TIKTOK_CIFRADO")):
+        faltan.append("autorización de TikTok (workflow 'Autorizar TikTok')")
+    return faltan
+
+
+def _pedir_token(datos: dict) -> dict:
     r = requests.post(f"{API}/oauth/token/", data={
         "client_key": os.environ["TIKTOK_CLIENT_KEY"],
-        "client_secret": os.environ["TIKTOK_CLIENT_SECRET"],
-        "grant_type": "refresh_token",
-        "refresh_token": os.environ["TIKTOK_REFRESH_TOKEN"],
+        "client_secret": os.environ["TIKTOK_CLIENT_SECRET"], **datos,
     }, headers={"Content-Type": "application/x-www-form-urlencoded"}, timeout=30)
     j = r.json()
     if "access_token" not in j:
-        raise ErrorTikTok(f"No se pudo refrescar el token: {j}")
+        raise ErrorTikTok(f"TikTok no devolvió token: {j.get('error')} {j.get('error_description')}")
+    return j
+
+
+def canjear_codigo(codigo: str, redirect_uri: str) -> dict:
+    """Primer paso tras autorizar: código -> tokens. Guarda el refresh_token cifrado."""
+    j = _pedir_token({"code": codigo, "grant_type": "authorization_code", "redirect_uri": redirect_uri})
+    guardar_refresh_token(j["refresh_token"])
+    return {"scope": j.get("scope"), "dias_validez": int(j.get("refresh_expires_in", 0)) // 86400}
+
+
+def refrescar_token() -> str:
+    """Obtiene un access_token nuevo (dura 24 h). Si TikTok rota el refresh_token, se guarda el nuevo."""
+    actual = leer_refresh_token()
+    j = _pedir_token({"grant_type": "refresh_token", "refresh_token": actual})
     nuevo = j.get("refresh_token")
-    if nuevo and nuevo != os.environ["TIKTOK_REFRESH_TOKEN"]:
-        _guardar_refresh_token(nuevo)
+    if nuevo and (nuevo != actual or not ESTADO.exists()) and os.environ.get("TIKTOK_CIFRADO"):
+        guardar_refresh_token(nuevo)
     return j["access_token"]
-
-
-def _guardar_refresh_token(token: str):
-    """TikTok puede rotar el refresh_token: se guarda en el secreto del repo si hay GH_PAT."""
-    if not os.environ.get("GH_PAT") or not os.environ.get("GITHUB_REPOSITORY"):
-        log.warning("TikTok ha devuelto un refresh_token nuevo pero no hay GH_PAT para guardarlo. "
-                     "Actualiza el secreto TIKTOK_REFRESH_TOKEN a mano si la próxima ejecución falla.")
-        return
-    subprocess.run(["gh", "secret", "set", "TIKTOK_REFRESH_TOKEN", "--repo", os.environ["GITHUB_REPOSITORY"],
-                    "--body", token], env={**os.environ, "GH_TOKEN": os.environ["GH_PAT"]}, check=True,
-                   capture_output=True)
-    log.info("refresh_token de TikTok actualizado en los secretos del repositorio")
 
 
 def _info_creador(token: str) -> dict:

@@ -127,7 +127,8 @@ def main():
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
     meta = construir(hoy, Path(a.salida), demo=a.demo)
 
-    faltan = [v for v in ("TIKTOK_CLIENT_KEY", "TIKTOK_CLIENT_SECRET", "TIKTOK_REFRESH_TOKEN") if not os.environ.get(v)]
+    from .tiktok import hay_credenciales
+    faltan = hay_credenciales() if a.publicar else []
     if a.publicar and faltan:
         log.warning("No se publica: faltan los secretos %s. El vídeo queda como artefacto de la ejecución.",
                     ", ".join(faltan))

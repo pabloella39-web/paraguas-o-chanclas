@@ -55,8 +55,8 @@ jobs:
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
-          GH_PAT: ${{ secrets.GH_PAT }}
-          TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'directo' }}
+          TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}
           TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
         run: |
           ARGS=""
@@ -79,11 +79,11 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      - name: Guardar historial (mantiene vivo el cron del repositorio)
-        if: success() && steps.horario.outputs.ejecutar == 'true'
+      - name: Guardar historial y token (mantiene vivo el cron del repositorio)
+        if: always() && steps.horario.outputs.ejecutar == 'true'
         run: |
           git config user.name "parte-bot"
           git config user.email "parte-bot@users.noreply.github.com"
-          git add historial/
+          git add historial/ estado/ 2>/dev/null || git add historial/
           git diff --cached --quiet || git commit -m "Parte del $(date +%F)"
           git push || true
