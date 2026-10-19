@@ -69,8 +69,8 @@ def hay_credenciales() -> list[str]:
 
 def _pedir_token(datos: dict) -> dict:
     r = requests.post(f"{API}/oauth/token/", data={
-        "client_key": os.environ["TIKTOK_CLIENT_KEY"],
-        "client_secret": os.environ["TIKTOK_CLIENT_SECRET"], **datos,
+        "client_key": os.environ["TIKTOK_CLIENT_KEY"].strip(),
+        "client_secret": os.environ["TIKTOK_CLIENT_SECRET"].strip(), **datos,
     }, headers={"Content-Type": "application/x-www-form-urlencoded"}, timeout=30)
     j = r.json()
     if "access_token" not in j:

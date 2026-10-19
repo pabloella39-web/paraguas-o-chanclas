@@ -34,5 +34,8 @@ if __name__ == "__main__":
     entrada = os.environ.get("CODIGO_TIKTOK") or (sys.argv[1] if len(sys.argv) > 1 else "")
     if not entrada:
         sys.exit("Pasa la URL de callback.html o el código")
+    ck = os.environ.get("TIKTOK_CLIENT_KEY", "")
+    print(f"Client key en GitHub: {ck.strip()!r} (longitud {len(ck)}; con espacios extra: {ck != ck.strip()})")
+    print(f"Client secret: longitud {len(os.environ.get('TIKTOK_CLIENT_SECRET', '').strip())}")
     res = canjear_codigo(extraer_codigo(entrada), REDIRECT_URI)
     print(f"✅ TikTok autorizado. Permisos: {res['scope']}. Validez: {res['dias_validez']} días.")
