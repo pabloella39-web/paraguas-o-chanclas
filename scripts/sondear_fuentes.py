@@ -33,4 +33,5 @@ for k, u in P.items():
     except Exception as e:
         res[k] = {"error": str(e)[:200]}
     print(k, res[k].get("status"), res[k].get("len"), res[k].get("error", ""))
+import os; os.makedirs("diagnostico", exist_ok=True)
 json.dump(res, open("diagnostico/fuentes.json", "w"), ensure_ascii=False, indent=1)
