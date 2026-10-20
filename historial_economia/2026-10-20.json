@@ -1,28 +1,32 @@
 {
  "fecha": "2026-10-20",
  "modo": "diario",
- "duracion": 67.4,
- "caption": "Petróleo a 108,5 dólares y un IBEX que esquiva a Europa 🐂\n\nResumen económico de hoy, martes 20 de octubre 📊\n🟢 IBEX 35: 19.092 (+0,3 %)\n🟢 S&P 500: 7.713 (+0,3 %)\n🟢 Bitcoin: 82.306 (+0,5 %)\n🔴 Oro: 4.146 (−0,3 %)\n🔴 Brent: 108,51 (−0,9 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
+ "duracion": 67.37,
+ "caption": "El petróleo americano se hunde un 5,6 % y el IBEX aguanta 📉\n\nResumen económico de hoy, martes 20 de octubre 📊\n🟢 IBEX 35: 19.092 (+0,3 %)\n🟢 S&P 500: 7.708 (+0,2 %)\n🟢 Bitcoin: 82.472 (+0,8 %)\n🔴 Oro: 4.142 (−0,4 %)\n🔴 Brent: 108,81 (−0,7 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
  "portada_ms": 0,
  "origen_guion": "claude",
  "voz": "masculina",
  "titulares": [
   {
-   "titulo": "El petróleo se calma y las bolsas respiran",
-   "fuente": "Cinco Días"
+   "titulo": "El IBEX aguanta por un posible diálogo EE. UU.-Irán",
+   "fuente": "Expansión"
   },
   {
-   "titulo": "La prima de riesgo francesa se dispara tras protestas",
+   "titulo": "La prima de riesgo francesa supera los 150 puntos",
    "fuente": "Cinco Días"
   }
  ],
  "guion": {
-  "intro": "¿Un barril a 108,5 dólares? Así arranca este martes 20 de octubre.",
-  "bolsas": "El IBEX 35 cerró ayer en 19.092 puntos, un 0,3 % más, mientras el Euro Stoxx 50 cedía un 0,4 %. En Wall Street, el S&P 500 sumó un 0,3 % y el Nasdaq, un 0,1 %. El Nikkei cayó un 1,3 % esta madrugada.",
-  "cripto": "El bitcoin anda en unos 82.300 dólares y el ethereum, en unos 2.430.",
-  "materias": "El oro cotiza a 4.146 dólares la onza. El Brent, a 108,5 dólares el barril. Y el euro, a 1,12 dólares.",
-  "agenda": "Hoy, a las once de la mañana, llega el índice ZEW alemán, que mide el ánimo de los analistas. Ojo, que la FED, el banco central de EE. UU., se reúne el miércoles 28, y el BCE, el jueves 29.",
-  "noticias": "El petróleo se calmó ante un posible diálogo entre EE. UU. e Irán, y las bolsas respiraron. Francia, en cambio, preocupa. Su prima de riesgo, lo que paga de más por endeudarse, se disparó tras las protestas.",
-  "cierre": "¿Toro u oso con el IBEX hoy? Cuéntamelo en los comentarios. Esto es información, no un consejo de inversión. Sígueme, publico cada mañana a las ocho y media."
+  "intro": "Martes 20 de octubre, y el petróleo americano se hunde un 5,6 %.",
+  "bolsas": "Ayer el IBEX 35 subió un 0,3 %, hasta 19.092 puntos. El Euro Stoxx 50 bajó un 0,4 % y el S&P 500 subió un 0,2 %. El Nikkei cayó un 1,3 % esta madrugada.",
+  "cripto": "El bitcoin anda por unos 82.500 dólares, un 0,8 % más. Ethereum sube un 1,6 %.",
+  "materias": "El WTI, el crudo de EE. UU., baja a 97,8 dólares el barril. El Brent, el europeo, está en 108,8 dólares el barril. El oro, a 4.142 dólares la onza, y el euro, a 1,12 dólares.",
+  "agenda": "Agenda tranquilita. A las ocho de la mañana, precios industriales de Alemania, y a las once, el índice ZEW. La FED, el banco central de EE. UU., se reúne el miércoles 28 y el BCE, el jueves 29.",
+  "noticias": "El IBEX aguantó porque EE. UU. e Irán podrían retomar las negociaciones. Y la prima de riesgo de Francia, el extra que paga por endeudarse, supera los 150 puntos por las protestas.",
+  "cierre": "¿Toro u oso con el IBEX hoy? Cuéntamelo abajo. Esto es información, no un consejo de inversión. Sígueme, publico cada día a las ocho y media."
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7698823086439188502",
+  "status": "SEND_TO_USER_INBOX"
  }
 }
