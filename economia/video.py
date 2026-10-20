@@ -487,10 +487,10 @@ class Compositor:
             im.alpha_composite(b, (214, int(h / 2 - 22)))
             titulo = trad.get(e.get("original", ""), e["titulo"]) if not e.get("traducido", True) else e["titulo"]
             f = fuente("ExtraBold", 38)
-            lineas = envolver(titulo, f, 560)
+            lineas = envolver(titulo, f, 535)
             if len(lineas) > 2:
                 f = fuente("ExtraBold", 32)
-                lineas = envolver(titulo, f, 560)[:2]
+                lineas = envolver(titulo, f, 535)[:2]
             y = h / 2 - (len(lineas) * (f.size + 6)) / 2
             for l in lineas:
                 d.text((304, y), l, font=f, fill=BLANCO)

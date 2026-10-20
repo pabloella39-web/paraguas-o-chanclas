@@ -49,6 +49,12 @@ def precio_pantalla(a: dict) -> str:
     return fnum(a["precio"], dec)
 
 
+def _d1(x: float) -> str:
+    """Un decimal, sin ',0' (107,0 -> '107')."""
+    t = fnum(x, 1)
+    return t[:-2] if t.endswith(",0") else t
+
+
 def precio_hablado(a: dict) -> str:
     """Redondeo pensado para el oído: 83.146 $ -> 'unos 83.100 dólares'."""
     p, c = a["precio"], a["clave"]
@@ -61,11 +67,11 @@ def precio_hablado(a: dict) -> str:
     if c in ("oro",):
         return f"{fnum(p)} dólares la onza"
     if c == "plata":
-        return f"{fnum(p, 1)} dólares la onza"
+        return f"{_d1(p)} dólares la onza"
     if c in ("brent", "wti"):
-        return f"{fnum(p, 1)} dólares el barril"
+        return f"{_d1(p)} dólares el barril"
     if c == "gas":
-        return f"{fnum(p, 1)} euros el megavatio hora"
+        return f"{_d1(p)} euros el megavatio hora"
     return f"{fnum(p)} puntos"
 
 
@@ -302,21 +308,33 @@ def guion_plantilla(merc: dict, agenda: dict, hoy: date, modo: str = "diario", f
         m.append(f"Y el euro se cambia a {precio_hablado(merc['eurusd'])}.")
     materias = " ".join(m)
 
-    evs = [e for e in agenda["eventos"] if e.get("traducido", True) and e.get("impacto") in ("High", "Medium")]
-    evs = sorted(evs, key=lambda e: 0 if e.get("impacto") == "High" else 1)[:3]
+    orden = {"High": 0, "Medium": 1}
+    evs = [e for e in agenda["eventos"] if e.get("traducido", True)]
+    evs = sorted(evs, key=lambda e: orden.get(e.get("impacto"), 2))[:3]
     evs.sort(key=lambda e: (e["fecha"], e.get("hora") or ""))
+
+    def limpio(t):
+        if len(t) > 1 and t[1].islower():
+            t = t[0].lower() + t[1:]
+        return t.replace("(EIA)", "en Estados Unidos").replace("(API)", "en Estados Unidos").replace(
+            "EE. UU.", "Estados Unidos")
+
+    grupos = []  # mismo momento -> una sola frase
+    for e in evs:
+        momento = dia_hablado(e["fecha"]) if sem else hora_hablada(e.get("hora"))
+        if grupos and grupos[-1][0] == momento:
+            grupos[-1][1].append(limpio(e["titulo"]))
+        else:
+            grupos.append((momento, [limpio(e["titulo"])]))
+    frases = " ".join(f"{m[0].upper() + m[1:]}, {' y '.join(t)}." for m, t in grupos)
     if evs and not sem:
-        ag = "¿Qué hay hoy en la agenda? " + " ".join(
-            f"{hora_hablada(e.get('hora')).capitalize()}, {e['titulo'].replace('(EIA)', 'de Estados Unidos')}."
-            for e in evs)
+        ag = "¿Qué hay hoy en la agenda? " + frases
     elif evs:
-        ag = "La semana que viene, ojo a esto. " + " ".join(
-            f"{dia_hablado(e['fecha']).capitalize()}, {e['titulo'].replace('(EIA)', 'de Estados Unidos')}."
-            for e in evs)
+        ag = "La semana que viene, ojo a esto. " + frases
     else:
         ag = "La agenda de hoy viene tranquila, sin datos de los gordos. Ideal para respirar."
     for p in agenda.get("proximas", []):
-        if p["dias"] == 0:
+        if p["dias"] == 0 or any(p["banco"] in e["titulo"] for e in evs):
             continue
         que = "la Reserva Federal decide los tipos de interés" if p["banco"] == "FED" else \
             "el BCE, el banco que fija los tipos en Europa, se reúne"

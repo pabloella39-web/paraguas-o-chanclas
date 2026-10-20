@@ -56,7 +56,17 @@ TRADUCCION = {
     "OPEC-JMMC Meetings": "Reunión de la OPEP+", "OPEC Meetings": "Reunión de la OPEP",
     "Bank Holiday": "Festivo", "IMF Meetings": "Reuniones del FMI", "G20 Meetings": "Reunión del G20",
     "Chinese GDP q/q": "PIB de China", "GDP q/y": "PIB de China",
+    "Housing Starts": "Viviendas iniciadas", "Building Permits": "Permisos de construcción",
+    "Pending Home Sales m/m": "Ventas pendientes de viviendas", "German PPI m/m": "Precios industriales de Alemania",
+    "Consumer Confidence": "Confianza del consumidor", "API Weekly Statistical Bulletin": "Inventarios de petróleo (API)",
+    "Industrial Production m/m": "Producción industrial", "Trade Balance": "Balanza comercial",
+    "German Unemployment Change": "Paro en Alemania", "Final Manufacturing PMI": "PMI manufacturero",
+    "Final Services PMI": "PMI de servicios", "Manufacturing PMI": "PMI manufacturero", "Services PMI": "PMI de servicios",
 }
+SUFIJO_PAIS = {"USD": "en EE. UU.", "EUR": "en la eurozona", "GBP": "en Reino Unido", "JPY": "en Japón",
+               "CNY": "en China"}
+YA_LOCALIZADO = re.compile(r"FED|BCE|EIA|API|Michigan|Nueva York|Filadelfia|España|Alemania|Francia|Italia|"
+                           r"Eurogrupo|ECOFIN|UE|OPEP|FMI|G20|China|Japón|Inglaterra|Festivo|Habla", re.I)
 CLAVES_SIEMPRE = re.compile(r"Crude Oil|Spanish|ECOFIN|Eurogroup|EU Economic|FOMC|ECB|Federal Funds|OPEC|"
                             r"Main Refinancing|Lagarde|Fed Chair", re.I)
 PAIS_BANDERA = {"USD": "us", "EUR": "eu", "GBP": "gb", "JPY": "jp", "CNY": "cn", "All": "mundo"}
@@ -100,7 +110,10 @@ def _normalizar(ev: dict) -> dict:
     dt_ny = datetime.fromisoformat(ev["date"])
     todo_dia = dt_ny.astimezone(NY).time() == time(0, 0)
     dt = dt_ny.astimezone(MAD)
-    return {"titulo": _traducir(ev["title"]) or ev["title"], "original": ev["title"], "traducido": bool(_traducir(ev["title"])),
+    titulo = _traducir(ev["title"])
+    if titulo and not YA_LOCALIZADO.search(titulo) and ev["country"] in SUFIJO_PAIS:
+        titulo = f"{titulo} {SUFIJO_PAIS[ev['country']]}"
+    return {"titulo": titulo or ev["title"], "original": ev["title"], "traducido": bool(_traducir(ev["title"])),
             "pais": ev["country"], "bandera": _bandera(ev), "impacto": ev["impact"],
             "fecha": (dt_ny.date() if todo_dia else dt.date()).isoformat(),
             "hora": None if todo_dia else dt.strftime("%H:%M"),
@@ -149,22 +162,29 @@ def obtener_agenda(hoy: date, modo: str = "diario") -> dict:
         hasta = desde + timedelta(days=4)
         semanas = ["thisweek", "nextweek"]  # Forex Factory cuenta las semanas de domingo a sábado
     eventos, fuente, fallos = [], "Forex Factory", 0
+    menores = []
     for cual in semanas:
         try:
             for ev in _semana(cual):
-                if not _relevante(ev):
+                relevante = _relevante(ev)
+                menor = (not relevante and ev["impact"] == "Low" and ev["country"] in ("USD", "EUR")
+                         and ev["title"] in TRADUCCION)
+                if not (relevante or menor):
                     continue
                 n = _normalizar(ev)
                 if desde.isoformat() <= n["fecha"] <= hasta.isoformat():
-                    eventos.append(n)
+                    (eventos if relevante else menores).append(n)
         except Exception as e:  # noqa: BLE001
             fallos += 1
             log.warning("Calendario %s no disponible: %s", cual, e)
-    if not eventos:
+    hubo_calendario = bool(eventos or menores)
+    if modo == "diario" and len(eventos) < 3:
+        eventos += menores[:3 - len(eventos)]  # día tranquilo: se rellena con datos menores
+    if not hubo_calendario:
         fuente = "calendarios oficiales"
     # Añade las citas fijas que falten (p. ej. si el calendario aún no ha publicado la semana)
     titulos = {(e["fecha"], e["titulo"]) for e in eventos}
-    for r in _respaldo(desde, hasta, eia=fallos == len(semanas)):
+    for r in _respaldo(desde, hasta, eia=not hubo_calendario):
         if not any(r["fecha"] == f and (r["titulo"] == t or r["titulo"].split()[-1] in t) for f, t in titulos):
             eventos.append(r)
     orden = {"High": 0, "Medium": 1, "Low": 2, "Holiday": 3}
