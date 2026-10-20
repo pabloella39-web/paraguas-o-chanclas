@@ -1,7 +1,7 @@
 """Horario de Madrid: decide qué ejecución programada vale (verano/invierno) y espera hasta las 7:30.
 
-GitHub Actions solo entiende UTC, así que el workflow se programa dos veces (04:45 y 05:45 UTC) y aquí
-se descarta la que no corresponde según el horario de verano (CEST, UTC+2) o invierno (CET, UTC+1).
+GitHub Actions solo entiende UTC y puede retrasar o saltarse ejecuciones, así que hay varios intentos
+programados; aquí se deja pasar el primero que cae en la ventana de la mañana si el parte de hoy no existe.
 Uso:  python -m tiempo.horario "<github.event_name>" "<github.event.schedule>"
 """
 from __future__ import annotations
@@ -13,25 +13,30 @@ import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from .config import HORA_PUBLICACION, ZONA_HORARIA
+from .config import HORA_PUBLICACION, RAIZ, ZONA_HORARIA
 
 log = logging.getLogger(__name__)
 TZ = ZoneInfo(ZONA_HORARIA)
 
-CRON_VERANO = "45 4 * * *"
-CRON_INVIERNO = "45 5 * * *"
 
 
 def ahora():
     return datetime.now(TZ)
 
 
-def debe_ejecutarse(evento: str, cron: str) -> bool:
+def debe_ejecutarse(evento: str, cron: str = "") -> bool:
+    """Las ejecuciones programadas solo trabajan entre las 6:00 y las 8:45 de Madrid y si hoy aún no hay parte."""
     if evento != "schedule":
         return True
-    desfase = ahora().utcoffset() or timedelta(0)
-    verano = desfase == timedelta(hours=2)
-    return (cron == CRON_VERANO and verano) or (cron == CRON_INVIERNO and not verano)
+    t = ahora()
+    if not ((6, 0) <= (t.hour, t.minute) <= (8, 45)):
+        print(f"Fuera de la ventana de publicación ({t:%H:%M} en Madrid)")
+        return False
+    hecho = RAIZ / "historial" / f"{t.date().isoformat()}.json"
+    if hecho.exists():
+        print(f"El parte de hoy ya está hecho ({hecho.name})")
+        return False
+    return True
 
 
 def esperar_hasta_publicacion():

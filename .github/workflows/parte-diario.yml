@@ -2,9 +2,19 @@ name: Parte diario del tiempo
 
 on:
   schedule:
-    # GitHub solo usa UTC. Se programa dos veces y el paso "horario" deja pasar solo la buena:
-    - cron: "45 4 * * *"   # 06:45 en Madrid con horario de verano (CEST)
-    - cron: "45 5 * * *"   # 06:45 en Madrid con horario de invierno (CET)
+    # GitHub solo usa UTC y a veces retrasa o se salta ejecuciones programadas. Por eso hay varios
+    # intentos cada 30 min: el primero que arranca entre las 6:00 y las 8:45 (hora de Madrid) hace el
+    # parte y los demás, al ver que ya está hecho (historial/AAAA-MM-DD.json), no hacen nada.
+    - cron: "17 4 * * *"
+    - cron: "47 4 * * *"
+    - cron: "17 5 * * *"
+    - cron: "47 5 * * *"
+    - cron: "17 6 * * *"
+    - cron: "47 6 * * *"
+  push:
+    # Lanzar un parte a mano desde git: cambiar el archivo lanzar.txt
+    branches: [main]
+    paths: ["lanzar.txt"]
   workflow_dispatch:
     inputs:
       publicar:
@@ -62,6 +72,8 @@ jobs:
           ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             ARGS="--publicar --esperar"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            ARGS="--publicar"
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
