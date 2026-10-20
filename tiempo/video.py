@@ -22,6 +22,7 @@ MAPA_H = MAPA_Y1 - MAPA_Y0
 AREA_MARCADORES = (24, 20, 930, MAPA_H - 10)  # relativo al mapa; x<930 deja libre la columna de botones de TikTok
 SUB_Y = 1515
 TRANSICION = 0.6
+PORTADA_FIJA, PORTADA_FIN = 0.5, 0.9   # la portada se ve entera 0,5 s y se desvanece hasta 0,9 s
 ACENTO = (255, 196, 45)
 
 PILLS = {"intro": None, "general": "HOY EN ESPAÑA", "cierre": "¡HASTA MAÑANA!"}
@@ -204,7 +205,58 @@ class Compositor:
             self._cierre(img, d, dt)
         self._atribucion(d)
         self._subtitulo(img, d, t)
+        if t < PORTADA_FIN:
+            # Portada (primer fotograma = miniatura en TikTok) que se desvanece al empezar
+            alfa = 1.0 if t < PORTADA_FIJA else 1 - (t - PORTADA_FIJA) / (PORTADA_FIN - PORTADA_FIJA)
+            portada = self.portada()
+            if alfa < 1:
+                portada = portada.copy()
+                portada.putalpha(portada.getchannel("A").point(lambda a: int(a * alfa)))
+            img.alpha_composite(portada)
         return img.convert("RGB")
+
+    # ------------------------------------------------ portada / miniatura
+    def portada(self) -> Image.Image:
+        """Miniatura legible en la cuadrícula del perfil (que recorta a 3:4: todo va en la franja central)."""
+        if getattr(self, "_portada", None) is not None:
+            return self._portada
+        im = Image.new("RGBA", (ANCHO, ALTO), (6, 16, 38, 238))
+        d = ImageDraw.Draw(im)
+        partes = self.fecha_txt.split(" ", 1)  # "MARTES", "20 DE OCTUBRE"
+        dia_sem, resto = partes[0], (partes[1] if len(partes) > 1 else "")
+        cy = ALTO / 2
+        # Marca
+        d.text((ANCHO / 2, cy - 520), "EL TIEMPO EN ESPAÑA", font=fuente("ExtraBold", 50), fill=ACENTO, anchor="mm")
+        # Fecha enorme
+        f1 = _ajustar(dia_sem, "Black", 190, 980)
+        d.text((ANCHO / 2 + 5, cy - 340 + 8), dia_sem, font=f1, fill=(0, 0, 0, 150), anchor="mm")
+        d.text((ANCHO / 2, cy - 340), dia_sem, font=f1, fill=(255, 255, 255), anchor="mm")
+        f2 = _ajustar(resto, "Black", 104, 980)
+        d.text((ANCHO / 2, cy - 180), resto, font=f2, fill=(255, 255, 255), anchor="mm")
+        # Tiempo dominante del día + extremos
+        cuenta = {}
+        for c in self.prev:
+            cuenta[c["icono"]] = cuenta.get(c["icono"], 0) + 1
+        orden = sorted(cuenta, key=lambda k: -cuenta[k])[:2]
+        tam = 300
+        xs = [ANCHO / 2 - tam / 2] if len(orden) == 1 else [ANCHO / 2 - tam - 20, ANCHO / 2 + 20]
+        for x, ic in zip(xs, orden):
+            im.alpha_composite(mapa.icono(ic, tam), (int(x), int(cy - 70)))
+        calor, frio = self.extremos["calor"], self.extremos["frio"]
+        fx = fuente("Black", 64)
+        lin1 = f"MÁX {calor['tmax']}° {calor['nombre'].upper()}"
+        lin2 = f"MÍN {frio['tmin']}° {frio['nombre'].upper()}"
+        for k, (txt, col) in enumerate(((lin1, (255, 160, 60)), (lin2, (140, 205, 255)))):
+            f = _ajustar(txt, "Black", 64, 960)
+            d.text((ANCHO / 2, cy + 300 + k * 86), txt, font=f, fill=col, anchor="mm")
+        # Pastilla con la pregunta del canal
+        txt = "¿PARAGUAS O CHANCLAS?"
+        f3 = fuente("Black", 54)
+        w = f3.getlength(txt) + 70
+        d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 470, ANCHO / 2 + w / 2, cy + 560], radius=45, fill=ACENTO)
+        d.text((ANCHO / 2, cy + 515), txt, font=f3, fill=(15, 25, 50), anchor="mm")
+        self._portada = im
+        return im
 
     def _pill(self, img, d, seg, dt):
         txt = PILLS.get(seg, REGIONES.get(seg, {}).get("titulo"))
