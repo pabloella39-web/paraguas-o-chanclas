@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre",
          "noviembre", "diciembre"]
-PALABRAS = {"intro": 14, "bolsas": 34, "cripto": 18, "materias": 24, "agenda": 24, "noticias": 26, "cierre": 20}
+PALABRAS = {"intro": 16, "bolsas": 36, "cripto": 20, "materias": 24, "agenda": 26, "noticias": 30, "cierre": 18}
 
 
 # ---------------------------------------------------------------- formato de cifras
@@ -130,32 +130,49 @@ def resumen_datos(merc: dict, agenda: dict, hoy: date) -> dict:
                 "importancia": e.get("impacto"), "prevision": e.get("prevision"), "anterior": e.get("anterior")}
                for e in agenda["eventos"][:14]]
     prox = [f"{p['banco']}: {dia_hablado(p['fecha'])} (dentro de {p['dias']} días)" for p in agenda["proximas"]]
-    return {"activos": activos, "agenda": eventos, "proximas_reuniones_bancos_centrales": prox}
+    out = {"activos": activos, "agenda": eventos, "proximas_reuniones_bancos_centrales": prox}
+    if agenda.get("hoy") is not None:  # edición de la noche: lo que estaba previsto hoy
+        out["agenda_de_hoy"] = [{"hora": e.get("hora"), "evento": e["titulo"], "importancia": e.get("impacto"),
+                                 "prevision": e.get("prevision"), "anterior": e.get("anterior")}
+                                for e in agenda["hoy"][:10]]
+    return out
 
 
 MODOS = {
-    "diario": "Resumen de un día laborable, publicado a las 8:30, antes de que abra la bolsa española. Las bolsas "
+    "diario": "Edición de la MAÑANA de un día laborable, publicada a las 8:00, antes de que abra la bolsa española: qué esperar del día. Las bolsas "
               "europeas y de EE. UU. muestran el cierre de su última sesión; el Nikkei, el cierre de esta madrugada; "
               "oro, petróleo, euro y cripto, el precio de ahora mismo. La agenda es la de HOY.",
     "noche": "Resumen de la JORNADA DE HOY, publicado por la noche. Las bolsas europeas (IBEX, Euro Stoxx, DAX) "
              "ya cerraron HOY; Wall Street puede seguir abierta (di 'a esta hora' si su último dato es de hoy); el "
-             "Nikkei cerró esta madrugada. Oro, petróleo, euro y cripto: precio de ahora mismo. La agenda es la de "
-             "MAÑANA (di 'mañana'). En el cierre, invita a seguir la cuenta porque cada mañana a las ocho y media "
-             "hay resumen nuevo. Nunca digas 'ayer' para referirte a hoy.",
+             "Nikkei cerró esta madrugada. Oro, petróleo, euro y cripto: precio de ahora mismo. Cuenta qué ha pasado HOY "
+             "con los eventos de 'agenda_de_hoy' (decisiones de la FED o del BCE, datos de inflación o empleo, "
+             "inventarios de petróleo, reuniones de la UE...): su resultado SOLO si aparece en los TITULARES; si no "
+             "aparece, no lo inventes. El bloque 'agenda' es la de MAÑANA (di 'mañana'). Nunca digas 'ayer' para "
+             "referirte a hoy.",
     "semanal": "Es sábado: repaso de la SEMANA en los mercados. Usa sobre todo cambio_semana_pct. "
                "La agenda es la de la SEMANA QUE VIENE (cuenta solo lo más importante).",
     "previa": "Es domingo: los mercados están cerrados. Repasa en breve cómo acabó la semana (cambio_semana_pct), "
               "cómo va el bitcoin el fin de semana y céntrate en lo que trae la SEMANA QUE VIENE.",
 }
 
-PROMPT = """Eres guionista de {canal}, un canal de TikTok en español de España que cada mañana resume la economía \
-y los mercados en poco más de un minuto. Lo lee en voz alta {presenta} con voz sintética.
+PROMPT = """Eres guionista de {canal}, un canal de TikTok en español de España que cada día laborable publica dos \
+vídeos de poco más de un minuto: por la mañana, lo que se espera del día; por la noche, cómo ha acabado. Lo lee en voz alta {presenta} con voz sintética.
 
 Hoy es {fecha}. {modo}
 
-TONO: cercano y claro, como un amigo que sabe de economía y te lo cuenta en el café. Humor ligero (un toque, no \
-chistes forzados). Explica la jerga en cuatro palabras cuando salga (p. ej. "el BCE, el banco que fija los tipos \
-en Europa"). Frases cortas y fáciles de decir en voz alta. Nada de listas con dos puntos.
+TONO: cercano, con energía y claro, como un amigo que sabe de economía y te lo cuenta con ganas en el café. \
+Humor ligero (un toque, no chistes forzados). Explica la jerga en cuatro palabras cuando salga (p. ej. "el BCE, \
+el banco que fija los tipos en Europa").
+
+ESTILO NARRATIVO (muy importante: NO es un recital de cotizaciones):
+- Cuenta la HISTORIA del día con un hilo conductor: qué ha movido los mercados y por qué (según los TITULARES), \
+y engancha cada bloque con el siguiente con una transición natural ("Y mientras la bolsa sonreía, el petróleo \
+iba a lo suyo...", "Pero ojo, que aquí viene lo interesante...").
+- Las cifras ya salen en pantalla: elige solo las que importan, como máximo 2 o 3 por bloque, y redondeadas. \
+Nunca encadenes cotizaciones una detrás de otra.
+- Escribe como se habla: frases enlazadas con "y", "pero", "mientras", "así que"; mezcla alguna frase corta y \
+contundente con otras más largas. Usa algún "¡...!" y alguna pregunta para dar entonación, sin pasarte.
+- Nada de listas ni de dos puntos.
 
 REGLAS OBLIGATORIAS (contenido financiero):
 - Usa SOLO las cifras de DATOS, copiadas tal cual en "valor_para_leer"; para porcentajes, redondea a un decimal \
@@ -170,13 +187,13 @@ INTERACCIÓN (para que la gente comente):
 llamativo de hoy) y menciona el día.
 - "cierre" pregunta "¿toro u oso?" (toro si crees que sube, oso si crees que baja) aplicado a algo concreto de \
 hoy (el IBEX, el bitcoin, el oro...), invita a comentar y a seguir a {canal}, que publica cada mañana a las ocho \
-y media. Varía la forma cada día.
+y cada noche a las nueve y media. Varía la forma cada día.
 
 BLOQUES (en este orden). LÍMITE ESTRICTO: como máximo {total} palabras en total y estas por bloque: \
 {palabras}. El vídeo dura poco más de un minuto: si te pasas, no cabe. Mejor contar menos cosas y bien.
 - intro: gancho + día.
-- bolsas: IBEX 35 primero; luego Europa (Euro Stoxx 50 o DAX), Wall Street (S&P 500 y Nasdaq) y, si aporta, el \
-Nikkei. Di cuándo es el cierre (ayer, el viernes...).
+- bolsas: el IBEX 35 primero y, en una o dos frases, cómo ha ido Europa y Wall Street (y el Nikkei si aporta). \
+Di cuándo es el cierre (ayer, hoy, el viernes...).
 - cripto: bitcoin (y ethereum si hay espacio).
 - materias: oro, petróleo Brent (y WTI, plata o gas si destacan) y el euro frente al dólar.
 - agenda: lo importante de la agenda con la hora en palabras como en DATOS ("a las cuatro y media de la tarde"); \
@@ -380,7 +397,7 @@ def guion_plantilla(merc: dict, agenda: dict, hoy: date, modo: str = "diario", f
     cierre = rnd.choice([
         "Y ahora te toca a ti: ¿toro u oso? Toro si crees que sube, oso si crees que baja. Te leo en comentarios.",
         "¿Hoy eres más de toro o de oso? Déjamelo en comentarios, que los leo todos.",
-    ]) + " Recuerda que esto es información, no un consejo de inversión. Sígueme y nos vemos mañana a las ocho y media."
+    ]) + " Recuerda que esto es información, no un consejo de inversión. Sígueme: resumen cada mañana a las ocho y cada noche a las nueve y media."
 
     seg = {"intro": intro, "bolsas": bolsas, "cripto": cripto, "materias": materias, "agenda": ag,
            "noticias": "", "cierre": cierre}

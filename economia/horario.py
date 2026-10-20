@@ -1,6 +1,7 @@
-"""Ventana horaria del canal económico (Madrid) y espera hasta las 8:30.
+"""Ediciones del canal económico (hora de Madrid): mañana (8:00) y noche (21:30, de lunes a viernes).
 
 Uso:  python -m economia.horario "<github.event_name>"
+Escribe en GITHUB_OUTPUT: ejecutar=true|false y edicion=manana|noche
 """
 from __future__ import annotations
 
@@ -11,26 +12,43 @@ import time
 
 from tiempo.horario import ahora
 
-from .config import HISTORIAL, HORA_PUBLICACION, VENTANA
+from .config import HISTORIAL, HORA_PUBLICACION, RAIZ, VENTANAS
 
 log = logging.getLogger(__name__)
 
 
-def debe_ejecutarse(evento: str) -> bool:
-    if evento != "schedule":
-        return True
+def edicion_actual(t=None) -> str | None:
+    t = t or ahora()
+    for edicion, (a, b) in VENTANAS.items():
+        if a <= (t.hour, t.minute) <= b:
+            if edicion == "noche" and t.weekday() >= 5:
+                return None  # fin de semana: sin edición de noche (bolsas cerradas)
+            return edicion
+    return None
+
+
+def archivo_historial(fecha, edicion: str):
+    return HISTORIAL / f"{fecha.isoformat()}{'-noche' if edicion == 'noche' else ''}.json"
+
+
+def debe_ejecutarse(evento: str) -> tuple[bool, str]:
     t = ahora()
-    if not (VENTANA[0] <= (t.hour, t.minute) <= VENTANA[1]):
-        print(f"Fuera de la ventana de publicación ({t:%H:%M} en Madrid)")
-        return False
-    if (HISTORIAL / f"{t.date().isoformat()}.json").exists():
-        print("El resumen de hoy ya está hecho")
-        return False
-    return True
+    if evento != "schedule":
+        lanzar = (RAIZ / "economia" / "lanzar.txt")
+        manual_noche = evento == "push" and lanzar.exists() and "noche" in lanzar.read_text().lower()
+        return True, "noche" if manual_noche or os.environ.get("EDICION") == "noche" else "manana"
+    edicion = edicion_actual(t)
+    if not edicion:
+        print(f"Fuera de las ventanas de publicación ({t:%a %H:%M} en Madrid)")
+        return False, "manana"
+    if archivo_historial(t.date(), edicion).exists():
+        print(f"La edición de {edicion} de hoy ya está hecha")
+        return False, edicion
+    return True, edicion
 
 
-def esperar_hasta_publicacion():
-    h, m = HORA_PUBLICACION
+def esperar_hasta_publicacion(edicion: str = "manana"):
+    h, m = HORA_PUBLICACION[edicion]
     objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0)
     falta = (objetivo - ahora()).total_seconds()
     if falta <= 0:
@@ -44,8 +62,8 @@ def esperar_hasta_publicacion():
 
 
 if __name__ == "__main__":
-    ok = debe_ejecutarse(sys.argv[1] if len(sys.argv) > 1 else "")
-    print(f"Hora en Madrid: {ahora():%Y-%m-%d %H:%M %Z} → ejecutar={ok}")
+    ok, edicion = debe_ejecutarse(sys.argv[1] if len(sys.argv) > 1 else "")
+    print(f"Hora en Madrid: {ahora():%Y-%m-%d %H:%M %Z} → ejecutar={ok}, edición={edicion}")
     if os.environ.get("GITHUB_OUTPUT"):
         with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-            f.write(f"ejecutar={'true' if ok else 'false'}\n")
+            f.write(f"ejecutar={'true' if ok else 'false'}\nedicion={edicion}\n")

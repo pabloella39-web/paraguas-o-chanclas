@@ -16,13 +16,14 @@
   header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
   header img { width:48px; height:48px; border-radius:50%; }
   h1 { font-size:20px; margin:0; }
+  h2 { font-size:17px; margin:22px 0 8px; color:var(--acento); }
   .fecha { color:var(--suave); font-size:14px; margin-top:2px; }
   .texto { background:var(--tarjeta); border-radius:16px; padding:16px; white-space:pre-wrap;
-           font-size:16px; line-height:1.5; word-break:break-word; min-height:120px; }
-  button { width:100%; margin-top:14px; padding:16px; border:0; border-radius:14px; font-size:18px;
+           font-size:16px; line-height:1.5; word-break:break-word; }
+  button { width:100%; margin-top:10px; padding:16px; border:0; border-radius:14px; font-size:18px;
            font-weight:800; background:var(--acento); color:#0f1932; cursor:pointer; }
   button:active { transform:scale(.98); }
-  .aviso { color:var(--suave); font-size:13px; margin-top:16px; line-height:1.5; }
+  .aviso { color:var(--suave); font-size:13px; margin-top:20px; line-height:1.5; }
   .viejo { color:#ffb4a8; font-size:14px; margin:10px 0 0; }
 </style>
 </head>
@@ -31,39 +32,46 @@
   <header>
     <img src="icono-200.png" alt="">
     <div>
-      <h1>Texto para el post de hoy</h1>
+      <h1>Textos para los posts de hoy</h1>
       <div class="fecha" id="fecha">Cargando…</div>
     </div>
   </header>
-  <div class="texto" id="texto"></div>
-  <p class="viejo" id="viejo" hidden>Ojo: este texto es de otro día. El resumen de hoy aún no se ha generado.</p>
-  <button id="copiar" type="button">Copiar texto</button>
-  <p class="aviso">Al publicar el borrador en TikTok, pega este texto en la descripción. Guarda esta página
-    en la pantalla de inicio del móvil para tenerla a mano cada mañana.</p>
+  <p class="viejo" id="viejo" hidden>Ojo: estos textos son de otro día. El resumen de hoy aún no se ha generado.</p>
+  <div id="ediciones"></div>
+  <p class="aviso">Al publicar cada borrador en TikTok, pega su texto en la descripción. La edición de la mañana
+    llega hacia las 8:00 y la de la noche hacia las 21:30 (de lunes a viernes).</p>
 </main>
 <script>
   const $ = (id) => document.getElementById(id);
+  const NOMBRES = {manana: '☀️ Edición de la mañana', noche: '🌙 Edición de la noche'};
+  function bloque(clave, caption) {
+    const sec = document.createElement('section');
+    const h = document.createElement('h2'); h.textContent = NOMBRES[clave] || clave;
+    const t = document.createElement('div'); t.className = 'texto'; t.textContent = caption;
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Copiar texto';
+    b.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(caption); }
+      catch (e) {
+        const r = document.createRange(); r.selectNodeContents(t);
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy');
+      }
+      b.textContent = '¡Copiado! ✅';
+      setTimeout(() => b.textContent = 'Copiar texto', 2000);
+    });
+    sec.append(h, t, b);
+    return sec;
+  }
   fetch('hoy.json?t=' + Date.now(), {cache: 'no-store'})
     .then(r => r.json())
     .then(d => {
-      $('texto').textContent = d.caption;
       const f = new Date(d.fecha + 'T12:00:00');
-      $('fecha').textContent = f.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})
-        + (d.voz ? ' · voz ' + d.voz : '');
+      $('fecha').textContent = f.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'});
       const hoy = new Date().toLocaleDateString('sv-SE', {timeZone: 'Europe/Madrid'});
       $('viejo').hidden = d.fecha === hoy;
+      const eds = d.ediciones || {[d.edicion || 'manana']: {caption: d.caption}};
+      ['noche', 'manana'].forEach(k => { if (eds[k]) $('ediciones').append(bloque(k, eds[k].caption)); });
     })
     .catch(() => { $('fecha').textContent = 'Todavía no hay texto generado.'; });
-  $('copiar').addEventListener('click', async () => {
-    const t = $('texto').textContent;
-    try { await navigator.clipboard.writeText(t); }
-    catch (e) {
-      const r = document.createRange(); r.selectNodeContents($('texto'));
-      const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy');
-    }
-    $('copiar').textContent = '¡Copiado! ✅';
-    setTimeout(() => $('copiar').textContent = 'Copiar texto', 2000);
-  });
 </script>
 </body>
 </html>

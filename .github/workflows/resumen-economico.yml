@@ -2,13 +2,17 @@ name: Resumen económico diario
 
 on:
   schedule:
-    # GitHub solo usa UTC: varios intentos; el primero que cae entre las 7:00 y las 9:45 de Madrid hace
-    # el vídeo y los demás ven que ya está hecho (historial_economia/AAAA-MM-DD.json).
+    # Dos ediciones: mañana (publica a las 8:00) y noche (21:30, de lunes a viernes). GitHub solo usa UTC y a
+    # veces se retrasa, así que hay varios intentos; el primero que cae en la ventana de Madrid hace el vídeo y
+    # los demás ven que ya está hecho (historial_economia/AAAA-MM-DD.json y AAAA-MM-DD-noche.json).
     - cron: "11 5 * * *"
     - cron: "41 5 * * *"
     - cron: "11 6 * * *"
     - cron: "41 6 * * *"
-    - cron: "11 7 * * *"
+    - cron: "11 18 * * 1-5"
+    - cron: "41 18 * * 1-5"
+    - cron: "11 19 * * 1-5"
+    - cron: "41 19 * * 1-5"
   push:
     # Lanzar a mano desde git: cambiar economia/lanzar.txt. Si contiene la palabra "publicar" se sube a
     # TikTok; si contiene "prueba", el vídeo se guarda en la rama pruebas-economia.
@@ -20,6 +24,11 @@ on:
         description: "Publicar en TikTok"
         type: boolean
         default: false
+      edicion:
+        description: "Edición"
+        type: choice
+        options: ["manana", "noche"]
+        default: "manana"
 
 permissions:
   contents: write
@@ -37,6 +46,8 @@ jobs:
 
       - name: Comprobar horario de Madrid
         id: horario
+        env:
+          EDICION: ${{ inputs.edicion }}
         run: python3 -m economia.horario "${{ github.event_name }}"
 
       - uses: actions/setup-python@v5
@@ -65,12 +76,12 @@ jobs:
           TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
         run: |
           ARGS=""
+          # Edición de la noche: resumen de la jornada de hoy con la agenda de mañana
+          [ "${{ steps.horario.outputs.edicion }}" = "noche" ] && export MODO_DIA=noche
           if [ "${{ github.event_name }}" = "schedule" ]; then
             ARGS="--publicar --esperar"
           elif [ "${{ github.event_name }}" = "push" ]; then
             grep -qi publicar economia/lanzar.txt && ARGS="--publicar"
-            # "noche": resumen de la jornada de hoy con la agenda de mañana
-            grep -qi noche economia/lanzar.txt && export MODO_DIA=noche
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="--publicar"
           fi

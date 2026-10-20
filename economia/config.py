@@ -7,8 +7,9 @@ NOMBRE_CANAL = "TORO U OSO"
 CUENTA_TIKTOK = "@torouoso"
 LEMA = "¿TORO U OSO?"          # pregunta del canal (toro = crees que sube, oso = crees que baja)
 ZONA_HORARIA = "Europe/Madrid"
-HORA_PUBLICACION = (8, 30)      # antes de que abra la bolsa española (9:00)
-VENTANA = ((7, 0), (9, 45))     # ejecuciones programadas válidas (hora de Madrid)
+# Dos ediciones cada día laborable (sábado y domingo, solo la de la mañana)
+HORA_PUBLICACION = {"manana": (8, 0), "noche": (21, 30)}
+VENTANAS = {"manana": ((6, 40), (9, 30)), "noche": ((19, 55), (22, 45))}  # hora de Madrid
 ESTADO_TIKTOK = "tiktok_token_economia.enc"
 HISTORIAL = RAIZ / "historial_economia"
 
