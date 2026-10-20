@@ -6,6 +6,11 @@ on:
       url:
         description: "Pega aquí la URL completa que muestra callback.html tras autorizar"
         required: true
+      canal:
+        description: "¿Qué cuenta estás autorizando?"
+        type: choice
+        options: ["tiempo (Paraguas o Chanclas)", "economia (Toro u Oso)"]
+        default: "tiempo (Paraguas o Chanclas)"
 
 permissions:
   contents: write
@@ -36,6 +41,7 @@ jobs:
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          TIKTOK_ESTADO: ${{ startsWith(inputs.canal, 'economia') && 'tiktok_token_economia.enc' || 'tiktok_token.enc' }}
         run: python -m tiempo.autorizar
       - name: Guardar
         run: |

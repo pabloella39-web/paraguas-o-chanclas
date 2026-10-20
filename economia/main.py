@@ -1,0 +1,152 @@
+"""Resumen económico diario: datos → guion → voz → vídeo (65–70 s) → espera a las 8:30 → TikTok.
+
+  python -m economia.main --demo                 # vídeo de prueba con datos inventados y sin voz
+  python -m economia.main                        # vídeo real (datos de internet), sin publicar
+  python -m economia.main --publicar --esperar   # lo que hace GitHub Actions cada mañana
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import os
+from datetime import date
+from pathlib import Path
+
+from tiempo import musica, voz
+from tiempo.main import VEL_MAX, VEL_MIN, _habla_objetivo, planificar
+from tiempo.horario import ahora
+from tiempo.video import renderizar
+from tiempo.config import DURACION_MAX, DURACION_MIN
+
+from . import descripcion
+from . import guion as g
+from .agenda import agenda_demo, obtener_agenda
+from .config import HISTORIAL, RAIZ, SEGMENTOS, VOCES, tipo_de_dia, voz_del_dia
+from .horario import esperar_hasta_publicacion
+from .mercados import mercados_demo, obtener_mercados
+from .noticias import obtener_titulares
+from .video import Compositor
+
+log = logging.getLogger("economia")
+
+
+def generar_locucion(merc, agenda, titulares, hoy, modo, trabajo: Path, demo: bool, tipo_voz: str):
+    factor, mejor = 1.0, None
+    for intento in range(3):
+        guion = (g.guion_plantilla(merc, agenda, hoy, modo, factor) if demo else
+                 g.escribir_guion(merc, agenda, titulares, hoy, modo, factor, VOCES[tipo_voz]["presenta"]))
+        bloques = [s for s in SEGMENTOS if str(guion["segmentos"].get(s, "")).strip()]
+        objetivo = _habla_objetivo(len(bloques))
+        vel = voz.velocidad_base()
+        for ajuste in range(3):
+            wavs = [voz.sintetizar(guion["segmentos"][s], trabajo / f"{intento}_{ajuste}_{s}.mp3", demo, vel)
+                    for s in bloques]
+            durs = [voz.duracion(w) for w in wavs]
+            habla = sum(durs)
+            log.info("Guion %d (%s), velocidad %+d%%: %d palabras, %.1f s de voz (objetivo %.1f s)", intento + 1,
+                     guion.get("origen", "plantilla"), vel,
+                     sum(len(guion["segmentos"][s].split()) for s in bloques), habla, objetivo)
+            mejor = (guion, bloques, wavs, durs)
+            if abs(habla - objetivo) <= 1.0:
+                return mejor
+            nueva = round((1 + vel / 100) * habla / objetivo * 100 - 100)
+            if not VEL_MIN <= nueva <= VEL_MAX:
+                break
+            vel = nueva
+        if guion.get("origen") == "plantilla" and habla < objetivo:
+            return mejor  # la plantilla no se alarga: el tiempo sobrante queda en la tarjeta final
+        factor *= objetivo * (1 + vel / 100) / (habla * (1 + voz.velocidad_base() / 100))
+    return mejor
+
+
+def _fuentes_txt(merc, agenda, titulares) -> str:
+    usadas = []
+    for a in merc.values():
+        if a["fuente"] not in usadas and a["fuente"] != "demo":
+            usadas.append(a["fuente"])
+    if agenda.get("fuente") == "Forex Factory":
+        usadas.append("Forex Factory")
+    if titulares:
+        usadas.append("prensa económica")
+    return "Datos: " + (" · ".join(usadas) if usadas else "demo") + " · pueden llevar retraso"
+
+
+def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
+    salida.mkdir(parents=True, exist_ok=True)
+    trabajo = salida / "trabajo"
+    trabajo.mkdir(exist_ok=True)
+    modo = os.environ.get("MODO_DIA") or tipo_de_dia(hoy)
+    merc = mercados_demo(hoy) if demo else obtener_mercados()
+    agenda = agenda_demo(hoy, modo) if demo else obtener_agenda(hoy, modo)
+    titulares = [] if demo else obtener_titulares(horas=20 if modo == "diario" else 40)
+    (salida / "datos.json").write_text(json.dumps({"mercados": merc, "agenda": agenda, "titulares": titulares},
+                                                  ensure_ascii=False, indent=1), encoding="utf-8")
+
+    tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
+    voz.elegir_voz(VOCES[tipo_voz])
+    log.info("Día %s (%s), voz %s", hoy, modo, tipo_voz)
+    guion, bloques, wavs, durs = generar_locucion(merc, agenda, titulares, hoy, modo, trabajo, demo, tipo_voz)
+    plan, total = planificar(bloques, wavs, durs)
+    for p in plan:
+        p["texto"] = guion["segmentos"][p["seg"]]
+
+    audio = trabajo / "pista.wav"
+    voz.montar_pista([(p["wav"], p["inicio"]) for p in plan], total, musica.generar(total), audio)
+    comp = Compositor(merc, agenda, guion, plan, total, hoy, modo, _fuentes_txt(merc, agenda, titulares))
+    video = salida / f"economia_{hoy.isoformat()}.mp4"
+    log.info("Renderizando %.2f s de vídeo…", total)
+    renderizar(comp, audio, video, total)
+    real = voz.duracion(video)
+    if not DURACION_MIN <= real <= DURACION_MAX:
+        raise RuntimeError(f"El vídeo final dura {real:.2f} s (debe estar entre 65 y 70)")
+    caption = descripcion.construir(merc, agenda, hoy, modo, guion.get("caption") if guion.get("origen") == "claude"
+                                    else None)
+    meta = {"fecha": hoy.isoformat(), "modo": modo, "duracion": round(real, 2), "video": str(video),
+            "caption": caption, "portada_ms": 0, "origen_guion": guion.get("origen"), "voz": tipo_voz,
+            "titulares": guion.get("titulares"), "guion": {p["seg"]: p["texto"] for p in plan}}
+    (salida / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("Vídeo listo: %s (%.2f s, guion %s)", video, real, guion.get("origen"))
+    return meta
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--demo", action="store_true")
+    ap.add_argument("--publicar", action="store_true")
+    ap.add_argument("--esperar", action="store_true", help="esperar a las 8:30 (Madrid) antes de publicar")
+    ap.add_argument("--salida", default=str(RAIZ / "salida_economia"))
+    ap.add_argument("--fecha", help="AAAA-MM-DD (por defecto, hoy en Madrid)")
+    a = ap.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
+    meta = construir(hoy, Path(a.salida), demo=a.demo)
+
+    from tiempo.tiktok import ESTADO, hay_credenciales
+    faltan = hay_credenciales() if a.publicar else []
+    if a.publicar and faltan:
+        log.warning("No se publica: falta %s. El vídeo queda como artefacto.", ", ".join(faltan))
+    elif a.publicar:
+        from tiempo.tiktok import publicar
+        log.info("Publicando con la autorización de %s", ESTADO.name)
+        if a.esperar:
+            esperar_hasta_publicacion()
+        meta["tiktok"] = publicar(Path(meta["video"]), meta["caption"], meta["portada_ms"])
+        log.info("Publicado en TikTok: %s", meta["tiktok"])
+    if os.environ.get("GITHUB_STEP_SUMMARY"):
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+            f.write(f"## Resumen económico del {hoy.isoformat()} ({meta['duracion']} s)\n\n"
+                    f"**Texto para el post** (cópialo al publicar):\n\n```\n{meta['caption']}\n```\n\n"
+                    f"Guion: {meta.get('origen_guion')}\n")
+    if not a.demo:
+        destino = RAIZ / "docs" / "economia" / "hoy.json"
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        destino.write_text(json.dumps({"fecha": hoy.isoformat(), "caption": meta["caption"], "voz": meta.get("voz"),
+                                       "duracion": meta["duracion"]}, ensure_ascii=False, indent=1), encoding="utf-8")
+        HISTORIAL.mkdir(exist_ok=True)
+        (HISTORIAL / f"{hoy.isoformat()}.json").write_text(
+            json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

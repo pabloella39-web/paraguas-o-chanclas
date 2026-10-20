@@ -1,0 +1,107 @@
+name: Resumen económico diario
+
+on:
+  schedule:
+    # GitHub solo usa UTC: varios intentos; el primero que cae entre las 7:00 y las 9:45 de Madrid hace
+    # el vídeo y los demás ven que ya está hecho (historial_economia/AAAA-MM-DD.json).
+    - cron: "11 5 * * *"
+    - cron: "41 5 * * *"
+    - cron: "11 6 * * *"
+    - cron: "41 6 * * *"
+    - cron: "11 7 * * *"
+  push:
+    # Lanzar a mano desde git: cambiar economia/lanzar.txt. Si contiene la palabra "publicar" se sube a
+    # TikTok; si contiene "prueba", el vídeo se guarda en la rama pruebas-economia.
+    branches: [main]
+    paths: ["economia/lanzar.txt"]
+  workflow_dispatch:
+    inputs:
+      publicar:
+        description: "Publicar en TikTok"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: resumen-economico
+  cancel-in-progress: false
+
+jobs:
+  resumen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar horario de Madrid
+        id: horario
+        run: python3 -m economia.horario "${{ github.event_name }}"
+
+      - uses: actions/setup-python@v5
+        if: steps.horario.outputs.ejecutar == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        if: steps.horario.outputs.ejecutar == 'true'
+        run: |
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          pip install -r requirements.txt
+
+      - name: Generar vídeo y publicar
+        if: steps.horario.outputs.ejecutar == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_WEATHER_API_KEY: ${{ secrets.GOOGLE_WEATHER_API_KEY }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          # Cuenta de TikTok propia del canal (no se pasa TIKTOK_REFRESH_TOKEN: es la del canal del tiempo)
+          TIKTOK_ESTADO: tiktok_token_economia.enc
+          TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}
+          TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            ARGS="--publicar --esperar"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            grep -qi publicar economia/lanzar.txt && ARGS="--publicar"
+          else
+            [ "${{ inputs.publicar }}" = "true" ] && ARGS="--publicar"
+          fi
+          python -m economia.main $ARGS
+
+      - name: Guardar el vídeo como artefacto
+        if: always() && steps.horario.outputs.ejecutar == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: resumen-${{ github.run_id }}
+          path: |
+            salida_economia/*.mp4
+            salida_economia/meta.json
+            salida_economia/datos.json
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Guardar el vídeo de prueba en la rama pruebas-economia
+        if: github.event_name == 'push' && hashFiles('salida_economia/meta.json') != ''
+        run: |
+          grep -qi prueba economia/lanzar.txt || exit 0
+          mkdir -p /tmp/p && cp salida_economia/*.mp4 salida_economia/meta.json salida_economia/datos.json /tmp/p/
+          cd /tmp/p && git init -q -b pruebas-economia
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Prueba $(date +%F-%H%M)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pruebas-economia
+
+      - name: Guardar historial y token
+        if: always() && steps.horario.outputs.ejecutar == 'true'
+        run: |
+          git config user.name "parte-bot"
+          git config user.email "parte-bot@users.noreply.github.com"
+          git add historial_economia/ estado/ docs/economia/hoy.json 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Resumen económico del $(date +%F)"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done

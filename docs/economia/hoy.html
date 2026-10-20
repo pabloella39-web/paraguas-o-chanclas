@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Texto de hoy · Toro u Oso</title>
+<link rel="icon" href="icono-200.png">
+<link rel="apple-touch-icon" href="icono-200.png">
+<style>
+  :root { --fondo:#070d1e; --tarjeta:#16234a; --texto:#fff; --suave:#b9c6e0; --acento:#ffc42d; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--fondo); color:var(--texto);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; padding:20px 16px 40px; }
+  main { max-width:560px; margin:0 auto; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  header img { width:48px; height:48px; border-radius:50%; }
+  h1 { font-size:20px; margin:0; }
+  .fecha { color:var(--suave); font-size:14px; margin-top:2px; }
+  .texto { background:var(--tarjeta); border-radius:16px; padding:16px; white-space:pre-wrap;
+           font-size:16px; line-height:1.5; word-break:break-word; min-height:120px; }
+  button { width:100%; margin-top:14px; padding:16px; border:0; border-radius:14px; font-size:18px;
+           font-weight:800; background:var(--acento); color:#0f1932; cursor:pointer; }
+  button:active { transform:scale(.98); }
+  .aviso { color:var(--suave); font-size:13px; margin-top:16px; line-height:1.5; }
+  .viejo { color:#ffb4a8; font-size:14px; margin:10px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icono-200.png" alt="">
+    <div>
+      <h1>Texto para el post de hoy</h1>
+      <div class="fecha" id="fecha">Cargando…</div>
+    </div>
+  </header>
+  <div class="texto" id="texto"></div>
+  <p class="viejo" id="viejo" hidden>Ojo: este texto es de otro día. El resumen de hoy aún no se ha generado.</p>
+  <button id="copiar" type="button">Copiar texto</button>
+  <p class="aviso">Al publicar el borrador en TikTok, pega este texto en la descripción. Guarda esta página
+    en la pantalla de inicio del móvil para tenerla a mano cada mañana.</p>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  fetch('hoy.json?t=' + Date.now(), {cache: 'no-store'})
+    .then(r => r.json())
+    .then(d => {
+      $('texto').textContent = d.caption;
+      const f = new Date(d.fecha + 'T12:00:00');
+      $('fecha').textContent = f.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})
+        + (d.voz ? ' · voz ' + d.voz : '');
+      const hoy = new Date().toLocaleDateString('sv-SE', {timeZone: 'Europe/Madrid'});
+      $('viejo').hidden = d.fecha === hoy;
+    })
+    .catch(() => { $('fecha').textContent = 'Todavía no hay texto generado.'; });
+  $('copiar').addEventListener('click', async () => {
+    const t = $('texto').textContent;
+    try { await navigator.clipboard.writeText(t); }
+    catch (e) {
+      const r = document.createRange(); r.selectNodeContents($('texto'));
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy');
+    }
+    $('copiar').textContent = '¡Copiado! ✅';
+    setTimeout(() => $('copiar').textContent = 'Copiar texto', 2000);
+  });
+</script>
+</body>
+</html>

@@ -31,7 +31,8 @@ def _comprobar(r: requests.Response) -> dict:
 
 # El refresh_token se guarda CIFRADO en el repositorio (estado/tiktok_token.enc) con la clave del
 # secreto TIKTOK_CIFRADO. Así se puede renovar cada día sin tocar los secretos de GitHub.
-ESTADO = Path(__file__).resolve().parent.parent / "estado" / "tiktok_token.enc"
+# Cada canal tiene su archivo (TIKTOK_ESTADO): el del tiempo y el económico son cuentas distintas.
+ESTADO = Path(__file__).resolve().parent.parent / "estado" / os.environ.get("TIKTOK_ESTADO", "tiktok_token.enc")
 
 
 def _openssl(args: list[str], datos: bytes) -> bytes:

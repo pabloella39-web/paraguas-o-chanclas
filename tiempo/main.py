@@ -120,7 +120,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     general = next((p for p in plan if p["seg"] == "general"), plan[0])
     caption = descripcion.construir(prev, hoy, guion["caption"] if guion.get("origen") == "claude" else None)
     meta = {"fecha": hoy.isoformat(), "duracion": round(real, 2), "video": str(video), "caption": caption,
-            "portada_ms": 0,  # el primer fotograma es la portada con la fecha "origen_guion": guion.get("origen"),
+            "portada_ms": 0,  # el primer fotograma es la portada con la fecha
+            "origen_guion": guion.get("origen"),
             "voz": tipo_voz,
             "guion": {p["seg"]: p["texto"] for p in plan}}
     (salida / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
