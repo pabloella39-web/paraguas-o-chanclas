@@ -137,6 +137,11 @@ MODOS = {
     "diario": "Resumen de un día laborable, publicado a las 8:30, antes de que abra la bolsa española. Las bolsas "
               "europeas y de EE. UU. muestran el cierre de su última sesión; el Nikkei, el cierre de esta madrugada; "
               "oro, petróleo, euro y cripto, el precio de ahora mismo. La agenda es la de HOY.",
+    "noche": "Resumen de la JORNADA DE HOY, publicado por la noche. Las bolsas europeas (IBEX, Euro Stoxx, DAX) "
+             "ya cerraron HOY; Wall Street puede seguir abierta (di 'a esta hora' si su último dato es de hoy); el "
+             "Nikkei cerró esta madrugada. Oro, petróleo, euro y cripto: precio de ahora mismo. La agenda es la de "
+             "MAÑANA (di 'mañana'). En el cierre, invita a seguir la cuenta porque cada mañana a las ocho y media "
+             "hay resumen nuevo. Nunca digas 'ayer' para referirte a hoy.",
     "semanal": "Es sábado: repaso de la SEMANA en los mercados. Usa sobre todo cambio_semana_pct. "
                "La agenda es la de la SEMANA QUE VIENE (cuenta solo lo más importante).",
     "previa": "Es domingo: los mercados están cerrados. Repasa en breve cómo acabó la semana (cambio_semana_pct), "
@@ -253,14 +258,16 @@ def escribir_guion(merc, agenda, titulares, hoy: date, modo: str, factor: float 
 # ---------------------------------------------------------------- plantilla (sin IA)
 def guion_plantilla(merc: dict, agenda: dict, hoy: date, modo: str = "diario", factor: float = 1.0) -> dict:
     rnd = random.Random(hoy.toordinal())
-    sem = modo != "diario"
+    sem = modo in ("semanal", "previa")
     cambio = (lambda a: a.get("semana")) if sem else (lambda a: a["cambio"])
     dia = DIAS[hoy.weekday()]
 
     def mov(clave, pasado=True):
         return movimiento(cambio(merc[clave]), pasado) if clave in merc else ""
 
-    if modo == "diario":
+    if modo == "noche":
+        intro = f"Así ha ido este {dia} en los mercados, en un minuto. Y al final, lo que viene mañana."
+    elif modo == "diario":
         intro = rnd.choice([
             f"Buenos días. Es {dia} y antes de que abra la bolsa te cuento cómo están los mercados en un minuto.",
             f"¿Toro u oso? Hoy es {fecha_larga(hoy)} y esto es lo que tienes que saber antes de que abra la bolsa.",
@@ -328,7 +335,7 @@ def guion_plantilla(merc: dict, agenda: dict, hoy: date, modo: str = "diario", f
             grupos.append((momento, [limpio(e["titulo"])]))
     frases = " ".join(f"{m[0].upper() + m[1:]}, {' y '.join(t)}." for m, t in grupos)
     if evs and not sem:
-        ag = "¿Qué hay hoy en la agenda? " + frases
+        ag = ("Para mañana, apunta. " if modo == "noche" else "¿Qué hay hoy en la agenda? ") + frases
     elif evs:
         ag = "La semana que viene, ojo a esto. " + frases
     else:

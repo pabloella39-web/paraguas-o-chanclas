@@ -256,12 +256,14 @@ class Compositor:
     def __init__(self, merc, agenda, guion, plan, total, hoy: date, modo: str, fuentes_txt: str):
         self.merc, self.agenda, self.guion = merc, agenda, guion
         self.plan, self.total, self.hoy, self.modo = plan, total, hoy, modo
-        self.sem = modo != "diario"
+        self.sem = modo in ("semanal", "previa")
         self.fecha_txt = f"{DIAS[hoy.weekday()]} {hoy.day} de {['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][hoy.month - 1]}".upper()
         self.fuentes_txt = fuentes_txt
         if self.sem:
             PILLS["agenda"] = "LA SEMANA QUE VIENE"
             PILLS["bolsas"] = "BOLSAS · LA SEMANA"
+        if modo == "noche":
+            PILLS["agenda"] = "AGENDA DE MAÑANA"
         self._subs = []
         for p in plan:
             trozos = _trocear_subtitulos(p["texto"])
@@ -372,7 +374,7 @@ class Compositor:
 
     def _e_intro(self):
         el = []
-        lineas = {"diario": ("¿QUÉ PASA HOY", "CON TU DINERO?"), "semanal": ("ASÍ HA IDO", "LA SEMANA"),
+        lineas = {"diario": ("¿QUÉ PASA HOY", "CON TU DINERO?"), "noche": ("ASÍ HA IDO", "EL DÍA"), "semanal": ("ASÍ HA IDO", "LA SEMANA"),
                   "previa": ("LO QUE VIENE", "ESTA SEMANA")}[self.modo]
         for k, txt in enumerate(lineas):
             f = _ajustar(txt, "Black", 112, 980)
@@ -627,7 +629,7 @@ class Compositor:
         im = Image.new("RGBA", (ANCHO, ALTO), (6, 12, 30, 246))
         d = ImageDraw.Draw(im)
         cy = ALTO / 2
-        marca = {"diario": "RESUMEN ECONÓMICO", "semanal": "LA SEMANA EN BOLSA", "previa": "LO QUE VIENE"}[self.modo]
+        marca = {"diario": "RESUMEN ECONÓMICO", "noche": "RESUMEN DEL DÍA", "semanal": "LA SEMANA EN BOLSA", "previa": "LO QUE VIENE"}[self.modo]
         d.text((ANCHO / 2, cy - 520), marca, font=fuente("ExtraBold", 52), fill=ACENTO, anchor="mm")
         dia_sem, resto = (self.fecha_txt.split(" ", 1) + [""])[:2]
         f1 = _ajustar(dia_sem, "Black", 190, 980)

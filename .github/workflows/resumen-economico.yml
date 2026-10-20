@@ -69,6 +69,8 @@ jobs:
             ARGS="--publicar --esperar"
           elif [ "${{ github.event_name }}" = "push" ]; then
             grep -qi publicar economia/lanzar.txt && ARGS="--publicar"
+            # "noche": resumen de la jornada de hoy con la agenda de mañana
+            grep -qi noche economia/lanzar.txt && export MODO_DIA=noche
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="--publicar"
           fi

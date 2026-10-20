@@ -25,8 +25,9 @@ def _flecha(x):
 def construir(merc: dict, agenda: dict, hoy: date, modo: str, gancho_ia: str | None = None) -> str:
     rnd = random.Random(hoy.toordinal() * 11)
     gancho = re.sub(r"\s*#\S+", "", (gancho_ia or "").strip()).strip() or rnd.choice(GANCHOS)
-    sem = modo != "diario"
+    sem = modo in ("semanal", "previa")
     titulo = {"diario": f"Resumen económico de hoy, {fecha_larga(hoy)} 📊",
+              "noche": f"Así ha ido la economía hoy, {fecha_larga(hoy)} 📊",
               "semanal": f"La semana en los mercados, {fecha_larga(hoy)} 📊",
               "previa": f"Lo que viene esta semana en los mercados 📅"}[modo]
     lineas = [titulo]
@@ -37,7 +38,8 @@ def construir(merc: dict, agenda: dict, hoy: date, modo: str, gancho_ia: str | N
             lineas.append(f"{_flecha(x)} {etq}: {precio_pantalla(a)} ({fpct(x)})")
     destacados = [e for e in agenda.get("pantalla", []) if e.get("impacto") == "High"][:2]
     for e in destacados:
-        lineas.append(f"📅 {(e['hora'] + ' ') if e.get('hora') and not sem else ''}{e['titulo']}")
+        cuando = "Mañana " if modo == "noche" else ""
+        lineas.append(f"📅 {cuando}{(e['hora'] + ' ') if e.get('hora') and not sem else ''}{e['titulo']}")
     lineas.append(f"⚠️ {AVISO}.")
 
     tags = list(FIJOS)

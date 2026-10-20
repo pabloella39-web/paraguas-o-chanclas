@@ -154,9 +154,9 @@ def proximas_reuniones(hoy: date) -> list[dict]:
 
 def obtener_agenda(hoy: date, modo: str = "diario") -> dict:
     """modo diario: eventos de hoy. semanal (sábado) / previa (domingo): eventos de la semana siguiente."""
-    if modo == "diario":
-        desde = hasta = hoy
-        semanas = ["thisweek"]
+    if modo in ("diario", "noche"):
+        desde = hasta = hoy + timedelta(days=1 if modo == "noche" else 0)
+        semanas = ["thisweek"] if desde.weekday() != 6 else ["nextweek"]
     else:
         desde = hoy + timedelta(days=(7 - hoy.weekday()) % 7 or 7)  # lunes siguiente
         hasta = desde + timedelta(days=4)
@@ -178,7 +178,7 @@ def obtener_agenda(hoy: date, modo: str = "diario") -> dict:
             fallos += 1
             log.warning("Calendario %s no disponible: %s", cual, e)
     hubo_calendario = bool(eventos or menores)
-    if modo == "diario" and len(eventos) < 3:
+    if modo in ("diario", "noche") and len(eventos) < 3:
         eventos += menores[:3 - len(eventos)]  # día tranquilo: se rellena con datos menores
     if not hubo_calendario:
         fuente = "calendarios oficiales"
