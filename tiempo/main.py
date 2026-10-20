@@ -168,10 +168,10 @@ def main():
         log.warning("No se publica: faltan los secretos %s. El vídeo queda como artefacto de la ejecución.",
                     ", ".join(faltan))
     elif a.publicar:
-        from .tiktok import publicar
+        from .tiktok import publicar_con_reintentos
         if a.esperar:
             esperar_hasta_publicacion()
-        res = publicar(Path(meta["video"]), meta["caption"], meta["portada_ms"])
+        res = publicar_con_reintentos(Path(meta["video"]), meta["caption"], meta["portada_ms"])
         meta["tiktok"] = res
         log.info("Publicado en TikTok: %s", res)
     if os.environ.get("GITHUB_STEP_SUMMARY"):

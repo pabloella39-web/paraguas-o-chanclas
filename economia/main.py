@@ -226,11 +226,11 @@ def main():
     if a.publicar and faltan:
         log.warning("No se publica: falta %s. El vídeo queda como artefacto.", ", ".join(faltan))
     elif a.publicar:
-        from tiempo.tiktok import publicar
+        from tiempo.tiktok import publicar_con_reintentos
         log.info("Publicando con la autorización de %s", ESTADO.name)
         if a.esperar:
             esperar_hasta_publicacion("noche" if meta["modo"] == "noche" else "manana")
-        meta["tiktok"] = publicar(Path(meta["video"]), meta["caption"], meta["portada_ms"])
+        meta["tiktok"] = publicar_con_reintentos(Path(meta["video"]), meta["caption"], meta["portada_ms"])
         log.info("Publicado en TikTok: %s", meta["tiktok"])
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:

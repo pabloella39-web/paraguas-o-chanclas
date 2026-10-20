@@ -148,6 +148,19 @@ def _estado(token: str, publish_id: str, espera_max=600) -> dict:
     raise ErrorTikTok("Tiempo de espera agotado consultando el estado de la publicación")
 
 
+def publicar_con_reintentos(ruta: Path, caption: str, portada_ms: int = 0, intentos: int = 3) -> dict:
+    """Reintenta los fallos puntuales (red, TikTok saturado). Si todos fallan, la ejecución termina con error y el
+    siguiente intento programado lo vuelve a probar (no hay historial del día, así que no se da por hecho)."""
+    for i in range(1, intentos + 1):
+        try:
+            return publicar(ruta, caption, portada_ms)
+        except Exception as e:  # noqa: BLE001
+            if i == intentos:
+                raise
+            log.warning("Publicación fallida (intento %d/%d): %s. Reintento en %d s", i, intentos, e, 60 * i)
+            time.sleep(60 * i)
+
+
 def publicar(ruta: Path, caption: str, portada_ms: int = 2000) -> dict:
     token = refrescar_token()
     tam = ruta.stat().st_size
