@@ -1,0 +1,1 @@
+assets/vecinos.json: siluetas de países de Natural Earth (naturalearthdata.com), dominio público; recortadas y simplificadas.

@@ -18,6 +18,8 @@ MAR_ABAJO = (18, 52, 102)
 TIERRA = (232, 222, 200)
 TIERRA_APAGADA = (150, 158, 170)
 TIERRA_FOCO = (246, 236, 212)
+VECINOS = (78, 92, 118)          # Portugal, Francia, norte de África...: presentes pero apagados
+BORDE_VECINOS = (150, 165, 190, 110)
 BORDE = (255, 255, 255, 110)
 BLANCO = (255, 255, 255)
 AZUL_MIN = (140, 205, 255)
@@ -26,6 +28,13 @@ AZUL_MIN = (140, 205, 255)
 @lru_cache(maxsize=None)
 def fuente(peso: str, tam: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(FUENTES_TIPO / f"Inter-{peso}.otf"), tam)
+
+
+@lru_cache(maxsize=1)
+def vecinos():
+    """Siluetas de países vecinos (Natural Earth, dominio público), recortadas y simplificadas."""
+    ruta = ASSETS / "vecinos.json"
+    return json.loads(ruta.read_text(encoding="utf-8")) if ruta.exists() else []
 
 
 @lru_cache(maxsize=1)
@@ -92,6 +101,13 @@ def dibujar_mapa(vista, ancho, alto, foco: str | None = None, ss: int = 2) -> Im
     for lat in range(26, 48, 2):
         _, y = pr(0, lat)
         d.line([(0, y), (W, y)], fill=(255, 255, 255, 14), width=ss)
+
+    # Países vecinos (debajo de todo): así Ceuta y Melilla no flotan en medio del mar
+    for pais in vecinos():
+        for anillo in pais["anillos"]:
+            pts = [pr(x, y) for x, y in anillo]
+            d.polygon(pts, fill=VECINOS)
+            d.line(pts + [pts[0]], fill=BORDE_VECINOS, width=max(1, int(1.2 * ss)), joint="curve")
 
     provs_foco = set(REGIONES[foco]["provincias"]) if foco and foco in REGIONES else None
     poligonos = []
