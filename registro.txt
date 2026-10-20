@@ -1,0 +1,15 @@
+2026-10-20 21:46:36,879 INFO Mercados: 15 activos (ibex Yahoo Finance, stoxx Yahoo Finance, dax Yahoo Finance, sp500 Yahoo Finance, nasdaq Yahoo Finance, dow Yahoo Finance, nikkei Yahoo Finance, oro Yahoo Finance, plata Yahoo Finance, brent Yahoo Finance, wti Yahoo Finance, gas Yahoo Finance, eurusd Yahoo Finance, btc CoinGecko, eth CoinGecko)
+2026-10-20 21:46:36,942 INFO Agenda (2026-10-20 → 2026-10-20): 3 eventos, 3 en pantalla
+2026-10-20 21:46:39,268 INFO Titulares: 62 de 9 fuentes
+2026-10-20 21:46:39,270 INFO Día 2026-10-20 (diario), voz masculina
+2026-10-20 21:47:31,299 INFO Guion 1 (claude), toma continua a +20%: 172 palabras, 65.4 s (objetivo 65.4 s)
+2026-10-20 21:47:41,739 INFO Renderizando 67.23 s de vídeo…
+2026-10-20 21:47:41,812 INFO Render 0/2017
+2026-10-20 21:47:48,513 INFO Render 300/2017
+2026-10-20 21:47:55,396 INFO Render 600/2017
+2026-10-20 21:48:02,351 INFO Render 900/2017
+2026-10-20 21:48:08,770 INFO Render 1200/2017
+2026-10-20 21:48:14,758 INFO Render 1500/2017
+2026-10-20 21:48:20,805 INFO Render 1800/2017
+2026-10-20 21:48:25,499 INFO Vídeo listo: /home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_economia/economia_2026-10-20.mp4 (67.23 s, guion claude)
+2026-10-20 21:48:27,152 INFO Texto del post publicado en la web (Texto del resumen económico (manana) del 2026-10-20)
