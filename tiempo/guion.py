@@ -20,7 +20,7 @@ MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto
 
 # Palabras objetivo por bloque (≈170 palabras ≈ 63 s a ritmo ágil; la velocidad de la voz se ajusta sola)
 PALABRAS = {"intro": 12, "general": 26, "norte": 24, "interior": 22, "mediterraneo": 22,
-            "sur": 22, "islas": 22, "cierre": 18}
+            "sur": 26, "islas": 22, "cierre": 18}
 
 
 def fecha_larga(d: date) -> str:
@@ -74,7 +74,8 @@ Escribe la locución en castellano de España, para leer en voz alta por una voz
 Bloques:
 - intro: saludo con la fecha y gancho para que no deslicen el vídeo.
 - general: resumen de España en una frase o dos (lo más destacado del día).
-- norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias).
+- norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias). En "sur" \
+nombra SIEMPRE Ceuta y Melilla (aunque sea en una frase corta): la gente de allí lo pide.
 - cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para tener el tiempo de cada día. NUNCA digas \
 horas de publicación ni "mañana a las...".
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
@@ -228,6 +229,11 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
             ciudad = max(lista, key=lambda p: (p["lluvia"], p["tmax"]))
             alusion = " " + _aludir(ciudad, rnd)
         seg[r] = f"{intros[r]}, {CIELO[dom]} y {_frase_ciudades(lista)}.{chiste}{alusion}{aviso}"
+        if r == "sur":  # Ceuta y Melilla, siempre nombradas
+            cm = [p for p in lista if p["nombre"] in ("Ceuta", "Melilla")]
+            if cm:
+                seg[r] += " " + " y ".join(f"{'en' if k else 'En'} {p['nombre']}, {p['tmax']} grados"
+                                           for k, p in enumerate(cm)) + "."
     pregunta = rnd.choice([
         "Y tú, ¿hoy eres de paraguas o de chanclas? Te leo en comentarios.",
         "¿Desde qué ciudad nos ves? Dímelo en comentarios.",

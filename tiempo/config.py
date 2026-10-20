@@ -48,6 +48,8 @@ CIUDADES = [
     {"id": "18087", "nombre": "Granada", "lat": 37.177, "lon": -3.599, "region": "sur"},
     {"id": "04013", "nombre": "Almería", "lat": 36.834, "lon": -2.464, "region": "sur"},
     {"id": "06015", "nombre": "Badajoz", "lat": 38.879, "lon": -6.970, "region": "sur"},
+    {"id": "51001", "nombre": "Ceuta", "lat": 35.889, "lon": -5.321, "region": "sur"},
+    {"id": "52001", "nombre": "Melilla", "lat": 35.292, "lon": -2.938, "region": "sur"},
     # Islas
     {"id": "07040", "nombre": "Palma", "lat": 39.570, "lon": 2.650, "region": "islas"},
     {"id": "35016", "nombre": "Las Palmas", "lat": 28.124, "lon": -15.430, "region": "islas"},
@@ -78,7 +80,7 @@ REGIONES = {
         "titulo": "SUR",
         "provincias": ["Huelva", "Sevilla", "Cádiz", "Málaga", "Córdoba", "Jaén", "Granada", "Almería",
                        "Badajoz", "Cáceres", "Ceuta", "Melilla"],
-        "vista": (-7.9, -1.4, 35.7, 39.7),
+        "vista": (-7.9, -1.4, 34.9, 39.7),
     },
     "islas": {
         "titulo": "BALEARES Y CANARIAS",
