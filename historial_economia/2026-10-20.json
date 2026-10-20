@@ -1,18 +1,18 @@
 {
  "fecha": "2026-10-20",
  "modo": "diario",
- "duracion": 67.47,
- "caption": "¿Toro u oso? Te leo en comentarios 👇\n\nResumen económico de hoy, martes 20 de octubre 📊\n🟢 IBEX 35: 19.184 (+0,8 %)\n🟢 S&P 500: 7.709 (+0,2 %)\n🟢 Bitcoin: 82.929 (+0,9 %)\n🟢 Oro: 4.160 (+0,0 %)\n🔴 Brent: 107,01 (−2,3 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
+ "duracion": 67.13,
+ "caption": "¿Toro u oso? Te leo en comentarios 👇\n\nResumen económico de hoy, martes 20 de octubre 📊\n🟢 IBEX 35: 19.092 (+0,3 %)\n🟢 S&P 500: 7.712 (+0,3 %)\n🟢 Bitcoin: 82.467 (+0,6 %)\n🔴 Oro: 4.148 (−0,3 %)\n🔴 Brent: 108,35 (−1,1 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
  "portada_ms": 0,
  "origen_guion": "plantilla",
  "voz": "masculina",
  "titulares": [],
  "guion": {
   "intro": "Buenos días. Es martes y antes de que abra la bolsa te cuento cómo están los mercados en un minuto.",
-  "bolsas": "El IBEX 35 subió un 0,8 % hoy y cerró en 19.184 puntos. En Europa, el Euro Stoxx 50 terminó plano y el DAX subió un 0,2 %. En Wall Street, el S&P 500 subió un 0,2 % y el Nasdaq terminó plano. Y esta madrugada en Tokio, el Nikkei bajó un 1,3 %.",
-  "cripto": "El bitcoin está en unos 82.900 dólares, y en las últimas 24 horas subió un 0,9 %. Ethereum, en unos 2.460 dólares.",
-  "materias": "El oro cotiza a 4.160 dólares la onza y está plano. El Brent, el petróleo de referencia en Europa, está en 107,0 dólares el barril. Y el euro se cambia a 1,12 dólares.",
-  "agenda": "La agenda de hoy viene tranquila, sin datos de los gordos. Ideal para respirar. Y apunta: el miércoles 28 la Reserva Federal decide los tipos de interés.",
+  "bolsas": "El IBEX 35 subió un 0,3 % hoy y cerró en 19.092 puntos. En Europa, el Euro Stoxx 50 bajó un 0,4 % y el DAX bajó un 0,1 %. En Wall Street, el S&P 500 subió un 0,3 % y el Nasdaq subió un 0,1 %.",
+  "cripto": "El bitcoin está en unos 82.500 dólares, y en las últimas 24 horas subió un 0,6 %.",
+  "materias": "El oro cotiza a 4.148 dólares la onza y baja un 0,3 %. El Brent, el petróleo de referencia en Europa, está en 108,3 dólares el barril. Y el euro se cambia a 1,12 dólares.",
+  "agenda": "¿Qué hay hoy en la agenda? A las ocho de la mañana, precios industriales de Alemania. A las once de la mañana, índice ZEW de Alemania y índice ZEW en la eurozona. Y apunta: el miércoles 28 la Reserva Federal decide los tipos de interés.",
   "cierre": "¿Hoy eres más de toro o de oso? Déjamelo en comentarios, que los leo todos. Recuerda que esto es información, no un consejo de inversión. Sígueme y nos vemos mañana a las ocho y media."
  }
 }
