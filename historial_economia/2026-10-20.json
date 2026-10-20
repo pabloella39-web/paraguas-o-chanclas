@@ -1,18 +1,28 @@
 {
  "fecha": "2026-10-20",
  "modo": "diario",
- "duracion": 67.13,
- "caption": "¿Toro u oso? Te leo en comentarios 👇\n\nResumen económico de hoy, martes 20 de octubre 📊\n🟢 IBEX 35: 19.092 (+0,3 %)\n🟢 S&P 500: 7.712 (+0,3 %)\n🟢 Bitcoin: 82.467 (+0,6 %)\n🔴 Oro: 4.148 (−0,3 %)\n🔴 Brent: 108,35 (−1,1 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
+ "duracion": 67.4,
+ "caption": "Petróleo a 108,5 dólares y un IBEX que esquiva a Europa 🐂\n\nResumen económico de hoy, martes 20 de octubre 📊\n🟢 IBEX 35: 19.092 (+0,3 %)\n🟢 S&P 500: 7.713 (+0,3 %)\n🟢 Bitcoin: 82.306 (+0,5 %)\n🔴 Oro: 4.146 (−0,3 %)\n🔴 Brent: 108,51 (−0,9 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
  "portada_ms": 0,
- "origen_guion": "plantilla",
+ "origen_guion": "claude",
  "voz": "masculina",
- "titulares": [],
+ "titulares": [
+  {
+   "titulo": "El petróleo se calma y las bolsas respiran",
+   "fuente": "Cinco Días"
+  },
+  {
+   "titulo": "La prima de riesgo francesa se dispara tras protestas",
+   "fuente": "Cinco Días"
+  }
+ ],
  "guion": {
-  "intro": "Buenos días. Es martes y antes de que abra la bolsa te cuento cómo están los mercados en un minuto.",
-  "bolsas": "El IBEX 35 subió un 0,3 % hoy y cerró en 19.092 puntos. En Europa, el Euro Stoxx 50 bajó un 0,4 % y el DAX bajó un 0,1 %. En Wall Street, el S&P 500 subió un 0,3 % y el Nasdaq subió un 0,1 %.",
-  "cripto": "El bitcoin está en unos 82.500 dólares, y en las últimas 24 horas subió un 0,6 %.",
-  "materias": "El oro cotiza a 4.148 dólares la onza y baja un 0,3 %. El Brent, el petróleo de referencia en Europa, está en 108,3 dólares el barril. Y el euro se cambia a 1,12 dólares.",
-  "agenda": "¿Qué hay hoy en la agenda? A las ocho de la mañana, precios industriales de Alemania. A las once de la mañana, índice ZEW de Alemania y índice ZEW en la eurozona. Y apunta: el miércoles 28 la Reserva Federal decide los tipos de interés.",
-  "cierre": "¿Hoy eres más de toro o de oso? Déjamelo en comentarios, que los leo todos. Recuerda que esto es información, no un consejo de inversión. Sígueme y nos vemos mañana a las ocho y media."
+  "intro": "¿Un barril a 108,5 dólares? Así arranca este martes 20 de octubre.",
+  "bolsas": "El IBEX 35 cerró ayer en 19.092 puntos, un 0,3 % más, mientras el Euro Stoxx 50 cedía un 0,4 %. En Wall Street, el S&P 500 sumó un 0,3 % y el Nasdaq, un 0,1 %. El Nikkei cayó un 1,3 % esta madrugada.",
+  "cripto": "El bitcoin anda en unos 82.300 dólares y el ethereum, en unos 2.430.",
+  "materias": "El oro cotiza a 4.146 dólares la onza. El Brent, a 108,5 dólares el barril. Y el euro, a 1,12 dólares.",
+  "agenda": "Hoy, a las once de la mañana, llega el índice ZEW alemán, que mide el ánimo de los analistas. Ojo, que la FED, el banco central de EE. UU., se reúne el miércoles 28, y el BCE, el jueves 29.",
+  "noticias": "El petróleo se calmó ante un posible diálogo entre EE. UU. e Irán, y las bolsas respiraron. Francia, en cambio, preocupa. Su prima de riesgo, lo que paga de más por endeudarse, se disparó tras las protestas.",
+  "cierre": "¿Toro u oso con el IBEX hoy? Cuéntamelo en los comentarios. Esto es información, no un consejo de inversión. Sígueme, publico cada mañana a las ocho y media."
  }
 }
