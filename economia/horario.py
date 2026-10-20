@@ -9,6 +9,7 @@ import logging
 import os
 import sys
 import time
+from datetime import timedelta
 
 from tiempo.horario import ahora
 
@@ -49,7 +50,8 @@ def debe_ejecutarse(evento: str) -> tuple[bool, str]:
 
 def esperar_hasta_publicacion(edicion: str = "manana"):
     h, m = HORA_PUBLICACION[edicion]
-    objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0)
+    # Se empieza a subir unos minutos antes: TikTok tarda ~2-3 min en procesar y el borrador debe estar a la hora
+    objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0) - timedelta(minutes=4)
     falta = (objetivo - ahora()).total_seconds()
     if falta <= 0:
         log.info("Ya son más de las %02d:%02d, se publica ahora", h, m)

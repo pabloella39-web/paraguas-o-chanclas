@@ -153,6 +153,14 @@ def main():
 
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
     meta = construir(hoy, Path(a.salida), demo=a.demo)
+    if not a.demo:
+        # Página del móvil con la descripción lista para copiar (docs/hoy.html la lee). Se sube YA, antes de
+        # esperar a la hora de publicación, para que el texto esté listo a la vez que el borrador.
+        (RAIZ / "docs" / "hoy.json").write_text(json.dumps(
+            {"fecha": hoy.isoformat(), "caption": meta["caption"], "voz": meta.get("voz"),
+             "duracion": meta["duracion"]}, ensure_ascii=False, indent=1), encoding="utf-8")
+        from .repo import subir
+        subir([RAIZ / "docs" / "hoy.json"], f"Texto del parte del {hoy.isoformat()}")
 
     from .tiktok import hay_credenciales
     faltan = hay_credenciales() if a.publicar else []
@@ -171,11 +179,6 @@ def main():
             f.write(f"## Parte del {hoy.isoformat()} ({meta['duracion']} s)\n\n"
                     f"**Texto para el post de TikTok** (cópialo al publicar):\n\n```\n{meta['caption']}\n```\n\n"
                     f"Guion: {meta.get('origen_guion')}\n")
-    if not a.demo:
-        # Página del móvil con la descripción lista para copiar (docs/hoy.html la lee)
-        (RAIZ / "docs" / "hoy.json").write_text(json.dumps(
-            {"fecha": hoy.isoformat(), "caption": meta["caption"], "voz": meta.get("voz"),
-             "duracion": meta["duracion"]}, ensure_ascii=False, indent=1), encoding="utf-8")
     hist = RAIZ / "historial" / f"{hoy.isoformat()}.json"
     if not a.demo:
         hist.parent.mkdir(exist_ok=True)

@@ -1,4 +1,4 @@
-"""Resumen económico: datos → guion → voz → vídeo (65–70 s) → espera a las 8:00 (o 21:30) → TikTok.
+"""Resumen económico: datos → guion → voz → vídeo (65–70 s) → espera a las 7:30 (o 21:00) → TikTok.
 
   python -m economia.main --demo                 # vídeo de prueba con datos inventados y sin voz
   python -m economia.main                        # vídeo real (datos de internet), sin publicar
@@ -211,13 +211,15 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--publicar", action="store_true")
-    ap.add_argument("--esperar", action="store_true", help="esperar a la hora de la edición (8:00 o 21:30, Madrid)")
+    ap.add_argument("--esperar", action="store_true", help="esperar a la hora de la edición (7:30 o 21:00, Madrid)")
     ap.add_argument("--salida", default=str(RAIZ / "salida_economia"))
     ap.add_argument("--fecha", help="AAAA-MM-DD (por defecto, hoy en Madrid)")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
     meta = construir(hoy, Path(a.salida), demo=a.demo)
+    if not a.demo:
+        _guardar_textos(hoy, meta)  # el texto queda en la web antes de la hora, a la vez que el borrador
 
     from tiempo.tiktok import ESTADO, hay_credenciales
     faltan = hay_credenciales() if a.publicar else []
@@ -237,6 +239,15 @@ def main():
                     f"Guion: {meta.get('origen_guion')}\n")
     if not a.demo:
         edicion = "noche" if meta["modo"] == "noche" else "manana"
+        HISTORIAL.mkdir(exist_ok=True)
+        (HISTORIAL / f"{hoy.isoformat()}{'-noche' if edicion == 'noche' else ''}.json").write_text(
+            json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def _guardar_textos(hoy: date, meta: dict):
+    from tiempo.repo import subir
+    if True:
+        edicion = "noche" if meta["modo"] == "noche" else "manana"
         destino = RAIZ / "docs" / "economia" / "hoy.json"
         destino.parent.mkdir(parents=True, exist_ok=True)
         try:
@@ -247,9 +258,7 @@ def main():
         ediciones[edicion] = {"caption": meta["caption"], "voz": meta.get("voz"), "duracion": meta["duracion"]}
         destino.write_text(json.dumps({"fecha": hoy.isoformat(), "caption": meta["caption"], "edicion": edicion,
                                        "ediciones": ediciones}, ensure_ascii=False, indent=1), encoding="utf-8")
-        HISTORIAL.mkdir(exist_ok=True)
-        (HISTORIAL / f"{hoy.isoformat()}{'-noche' if edicion == 'noche' else ''}.json").write_text(
-            json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1), encoding="utf-8")
+        subir([destino], f"Texto del resumen económico ({edicion}) del {hoy.isoformat()}")
 
 
 if __name__ == "__main__":
