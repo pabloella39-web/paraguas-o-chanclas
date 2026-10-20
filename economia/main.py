@@ -48,7 +48,8 @@ def generar_locucion(merc, agenda, titulares, hoy, modo, trabajo: Path, demo: bo
                      guion.get("origen", "plantilla"), vel,
                      sum(len(guion["segmentos"][s].split()) for s in bloques), habla, objetivo)
             mejor = (guion, bloques, wavs, durs)
-            if abs(habla - objetivo) <= 1.0:
+            # Hasta 3 s por debajo del objetivo también vale: el vídeo sigue pasando de 65 s
+            if abs(habla - objetivo) <= 1.0 or objetivo - 3.0 <= habla <= objetivo:
                 return mejor
             nueva = round((1 + vel / 100) * habla / objetivo * 100 - 100)
             if not VEL_MIN <= nueva <= VEL_MAX:
