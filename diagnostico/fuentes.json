@@ -1,0 +1,149 @@
+{
+ "yahoo_q1": {
+  "status": 429,
+  "ms": 62,
+  "len": 19,
+  "tipo": "text/html",
+  "muestra": "Too Many Requests\r\n"
+ },
+ "yahoo_q2": {
+  "status": 429,
+  "ms": 79,
+  "len": 19,
+  "tipo": "text/html",
+  "muestra": "Too Many Requests\r\n"
+ },
+ "yahoo_btc": {
+  "status": 429,
+  "ms": 48,
+  "len": 19,
+  "tipo": "text/html",
+  "muestra": "Too Many Requests\r\n"
+ },
+ "stooq_csv": {
+  "status": 200,
+  "ms": 448,
+  "len": 796,
+  "tipo": "text/html; charset=utf-8",
+  "muestra": "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow\"></head><body><noscript>This site requires JavaScript to verify your browser. Please enable JavaScript and reload.</noscript><script nonce=\"eJ_3-MMlet-P9sRvU188ZQ\">\n(async()=>{const c=\"AAAAAGrXgaUfeoHzViwz_15CJBg7bomCFKj5k5cADvqEl4iyOfgZY_Oez_0\",d=4,t=\"0\".repeat(d),e=new TextEncoder;let n=0;while(1){cons"
+ },
+ "stooq_ult": {
+  "status": 404,
+  "ms": 412,
+  "len": 271,
+  "tipo": "text/html",
+  "muestra": "<meta charset=utf-8><title>Stooq</title><center style=font-family:arial;margin-top:50px><p><a href=/><img src=//static.stooq.com/stooq.svg height=68></a><p style=font-size:x-large>The page you requested does not exist<br>or has been moved<p><small><a href=/>Main Page</a>"
+ },
+ "coingecko": {
+  "status": 200,
+  "ms": 94,
+  "len": 218,
+  "tipo": "application/json; charset=utf-8",
+  "muestra": "{\"bitcoin\":{\"eur\":73942,\"eur_24h_change\":0.965294974308158,\"usd\":83146,\"usd_24h_change\":1.2241477419998288},\"ethereum\":{\"usd\":2464.9,\"usd_24h_change\":2.44977874705284,\"eur\":2192.06,\"eur_24h_change\":2.1877917669730675}}"
+ },
+ "coingecko_chart": {
+  "status": 200,
+  "ms": 64,
+  "len": 3244,
+  "tipo": "application/json; charset=utf-8",
+  "muestra": "{\"prices\":[[1789948800000,81169.03511950027],[1790035200000,86596.74004249526],[1790121600000,86183.29442787907],[1790208000000,84382.39990356649],[1790294400000,84377.96508359577],[1790380800000,84075.71659039952],[1790467200000,84416.7149816521],[1790553600000,84448.75015162026],[1790640000000,83479.2543356063],[1790726400000,83640.10160067653],[1790812800000,83576.13460018387],[1790899200000,84"
+ },
+ "kraken": {
+  "status": 200,
+  "ms": 88,
+  "len": 310,
+  "tipo": "application/json",
+  "muestra": "{\"error\":[],\"result\":{\"XXBTZUSD\":{\"a\":[\"83187.60000\",\"1\",\"1.000\"],\"b\":[\"83187.50000\",\"1\",\"1.000\"],\"c\":[\"83187.50000\",\"0.01654227\"],\"v\":[\"1215.85656851\",\"1675.20287621\"],\"p\":[\"82030.87390\",\"82011.98528\"],\"t\":[99261,149991],\"l\":[\"81099.70000\",\"81099.70000\"],\"h\":[\"83339.10000\",\"83339.10000\"],\"o\":\"81843.00000\"}}}"
+ },
+ "ff_semana": {
+  "status": 200,
+  "ms": 111,
+  "len": 11604,
+  "tipo": "application/json",
+  "muestra": "[{\"title\":\"IMF Meetings\",\"country\":\"All\",\"date\":\"2026-10-18T10:15:00-04:00\",\"impact\":\"Low\",\"forecast\":\"\",\"previous\":\"\"},{\"title\":\"BusinessNZ Services Index\",\"country\":\"NZD\",\"date\":\"2026-10-18T17:30:00-04:00\",\"impact\":\"Low\",\"forecast\":\"\",\"previous\":\"51.2\"},{\"title\":\"Trade Balance\",\"country\":\"NZD\",\"date\":\"2026-10-18T17:45:00-04:00\",\"impact\":\"Low\",\"forecast\":\"-775M\",\"previous\":\"-1349M\"},{\"title\":\"Rig"
+ },
+ "frankfurter": {
+  "status": 200,
+  "ms": 164,
+  "len": 97,
+  "tipo": "application/json; charset=utf-8",
+  "muestra": "{\"amount\":1.0,\"base\":\"EUR\",\"date\":\"2026-10-20\",\"rates\":{\"GBP\":0.84028,\"JPY\":177.34,\"USD\":1.1215}}"
+ },
+ "fed_cal": {
+  "status": 200,
+  "ms": 84,
+  "len": 165751,
+  "tipo": "text/html",
+  "muestra": "ï»¿<!doctype html>\r\n<html lang=\"en\" class=\"no-js\">\r\n    <head>\r\n        <meta charset=\"utf-8\">\r\n        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/>\r\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, minimum-scale=1.0 maximum-scale=1.6, user-scalable=1\"/>\r\n        <meta name=\"keywords\" content=\"Board of Governors of the Federal Reserve System, Federal Reserve "
+ },
+ "rss_expansion": {
+  "status": 200,
+  "ms": 170,
+  "len": 146500,
+  "tipo": "text/xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\">\n    <channel>\n        <title><![CDATA[Portada // expansion]]></title>\n        <link>http://www.expansion.com</link>\n        <description><![CDATA[Portada "
+ },
+ "rss_expansion_mercados": {
+  "status": 200,
+  "ms": 128,
+  "len": 93307,
+  "tipo": "text/xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\">\n    <channel>\n        <title><![CDATA[Mercados // expansion]]></title>\n        <link>http://www.expansion.com</link>\n        <description><![CDATA[Mercado"
+ },
+ "rss_cincodias": {
+  "status": 200,
+  "ms": 81,
+  "len": 277504,
+  "tipo": "application/xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<rss version=\"2.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\">\n  <channel>\n    <title>Cinco Días: economía y mercados</title>\n    <description>Noticias de última hora sobre eco"
+ },
+ "rss_elpais_eco": {
+  "status": 200,
+  "ms": 35,
+  "len": 134810,
+  "tipo": "application/xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<rss version=\"2.0\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:media=\"http://search.yahoo.com/mrss/\">\n  <channel>\n    <title>Economía en EL PAÍS</title>\n    <description>Las últimas noticias sobre la economía en Esp"
+ },
+ "rss_eleconomista": {
+  "status": 403,
+  "ms": 299,
+  "len": 405,
+  "tipo": "text/html",
+  "muestra": "<HTML><HEAD>\n<TITLE>Access Denied</TITLE>\n</HEAD><BODY>\n<H1>Access Denied</H1>\n \nYou don't have permission to access \"http&#58;&#47;&#47;www&#46;eleconomista&#46;es&#47;rss&#47;rss&#45;mercados&#46;php\" on this server.<P>\nReference&#32;&#35;18&#46;60ed2c17&#46;1792508327&#46;327cd0fe\n<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;18&#46;60ed2c17&#46;1792508327&#46;327cd0fe</P>\n</BODY>\n</H"
+ },
+ "rss_europapress": {
+  "status": 200,
+  "ms": 449,
+  "len": 11438,
+  "tipo": "text/xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\r\n  <channel>\r\n    <title>Europa Press - EconomÃ­a Finanzas</title>\r\n    <link>https://www.europapress.es/economia/</link>\r\n    <description>EconomÃ­a Finanzas. Europa Press.</description>\r\n    <image>\r\n      <url>https://s01.europapress.net/imagenes/estaticos/eplogo.gif</url>\r\n      <title>Europa P"
+ },
+ "rss_investing": {
+  "status": 200,
+  "ms": 123,
+  "len": 4706,
+  "tipo": "application/rss+xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>Todas las noticias</title>\n    <link>https://es.investing.com</link>\n    <item>\n      <title>ClimateRock modifica el acuerdo de fusión con GreenRock y amplía el plazo hasta 2027</title>\n      <pubDate>2026-10-20 14:34:11</pubDate>\n      <author>Investing.com</author>\n      <link>https://es.investing.com/news/sec-fili"
+ },
+ "rss_bce": {
+  "status": 200,
+  "ms": 565,
+  "len": 5766,
+  "tipo": "application/rss+xml",
+  "muestra": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\"><channel>\n\t\t\t\t<title>ECB - European Central Bank</title><link>https://www.ecb.europa.eu/</link><description>Latest releases on the ECB website - Press releases, speeches and interviews, press conferences.</description><language>en</language><copyright>Copyright 2026, European Central Bank</copyright>"
+ },
+ "rss_fed": {
+  "status": 200,
+  "ms": 50,
+  "len": 14813,
+  "tipo": "text/xml",
+  "muestra": "ï»¿<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n<rss version=\"2.0\">\r\n    <channel>\r\n        <title>FRB: Press Release - All Releases</title>\r\n        <link><![CDATA[https://www.federalreserve.gov/feeds/feeds.htm]]></link>\r\n        <description><![CDATA[All recent press releases from the Federal Reserve Board]]></description>\r\n        <language>en</language>\r\n        <item>\r\n            <title>Federal "
+ },
+ "rss_consilium": {
+  "status": 200,
+  "ms": 733,
+  "len": 14138,
+  "tipo": "text/xml; charset=utf-8",
+  "muestra": "﻿<?xml version=\"1.0\" encoding=\"utf-8\"?><rss xmlns:a10=\"http://www.w3.org/2005/Atom\" version=\"2.0\"><channel><title>Consejo de la UE</title><link>https://www.consilium.europa.eu/</link><description /><language>es</language><item><guid isPermaLink=\"false\">151482</guid><link>https://www.consilium.europa.eu/es/press/press-releases/2026/10/20/council-and-parliament-strike-deal-on-updated-measures-to-sup"
+ }
+}
