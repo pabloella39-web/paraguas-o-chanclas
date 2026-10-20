@@ -75,7 +75,8 @@ Bloques:
 - intro: saludo con la fecha y gancho para que no deslicen el vídeo.
 - general: resumen de España en una frase o dos (lo más destacado del día).
 - norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias).
-- cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para el parte de mañana a las 7 y media.
+- cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para tener el tiempo de cada día. NUNCA digas \
+horas de publicación ni "mañana a las...".
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
 
 Además escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), que
@@ -233,8 +234,7 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
         "¿Qué plan tienes con este tiempo? Cuéntamelo abajo.",
         "Etiqueta a ese amigo que siempre sale en manga corta.",
     ])
-    seg["cierre"] = (f"{pregunta} Y sigue a Paraguas o Chanclas, que mañana a las siete y media "
-                     "vuelvo con el parte.")
+    seg["cierre"] = f"{pregunta} Y sigue a Paraguas o Chanclas para tener el tiempo de cada día."
     if factor > 1.2:
         seg["cierre"] += " ¡Pásaselo a quien siempre sale sin chaqueta!"
     caption = (f"El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ ¿Tú hoy eres de paraguas o de chanclas? 👇 "

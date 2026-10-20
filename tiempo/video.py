@@ -320,7 +320,7 @@ class Compositor:
             d.text((cx, cy - 18), "¡Dímelo en comentarios!", font=fuente("ExtraBold", 42),
                    fill=oscuro, anchor="mm")
             d.line([(cx - 300, cy + 26), (cx + 300, cy + 26)], fill=(15, 25, 50, 90), width=3)
-            d.text((cx, cy + 74), "Sígueme · cada mañana a las 7:30", font=fuente("ExtraBold", 38), fill=oscuro,
+            d.text((cx, cy + 74), "Sígueme · el tiempo de cada día", font=fuente("ExtraBold", 38), fill=oscuro,
                    anchor="mm")
 
     def _subtitulo(self, img, d, t):
