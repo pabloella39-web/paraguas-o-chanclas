@@ -1,0 +1,22 @@
+{
+ "fecha": "2026-10-20",
+ "duracion": 67.77,
+ "caption": "Antes de salir de casa, mira esto 👀\n\nEl tiempo en España hoy, martes 20 de octubre 🇪🇸\n🌧️ Lluvia en Palma y A Coruña\n🔥 Máxima: 28° en Alicante\n🥶 Mínima: 3° en Salamanca\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #frio #otoño #Palma",
+ "portada_ms": 10526,
+ "origen_guion": "plantilla",
+ "voz": "femenina",
+ "guion": {
+  "intro": "¡Buenos días! Es martes 20 de octubre. Quédate hasta el final, que hoy te toca elegir: ¿paraguas o chanclas?",
+  "general": "Lo más caluroso, Alicante con 28 grados, y lo más frío al amanecer, Salamanca con 3. Ojo con la lluvia en A Coruña y Oviedo.",
+  "norte": "Empezamos por el norte, lluvia y máximas entre los 16 grados de Pamplona y los 18 de Bilbao. Hoy no tiendas la ropa.",
+  "interior": "En el interior, sol con alguna nube y máximas entre los 15 grados de Valladolid y los 19 de Zaragoza. Si eres de Zaragoza, día tranquilo para lo que tengas en mente.",
+  "mediterraneo": "En el Mediterráneo, chubascos a ratos y máximas entre los 22 grados de Barcelona y los 28 de Alicante. Paraguas aunque parezca que no.",
+  "sur": "En el sur, sol con alguna nube y máximas entre los 20 grados de Granada y los 26 de Málaga. Gente de Sevilla, hoy toca chubasquero. Lluvia muy probable.",
+  "islas": "Y en las islas, lluvia y máximas entre los 22 grados de Palma y los 26 de Santa Cruz de Tenerife. El paraguas, de copiloto.",
+  "cierre": "Etiqueta a ese amigo que siempre sale en manga corta. Y sigue a Paraguas o Chanclas, que mañana a las siete y media vuelvo con el parte."
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7698614235777189910",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
