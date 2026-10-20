@@ -555,8 +555,8 @@ class Compositor:
         d.text((420, 76), LEMA, font=fuente("Black", 70), fill=OSCURO, anchor="mm")
         d.text((420, 150), "¡Dímelo en comentarios!", font=fuente("ExtraBold", 44), fill=OSCURO, anchor="mm")
         d.line([(110, 200), (730, 200)], fill=(15, 25, 50, 90), width=3)
-        d.text((420, 256), "Sígueme · cada día a las 8:00 y 21:30",
-               font=_ajustar("Sígueme · cada día a las 8:00 y 21:30", "ExtraBold", 40, 780), fill=OSCURO,
+        d.text((420, 256), "Sígueme · información actualizada cada día",
+               font=_ajustar("Sígueme · información actualizada cada día", "ExtraBold", 40, 780), fill=OSCURO,
                anchor="mm")
         el.append({"img": im, "x": 120, "y": 660, "delay": 0.5, "tipo": "pop"})
         return el

@@ -139,7 +139,7 @@ def resumen_datos(merc: dict, agenda: dict, hoy: date) -> dict:
 
 
 MODOS = {
-    "diario": "Edición de la MAÑANA de un día laborable, publicada a las 8:00, antes de que abra la bolsa española: qué esperar del día. Las bolsas "
+    "diario": "Edición de la MAÑANA de un día laborable, publicada antes de que abra la bolsa española: qué esperar del día. Las bolsas "
               "europeas y de EE. UU. muestran el cierre de su última sesión; el Nikkei, el cierre de esta madrugada; "
               "oro, petróleo, euro y cripto, el precio de ahora mismo. La agenda es la de HOY.",
     "noche": "Resumen de la JORNADA DE HOY, publicado por la noche. Las bolsas europeas (IBEX, Euro Stoxx, DAX) "
@@ -186,8 +186,8 @@ INTERACCIÓN (para que la gente comente):
 - Habla al espectador de tú. "intro" empieza con un gancho que dé ganas de quedarse (una pregunta o un dato \
 llamativo de hoy) y menciona el día.
 - "cierre" pregunta "¿toro u oso?" (toro si crees que sube, oso si crees que baja) aplicado a algo concreto de \
-hoy (el IBEX, el bitcoin, el oro...), invita a comentar y a seguir a {canal}, que publica cada mañana a las ocho \
-y cada noche a las nueve y media. Varía la forma cada día.
+hoy (el IBEX, el bitcoin, el oro...), invita a comentar y a seguir a {canal} para tener la información actualizada \
+cada día. NUNCA digas horas de publicación ni "mañana a las..." para el próximo vídeo. Varía la forma cada día.
 
 BLOQUES (en este orden). LÍMITE ESTRICTO: como máximo {total} palabras en total y estas por bloque: \
 {palabras}. El vídeo dura poco más de un minuto: si te pasas, no cabe. Mejor contar menos cosas y bien.
@@ -397,7 +397,7 @@ def guion_plantilla(merc: dict, agenda: dict, hoy: date, modo: str = "diario", f
     cierre = rnd.choice([
         "Y ahora te toca a ti: ¿toro u oso? Toro si crees que sube, oso si crees que baja. Te leo en comentarios.",
         "¿Hoy eres más de toro o de oso? Déjamelo en comentarios, que los leo todos.",
-    ]) + " Recuerda que esto es información, no un consejo de inversión. Sígueme: resumen cada mañana a las ocho y cada noche a las nueve y media."
+    ]) + " Recuerda que esto es información, no un consejo de inversión. Sígueme para tener la información actualizada cada día."
 
     seg = {"intro": intro, "bolsas": bolsas, "cripto": cripto, "materias": materias, "agenda": ag,
            "noticias": "", "cierre": cierre}
