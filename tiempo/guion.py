@@ -11,6 +11,7 @@ from datetime import date
 import requests
 
 from .config import MODELO_CLAUDE, SEGMENTOS
+from .prioridad import orden_regiones
 
 log = logging.getLogger(__name__)
 
@@ -71,9 +72,14 @@ Escribe la locución en castellano de España, para leer en voz alta por una voz
 - Si una ciudad tiene "discrepancia_tmax" de 3 o más, puedes bromear con que AEMET y los modelos no se ponen de acuerdo.
 - Longitud EXACTA aproximada por bloque (palabras): {palabras}. Total ≈ {total} palabras. Es crucial respetarlo.
 
+ORDEN DE HOY: los bloques regionales NO van siempre igual: se cuentan de más a menos relevante. Hoy el orden es
+{orden}. Motivos detectados en los datos: {motivos}. Empieza el primero con fuerza (es la noticia del día) y
+enlaza cada región con la siguiente con naturalidad; no digas "empezamos por el norte" si no toca.
+
 Bloques:
 - intro: saludo con la fecha y gancho para que no deslicen el vídeo.
-- general: resumen de España en una frase o dos (lo más destacado del día).
+- general: resumen de España en una frase o dos, EMPEZANDO por lo más destacado del día (lo de la región que va
+  primero en el orden de hoy).
 - norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias). En "sur" \
 nombra SIEMPRE Ceuta y Melilla (aunque sea en una frase corta): la gente de allí lo pide.
 - cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para tener el tiempo de cada día. NUNCA digas \
@@ -112,19 +118,25 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                    presenta: str = "un presentador") -> dict:
     """factor < 1 pide un guion más corto; > 1 más largo (para ajustar la duración)."""
     palabras = {k: max(6, round(v * factor)) for k, v in PALABRAS.items()}
+    orden, info = orden_regiones(prev, texto_aemet, hoy)
+    log.info("Orden de regiones hoy: %s", ", ".join(f"{r} ({info[r]['puntos']})" for r in orden))
     clave = os.environ.get("ANTHROPIC_API_KEY", "")
     if clave:
         prompt = PROMPT.format(fecha=fecha_larga(hoy), datos=json.dumps(_resumen_datos(prev), ensure_ascii=False),
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
-                               palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta)
+                               palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
+                               orden=" → ".join(orden),
+                               motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
+                                                  ensure_ascii=False))
         for intento in range(2):
             try:
                 g = _claude(prompt, clave)
                 g["origen"] = "claude"
+                g["orden"] = orden
                 return g
             except Exception as e:  # noqa: BLE001
                 log.warning("Guion con Claude falló (intento %d): %s", intento + 1, e)
-    g = guion_plantilla(prev, hoy, factor)
+    g = guion_plantilla(prev, hoy, factor, texto_aemet)
     g["origen"] = "plantilla"
     return g
 
@@ -188,7 +200,7 @@ CIELO = {"sol": "cielo despejado", "sol_nubes": "sol con alguna nube", "nubes": 
          "nieve": "nieve", "niebla": "nieblas por la mañana"}
 
 
-def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
+def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aemet: str = "") -> dict:
     """Guion sin IA (respaldo). factor < 0.85 quita los comentarios; > 1.1 añade uno al cierre."""
     rnd = random.Random(hoy.toordinal())
     reg = _resumen_datos(prev)
@@ -213,9 +225,19 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
                     + (f"Ojo con la lluvia en {' y '.join(lluviosas[:2])}." if lluviosas
                        else "De lluvia, poca cosa.")),
     }
-    intros = {"norte": "Empezamos por el norte", "interior": "En el interior",
-              "mediterraneo": "En el Mediterráneo", "sur": "En el sur", "islas": "Y en las islas"}
-    for r in ("norte", "interior", "mediterraneo", "sur", "islas"):
+    orden, info = orden_regiones(prev, texto_aemet, hoy)
+    zonas = {"norte": "el norte", "interior": "el interior", "mediterraneo": "el Mediterráneo", "sur": "el sur",
+             "islas": "las islas"}
+    intros = {}
+    for k, r in enumerate(orden):
+        if k == 0:
+            intros[r] = (f"Lo más destacado de hoy está en {zonas[r]}" if info[r]["motivos"]
+                         else f"Empezamos por {zonas[r]}")
+        elif k == len(orden) - 1:
+            intros[r] = f"Y para terminar, en {zonas[r]}"
+        else:
+            intros[r] = rnd.choice([f"En {zonas[r]}", f"Vamos con {zonas[r]}", f"Si miramos a {zonas[r]}"])
+    for r in orden:
         lista = reg.get(r, [])
         if not lista:
             seg[r] = ""
@@ -228,7 +250,22 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
         if r in con_alusion:
             ciudad = max(lista, key=lambda p: (p["lluvia"], p["tmax"]))
             alusion = " " + _aludir(ciudad, rnd)
-        seg[r] = f"{intros[r]}, {CIELO[dom]} y {_frase_ciudades(lista)}.{chiste}{alusion}{aviso}"
+        graves = [c for c in lista if c["icono"] in ("tormenta", "nieve") or c["lluvia"] >= 70]
+        if graves:
+            # Día complicado: primero el aviso, sin chistes
+            fen = ("tormentas" if any(c["icono"] == "tormenta" for c in graves) else
+                   "nieve" if any(c["icono"] == "nieve" for c in graves) else "lluvia")
+            nombres = " y ".join(_nombre(c) for c in graves[:2])
+            prob = max(c["lluvia"] for c in graves)
+            if fen == "lluvia" and prob < 90:
+                seg[r] = (f"{intros[r]}, con lluvia casi segura en {nombres}, un {prob} por ciento. Paraguas en mano. "
+                          f"Las máximas, {_frase_ciudades(lista).replace('máximas ', '')}.{alusion}")
+            else:
+                seg[r] = (f"{intros[r]}, y ojo, que hay {fen} en {nombres}, con hasta un {prob} por ciento de "
+                          f"probabilidad de lluvia. Mucha precaución. "
+                          f"Las máximas, {_frase_ciudades(lista).replace('máximas ', '')}.{alusion}")
+        else:
+            seg[r] = f"{intros[r]}, {CIELO[dom]} y {_frase_ciudades(lista)}.{chiste}{alusion}{aviso}"
         if r == "sur":  # Ceuta y Melilla, siempre nombradas
             cm = [p for p in lista if p["nombre"] in ("Ceuta", "Melilla")]
             if cm:
@@ -245,4 +282,4 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0) -> dict:
         seg["cierre"] += " ¡Pásaselo a quien siempre sale sin chaqueta!"
     caption = (f"El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ ¿Tú hoy eres de paraguas o de chanclas? 👇 "
                "#eltiempo #AEMET #meteo #tiempoespaña #paraguasochanclas")
-    return {"segmentos": seg, "caption": caption}
+    return {"segmentos": seg, "caption": caption, "orden": orden}

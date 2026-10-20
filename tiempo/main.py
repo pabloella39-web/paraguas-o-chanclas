@@ -44,7 +44,9 @@ def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool, tipo_voz
                  else g.escribir_guion(prev, hoy, texto_aemet, factor, VOCES[tipo_voz]["presenta"]))
         if plantilla:
             guion["origen"] = "plantilla"
-        bloques = [s for s in SEGMENTOS if guion["segmentos"].get(s, "").strip()]
+        # Regiones en el orden de relevancia del día (lo más destacado primero)
+        secuencia = ["intro", "general", *guion.get("orden", SEGMENTOS[2:-1]), "cierre"]
+        bloques = [s for s in secuencia if guion["segmentos"].get(s, "").strip()]
         objetivo = _habla_objetivo(len(bloques))
         vel = voz.velocidad_base()
         for ajuste in range(3):
