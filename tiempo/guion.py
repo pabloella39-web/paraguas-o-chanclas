@@ -91,9 +91,9 @@ def _claude(prompt: str, clave: str) -> dict:
     r = requests.post(
         "https://api.anthropic.com/v1/messages",
         headers={"x-api-key": clave, "anthropic-version": "2023-06-01", "content-type": "application/json"},
-        json={"model": os.environ.get("CLAUDE_MODEL", MODELO_CLAUDE), "max_tokens": 2000,
+        json={"model": os.environ.get("CLAUDE_MODEL", MODELO_CLAUDE), "max_tokens": 12000,
               "messages": [{"role": "user", "content": prompt}]},
-        timeout=120,
+        timeout=240,
     )
     r.raise_for_status()
     texto = "".join(b.get("text", "") for b in r.json()["content"] if b.get("type") == "text")
