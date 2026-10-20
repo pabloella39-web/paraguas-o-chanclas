@@ -172,7 +172,8 @@ llamativo de hoy) y menciona el día.
 hoy (el IBEX, el bitcoin, el oro...), invita a comentar y a seguir a {canal}, que publica cada mañana a las ocho \
 y media. Varía la forma cada día.
 
-BLOQUES (en este orden; respeta las palabras aproximadas de cada uno, total ≈ {total}): {palabras}
+BLOQUES (en este orden). LÍMITE ESTRICTO: como máximo {total} palabras en total y estas por bloque: \
+{palabras}. El vídeo dura poco más de un minuto: si te pasas, no cabe. Mejor contar menos cosas y bien.
 - intro: gancho + día.
 - bolsas: IBEX 35 primero; luego Europa (Euro Stoxx 50 o DAX), Wall Street (S&P 500 y Nasdaq) y, si aporta, el \
 Nikkei. Di cuándo es el cierre (ayer, el viernes...).
@@ -232,6 +233,30 @@ def _revisar(g: dict) -> dict:
     return g
 
 
+def _contar(g: dict) -> int:
+    return sum(len(str(v).split()) for v in g["segmentos"].values())
+
+
+ACORTAR = """Este guion para un vídeo de TikTok es demasiado largo ({actual} palabras) y debe durar poco más \
+de un minuto. Reescríbelo con un MÁXIMO de {total} palabras en total, respetando este máximo por bloque: \
+{palabras}. Quita detalles secundarios, no las cifras principales ni la pregunta final. No añadas datos nuevos, \
+mantén el mismo tono y las mismas reglas (sin consejos de inversión; aviso de que es información en el cierre).
+Responde SOLO con el mismo JSON, con los mismos campos.
+
+{guion}"""
+
+
+def _acortar(g: dict, palabras: dict, clave: str) -> dict:
+    total = sum(palabras.values())
+    log.info("Guion de %d palabras: se pide recortar a %d", _contar(g), total)
+    nuevo = _claude(ACORTAR.format(actual=_contar(g), total=total, palabras=json.dumps(palabras, ensure_ascii=False),
+                                   guion=json.dumps({k: v for k, v in g.items() if k != "origen"},
+                                                    ensure_ascii=False)), clave)
+    for k in ("titulares", "agenda_es", "caption"):
+        nuevo.setdefault(k, g.get(k))
+    return _revisar(nuevo)
+
+
 def escribir_guion(merc, agenda, titulares, hoy: date, modo: str, factor: float = 1.0,
                    presenta: str = "un presentador") -> dict:
     palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS.items()}
@@ -246,6 +271,10 @@ def escribir_guion(merc, agenda, titulares, hoy: date, modo: str, factor: float 
         for intento in range(2):
             try:
                 g = _revisar(_claude(prompt, clave))
+                for _ in range(2):  # Claude tiende a pasarse: se le pide recortar a la medida exacta
+                    if _contar(g) <= sum(palabras.values()) * 1.1:
+                        break
+                    g = _acortar(g, palabras, clave)
                 g["origen"] = "claude"
                 return g
             except Exception as e:  # noqa: BLE001

@@ -35,12 +35,15 @@ def _habla_objetivo(n_bloques: int) -> float:
     return DURACION_OBJETIVO - INICIO - PAUSA * (n_bloques - 1) - COLA_MIN - 0.3
 
 
-def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool, tipo_voz: str = "masculina"):
+def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool, tipo_voz: str = "masculina",
+                     plantilla: bool = False):
     """Genera la voz y ajusta su VELOCIDAD (no las pausas) para que encaje en 65-70 s."""
     factor, mejor = 1.0, None
     for intento in range(3):
-        guion = (g.guion_plantilla(prev, hoy, factor) if demo
+        guion = (g.guion_plantilla(prev, hoy, factor) if demo or plantilla
                  else g.escribir_guion(prev, hoy, texto_aemet, factor, VOCES[tipo_voz]["presenta"]))
+        if plantilla:
+            guion["origen"] = "plantilla"
         bloques = [s for s in SEGMENTOS if guion["segmentos"].get(s, "").strip()]
         objetivo = _habla_objetivo(len(bloques))
         vel = voz.velocidad_base()
@@ -58,7 +61,11 @@ def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool, tipo_voz
             # La duración es inversamente proporcional a la velocidad
             nueva = round((1 + vel / 100) * habla / objetivo * 100 - 100)
             if not VEL_MIN <= nueva <= VEL_MAX:
-                break  # haría falta una voz demasiado lenta o rápida: se cambia la longitud del guion
+                limite = min(max(nueva, VEL_MIN), VEL_MAX)
+                if limite == vel:
+                    break  # haría falta una voz demasiado lenta o rápida: se cambia la longitud del guion
+                vel = limite
+                continue
             vel = nueva
         # Guion demasiado corto o largo para una velocidad natural: se pide otro de distinta longitud
         factor *= objetivo * (1 + vel / 100) / (habla * (1 + voz.velocidad_base() / 100))
@@ -101,7 +108,12 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     voz.elegir_voz(VOCES[tipo_voz])
     log.info("Voz del día: %s (%s)", tipo_voz, VOCES[tipo_voz]["edge"])
     guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz)
-    plan, total = planificar(bloques, wavs, durs)
+    try:
+        plan, total = planificar(bloques, wavs, durs)
+    except RuntimeError as e:
+        log.warning("%s → se usa la plantilla", e)  # red de seguridad: el parte sale igual
+        guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz, plantilla=True)
+        plan, total = planificar(bloques, wavs, durs)
     for p in plan:
         p["texto"] = guion["segmentos"][p["seg"]]
 

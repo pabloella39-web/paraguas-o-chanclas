@@ -52,12 +52,32 @@ def generar_locucion(merc, agenda, titulares, hoy, modo, trabajo: Path, demo: bo
                 return mejor
             nueva = round((1 + vel / 100) * habla / objetivo * 100 - 100)
             if not VEL_MIN <= nueva <= VEL_MAX:
-                break
+                limite = min(max(nueva, VEL_MIN), VEL_MAX)
+                if limite == vel:
+                    break
+                vel = limite  # se prueba con la velocidad máxima/mínima permitida antes de cambiar el guion
+                continue
             vel = nueva
         if guion.get("origen") == "plantilla" and habla < objetivo:
             return mejor  # la plantilla no se alarga: el tiempo sobrante queda en la tarjeta final
         factor *= objetivo * (1 + vel / 100) / (habla * (1 + voz.velocidad_base() / 100))
     return mejor
+
+
+def _plantilla(merc, agenda, hoy, modo, trabajo, tipo_voz):
+    guion = g.guion_plantilla(merc, agenda, hoy, modo)
+    guion["origen"] = "plantilla"
+    bloques = [s for s in SEGMENTOS if str(guion["segmentos"].get(s, "")).strip()]
+    objetivo = _habla_objetivo(len(bloques))
+    vel = voz.velocidad_base()
+    for ajuste in range(3):
+        wavs = [voz.sintetizar(guion["segmentos"][s], trabajo / f"p{ajuste}_{s}.mp3", False, vel) for s in bloques]
+        durs = [voz.duracion(w) for w in wavs]
+        nueva = min(max(round((1 + vel / 100) * sum(durs) / objetivo * 100 - 100), VEL_MIN), VEL_MAX)
+        if abs(sum(durs) - objetivo) <= 1.0 or nueva == vel:
+            break
+        vel = nueva
+    return guion, bloques, wavs, durs
 
 
 def _fuentes_txt(merc, agenda, titulares) -> str:
@@ -87,7 +107,14 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     voz.elegir_voz(VOCES[tipo_voz])
     log.info("Día %s (%s), voz %s", hoy, modo, tipo_voz)
     guion, bloques, wavs, durs = generar_locucion(merc, agenda, titulares, hoy, modo, trabajo, demo, tipo_voz)
-    plan, total = planificar(bloques, wavs, durs)
+    try:
+        plan, total = planificar(bloques, wavs, durs)
+    except RuntimeError as e:
+        # Red de seguridad: si el guion de Claude no cabe en 70 s, se usa la plantilla (más corta)
+        log.warning("%s → se usa la plantilla", e)
+        guion, bloques, wavs, durs = generar_locucion(merc, agenda, titulares, hoy, modo, trabajo, True, tipo_voz) \
+            if demo else _plantilla(merc, agenda, hoy, modo, trabajo, tipo_voz)
+        plan, total = planificar(bloques, wavs, durs)
     for p in plan:
         p["texto"] = guion["segmentos"][p["seg"]]
 
