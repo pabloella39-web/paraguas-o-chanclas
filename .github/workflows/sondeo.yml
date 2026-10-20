@@ -1,0 +1,18 @@
+name: Sondeo de fuentes
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/sondear_fuentes.py", "diagnostico/lanzar.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sondeo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests && python scripts/sondear_fuentes.py
+      - run: |
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add diagnostico/; git commit -m "Sondeo de fuentes" || true
+          git pull --rebase -q; git push
