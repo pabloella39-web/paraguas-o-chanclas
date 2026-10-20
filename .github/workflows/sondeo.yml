@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install requests && python scripts/sondear_fuentes.py
+      - run: pip install requests curl_cffi yfinance && python scripts/sondear_fuentes.py
       - run: |
           git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
           git add diagnostico/; git commit -m "Sondeo de fuentes" || true
