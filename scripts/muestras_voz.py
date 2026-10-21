@@ -1,27 +1,34 @@
-"""Genera muestras de voces (edge-tts) con un fragmento del guion económico para elegir la más natural."""
-import asyncio, json, os
+"""Muestras de Remy (voz multilingüe) intentando forzar el español de España con <lang xml:lang='es-ES'>."""
+import asyncio, inspect, os
 import edge_tts
+import edge_tts.communicate as ec
 
 TEXTO = ("¿El petróleo por encima de ciento diez dólares y el Ibex aguantando el tipo? Pues así arranca este "
          "miércoles. El Ibex cerró ayer en 19.092 puntos, un 0,3 % más, y lo hizo esquivando las caídas del resto "
-         "de Europa, mientras en Wall Street el Dow Jones subía un 1 %. Y ojo al crudo, porque el Brent ya anda "
-         "por los 110 dólares el barril, algo que acabarás notando en la gasolinera.")
+         "de Europa. Y ojo al crudo, porque el Brent ya anda por los 110 dólares el barril, algo que acabarás "
+         "notando en la gasolinera.")
+
+original = ec.mkssml
+print("firma mkssml:", inspect.signature(original))
+
+
+def con_lang(*args, **kw):
+    args = list(args)
+    args[-1] = f"<lang xml:lang='es-ES'>{args[-1]}</lang>"
+    return original(*args, **kw)
+
 
 async def main():
     os.makedirs("muestras", exist_ok=True)
-    voces = await edge_tts.list_voices()
-    es = [v["ShortName"] for v in voces if v["Locale"].startswith("es-ES")]
-    multi = [v["ShortName"] for v in voces if "Multilingual" in v["ShortName"]]
-    json.dump({"es-ES": es, "multilingual": multi}, open("muestras/voces.json", "w"), indent=1)
-    candidatas = es + [m for m in multi if m.split("-")[2].startswith(("Andrew", "Ava", "Emma", "Brian", "Vivienne",
-                                                                        "Remy", "Seraphina", "Florian"))]
-    for n, voz in enumerate(candidatas, 1):
-        for rate in ("+5%", "+15%"):
-            ruta = f"muestras/{n:02d}_{voz}_{rate.replace('+', 'mas')}.mp3"
+    for etiqueta, parche in (("normal", False), ("es-ES", True)):
+        ec.mkssml = con_lang if parche else original
+        for voz in ("fr-FR-RemyMultilingualNeural", "es-ES-XimenaNeural"):
+            ruta = f"muestras/{voz}_{etiqueta}.mp3"
             try:
-                await edge_tts.Communicate(TEXTO, voz, rate=rate).save(ruta)
-                print("ok", ruta)
+                await edge_tts.Communicate(TEXTO, voz, rate="+8%").save(ruta)
+                print("ok", ruta, os.path.getsize(ruta))
             except Exception as e:
-                print("error", voz, e)
+                print("error", ruta, repr(e))
+    ec.mkssml = original
 
 asyncio.run(main())

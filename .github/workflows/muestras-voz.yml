@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install edge-tts && python scripts/muestras_voz.py
+      - run: pip install edge-tts && python scripts/muestras_voz.py 2>&1 | tee muestras_log.txt; mkdir -p muestras; cp muestras_log.txt muestras/
       - run: |
           cd muestras && git init -q -b muestras-voz
           git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
