@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre",
          "noviembre", "diciembre"]
-PALABRAS = {"intro": 16, "bolsas": 36, "cripto": 20, "materias": 24, "agenda": 26, "noticias": 30, "cierre": 18}
+PALABRAS = {"intro": 15, "bolsas": 32, "cripto": 18, "materias": 22, "agenda": 24, "noticias": 28, "cierre": 16}
 
 
 # ---------------------------------------------------------------- formato de cifras
@@ -172,7 +172,9 @@ iba a lo suyo...", "Pero ojo, que aquí viene lo interesante...").
 Nunca encadenes cotizaciones una detrás de otra.
 - Escribe como se habla: frases enlazadas con "y", "pero", "mientras", "así que"; mezcla alguna frase corta y \
 contundente con otras más largas. Usa algún "¡...!" y alguna pregunta para dar entonación, sin pasarte.
-- Nada de listas ni de dos puntos.
+- Nada de listas ni de dos puntos. Nada de frases telegráficas o sin verbo ("La FED, el 28.", "Ethereum también \
+avanza.", "Euro, 1,12 dólares."): cada bloque son 1 a 3 frases completas, bien enlazadas, como las diría una \
+persona hablando de tú a tú. Mejor menos datos y bien contados.
 
 REGLAS OBLIGATORIAS (contenido financiero):
 - Usa SOLO las cifras de DATOS, copiadas tal cual en "valor_para_leer"; para porcentajes, redondea a un decimal \

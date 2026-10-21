@@ -66,7 +66,8 @@ def generar_locucion(merc, agenda, titulares, hoy, modo, trabajo: Path, demo: bo
 
 
 INICIO_C, COLA_C = 0.45, 1.4   # toma continua: arranque tras la portada y cola con la tarjeta final
-VEL_BASE = 20                  # un poco más rápida que el canal del tiempo: suena más activa
+VEL_BASE = 10                  # ritmo natural: acelerar mucho una voz sintética la hace sonar robótica
+VEL_MIN_C, VEL_MAX_C = 4, 20   # margen de ajuste de velocidad de la toma continua
 
 
 def generar_continua(merc, agenda, titulares, hoy, modo, trabajo: Path, tipo_voz: str, plantilla=False):
@@ -88,7 +89,7 @@ def generar_continua(merc, agenda, titulares, hoy, modo, trabajo: Path, tipo_voz
             mejor = (guion, bloques, wav, dur, lim)
             if objetivo - 3.0 <= dur <= objetivo + 0.8:
                 return mejor
-            nueva = min(max(round((1 + vel / 100) * dur / objetivo * 100 - 100), VEL_MIN), VEL_MAX)
+            nueva = min(max(round((1 + vel / 100) * dur / objetivo * 100 - 100), VEL_MIN_C), VEL_MAX_C)
             if nueva == vel:
                 break
             vel = nueva

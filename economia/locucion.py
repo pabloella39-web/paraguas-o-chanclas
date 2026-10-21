@@ -16,7 +16,7 @@ from pathlib import Path
 from tiempo import voz
 
 log = logging.getLogger(__name__)
-TONO = os.environ.get("TONO_VOZ", "+2Hz")   # un pelín más agudo = suena más vivo
+TONO = os.environ.get("TONO_VOZ", "+0Hz")   # sin retocar el tono: cualquier cambio suena más artificial
 
 
 def _norm(t: str) -> str:
