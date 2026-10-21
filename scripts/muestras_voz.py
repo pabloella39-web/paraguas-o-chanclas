@@ -12,17 +12,23 @@ original = ec.mkssml
 print("firma mkssml:", inspect.signature(original))
 
 
-def con_lang(*args, **kw):
-    args = list(args)
-    args[-1] = f"<lang xml:lang='es-ES'>{args[-1]}</lang>"
-    return original(*args, **kw)
+def con_lang(tc, texto):
+    t = texto.decode() if isinstance(texto, bytes) else texto
+    t = f"<lang xml:lang='es-ES'>{t}</lang>"
+    return original(tc, t.encode() if isinstance(texto, bytes) else t)
+
+
+def speak_es(tc, texto):
+    out = original(tc, texto)
+    print("SSML:", out[:200])
+    return out.replace("xml:lang='en-US'", "xml:lang='es-ES'")
 
 
 async def main():
     os.makedirs("muestras", exist_ok=True)
-    for etiqueta, parche in (("normal", False), ("es-ES", True)):
-        ec.mkssml = con_lang if parche else original
-        for voz in ("fr-FR-RemyMultilingualNeural", "es-ES-XimenaNeural"):
+    for etiqueta, parche in (("lang", con_lang), ("speak", speak_es)):
+        ec.mkssml = parche
+        for voz in ("fr-FR-RemyMultilingualNeural",):
             ruta = f"muestras/{voz}_{etiqueta}.mp3"
             try:
                 await edge_tts.Communicate(TEXTO, voz, rate="+8%").save(ruta)
