@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-21",
+ "modo": "diario",
+ "duracion": 66.07,
+ "caption": "Petróleo sobre 110 dólares y el Ibex resiste: así empieza el miércoles 📈\n\nResumen económico de hoy, miércoles 21 de octubre 📊\n🟢 IBEX 35: 19.092 (+0,3 %)\n🟢 S&P 500: 7.713 (+0,3 %)\n🟢 Bitcoin: 82.841 (+1,1 %)\n🔴 Oro: 4.133 (−0,2 %)\n🟢 Brent: 110,18 (+1,3 %)\n📅 08:00 IPC anual en Reino Unido\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #petroleo #inflacion #cripto #inversion #noticias",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "femenina",
+ "titulares": [
+  {
+   "titulo": "Los precios ganan terreno a los sueldos en los convenios",
+   "fuente": "El País"
+  },
+  {
+   "titulo": "Waymo llevará sus robotaxis a Madrid en pruebas",
+   "fuente": "Expansión"
+  }
+ ],
+ "guion": {
+  "intro": "¿Petróleo por encima de 110 dólares y el Ibex aguantando? Así arranca este miércoles 21.",
+  "bolsas": "El Ibex cerró ayer en 19.092 puntos, un 0,3 % más, esquivando las caídas de Europa. En Wall Street el Dow Jones subió un 1,0 % y el Nikkei hoy, un 0,8 %.",
+  "cripto": "El bitcoin ronda unos 82.800 dólares y sube un 1,1 % en el día. Ethereum también avanza.",
+  "materias": "¡Ojo al crudo! El Brent anda en 110,2 dólares el barril, el oro en 4.133 dólares la onza y el euro en 1,12 dólares.",
+  "agenda": "A las ocho de la mañana, inflación británica, y a las cuatro y media de la tarde, crudo en EE. UU. La FED, el 28.",
+  "noticias": "La inflación se come los sueldos, porque seis de cada diez convenios no tienen cláusula de revisión. Y Waymo, de Google, probará robotaxis en Madrid en los próximos días.",
+  "cierre": "¿Toro u oso con el Ibex hoy? Cuéntamelo en comentarios. Esto no es consejo de inversión. ¡Sígueme!"
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7698987478623045654",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
