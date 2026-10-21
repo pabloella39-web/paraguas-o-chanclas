@@ -1,22 +1,22 @@
 {
  "fecha": "2026-10-21",
- "duracion": 67.23,
- "caption": "¿Paraguas o chanclas hoy? Dinos desde qué ciudad nos ves 🌧️😎\n\nEl tiempo en España hoy, miércoles 21 de octubre 🇪🇸\n🌧️ Lluvia en Oviedo y Santander\n🔥 Máxima: 27° en Alicante\n🥶 Mínima: 6° en Pamplona\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #otoño #Oviedo #Alicante #Pamplona",
+ "duracion": 67.77,
+ "caption": "¿Paraguas en el norte o chanclas en el sur? Cuéntanos qué te toca hoy ☔😎\n\nEl tiempo en España hoy, miércoles 21 de octubre 🇪🇸\n🌧️ Lluvia en Oviedo y Santander\n🔥 Máxima: 27° en Alicante\n🥶 Mínima: 6° en Pamplona\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #otoño #Oviedo #Alicante #Pamplona",
  "portada_ms": 0,
  "origen_guion": "claude",
  "voz": "masculina",
  "guion": {
-  "intro": "Miércoles 21 de octubre. ¿Paraguas o chanclas? Quédate y descubre qué te toca en tu ciudad.",
-  "general": "Hoy la noticia está en Canarias, con lluvia en Las Palmas y Santa Cruz de Tenerife, y en el norte, donde mandan el agua y el viento.",
-  "islas": "Gente de Las Palmas y Santa Cruz de Tenerife, paraguas a mano, con 79 y 87 por ciento de lluvia y 24 grados. Palma, con sol y 24 grados.",
-  "norte": "Si eres de Santander, agárrate, con lluvia segura y rachas de 63 kilómetros por hora. Oviedo, Bilbao y A Coruña, también mojados, con 16 o 17 grados.",
-  "mediterraneo": "Barcelona, con intervalos nubosos, 22 grados y un 23 por ciento de lluvia. Valencia, Alicante y Murcia, despejados y con 25 a 27 grados. Plan de playa.",
-  "interior": "Madrid y Toledo, con cielo despejado y 17 y 20 grados. Zaragoza, ojo al viento, con rachas de 48 kilómetros por hora. Salamanca, más nubes.",
-  "sur": "Sevilla y Badajoz, sin lluvia y con 25 y 24 grados, aunque AEMET y los modelos discrepan hasta en 3 grados. Ceuta marcará 22 grados y Melilla 24, con algo de viento.",
-  "cierre": "Y tú, ¿desde qué ciudad nos ves? Cuéntamelo en comentarios y sigue Paraguas o Chanclas. Hoy, paraguas al norte y chanclas al sur."
+  "intro": "Miércoles 21 de octubre: ¿paraguas o chanclas? Quédate y te lo cuento según dónde vivas.",
+  "general": "Hoy lo más mojado está en Canarias y en el norte, mientras el resto de España se queda con sol y temperaturas bastante agradables.",
+  "islas": "Gente de Las Palmas y Santa Cruz de Tenerife, sacad el paraguas: lluvia muy probable y 24 grados. En Palma, sol y 24 grados.",
+  "norte": "Si eres de Santander, agárrate: lluvia segura y rachas de 63 kilómetros por hora. A Coruña, Oviedo y Bilbao también mojados, con 16 o 17 grados.",
+  "mediterraneo": "Barcelona deja algún nubarrón, con 22 grados, y de Valencia a Alicante, sol y entre 25 y 27 grados. Playa asegurada.",
+  "interior": "Madrid y Toledo, sol y ni una gota, con 17 y 20 grados. Zaragoza también con sol, pero con rachas de 48 kilómetros por hora: peinado en peligro.",
+  "sur": "Sol de sobra en el sur. Gente de Sevilla y Badajoz, con 25 y 24 grados, AEMET y los modelos no se ponen de acuerdo. Ceuta y Melilla, 22 y 24 grados, con algo de viento.",
+  "cierre": "Cuéntame en comentarios desde dónde nos ves y sigue Paraguas o Chanclas. Hoy, paraguas al norte y chanclas al sur."
  },
  "tiktok": {
-  "publish_id": "v_inbox_file~v2.7698987431454017558",
+  "publish_id": "v_inbox_file~v2.7698989555302795286",
   "status": "SEND_TO_USER_INBOX"
  }
 }
