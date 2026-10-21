@@ -1,0 +1,4 @@
+firma mkssml: (tc: edge_tts.data_classes.TTSConfig, escaped_text: Union[str, bytes]) -> str
+error muestras/fr-FR-RemyMultilingualNeural_lang.mp3 NoAudioReceived('No audio was received. Please verify that your parameters are correct.')
+SSML: <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='Microsoft Server Speech Text to Speech Voice (fr-FR, RemyMultilingualNeural)'><prosody pitch='+0Hz' rate=
+ok muestras/fr-FR-RemyMultilingualNeural_speak.mp3 121968
