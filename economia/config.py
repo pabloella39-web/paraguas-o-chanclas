@@ -56,7 +56,7 @@ FUENTES_RSS = [
 
 VOCES = {
     "masculina": {"edge": "es-ES-AlvaroNeural", "google": "MALE", "presenta": "un presentador"},
-    "femenina": {"edge": "es-ES-ElviraNeural", "google": "FEMALE", "presenta": "una presentadora"},
+    "femenina": {"edge": "es-ES-XimenaNeural", "google": "FEMALE", "presenta": "una presentadora"},
 }
 
 
