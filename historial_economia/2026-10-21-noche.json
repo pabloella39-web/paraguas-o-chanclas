@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-21",
+ "modo": "noche",
+ "duracion": 65.5,
+ "caption": "El IBEX se anima y el bitcoin no quiere perderse la fiesta 🐂\n\nAsí ha ido la economía hoy, miércoles 21 de octubre 📊\n🟢 IBEX 35: 19.324 (+1,2 %)\n🟢 S&P 500: 7.765 (+0,7 %)\n🟢 Bitcoin: 84.668 (+2,5 %)\n🟢 Oro: 4.155 (+0,3 %)\n🔴 Brent: 108,62 (−0,2 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #cripto #inversion #noticias",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "femenina",
+ "titulares": [
+  {
+   "titulo": "Francia paga ya un 5 % por su deuda a 10 años",
+   "fuente": "Cinco Días"
+  },
+  {
+   "titulo": "Bruselas investiga a Booking por anuncios fraudulentos",
+   "fuente": "Europa Press"
+  }
+ ],
+ "guion": {
+  "intro": "¿Miércoles 21 de octubre con las bolsas en verde? ¡Sí, y el bitcoin se apuntó!",
+  "bolsas": "El IBEX cerró hoy un 1,2 % arriba, en 19.324 puntos, con la banca y los resultados empresariales tirando, y Europa fue a una. Wall Street, a esta hora, también sube.",
+  "cripto": "Y el bitcoin no se quedó fuera, y ronda los 84.700 dólares tras subir un 2,5 %.",
+  "materias": "El Brent, casi plano, ronda 108,6 dólares el barril, el oro sube a 4.155 dólares y el euro vale 1,12 dólares.",
+  "agenda": "Mañana a las dos y media de la tarde llega el paro americano, y la FED y el BCE se reúnen el 28 y el 29.",
+  "noticias": "La rentabilidad del bono francés supera el 5 % por primera vez desde 2002, y Bruselas investiga a Booking por no frenar los anuncios fraudulentos.",
+  "cierre": "¿Toro u oso con el IBEX? Comenta, que esto no es consejo de inversión, y sígueme."
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7699202718245619734",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
