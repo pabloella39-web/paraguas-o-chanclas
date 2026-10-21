@@ -1,0 +1,19 @@
+name: Muestras de voz
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/muestras_voz.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  muestras:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install edge-tts && python scripts/muestras_voz.py
+      - run: |
+          cd muestras && git init -q -b muestras-voz
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Muestras de voz"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" muestras-voz
