@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-22",
+ "modo": "diario",
+ "duracion": 65.5,
+ "caption": "Bolsas en verde, Brent a 111 dólares y la FED en el radar 🐻\n\nResumen económico de hoy, jueves 22 de octubre 📊\n🟢 IBEX 35: 19.324 (+1,2 %)\n🟢 S&P 500: 7.757 (+0,6 %)\n🔴 Bitcoin: 82.810 (−0,1 %)\n🔴 Oro: 4.107 (−1,0 %)\n🟢 Brent: 110,98 (+2,0 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "masculina",
+ "titulares": [
+  {
+   "titulo": "El bono francés rompe el 5 % tras 24 años",
+   "fuente": "Expansión"
+  },
+  {
+   "titulo": "La banca devolverá en 24 h el dinero del fraude",
+   "fuente": "Cinco Días"
+  }
+ ],
+ "guion": {
+  "intro": "¿Bolsas arriba y petróleo por las nubes? Así arranca este jueves 22 de octubre.",
+  "bolsas": "Ayer el IBEX 35 cerró en 19.324 puntos, un 1,2 % más, con la banca tirando. Europa y Wall Street también subieron, pero el Nikkei ha cerrado hoy un 2,0 % abajo.",
+  "cripto": "El bitcoin anda tranquilo, en unos 82.800 dólares, y el ethereum, en unos 2.440 dólares, igual de dormido.",
+  "materias": "El Brent sube un 2,0 % hasta 111 dólares el barril, el oro baja un 1,0 % y el euro cotiza a 1,12 dólares.",
+  "agenda": "A las dos y media de la tarde toca paro en EE. UU. La FED se reúne el miércoles 28 y el BCE el jueves 29.",
+  "noticias": "El bono francés supera el 5 % por primera vez en 24 años, aunque no se espera contagio. Y la banca devolverá en 24 horas el dinero del fraude.",
+  "cierre": "¿Toro u oso para el IBEX? Comenta. Esto no es consejo de inversión. ¡Sigue Toro U Oso!"
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7699358699264952342",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
