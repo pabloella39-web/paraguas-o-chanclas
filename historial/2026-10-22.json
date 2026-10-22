@@ -1,22 +1,22 @@
 {
  "fecha": "2026-10-22",
  "duracion": 67.27,
- "caption": "¿Paraguas o chanclas hoy? Dime desde qué ciudad nos ves ☔😎\n\nEl tiempo en España hoy, jueves 22 de octubre 🇪🇸\n🌧️ Lluvia en A Coruña y Las Palmas\n🔥 Máxima: 26° en Sevilla\n🥶 Mínima: 4° en Pamplona\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #otoño #ACoruna #Sevilla #Pamplona",
+ "caption": "¿Paraguas en A Coruña o chanclas en Sevilla? Dime dónde estás 🌧️🩴\n\nEl tiempo en España hoy, jueves 22 de octubre 🇪🇸\n🌧️ Lluvia en A Coruña y Las Palmas\n🔥 Máxima: 26° en Sevilla\n🥶 Mínima: 4° en Pamplona\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #otoño #ACoruna #Sevilla #Pamplona",
  "portada_ms": 0,
  "origen_guion": "claude",
  "voz": "femenina",
  "guion": {
-  "intro": "Jueves 22 de octubre, ¿paraguas o chanclas? Quédate, que hoy depende de dónde vivas.",
-  "general": "La noticia está en Canarias, con mucha lluvia, y en el norte, donde A Coruña recibe lluvia y viento. Mientras, interior y sur van tranquilos.",
-  "islas": "Canarias saca el paraguas, con 88 por ciento de lluvia en Las Palmas y 63 en Santa Cruz de Tenerife, ambas a 26 grados. Palma, sin lluvia y a 23.",
-  "norte": "En el norte, A Coruña se moja seguro, con rachas de 69 kilómetros por hora, y Oviedo también. Si eres de Bilbao, respira, 20 grados y poca lluvia.",
-  "mediterraneo": "Barcelona, con 59 por ciento de lluvia, lleva paraguas. Gente de Valencia, 23 grados y buen día. Alicante llega a 25, aunque AEMET y los modelos no se ponen de acuerdo.",
-  "interior": "En el interior no cae ni una gota. Madrid, Valladolid y Salamanca, 18 grados, y Toledo y Zaragoza, 21 y 20. Gente de Salamanca, ojo al viento, con rachas de 42.",
-  "sur": "Sevilla manda con 26 grados y sol, y Málaga, Almería, Badajoz y Granada se mueven entre 23 y 25. Ceuta y Melilla, 24 grados y cielo bastante despejado. Chanclas aseguradas.",
-  "cierre": "Cuéntame desde qué ciudad nos ves y sigue Paraguas o Chanclas. Hoy, paraguas en el norte y Canarias, chanclas en el sur."
+  "intro": "Jueves 22 de octubre. ¿Paraguas o chanclas? Quédate, que hoy depende de dónde estés.",
+  "general": "Lo más movido está en Canarias, con chubascos, y en el norte, con lluvia y viento. En el resto de España, sol y nubes, y bastante tranquilidad.",
+  "islas": "Si eres de Las Palmas o de Tenerife, paraguas: 89 y 70 por ciento de lluvia, aunque con 26 grados. En Palma, 23 grados y poco nuboso.",
+  "norte": "En el norte, gente de A Coruña, paraguas sí o sí: 100 por ciento de lluvia y rachas de 69 kilómetros por hora. Oviedo también se moja, Bilbao no.",
+  "mediterraneo": "Barcelona, con 64 por ciento de lluvia y 20 grados, pide paraguas. Valencia llega a 23 grados y Murcia a 25. Y en Alicante, AEMET y los modelos no se ponen de acuerdo.",
+  "interior": "Interior sin lluvia y con nubes altas. Madrid, 18 grados y Toledo 21. Si eres de Valladolid o Salamanca, ojo: amanece con 4 grados, así que abrígate un poco.",
+  "sur": "El sur, tranquilísimo: poco nuboso y casi sin lluvia. Sevilla llega a 26 grados y Málaga y Almería a 25. Ceuta y Melilla, 24 grados, y Badajoz también. Gente de Sevilla, chanclas fuera.",
+  "cierre": "Y tú, ¿paraguas o chanclas? Cuéntame desde qué ciudad nos ves y sigue Paraguas o Chanclas para tener el tiempo cada día."
  },
  "tiktok": {
-  "publish_id": "v_inbox_file~v2.7699358738263623702",
+  "publish_id": "v_inbox_file~v2.7699360648450623510",
   "status": "SEND_TO_USER_INBOX"
  }
 }
