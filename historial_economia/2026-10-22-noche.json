@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-22",
+ "modo": "noche",
+ "duracion": 65.5,
+ "caption": "El petróleo se dispara y las bolsas sufren 🐻 Así ha cerrado el jueves\n\nAsí ha ido la economía hoy, jueves 22 de octubre 📊\n🔴 IBEX 35: 18.914 (−2,1 %)\n🔴 S&P 500: 7.645 (−1,4 %)\n🔴 Bitcoin: 80.989 (−4,4 %)\n🔴 Oro: 4.063 (−2,1 %)\n🟢 Brent: 113,24 (+4,1 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "masculina",
+ "titulares": [
+  {
+   "titulo": "Bankinter gana un 11 % pero se hunde en bolsa",
+   "fuente": "Cinco Días"
+  },
+  {
+   "titulo": "La prima de riesgo francesa marca máximos desde 2011",
+   "fuente": "Europa Press"
+  }
+ ],
+ "guion": {
+  "intro": "¿Jueves 22 de octubre y todo en rojo? El petróleo ha sacudido las bolsas.",
+  "bolsas": "El IBEX 35 ha cerrado hoy un 2,1 % abajo, en 18.914 puntos, arrastrado por los bancos. Europa cayó y, a esta hora, el Nasdaq de Wall Street pierde un 2,7 %.",
+  "cripto": "El bitcoin cae un 4,4 %, hasta unos 81.000 dólares, y el ethereum, un 5,6 %.",
+  "materias": "El Brent sube un 4,1 %, a 113,2 dólares, mientras el oro cae un 2,1 % y el euro sigue en 1,12.",
+  "agenda": "Mañana, a las nueve y media, sale el PMI alemán, que mide el pulso industrial, y el miércoles se reúne la FED.",
+  "noticias": "Bankinter gana un 11 % más, pero cae un 7,6 % en bolsa por sus comisiones. Y la prima de riesgo de Francia, el sobrecoste de su deuda, toca máximos desde 2011.",
+  "cierre": "¿Toro u oso con el IBEX? Cuéntamelo en comentarios. Esto no es consejo de inversión. ¡Sígueme!"
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7699573639464699926",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
