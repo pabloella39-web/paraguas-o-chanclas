@@ -1,10 +1,15 @@
 {
  "fecha": "2026-10-22",
- "caption": "Bolsas en verde, Brent a 111 dólares y la FED en el radar 🐻\n\nResumen económico de hoy, jueves 22 de octubre 📊\n🟢 IBEX 35: 19.324 (+1,2 %)\n🟢 S&P 500: 7.757 (+0,6 %)\n🔴 Bitcoin: 82.810 (−0,1 %)\n🔴 Oro: 4.107 (−1,0 %)\n🟢 Brent: 110,98 (+2,0 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
- "edicion": "manana",
+ "caption": "El petróleo se dispara y las bolsas sufren 🐻 Así ha cerrado el jueves\n\nAsí ha ido la economía hoy, jueves 22 de octubre 📊\n🔴 IBEX 35: 18.914 (−2,1 %)\n🔴 S&P 500: 7.645 (−1,4 %)\n🔴 Bitcoin: 80.989 (−4,4 %)\n🔴 Oro: 4.063 (−2,1 %)\n🟢 Brent: 113,24 (+4,1 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
+ "edicion": "noche",
  "ediciones": {
   "manana": {
    "caption": "Bolsas en verde, Brent a 111 dólares y la FED en el radar 🐻\n\nResumen económico de hoy, jueves 22 de octubre 📊\n🟢 IBEX 35: 19.324 (+1,2 %)\n🟢 S&P 500: 7.757 (+0,6 %)\n🔴 Bitcoin: 82.810 (−0,1 %)\n🔴 Oro: 4.107 (−1,0 %)\n🟢 Brent: 110,98 (+2,0 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
+   "voz": "masculina",
+   "duracion": 65.5
+  },
+  "noche": {
+   "caption": "El petróleo se dispara y las bolsas sufren 🐻 Así ha cerrado el jueves\n\nAsí ha ido la economía hoy, jueves 22 de octubre 📊\n🔴 IBEX 35: 18.914 (−2,1 %)\n🔴 S&P 500: 7.645 (−1,4 %)\n🔴 Bitcoin: 80.989 (−4,4 %)\n🔴 Oro: 4.063 (−2,1 %)\n🟢 Brent: 113,24 (+4,1 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
    "voz": "masculina",
    "duracion": 65.5
   }
