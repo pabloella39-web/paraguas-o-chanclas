@@ -1,0 +1,22 @@
+{
+ "fecha": "2026-10-23",
+ "duracion": 67.23,
+ "caption": "¿Eres del Cantábrico? Hoy tu paraguas pide horas extra ☔\n\nEl tiempo en España hoy, viernes 23 de octubre 🇪🇸\n🌧️ Lluvia en Santander y Oviedo\n🔥 Máxima: 28° en Alicante\n🥶 Mínima: 6° en Salamanca\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #Santander #Alicante",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Viernes 23 de octubre. ¿Paraguas o chanclas? Quédate, que depende de dónde estés.",
+  "general": "Hoy manda el Cantábrico, con lluvia y rachas de 80 kilómetros por hora en Santander, mientras el resto de la Península se queda tranquilo con sol y nubes.",
+  "norte": "Si eres de Santander, agarra el paraguas, con 98 por ciento de lluvia y rachas de 80 kilómetros por hora. Oviedo y Bilbao también se mojan.",
+  "islas": "Gente de Las Palmas, paraguas con 62 por ciento de lluvia. Santa Cruz de Tenerife llega a 27 grados y Palma a 24, sin una gota.",
+  "interior": "Interior sin lluvia y con sol y nubes. Madrid llega a 19 grados, y si eres de Zaragoza, ojo al viento, con rachas de 53 por hora.",
+  "sur": "Sur de sol y nubes sin lluvia, con Málaga a 27 grados y Sevilla a 25. Ceuta tiene un 23 por ciento de lluvia, y Melilla, casi nada.",
+  "mediterraneo": "Mediterráneo con sol y nubes y chanclas puestas. Alicante llega a 28 grados y Valencia a 25, mientras Barcelona se queda en 22.",
+  "cierre": "¿Desde qué ciudad nos ves? Cuéntalo y sigue Paraguas o Chanclas. Hoy, paraguas en el norte y chanclas en el resto."
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7699729519439284246",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
