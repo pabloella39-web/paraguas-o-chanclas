@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-23",
+ "modo": "diario",
+ "duracion": 67.13,
+ "caption": "El IBEX amanece tras caer un 2,1 % y el petróleo no da tregua 🐻\n\nResumen económico de hoy, viernes 23 de octubre 📊\n🔴 IBEX 35: 18.914 (−2,1 %)\n🔴 S&P 500: 7.663 (−1,2 %)\n🔴 Bitcoin: 81.615 (−1,4 %)\n🔴 Oro: 4.019 (−1,0 %)\n🟢 Brent: 113,91 (+0,7 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "femenina",
+ "titulares": [
+  {
+   "titulo": "Bankinter se desploma en bolsa",
+   "fuente": "Expansión"
+  },
+  {
+   "titulo": "La crisis del Golfo amenaza con escalar",
+   "fuente": "El País"
+  }
+ ],
+ "guion": {
+  "intro": "¿Resaca bursátil? Este viernes 23 de octubre empieza con las bolsas en rojo.",
+  "bolsas": "Ayer el IBEX 35 cayó un 2,1 % hasta 18.914 puntos, con la tecnología y el petróleo de fondo. Europa también sufrió y en Wall Street el Nasdaq se dejó un 2,6 %.",
+  "cripto": "El bitcoin ronda unos 81.600 dólares, un 1,4 % menos hoy, y vigila de reojo a la tecnología.",
+  "materias": "El oro cede un 1,0 % y el Brent sube a 113,9 dólares el barril, mientras el euro flojea en 1,12 dólares.",
+  "agenda": "A las nueve y media llega el PMI alemán, y a las cuatro menos cuarto los de EE. UU. Y el miércoles, la FED.",
+  "noticias": "Bankinter protagoniza una caída fuerte en bolsa. Y la crisis del Golfo podría escalar tras las votaciones en EE. UU. e Israel, lo que encarecería el suministro de petróleo.",
+  "cierre": "¿Toro u oso con el IBEX? Comenta; no es consejo de inversión. ¡Y sígueme!"
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7699729824624936982",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
