@@ -1,22 +1,22 @@
 {
  "fecha": "2026-10-23",
- "duracion": 67.23,
- "caption": "¿Eres del Cantábrico? Hoy tu paraguas pide horas extra ☔\n\nEl tiempo en España hoy, viernes 23 de octubre 🇪🇸\n🌧️ Lluvia en Santander y Oviedo\n🔥 Máxima: 28° en Alicante\n🥶 Mínima: 6° en Salamanca\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #Santander #Alicante",
+ "duracion": 67.33,
+ "caption": "¿Paraguas en el norte o chanclas en el sur? Dime dónde estás hoy ☔🩴\n\nEl tiempo en España hoy, viernes 23 de octubre 🇪🇸\n🌧️ Lluvia en Santander y Oviedo\n🔥 Máxima: 28° en Alicante\n🥶 Mínima: 6° en Salamanca\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #Santander #Alicante",
  "portada_ms": 0,
  "origen_guion": "claude",
  "voz": "masculina",
  "guion": {
-  "intro": "Viernes 23 de octubre. ¿Paraguas o chanclas? Quédate, que depende de dónde estés.",
-  "general": "Hoy manda el Cantábrico, con lluvia y rachas de 80 kilómetros por hora en Santander, mientras el resto de la Península se queda tranquilo con sol y nubes.",
-  "norte": "Si eres de Santander, agarra el paraguas, con 98 por ciento de lluvia y rachas de 80 kilómetros por hora. Oviedo y Bilbao también se mojan.",
-  "islas": "Gente de Las Palmas, paraguas con 62 por ciento de lluvia. Santa Cruz de Tenerife llega a 27 grados y Palma a 24, sin una gota.",
-  "interior": "Interior sin lluvia y con sol y nubes. Madrid llega a 19 grados, y si eres de Zaragoza, ojo al viento, con rachas de 53 por hora.",
-  "sur": "Sur de sol y nubes sin lluvia, con Málaga a 27 grados y Sevilla a 25. Ceuta tiene un 23 por ciento de lluvia, y Melilla, casi nada.",
-  "mediterraneo": "Mediterráneo con sol y nubes y chanclas puestas. Alicante llega a 28 grados y Valencia a 25, mientras Barcelona se queda en 22.",
-  "cierre": "¿Desde qué ciudad nos ves? Cuéntalo y sigue Paraguas o Chanclas. Hoy, paraguas en el norte y chanclas en el resto."
+  "intro": "Viernes 23 de octubre. ¿Paraguas o chanclas? Dímelo tú: ¿dónde estás hoy?",
+  "general": "Lo gordo está en el Cantábrico, con lluvia casi segura y rachas de 80 kilómetros por hora, mientras el resto de la Península disfruta de sol y nubes.",
+  "norte": "Santander lleva 98 por ciento de lluvia y rachas de 80 kilómetros por hora. Si eres de Bilbao u Oviedo, paraguas bien agarrado, que hoy no da tregua.",
+  "islas": "Gente de Las Palmas, paraguas pequeño: 62 por ciento de lluvia escasa y 26 grados. Santa Cruz de Tenerife llega a 27, y Palma, a 24 con sol.",
+  "interior": "Interior sin lluvia: Madrid, Toledo y Zaragoza rondan los 20 grados. Eso sí, Zaragoza tendrá rachas de 53 kilómetros por hora, así que sujeta el peinado.",
+  "sur": "Gente de Sevilla y Málaga, chanclas fuera, con 25 y 27 grados sin una gota. Ceuta marca 23 grados con alguna nube, y Melilla, 24 y casi sin lluvia.",
+  "mediterraneo": "Alicante se lleva el trofeo con 28 grados, Murcia marca 26 y Valencia 25, todo sin lluvia. Barcelona se queda en 22 grados y casi seca.",
+  "cierre": "Y tú, ¿desde qué ciudad nos ves? Cuéntalo y sigue Paraguas o Chanclas. Hoy, paraguas al norte y chanclas al sur."
  },
  "tiktok": {
-  "publish_id": "v_inbox_file~v2.7699729519439284246",
+  "publish_id": "v_inbox_file~v2.7699731591165233174",
   "status": "SEND_TO_USER_INBOX"
  }
 }
