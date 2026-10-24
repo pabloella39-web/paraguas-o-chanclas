@@ -1,17 +1,12 @@
 {
- "fecha": "2026-10-23",
- "caption": "El petróleo aprieta, el oro se desinfla y el IBEX resiste 📉\n\nAsí ha ido la economía hoy, viernes 23 de octubre 📊\n🟢 IBEX 35: 18.990 (+0,4 %)\n🔴 S&P 500: 7.625 (−0,5 %)\n🔴 Bitcoin: 81.256 (−0,2 %)\n🔴 Oro: 4.013 (−1,2 %)\n🔴 Brent: 112,06 (−1,0 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
- "edicion": "noche",
+ "fecha": "2026-10-24",
+ "caption": "El oro se hunde y las bolsas sufren: así fue la semana 📉\n\nLa semana en los mercados, sábado 24 de octubre 📊\n🔴 IBEX 35: 18.990 (−1,7 %)\n🔴 S&P 500: 7.624 (−0,5 %)\n🔴 Bitcoin: 80.802 (−0,7 %)\n🔴 Oro: 4.008 (−4,1 %)\n🟢 Brent: 111,70 (+1,7 %)\n📅 Decisión de tipos de la FED\n📅 Decisión de tipos del BCE\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #fed #bce #petroleo #oro #cripto",
+ "edicion": "manana",
  "ediciones": {
   "manana": {
-   "caption": "El IBEX amanece tras caer un 2,1 % y el petróleo no da tregua 🐻\n\nResumen económico de hoy, viernes 23 de octubre 📊\n🔴 IBEX 35: 18.914 (−2,1 %)\n🔴 S&P 500: 7.663 (−1,2 %)\n🔴 Bitcoin: 81.615 (−1,4 %)\n🔴 Oro: 4.019 (−1,0 %)\n🟢 Brent: 113,91 (+0,7 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
-   "voz": "femenina",
-   "duracion": 67.13
-  },
-  "noche": {
-   "caption": "El petróleo aprieta, el oro se desinfla y el IBEX resiste 📉\n\nAsí ha ido la economía hoy, viernes 23 de octubre 📊\n🟢 IBEX 35: 18.990 (+0,4 %)\n🔴 S&P 500: 7.625 (−0,5 %)\n🔴 Bitcoin: 81.256 (−0,2 %)\n🔴 Oro: 4.013 (−1,2 %)\n🔴 Brent: 112,06 (−1,0 %)\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #oro #cripto #inversion #noticias",
-   "voz": "femenina",
-   "duracion": 65.5
+   "caption": "El oro se hunde y las bolsas sufren: así fue la semana 📉\n\nLa semana en los mercados, sábado 24 de octubre 📊\n🔴 IBEX 35: 18.990 (−1,7 %)\n🔴 S&P 500: 7.624 (−0,5 %)\n🔴 Bitcoin: 80.802 (−0,7 %)\n🔴 Oro: 4.008 (−4,1 %)\n🟢 Brent: 111,70 (+1,7 %)\n📅 Decisión de tipos de la FED\n📅 Decisión de tipos del BCE\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #fed #bce #petroleo #oro #cripto",
+   "voz": "masculina",
+   "duracion": 66.73
   }
  }
 }
