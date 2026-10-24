@@ -1,22 +1,22 @@
 {
  "fecha": "2026-10-24",
- "duracion": 67.5,
- "caption": "¿Barcelona o Canarias? Hoy toca paraguas, ¿y tú desde dónde nos ves? ☔🩴\n\nEl tiempo en España hoy, sábado 24 de octubre 🇪🇸\n🌧️ Lluvia en Barcelona y Las Palmas\n🔥 Máxima: 27° en Sevilla\n🥶 Mínima: 3° en Salamanca\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #frio #otoño #Barcelona #Sevilla",
+ "duracion": 67.27,
+ "caption": "¿Paraguas o chanclas hoy en tu ciudad? Barcelona y Canarias ya lo tienen claro ☔\n\nEl tiempo en España hoy, sábado 24 de octubre 🇪🇸\n🌧️ Lluvia en Barcelona y Las Palmas\n🔥 Máxima: 27° en Sevilla\n🥶 Mínima: 3° en Salamanca\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #frio #otoño #Barcelona #Sevilla",
  "portada_ms": 0,
  "origen_guion": "claude",
  "voz": "femenina",
  "guion": {
-  "intro": "Sábado 24 de octubre: ¿paraguas o chanclas? Quédate, que hoy depende de dónde estés.",
-  "general": "Lo más mojado del día está en Canarias, con 70 por ciento de lluvia, y Barcelona también se apunta. El resto de España, bastante tranquilo y con nubes altas.",
-  "islas": "Gente de Las Palmas y Santa Cruz de Tenerife, paraguas: 70 por ciento de lluvia y 25 o 26 grados. Palma, más tranquila, 22 grados.",
-  "norte": "Santander tiene 31 por ciento de lluvia y Bilbao 23, así que paraguas en el bolso. A Coruña, rachas de 42 kilómetros por hora; Oviedo, 18 grados tranquilos.",
-  "mediterraneo": "Si eres de Barcelona, paraguas seguro: 73 por ciento de lluvia y 19 grados. Valencia, Alicante y Murcia, sin lluvia y entre 23 y 24 grados.",
-  "sur": "El sur, de relax: Sevilla llega a 27 grados, Málaga y Almería a 25, y Badajoz a 24. Ceuta, 23 grados, y Melilla, 24 con cielo despejado.",
-  "interior": "Interior tranquilo y sin lluvia. Toledo llega a 21 grados, y Madrid y Salamanca, a 19. Eso sí, madrugadas frescas: Salamanca baja a 3 grados.",
-  "cierre": "Cuéntame en comentarios desde qué ciudad nos ves y sigue Paraguas o Chanclas. Hoy, chanclas, salvo en Barcelona y Canarias."
+  "intro": "Sábado 24 de octubre: ¿paraguas o chanclas? Quédate, que hoy depende muchísimo de dónde vivas.",
+  "general": "Hoy la noticia está en Canarias, con lluvia probable, mientras la Península va tranquila, con nubes altas y temperaturas suaves. Solo Barcelona saca el paraguas.",
+  "islas": "Las Palmas y Santa Cruz de Tenerife, con un 70 por ciento de lluvia y entre 25 y 26 grados: paraguas y bañador, gente de Tenerife. Palma, 22 grados.",
+  "norte": "En el norte, A Coruña tendrá rachas de hasta 42 kilómetros por hora, y Santander un 31 por ciento de lluvia. Si eres de Bilbao, 19 grados y algún chispeo.",
+  "mediterraneo": "Barcelona se moja, con un 73 por ciento de lluvia y 19 grados, mientras Valencia y Alicante llegan a 23 y Murcia a 24, sin una gota.",
+  "sur": "Sevilla manda con 27 grados, y Málaga y Almería llegan a 25 con cielos poco nubosos. Ceuta, 23 y Melilla, 24, sin lluvia: gente de Ceuta y Melilla, chanclas fuera.",
+  "interior": "Madrid rondará los 19 grados con nubes altas, y Toledo llegará a 21. Valladolid y Salamanca amanecen fresquitas, con 4 y 3 grados. Abrigo por la mañana, camiseta por la tarde.",
+  "cierre": "¿Desde qué ciudad nos ves? Cuéntalo y sigue Paraguas o Chanclas. Hoy, chanclas casi en todas partes; paraguas en Barcelona y Canarias."
  },
  "tiktok": {
-  "publish_id": "v_inbox_file~v2.7700100821358692355",
+  "publish_id": "v_inbox_file~v2.7700102613475346454",
   "status": "SEND_TO_USER_INBOX"
  }
 }
