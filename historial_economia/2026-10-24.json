@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-24",
+ "modo": "semanal",
+ "duracion": 66.73,
+ "caption": "El oro se hunde y las bolsas sufren: así fue la semana 📉\n\nLa semana en los mercados, sábado 24 de octubre 📊\n🔴 IBEX 35: 18.990 (−1,7 %)\n🔴 S&P 500: 7.624 (−0,5 %)\n🔴 Bitcoin: 80.802 (−0,7 %)\n🔴 Oro: 4.008 (−4,1 %)\n🟢 Brent: 111,70 (+1,7 %)\n📅 Decisión de tipos de la FED\n📅 Decisión de tipos del BCE\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #fed #bce #petroleo #oro #cripto",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "masculina",
+ "titulares": [
+  {
+   "titulo": "El crudo toca 117 dólares por el temor bélico",
+   "fuente": "Expansión"
+  },
+  {
+   "titulo": "La banca encarece las hipotecas y filtra más",
+   "fuente": "Expansión"
+  }
+ ],
+ "guion": {
+  "intro": "¿Semana de sustos? Este sábado 24 de octubre repasamos cómo han sufrido las bolsas y el oro.",
+  "bolsas": "El IBEX 35 cerró ayer en 18.990 puntos, un 1,7 % menos en la semana, y Europa sufrió más, con el Euro Stoxx un 2,2 % abajo. Wall Street aguantó mejor, con un 0,5 % menos.",
+  "cripto": "El bitcoin, en unos 80.800 dólares, se deja un 0,7 % en la semana, y el ethereum un 0,9 %.",
+  "materias": "El oro se hundió un 4,1 % esta semana, mientras el Brent subió un 1,7 % y el euro vale 1,12 dólares.",
+  "agenda": "Semana de bancos centrales, con la FED decidiendo el miércoles 28 a las siete de la tarde y el BCE el jueves 29 a las dos y cuarto de la tarde.",
+  "noticias": "El crudo tocó los 117 dólares por el temor a que la guerra en Oriente Próximo se alargue. Y en España, los bancos encarecen las hipotecas y serán más selectivos.",
+  "cierre": "¿Toro u oso con el oro? Comenta, sigue a Toro U Oso. Es información, no consejo de inversión."
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7700100739967977494",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
