@@ -52,6 +52,18 @@
         + (d.voz ? ' · voz ' + d.voz : '');
       const hoy = new Date().toLocaleDateString('sv-SE', {timeZone: 'Europe/Madrid'});
       $('viejo').hidden = d.fecha === hoy;
+      if (d.anterior) { $('texto').textContent = '(El parte de hoy aún no se ha generado)'; }
+      (d.extras || []).forEach(x => {
+        const h = document.createElement('h2'); h.textContent = '⭐ ' + x.titulo + (x.hora ? ' · ' + x.hora : '');
+        h.style.cssText = 'font-size:17px;margin:26px 0 8px;color:var(--acento)';
+        const t = document.createElement('div'); t.className = 'texto'; t.textContent = x.caption;
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Copiar texto';
+        b.onclick = async () => { try { await navigator.clipboard.writeText(x.caption); } catch (e) {}
+          b.textContent = '¡Copiado! ✅'; setTimeout(() => b.textContent = 'Copiar texto', 2000); };
+        document.querySelector('main').insertBefore(h, document.querySelector('.aviso'));
+        document.querySelector('main').insertBefore(t, document.querySelector('.aviso'));
+        document.querySelector('main').insertBefore(b, document.querySelector('.aviso'));
+      });
     })
     .catch(() => { $('fecha').textContent = 'Todavía no hay texto generado.'; });
   $('copiar').addEventListener('click', async () => {

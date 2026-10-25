@@ -234,6 +234,8 @@ def main():
     ap.add_argument("--demo", action="store_true", help="datos inventados, sin claves y sin voz")
     ap.add_argument("--publicar", action="store_true", help="subir a TikTok")
     ap.add_argument("--esperar", action="store_true", help="esperar a las 7:30 (Madrid) antes de publicar")
+    ap.add_argument("--prueba", action="store_true",
+                    help="prueba real: genera el vídeo y lo sube a YouTube como PRIVADO; ni TikTok ni historial")
     ap.add_argument("--salida", default=str(RAIZ / "salida"))
     ap.add_argument("--fecha", help="AAAA-MM-DD (por defecto, hoy en Madrid)")
     a = ap.parse_args()
@@ -241,12 +243,24 @@ def main():
 
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
     meta = construir(hoy, Path(a.salida), demo=a.demo)
+    if a.prueba:
+        os.environ["YT_PRIVACIDAD"] = "private"
+        publicar_youtube(meta, hoy)
+        (Path(a.salida) / "meta.json").write_text(json.dumps({k: v for k, v in meta.items()}, ensure_ascii=False,
+                                                             indent=1), encoding="utf-8")
+        log.info("Prueba terminada: %s", {k: meta.get(k) for k in ("motor_voz", "youtube", "youtube_error")})
+        return
     if not a.demo:
         # Página del móvil con la descripción lista para copiar (docs/hoy.html la lee). Se sube YA, antes de
         # esperar a la hora de publicación, para que el texto esté listo a la vez que el borrador.
+        try:
+            previo = json.loads((RAIZ / "docs" / "hoy.json").read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            previo = {}
+        extras = previo.get("extras", []) if previo.get("fecha") == hoy.isoformat() else []
         (RAIZ / "docs" / "hoy.json").write_text(json.dumps(
             {"fecha": hoy.isoformat(), "caption": meta["caption"], "voz": meta.get("voz"),
-             "duracion": meta["duracion"]}, ensure_ascii=False, indent=1), encoding="utf-8")
+             "duracion": meta["duracion"], "extras": extras}, ensure_ascii=False, indent=1), encoding="utf-8")
         from .repo import subir
         subir([RAIZ / "docs" / "hoy.json"], f"Texto del parte del {hoy.isoformat()}")
 

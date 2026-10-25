@@ -80,11 +80,25 @@ jobs:
             ARGS="--publicar --esperar"
           elif [ "${{ github.event_name }}" = "push" ]; then
             ARGS="--publicar"
+            # "prueba" en lanzar.txt: vídeo real subido a YouTube como privado, sin TikTok ni historial
+            grep -qi prueba lanzar.txt && ARGS="--prueba"
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
           fi
-          python -m tiempo.main $ARGS
+          mkdir -p salida
+          set -o pipefail
+          python -m tiempo.main $ARGS 2>&1 | tee salida/registro.txt
+
+      - name: Guardar la prueba en la rama pruebas-tiempo
+        if: always() && github.event_name == 'push'
+        run: |
+          grep -qi prueba lanzar.txt || exit 0
+          mkdir -p /tmp/p && cp salida/*.mp4 salida/meta.json salida/registro.txt /tmp/p/ 2>/dev/null || true
+          cd /tmp/p && git init -q -b pruebas-tiempo
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Prueba $(date +%F-%H%M)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pruebas-tiempo
 
       - name: Guardar el vídeo como artefacto
         if: always() && steps.horario.outputs.ejecutar == 'true'
