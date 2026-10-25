@@ -264,9 +264,21 @@ def main():
         from .repo import subir
         subir([RAIZ / "docs" / "hoy.json"], f"Texto del parte del {hoy.isoformat()}")
 
+    from . import uploadpost
     from .tiktok import hay_credenciales
     faltan = hay_credenciales() if a.publicar else []
-    if a.publicar and faltan:
+    if a.publicar and uploadpost.disponible():
+        # Publicación pública y automática (Upload-Post); si falla, borrador como siempre
+        if a.esperar:
+            esperar_hasta_publicacion()
+        try:
+            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo")
+        except Exception as e:  # noqa: BLE001
+            log.error("Upload-Post falló (%s): se envía como borrador", e)
+            from .tiktok import publicar_con_reintentos
+            if not faltan:
+                meta["tiktok"] = publicar_con_reintentos(Path(meta["video"]), meta["caption"], meta["portada_ms"])
+    elif a.publicar and faltan:
         log.warning("No se publica: faltan los secretos %s. El vídeo queda como artefacto de la ejecución.",
                     ", ".join(faltan))
     elif a.publicar:

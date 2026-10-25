@@ -226,6 +226,16 @@ def main():
     faltan = hay_credenciales() if a.publicar else []
     if a.publicar and faltan:
         log.warning("No se publica: falta %s. El vídeo queda como artefacto.", ", ".join(faltan))
+    elif a.publicar and __import__("tiempo.uploadpost", fromlist=["x"]).disponible():
+        from tiempo import uploadpost
+        if a.esperar:
+            esperar_hasta_publicacion("noche" if meta["modo"] == "noche" else "manana")
+        try:
+            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "economia")
+        except Exception as e:  # noqa: BLE001
+            log.error("Upload-Post falló (%s): se envía como borrador", e)
+            from tiempo.tiktok import publicar_con_reintentos
+            meta["tiktok"] = publicar_con_reintentos(Path(meta["video"]), meta["caption"], meta["portada_ms"])
     elif a.publicar:
         from tiempo.tiktok import publicar_con_reintentos
         log.info("Publicando con la autorización de %s", ESTADO.name)

@@ -71,6 +71,9 @@ jobs:
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+          UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
+          UPLOADPOST_PERFIL_ECONOMIA: ${{ vars.UPLOADPOST_PERFIL_ECONOMIA }}
           # Cuenta de TikTok propia del canal (no se pasa TIKTOK_REFRESH_TOKEN: es la del canal del tiempo)
           TIKTOK_ESTADO: tiktok_token_economia.enc
           TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}

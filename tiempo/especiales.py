@@ -536,9 +536,17 @@ def avisos_demo() -> list[dict]:
 
 # ================================================================ publicación y CLI
 def _publicar(meta: dict, hoy: date):
+    from . import uploadpost
     from .main import publicar_youtube
     from .tiktok import hay_credenciales, publicar_con_reintentos
-    if not hay_credenciales():
+    hecho = False
+    if uploadpost.disponible():
+        try:
+            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo")
+            hecho = True
+        except Exception as e:  # noqa: BLE001
+            log.error("Upload-Post falló (%s): borrador", e)
+    if not hecho and not hay_credenciales():
         meta["tiktok"] = publicar_con_reintentos(Path(meta["video"]), meta["caption"], 0)
     publicar_youtube(meta, hoy)
 

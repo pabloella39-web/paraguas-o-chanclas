@@ -72,6 +72,9 @@ jobs:
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
           TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+          UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
+          UPLOADPOST_PERFIL_ECONOMIA: ${{ vars.UPLOADPOST_PERFIL_ECONOMIA }}
           TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}
           TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
         run: |
