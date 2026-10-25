@@ -89,7 +89,19 @@ def _trocear_subtitulos(texto: str, max_car=30):
 
 
 class Compositor:
-    def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = ""):
+    def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
+                 pills=None, portada_txt=None, capas=None, sin_marcadores=()):
+        """Opcionales para los vídeos especiales (fin de semana, avisos):
+        datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
+        vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
+        portada_txt: (marca, texto grande, texto pequeño). capas: {bloque: función(img, proyección, dt)} que dibuja
+        encima del mapa. sin_marcadores: bloques sin marcadores de ciudades."""
+        self.datos_seg = datos_seg or {}
+        self.vistas = vistas or {}
+        self.pills = {**PILLS, **(pills or {})}
+        self.portada_txt = portada_txt
+        self.capas = capas or {}
+        self.sin_marcadores = set(sin_marcadores)
         self.prev = prev
         self.titular = (titular or "¿PARAGUAS O CHANCLAS?").upper()
         # La intro se dibuja ya sobre la región más relevante (la que va justo después)
@@ -129,17 +141,24 @@ class Compositor:
         for i, txt in enumerate(lineas):
             d.text((ANCHO / 2, MAPA_Y1 + 8 + i * 28), txt, font=fnt, fill=(225, 232, 245), anchor="ma")
 
+    def vista_de(self, seg):
+        return self.vistas.get(seg) or vista_de(seg)
+
     def mapa_estatico(self, seg):
-        clave = (vista_de(seg), foco_de(seg))
+        clave = (self.vista_de(seg), foco_de(seg))
         if clave not in self._cache_mapa:
             self._cache_mapa[clave] = _fundido_bordes(mapa.dibujar_mapa(clave[0], ANCHO, MAPA_H, foco=clave[1]))
         return self._cache_mapa[clave]
 
     def marcadores(self, seg):
         if seg not in self._cache_marc:
-            vista = vista_de(seg)
+            vista = self.vista_de(seg)
             pr = mapa.Proyeccion(vista, ANCHO, MAPA_H)
-            if seg in ("general", "cierre"):
+            if seg in self.sin_marcadores:
+                lista, estilo = [], "mini"
+            elif seg in self.datos_seg:
+                lista, estilo = self.datos_seg[seg], "mini"
+            elif seg in ("general", "cierre"):
                 lista, estilo = self.prev, "mini"
             elif seg in REGIONES:
                 lista, estilo = [c for c in self.prev if c["region"] == seg], "tarjeta"
@@ -161,9 +180,9 @@ class Compositor:
         seg, prev_seg = self.alias.get(seg_real, seg_real), self.alias.get(prev_real, prev_real)
         img = _fondo()
         dt = t - ini
-        en_trans = vista_de(prev_seg) != vista_de(seg) and dt < TRANSICION
+        en_trans = self.vista_de(prev_seg) != self.vista_de(seg) and dt < TRANSICION
         if en_trans:
-            vista = mapa.interpolar_vista(vista_de(prev_seg), vista_de(seg), dt / TRANSICION)
+            vista = mapa.interpolar_vista(self.vista_de(prev_seg), self.vista_de(seg), dt / TRANSICION)
             m = _fundido_bordes(mapa.dibujar_mapa(vista, ANCHO, MAPA_H, foco=foco_de(seg), ss=1))
         else:
             m = self.mapa_estatico(seg)
@@ -173,7 +192,7 @@ class Compositor:
 
         # Marcadores con animación de entrada escalonada (en el gancho no: solo el titular sobre el mapa)
         if not en_trans and seg_real != "intro":
-            t_marc = dt - (TRANSICION if vista_de(prev_seg) != vista_de(seg) else 0.1)
+            t_marc = dt - (TRANSICION if self.vista_de(prev_seg) != self.vista_de(seg) else 0.1)
             estilo, items = self.marcadores(seg)
             for k, (im, (x, y), (px, py)) in enumerate(items):
                 s = _ease_back((t_marc - k * (0.06 if estilo == "mini" else 0.15)) / 0.35)
@@ -188,6 +207,9 @@ class Compositor:
                 imr = im.resize((w, h), Image.BILINEAR) if (w, h) != im.size else im
                 capa.alpha_composite(imr, (int(x + (im.width - w) / 2), int(MAPA_Y0 + y + (im.height - h) / 2)))
 
+        # Capas propias de un bloque (p. ej. zonas con aviso)
+        if not en_trans and seg_real in self.capas:
+            self.capas[seg_real](capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt)
         # Extremos del día en el bloque general
         if seg_real == "general" and not en_trans:
             self._chips_extremos(capa, d, dt)
@@ -222,9 +244,14 @@ class Compositor:
         d = ImageDraw.Draw(im)
         partes = self.fecha_txt.split(" ", 1)  # "MARTES", "20 DE OCTUBRE"
         dia_sem, resto = partes[0], (partes[1] if len(partes) > 1 else "")
+        marca = "EL TIEMPO EN ESPAÑA"
+        lineas_extra = None
+        if self.portada_txt:
+            marca, dia_sem, resto = self.portada_txt[:3]
+            lineas_extra = self.portada_txt[3] if len(self.portada_txt) > 3 else None
         cy = ALTO / 2
         # Marca
-        d.text((ANCHO / 2, cy - 520), "EL TIEMPO EN ESPAÑA", font=fuente("ExtraBold", 50), fill=ACENTO, anchor="mm")
+        d.text((ANCHO / 2, cy - 520), marca, font=_ajustar(marca, "ExtraBold", 50, 980), fill=ACENTO, anchor="mm")
         # Fecha enorme
         f1 = _ajustar(dia_sem, "Black", 190, 980)
         d.text((ANCHO / 2 + 5, cy - 340 + 8), dia_sem, font=f1, fill=(0, 0, 0, 150), anchor="mm")
@@ -240,11 +267,13 @@ class Compositor:
         xs = [ANCHO / 2 - tam / 2] if len(orden) == 1 else [ANCHO / 2 - tam - 20, ANCHO / 2 + 20]
         for x, ic in zip(xs, orden):
             im.alpha_composite(mapa.icono(ic, tam), (int(x), int(cy - 70)))
-        calor, frio = self.extremos["calor"], self.extremos["frio"]
-        fx = fuente("Black", 64)
-        lin1 = f"MÁX {calor['tmax']}° {calor['nombre'].upper()}"
-        lin2 = f"MÍN {frio['tmin']}° {frio['nombre'].upper()}"
-        for k, (txt, col) in enumerate(((lin1, (255, 160, 60)), (lin2, (140, 205, 255)))):
+        if lineas_extra is not None:
+            pares = lineas_extra
+        else:
+            calor, frio = self.extremos["calor"], self.extremos["frio"]
+            pares = ((f"MÁX {calor['tmax']}° {calor['nombre'].upper()}", (255, 160, 60)),
+                     (f"MÍN {frio['tmin']}° {frio['nombre'].upper()}", (140, 205, 255)))
+        for k, (txt, col) in enumerate(pares):
             f = _ajustar(txt, "Black", 64, 960)
             d.text((ANCHO / 2, cy + 300 + k * 86), txt, font=f, fill=col, anchor="mm")
         # Pastilla con la pregunta del canal
@@ -257,7 +286,7 @@ class Compositor:
         return im
 
     def _pill(self, img, d, seg, dt):
-        txt = PILLS.get(seg, REGIONES.get(seg, {}).get("titulo"))
+        txt = self.pills.get(seg, REGIONES.get(seg, {}).get("titulo"))
         if not txt:
             return
         f = fuente("Black", 40)
