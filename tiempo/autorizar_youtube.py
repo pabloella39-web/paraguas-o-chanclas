@@ -24,7 +24,7 @@ if __name__ == "__main__":
     print(f"::notice::YT_CLIENT_ID termina en {cid[-30:]!r} (longitud {len(cid)}); "
           f"YT_CLIENT_SECRET empieza por {sec[:7]!r} (longitud {len(sec)})")
     try:
-        res = canjear_codigo(urllib.parse.unquote(entrada))
+        res = canjear_codigo(urllib.parse.unquote(entrada), os.environ.get("CANAL_YOUTUBE") or "tiempo")
     except Exception as e:  # noqa: BLE001
         print(f"::error::{e}")
         sys.exit(1)

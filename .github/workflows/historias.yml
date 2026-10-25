@@ -1,14 +1,14 @@
 name: Historia del día (Lo que Callan las Paredes)
 
-# Cada tarde genera la historia (2-3 partes) y la deja programada en TikTok: la PARTE 1 sale a las 21:00 (Madrid)
+# Lunes, miércoles, viernes, sábado y domingo genera la historia (2-3 partes) y la deja programada en TikTok: la PARTE 1 sale a las 21:00 (Madrid)
 # y las demás unos minutos antes, para que en el perfil queden en orden. Varios intentos por si GitHub se retrasa;
 # historial_historias/AAAA-MM-DD.json evita repetir.
 on:
   schedule:
-    - cron: "5 16 * * *"
-    - cron: "35 16 * * *"
-    - cron: "5 17 * * *"
-    - cron: "35 17 * * *"
+    - cron: "5 16 * * 0,1,3,5,6"
+    - cron: "35 16 * * 0,1,3,5,6"
+    - cron: "5 17 * * 0,1,3,5,6"
+    - cron: "35 17 * * 0,1,3,5,6"
   push:
     branches: [main]
     paths: ["historias/lanzar.txt"]   # "prueba" = genera sin publicar; "publicar" = genera y programa
@@ -45,6 +45,9 @@ jobs:
           HISTORIAS_VOZ: ${{ vars.HISTORIAS_VOZ }}
           UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
           UPLOADPOST_PERFIL_HISTORIAS: ${{ vars.UPLOADPOST_PERFIL_HISTORIAS }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
         run: |
           ARGS="--publicar"
           # Interruptor: historias/activo.txt = "si" cuando la cuenta de TikTok esté conectada en Upload-Post
@@ -67,7 +70,7 @@ jobs:
         if: always()
         run: |
           git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
-          git add historial_historias/ assets/historias/ 2>/dev/null || true
+          git add historial_historias/ assets/historias/ estado/ 2>/dev/null || true
           git diff --cached --quiet && exit 0
           git commit -m "Historia del $(date +%F)"
           for i in 1 2 3 4; do git pull --rebase -q && git push && break; sleep 5; done

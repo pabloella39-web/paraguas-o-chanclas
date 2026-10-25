@@ -22,6 +22,7 @@ from .tiktok import _openssl
 
 log = logging.getLogger(__name__)
 ESTADO = RAIZ / "estado" / "youtube_token.enc"
+ESTADOS = {"tiempo": ESTADO, "historias": RAIZ / "estado" / "youtube_token_historias.enc"}
 REDIRECT_URI = "https://pabloella39-web.github.io/paraguas-o-chanclas/callback.html"
 SCOPE = "https://www.googleapis.com/auth/youtube.upload"
 TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -31,9 +32,9 @@ def _cliente() -> tuple[str, str]:
     return os.environ.get("YT_CLIENT_ID", "").strip(), os.environ.get("YT_CLIENT_SECRET", "").strip()
 
 
-def hay_credenciales() -> bool:
+def hay_credenciales(canal: str = "tiempo") -> bool:
     cid, sec = _cliente()
-    return bool(cid and sec and ESTADO.exists() and os.environ.get("TIKTOK_CIFRADO"))
+    return bool(cid and sec and ESTADOS[canal].exists() and os.environ.get("TIKTOK_CIFRADO"))
 
 
 def url_autorizacion(client_id: str) -> str:
@@ -42,21 +43,21 @@ def url_autorizacion(client_id: str) -> str:
         "access_type": "offline", "prompt": "consent", "state": "youtube"})
 
 
-def canjear_codigo(codigo: str) -> dict:
+def canjear_codigo(codigo: str, canal: str = "tiempo") -> dict:
     cid, sec = _cliente()
     r = requests.post(TOKEN_URL, data={"code": codigo, "client_id": cid, "client_secret": sec,
                                        "redirect_uri": REDIRECT_URI, "grant_type": "authorization_code"}, timeout=30)
     j = r.json()
     if "refresh_token" not in j:
         raise RuntimeError(f"Google no devolvió refresh_token: {j.get('error')} {j.get('error_description')}")
-    ESTADO.parent.mkdir(exist_ok=True)
-    ESTADO.write_bytes(_openssl(["-salt"], j["refresh_token"].encode()) + b"\n")
+    ESTADOS[canal].parent.mkdir(exist_ok=True)
+    ESTADOS[canal].write_bytes(_openssl(["-salt"], j["refresh_token"].encode()) + b"\n")
     return {"scope": j.get("scope")}
 
 
-def _access_token() -> str:
+def _access_token(canal: str = "tiempo") -> str:
     cid, sec = _cliente()
-    refresh = _openssl(["-d"], ESTADO.read_bytes().strip()).decode().strip()
+    refresh = _openssl(["-d"], ESTADOS[canal].read_bytes().strip()).decode().strip()
     r = requests.post(TOKEN_URL, data={"client_id": cid, "client_secret": sec, "refresh_token": refresh,
                                        "grant_type": "refresh_token"}, timeout=30)
     j = r.json()
@@ -65,14 +66,20 @@ def _access_token() -> str:
     return j["access_token"]
 
 
-def subir(video: Path, titulo: str, descripcion: str, etiquetas: list[str]) -> dict:
-    token = _access_token()
+def subir(video: Path, titulo: str, descripcion: str, etiquetas: list[str], canal: str = "tiempo",
+          publicar_en=None, categoria: str = "22") -> dict:
+    """publicar_en: datetime con zona horaria → se sube privado y YouTube lo publica a esa hora."""
+    token = _access_token(canal)
     meta = {
         "snippet": {"title": titulo[:100], "description": descripcion[:4900], "tags": etiquetas[:15],
-                    "categoryId": "22", "defaultLanguage": "es", "defaultAudioLanguage": "es"},
+                    "categoryId": categoria, "defaultLanguage": "es", "defaultAudioLanguage": "es"},
         "status": {"privacyStatus": os.environ.get("YT_PRIVACIDAD", "public"), "selfDeclaredMadeForKids": False,
                    "containsSyntheticMedia": True, "embeddable": True},
     }
+    if publicar_en is not None:
+        meta["status"]["privacyStatus"] = "private"
+        meta["status"]["publishAt"] = publicar_en.astimezone(__import__("datetime").timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ")
     tam = video.stat().st_size
     r = requests.post("https://www.googleapis.com/upload/youtube/v3/videos",
                       params={"uploadType": "resumable", "part": "snippet,status"},
@@ -91,10 +98,11 @@ def subir(video: Path, titulo: str, descripcion: str, etiquetas: list[str]) -> d
     return {"id": vid, "url": f"https://youtube.com/shorts/{vid}"}
 
 
-def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: list[str], intentos: int = 3):
+def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: list[str], intentos: int = 3,
+                         **kw):
     for i in range(1, intentos + 1):
         try:
-            return subir(video, titulo, descripcion, etiquetas)
+            return subir(video, titulo, descripcion, etiquetas, **kw)
         except Exception as e:  # noqa: BLE001
             if i == intentos:
                 raise

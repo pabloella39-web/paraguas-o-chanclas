@@ -6,6 +6,11 @@ on:
       url:
         description: "Pega aquí la URL completa que muestra callback.html tras autorizar con Google"
         required: true
+      canal:
+        description: "Canal de YouTube"
+        type: choice
+        options: ["tiempo", "historias"]
+        default: "tiempo"
 
 permissions:
   contents: write
@@ -36,6 +41,7 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          CANAL_YOUTUBE: ${{ inputs.canal }}
         run: python -m tiempo.autorizar_youtube
       - name: Guardar
         run: |

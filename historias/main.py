@@ -185,9 +185,33 @@ def publicar(meta: dict, ya: bool = False) -> list:
                                        primer_comentario=meta.get("pregunta"))
         p["publicacion"] = r
         res.append(r)
+        p["youtube"] = publicar_youtube(meta, p, n, cuando)
         print(f"::notice::Parte {p['parte']}/{n} " + (f"programada para las {cuando:%H:%M}" if cuando else
                                                          f"publicada: {str(r)[:150]}"))
     return res
+
+
+def publicar_youtube(meta: dict, p: dict, n: int, cuando):
+    """Short en el canal de YouTube de historias (a la misma hora que en TikTok)."""
+    from tiempo import youtube
+    if not youtube.hay_credenciales("historias"):
+        log.info("YouTube de historias sin autorizar: se omite")
+        return None
+    titulo = f"{meta['titulo'].title()} · Parte {p['parte']}/{n} | Historia de terror #Shorts"
+    if len(titulo) > 100:
+        titulo = f"{meta['titulo'].title()[:60]} · Parte {p['parte']}/{n} #Shorts"
+    desc = p["caption"].replace("ya está en mi perfil", "está en el canal") + \
+        "\n\nCada lunes, miércoles, viernes, sábado y domingo, una historia nueva. Suscríbete 🕯️"
+    tags = ["historias de terror", "terror", "misterio", "suspense", "relatos", "creepypasta", "true crime",
+            "leyendas", "shorts"]
+    try:
+        r = youtube.subir_con_reintentos(Path(p["video"]), titulo, desc, tags, canal="historias", publicar_en=cuando,
+                                         categoria="24")
+        print(f"::notice::YouTube parte {p['parte']}: {r['url']}")
+        return r
+    except Exception as e:  # noqa: BLE001
+        log.error("YouTube falló en la parte %d: %s", p["parte"], e)
+        return {"error": str(e)}
 
 
 def main():
