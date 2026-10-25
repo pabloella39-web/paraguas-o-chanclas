@@ -1,32 +1,32 @@
 {
  "fecha": "2026-10-25",
  "modo": "previa",
- "duracion": 67.4,
- "caption": "Semana de FED y BCE: lo que puede mover tu bolsillo 📈\n\nLo que viene esta semana en los mercados 📅\n🔴 IBEX 35: 18.990 (−1,7 %)\n🔴 S&P 500: 7.624 (−0,5 %)\n🔴 Bitcoin: 80.838 (−1,4 %)\n🔴 Oro: 4.008 (−4,1 %)\n🟢 Brent: 111,70 (+1,7 %)\n📅 Annual Budget Release\n📅 Decisión de tipos de la FED\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #fed #bce #petroleo #oro #inflacion",
+ "duracion": 67.0,
+ "caption": "Semana grande: FED y BCE deciden sobre los tipos 🐻\n\nLo que viene esta semana en los mercados 📅\n🔴 IBEX 35: 18.990 (−1,7 %)\n🔴 S&P 500: 7.624 (−0,5 %)\n🔴 Bitcoin: 80.578 (−1,8 %)\n🔴 Oro: 4.008 (−4,1 %)\n🟢 Brent: 111,70 (+1,7 %)\n📅 Annual Budget Release\n📅 Decisión de tipos de la FED\n⚠️ Información, no asesoramiento financiero.\n\n#economia #bolsa #finanzas #ibex35 #bitcoin #parati #torouoso #fed #bce #petroleo #oro #inflacion",
  "portada_ms": 0,
  "origen_guion": "claude",
  "voz": "femenina",
  "titulares": [
   {
-   "titulo": "Las tecnológicas pinchan y la IA, en el punto de mira",
+   "titulo": "Las tecnológicas pinchan y la IA, en duda",
    "fuente": "Cinco Días"
   },
   {
-   "titulo": "Escalada bélica y energía agitan las bolsas",
-   "fuente": "Expansión"
+   "titulo": "Francia tensa la deuda antes del BCE",
+   "fuente": "Cinco Días"
   }
  ],
  "guion": {
-  "intro": "¿Preparado para una semana de bancos centrales? Hoy, domingo 25 de octubre, te la cuento.",
-  "bolsas": "El Ibex cerró el viernes en 18.990 puntos, un 1,7 % menos en la semana, y Europa lo pasó peor. Wall Street aguantó mejor y el Nikkei se hundió un 4,0 %.",
-  "cripto": "Y el bitcoin, que no cierra nunca, está en unos 80.800 dólares, un 1,4 % menos que hace una semana.",
-  "materias": "El gas europeo roza máximos, y el Brent sigue en 111,7 dólares el barril, mientras el oro cae a 4.008 dólares la onza.",
-  "agenda": "¡Atento! La FED americana decide tipos el miércoles a las siete de la tarde y el BCE, el banco europeo, el jueves a las dos y cuarto.",
-  "noticias": "Las tecnológicas han pinchado y el desplome de CoreWeave reabre el debate sobre lo que cuesta la IA. Y la escalada bélica tensa otra vez la energía, con reservas en mínimos.",
-  "cierre": "¿Toro u oso con el Ibex? Comenta y sigue Toro U Oso, que no es consejo de inversión."
+  "intro": "Domingo 25 de octubre, ¡y la semana que viene trae FED y BCE seguidos!",
+  "bolsas": "Los mercados descansan, y el IBEX 35 cerró el viernes en 18.990 puntos, un 1,7 % menos en la semana. Europa cayó algo más y el Nikkei un 4,0 %, mientras Wall Street aguantó mejor.",
+  "cripto": "Y el bitcoin, que no cierra nunca, ronda unos 80.600 dólares, un 1,8 % menos en la semana.",
+  "materias": "El Brent anda en 111,7 dólares el barril, el oro se deja un 4,1 % en la semana y el euro vale 1,12 dólares.",
+  "agenda": "La FED, el banco de EE. UU., decide el miércoles a las siete de la tarde y el BCE, el jueves a las dos y cuarto.",
+  "noticias": "Las tecnológicas pinchan y reabren el debate sobre lo que cuesta la IA. Y la deuda de Francia tensa el mercado, así que un experto espera una señal del BCE.",
+  "cierre": "¿Toro u oso con el IBEX? Cuéntamelo, y recuerda que esto no es consejo de inversión. ¡Sígueme!"
  },
  "tiktok": {
-  "publish_id": "v_inbox_file~v2.7700487349884700694",
+  "publish_id": "v_inbox_file~v2.7700488962032437271",
   "status": "SEND_TO_USER_INBOX"
  }
 }
