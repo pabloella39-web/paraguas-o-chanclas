@@ -1,0 +1,22 @@
+name: Muestras de voz (historias)
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/voces_historias.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  muestras:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}
+        run: pip install requests && python scripts/voces_historias.py 2>&1 | tee registro.txt; mkdir -p muestras; cp registro.txt muestras/
+      - run: |
+          cd muestras && git init -q -b muestras-historias
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Muestras de voz para historias"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" muestras-historias
