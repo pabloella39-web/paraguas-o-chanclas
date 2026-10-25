@@ -1,0 +1,19 @@
+name: Prueba de imágenes (historias)
+on:
+  push:
+    branches: [main]
+    paths: ["historias/medios.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  imagenes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests pillow numpy && python -m historias.medios "abandoned house night" "dark corridor" "old wooden door" "foggy forest road" "old mill" "candle dark" 2>&1 | tee registro.txt; mkdir -p muestras_imagenes; cp registro.txt muestras_imagenes/
+      - run: |
+          cd muestras_imagenes && git init -q -b muestras-imagenes
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Muestras de imágenes"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" muestras-imagenes

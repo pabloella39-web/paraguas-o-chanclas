@@ -25,17 +25,34 @@ ELEVEN = "https://api.elevenlabs.io/v1"
 TINTES = {"ficcion": (0.80, 0.95, 1.10), "leyenda": (1.10, 0.95, 0.78), "real": (1.04, 1.0, 0.92)}
 
 
+LIBRES = ("cc0", "public domain", "pd", "no restrictions", "copyrighted free use")
+
+
 def buscar_imagenes(consulta: str, n: int = 3) -> list[dict]:
+    """Wikimedia Commons: solo dominio público y CC0 (no hace falta atribución)."""
     try:
-        r = requests.get("https://api.openverse.org/v1/images/", headers=UA, timeout=30, params={
-            "q": consulta, "license": "cc0,pdm", "page_size": 20, "mature": "false"})
+        r = requests.get("https://commons.wikimedia.org/w/api.php", headers=UA, timeout=30, params={
+            "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6, "gsrlimit": 30,
+            "gsrsearch": f"filetype:bitmap {consulta}", "prop": "imageinfo",
+            "iiprop": "url|size|extmetadata|mime", "iiurlwidth": 1400})
         r.raise_for_status()
-        res = [x for x in r.json().get("results", []) if (x.get("width") or 0) >= 700 and (x.get("height") or 0) >= 600]
+        paginas = (r.json().get("query") or {}).get("pages", {}).values()
     except Exception as e:  # noqa: BLE001
-        log.warning("Openverse '%s': %s", consulta, e)
+        log.warning("Wikimedia '%s': %s", consulta, e)
         return []
-    # Preferir verticales y grandes
-    res.sort(key=lambda x: -((x.get("height") or 1) / (x.get("width") or 1) + (x.get("width") or 0) / 4000))
+    res = []
+    for pg in paginas:
+        ii = (pg.get("imageinfo") or [{}])[0]
+        meta = ii.get("extmetadata") or {}
+        lic = str((meta.get("LicenseShortName") or {}).get("value", "")).lower()
+        if not any(lic.startswith(l) or l in lic for l in LIBRES) or "by" in lic.replace("by-sa", "by"):
+            continue
+        if ii.get("mime") not in ("image/jpeg", "image/png") or (ii.get("width") or 0) < 800:
+            continue
+        res.append({"id": pg.get("pageid"), "title": pg.get("title", ""), "license": lic, "url": ii.get("thumburl"),
+                    "thumbnail": ii.get("url"), "width": ii.get("width"), "height": ii.get("height"),
+                    "orden": pg.get("index", 99)})
+    res.sort(key=lambda x: x["orden"])
     return res[: n * 3]
 
 
@@ -200,5 +217,15 @@ def musica(segundos: float, semilla: int) -> np.ndarray | None:
 def clave_estable(*partes) -> int:
     return int(hashlib.md5("|".join(map(str, partes)).encode()).hexdigest()[:8], 16)
 
+
+if __name__ == "__main__":  # prueba: python -m historias.medios "abandoned house" "dark forest"
+    import sys
+    logging.basicConfig(level=logging.INFO)
+    salida = Path("muestras_imagenes")
+    salida.mkdir(exist_ok=True)
+    ims = imagenes_para(sys.argv[1:], "ficcion", set())
+    for k, im in enumerate(ims):
+        im.resize((540, 960)).save(salida / f"{k:02d}.jpg", quality=80)
+    print(f"{len(ims)} de {len(sys.argv) - 1} imágenes")
 
 __all__ = ["imagenes_para", "fondo_procedural", "ambiente", "golpe", "musica", "SR", "clave_estable", "random"]
