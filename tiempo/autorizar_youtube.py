@@ -19,5 +19,13 @@ if __name__ == "__main__":
         if "error" in q:
             sys.exit(f"Google devolvió un error: {q['error'][0]}")
         entrada = q["code"][0]
-    res = canjear_codigo(urllib.parse.unquote(entrada))
+    cid, sec = os.environ.get("YT_CLIENT_ID", "").strip(), os.environ.get("YT_CLIENT_SECRET", "").strip()
+    # GitHub oculta los secretos: solo se muestran datos para comprobar que están bien copiados
+    print(f"::notice::YT_CLIENT_ID termina en {cid[-30:]!r} (longitud {len(cid)}); "
+          f"YT_CLIENT_SECRET empieza por {sec[:7]!r} (longitud {len(sec)})")
+    try:
+        res = canjear_codigo(urllib.parse.unquote(entrada))
+    except Exception as e:  # noqa: BLE001
+        print(f"::error::{e}")
+        sys.exit(1)
     print(f"✅ YouTube autorizado. Permisos: {res['scope']}")
