@@ -41,6 +41,26 @@ ACENTO = (255, 196, 45)
 MESES_CORTOS = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"]
 
 
+# ================================================================ duración (los avisos son cortos)
+from contextlib import contextmanager
+
+
+@contextmanager
+def duracion(dmin: float, dmax: float, dobj: float):
+    """Cambia temporalmente el rango de duración (65-70 s por defecto) para un vídeo especial."""
+    import sys
+    from . import main as M
+    mods = [M, sys.modules[__name__]]
+    viejos = [(m, m.DURACION_MIN, m.DURACION_MAX, m.DURACION_OBJETIVO) for m in mods]
+    for m in mods:
+        m.DURACION_MIN, m.DURACION_MAX, m.DURACION_OBJETIVO = dmin, dmax, dobj
+    try:
+        yield
+    finally:
+        for m, a, b, c in viejos:
+            m.DURACION_MIN, m.DURACION_MAX, m.DURACION_OBJETIVO = a, b, c
+
+
 # ================================================================ voz (común)
 def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     """escribir(factor, plantilla) -> guion con 'segmentos' y 'orden'. Devuelve (guion, plan, total, trozos, motor)."""
@@ -537,30 +557,31 @@ def _capa_poligonos(grupos, con_lista=False, consejos=None):
     return dibujar
 
 
-PROMPT_AVISO = """Eres el guionista de "Paraguas o Chanclas", canal de TikTok del tiempo en España. Hoy NO hay humor:
-es un vídeo ESPECIAL por avisos de AEMET. Tono serio, claro y cercano, sin alarmismo ni sensacionalismo. Usa SOLO
-estos datos oficiales de AEMET (no inventes cifras, zonas, horas ni daños). Lo lee {presenta} con voz sintética.
+PROMPT_AVISO = """Eres el guionista de "Paraguas o Chanclas", canal de TikTok del tiempo en España. Es un vídeo
+FLASH de 25 segundos por avisos de AEMET: solo para llamar la atención sobre lo urgente. Sin humor, tono directo y
+claro, con urgencia pero sin sensacionalismo. Usa SOLO estos datos oficiales de AEMET (no inventes cifras, zonas, horas
+ni daños). Lo lee {presenta} con voz sintética.
 
-Hoy es {fecha}. Avisos naranjas y rojos vigentes o para las próximas horas:
+Hoy es {fecha}. Avisos vigentes o para las próximas horas:
 {avisos}
 
-Bloques (palabras aproximadas: {palabras}; total ≈ {total}):
-- intro: gancho directo (qué aviso, de qué nivel y dónde) y "quédate, que al final te digo qué hacer".
-- zonas: qué zonas concretas y cuándo (horas en palabras, p. ej. "desde las seis de la tarde del domingo").
-- detalle: qué se espera exactamente según la descripción de AEMET y qué significa el nivel (naranja: riesgo
-  importante; rojo: riesgo extraordinario).
-- consejos: las recomendaciones oficiales (de "instrucción") contadas con tus palabras + "en una emergencia, llama
-  al 112" + "sigue las indicaciones de AEMET y de Protección Civil".
-- cierre: pide compartir el vídeo con quien viva en esas zonas y seguir la cuenta. Sin horas de publicación.
-Habla de tú, frases completas que fluyan; números en cifras con "grados", "por ciento", "litros"... sin símbolos.
+Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasarse):
+- intro: la PRIMERA FRASE (máx. 10 palabras) es el titular de última hora: zona + nivel + fenómeno ("Atención
+  Valencia: aviso rojo por lluvias torrenciales."). Luego, en una frase, lo más grave que se espera.
+- zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras).
+- consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
+- cierre: una sola frase: "Compártelo con quien viva allí." (puedes variarla un poco).
+Frases cortas y directas, de tú; números en cifras con "grados", "por ciento", "litros", "kilómetros por hora".
+Nombres de fenómeno naturales: "oleaje" (no "costeros"), "viento", "lluvias", "tormentas", "nieve", "calor".
 
-"titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres (ej. "AVISO ROJO EN VALENCIA").
+"titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres (ej. "VALENCIA: AVISO ROJO").
 "consejos_pantalla": 3 consejos MUY cortos (máx. 26 caracteres cada uno) para la pantalla.
 "caption": una frase (máx. 90 caracteres) con 1 emoji ⚠️, sin hashtags.
 
-Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "detalle": "...", "consejos": "...",
-"cierre": "..."}}, "titular": "...", "consejos_pantalla": ["...", "...", "..."], "caption": "..."}}"""
-PALABRAS_AVISO = {"intro": 26, "zonas": 40, "detalle": 38, "consejos": 44, "cierre": 22}
+Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "consejos": "...", "cierre": "..."}},
+"titular": "...", "consejos_pantalla": ["...", "...", "..."], "caption": "..."}}"""
+PALABRAS_AVISO = {"intro": 20, "zonas": 20, "consejos": 18, "cierre": 6}
+DURACION_AVISO = (20.0, 30.0, 25.0)
 CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAMA AL 112"],
                  "tormentas": ["RESGUÁRDATE BAJO TECHO", "LEJOS DE ÁRBOLES", "LLAMA AL 112"],
                  "vientos": ["CUIDADO CON OBJETOS", "EVITA PARQUES", "LLAMA AL 112"],
@@ -575,7 +596,7 @@ def _hora_txt(iso: str) -> str:
 
 
 def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool) -> dict:
-    orden = ["intro", "zonas", "detalle", "consejos", "cierre"]
+    orden = ["intro", "zonas", "consejos", "cierre"]
     palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_AVISO.items()}
     datos = [{"nivel": gr["nivel"], "fenomeno": gr["fenomeno"], "zonas": gr["zonas"][:12],
               "desde": _hora_txt(gr["inicio"]), "hasta": _hora_txt(gr["fin"]), "descripcion": gr["descripcion"],
@@ -592,14 +613,13 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             log.warning("Guion del aviso con Claude falló: %s", e)
     gr = grupos[0]
     zonas = ", ".join(z.split(" - ")[-1] for z in gr["zonas"][:4])
+    from .gancho import nombre_fenomeno
+    fen = nombre_fenomeno(gr["fenomeno"])
     seg = {
-        "intro": f"Atención: AEMET activa el aviso {gr['nivel']} por {gr['fenomeno']}. Quédate, que al final te digo qué hacer.",
-        "zonas": f"Afecta a {zonas}, desde el {_hora_txt(gr['inicio'])} hasta el {_hora_txt(gr['fin'])}.",
-        "detalle": f"{gr['descripcion']} El nivel {gr['nivel']} significa un riesgo "
-                   + ("importante." if gr["nivel"] == "naranja" else "extraordinario."),
-        "consejos": "Mantente informado con AEMET, sigue las indicaciones de Protección Civil y, en una emergencia, "
-                    "llama al 112.",
-        "cierre": "Comparte este vídeo con quien viva en esas zonas y sígueme para tener el tiempo de cada día.",
+        "intro": f"Atención: aviso {gr['nivel']} de AEMET por {fen}.",
+        "zonas": f"Afecta a {zonas}, desde el {_hora_txt(gr['inicio'])}.",
+        "consejos": "Extrema la precaución y, si hay una emergencia, llama al 112.",
+        "cierre": "Compártelo con quien viva allí.",
     }
     return {"segmentos": seg, "orden": orden, "titular": f"AVISO {gr['nivel'].upper()}",
             "caption": f"⚠️ Aviso {gr['nivel']} por {gr['fenomeno']}: lo que tienes que saber",
@@ -621,31 +641,41 @@ def caption_aviso(grupos, gancho) -> str:
             + "\n\n" + " ".join(dict.fromkeys(tags)))[:2200]
 
 
+def _gancho_aviso(grupos) -> dict:
+    from .config import CIUDADES
+    from .gancho import fenomeno_del_dia
+    prev = [{**c, "tmax": 0, "tmin": 0, "lluvia": 0, "icono": "nubes", "racha": None} for c in CIUDADES]
+    return fenomeno_del_dia(prev, grupos)
+
+
 def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False) -> dict:
     salida.mkdir(parents=True, exist_ok=True)
     trabajo = salida / "trabajo"
     trabajo.mkdir(exist_ok=True)
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
     voz.elegir_voz(VOCES[tipo_voz])
-    guion, plan, total, trozos, motor = locutar(
-        lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
+    with duracion(*DURACION_AVISO):  # vídeo flash de 20-30 s
+        guion, plan, total, trozos, motor = locutar(
+            lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     zona = _vista_zonas(grupos)
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]
     kwargs = {
-        "vistas": {"intro": zona, "zonas": zona, "detalle": VISTA_GENERAL, "consejos": zona, "cierre": VISTA_GENERAL},
-        "sin_marcadores": ("intro", "zonas", "detalle", "consejos", "cierre"),
-        "pills": {"zonas": "ZONAS AFECTADAS", "detalle": "QUÉ SE ESPERA", "consejos": "QUÉ HACER",
-                  "cierre": "COMPÁRTELO"},
+        "vistas": {"intro": zona, "zonas": zona, "consejos": zona, "cierre": zona},
+        "sin_marcadores": ("intro", "zonas", "consejos", "cierre"),
+        "pills": {"zonas": "ZONAS Y HORAS", "consejos": "QUÉ HACER", "cierre": "COMPÁRTELO",
+                  "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
+                  "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
         "capas": {"intro": _capa_poligonos(grupos), "zonas": _capa_poligonos(grupos, con_lista=True),
-                  "detalle": _capa_poligonos(grupos, con_lista=True),
                   "consejos": _capa_poligonos(grupos, consejos=consejos), "cierre": _capa_poligonos(grupos)},
+        "gancho": _gancho_aviso(grupos),
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
                         tuple((z.split(" - ")[-1].upper()[:30], COLOR_NIVEL[gr["nivel"]]) for z in gr["zonas"][:2])),
     }
-    video = _producir(f"aviso_{hoy.isoformat()}", guion, plan, total, trozos, kwargs, [], None,
-                      g.fecha_larga(hoy).upper(), salida, trabajo)
+    with duracion(*DURACION_AVISO):
+        video = _producir(f"aviso_{hoy.isoformat()}", guion, plan, total, trozos, kwargs, [], None,
+                          g.fecha_larga(hoy).upper(), salida, trabajo)
     caption = caption_aviso(grupos, guion.get("caption") if guion.get("origen") == "claude" else None)
     return {"tipo": "aviso", "fecha": hoy.isoformat(), "video": str(video), "caption": caption,
             "titular": guion.get("titular"), "motor_voz": motor, "origen_guion": guion.get("origen"),

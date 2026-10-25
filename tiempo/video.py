@@ -374,8 +374,9 @@ class Compositor:
             f = _ajustar(txt, "Black", 64, 960)
             d.text((ANCHO / 2, cy + 300 + k * 86), txt, font=f, fill=col, anchor="mm")
         # Pastilla con la pregunta del canal
-        txt = self.gancho["insignia"] if self.gancho and not self.portada_txt else "¿PARAGUAS O CHANCLAS?"
-        col = tuple(self.gancho["color"]) if self.gancho and not self.portada_txt else ACENTO
+        usar = self.gancho and (not self.portada_txt or self.gancho.get("nivel"))
+        txt = self.gancho["insignia"] if usar else "¿PARAGUAS O CHANCLAS?"
+        col = tuple(self.gancho["color"]) if usar else ACENTO
         f3 = _ajustar(txt, "Black", 54, 900)
         w = f3.getlength(txt) + 70
         d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 470, ANCHO / 2 + w / 2, cy + 560], radius=45, fill=col)
@@ -533,12 +534,14 @@ class Compositor:
         d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=36 * s, fill=ACENTO)
         if s > 0.8:
             oscuro = (15, 25, 50)
-            d.text((cx, cy - 78), "¿PARAGUAS O CHANCLAS?", font=fuente("Black", 50), fill=oscuro, anchor="mm")
-            d.text((cx, cy - 18), "¡Dímelo en comentarios!", font=fuente("ExtraBold", 42),
+            l1 = self.pills.get("cierre_1", "¿PARAGUAS O CHANCLAS?")
+            l2 = self.pills.get("cierre_2", "¡Dímelo en comentarios!")
+            d.text((cx, cy - 78), l1, font=_ajustar(l1, "Black", 50, 740), fill=oscuro, anchor="mm")
+            d.text((cx, cy - 18), l2, font=_ajustar(l2, "ExtraBold", 42, 740),
                    fill=oscuro, anchor="mm")
             d.line([(cx - 300, cy + 26), (cx + 300, cy + 26)], fill=(15, 25, 50, 90), width=3)
-            d.text((cx, cy + 74), "Sígueme · el tiempo de cada día", font=fuente("ExtraBold", 38), fill=oscuro,
-                   anchor="mm")
+            l3 = self.pills.get("cierre_3", "Sígueme · el tiempo de cada día")
+            d.text((cx, cy + 74), l3, font=_ajustar(l3, "ExtraBold", 38, 740), fill=oscuro, anchor="mm")
 
     def _subtitulo(self, img, d, t):
         """Frase corta en pantalla con la palabra que se está diciendo resaltada (estilo karaoke)."""
