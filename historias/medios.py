@@ -87,7 +87,10 @@ def tratar(im: Image.Image, tipo: str) -> Image.Image:
 def imagenes_para(escenas: list[str], tipo: str, usadas: set[str]) -> list[Image.Image]:
     out = []
     for esc in escenas:
-        for info in buscar_imagenes(esc):
+        candidatos = buscar_imagenes(esc)
+        if not candidatos and len(esc.split()) > 1:  # segundo intento, más general ("dark mill interior" → "mill interior")
+            candidatos = buscar_imagenes(" ".join(esc.split()[-2:])) or buscar_imagenes(esc.split()[-1])
+        for info in candidatos:
             if info.get("id") in usadas:
                 continue
             im = descargar(info)
