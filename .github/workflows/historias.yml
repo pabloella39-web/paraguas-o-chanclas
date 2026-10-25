@@ -1,0 +1,69 @@
+name: Historia del día (Lo que Callan las Paredes)
+
+# Cada tarde genera la historia (2-3 partes) y la deja programada en TikTok: la PARTE 1 sale a las 21:00 (Madrid)
+# y las demás unos minutos antes, para que en el perfil queden en orden. Varios intentos por si GitHub se retrasa;
+# historial_historias/AAAA-MM-DD.json evita repetir.
+on:
+  schedule:
+    - cron: "5 16 * * *"
+    - cron: "35 16 * * *"
+    - cron: "5 17 * * *"
+    - cron: "35 17 * * *"
+  push:
+    branches: [main]
+    paths: ["historias/lanzar.txt"]   # "prueba" = genera sin publicar; "publicar" = genera y programa
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historias
+  cancel-in-progress: false
+
+jobs:
+  historia:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Dependencias
+        run: |
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          pip install -r requirements.txt
+          [ -f assets/historias/SpecialElite-Regular.ttf ] || curl -sfL -o assets/historias/SpecialElite-Regular.ttf \
+            https://raw.githubusercontent.com/google/fonts/main/apache/specialelite/SpecialElite-Regular.ttf || true
+      - name: Generar
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}
+          HISTORIAS_VOZ: ${{ vars.HISTORIAS_VOZ }}
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+          UPLOADPOST_PERFIL_HISTORIAS: ${{ vars.UPLOADPOST_PERFIL_HISTORIAS }}
+        run: |
+          ARGS="--publicar"
+          if [ "${{ github.event_name }}" = "push" ] && ! grep -qi publicar historias/lanzar.txt; then ARGS="--prueba"; fi
+          mkdir -p salida_historias
+          set -o pipefail
+          python -m historias.main $ARGS 2>&1 | grep -v " Render " | tee salida_historias/registro.txt
+      - name: Guardar vídeos en la rama pruebas-historias
+        if: always()
+        run: |
+          mkdir -p /tmp/p && cp salida_historias/*.mp4 salida_historias/meta.json salida_historias/registro.txt /tmp/p/ 2>/dev/null || true
+          cd /tmp/p && git init -q -b pruebas-historias
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Historia $(date +%F-%H%M)" && \
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" pruebas-historias
+      - name: Guardar historial, sonidos y música
+        if: always()
+        run: |
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add historial_historias/ assets/historias/ 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Historia del $(date +%F)"
+          for i in 1 2 3 4; do git pull --rebase -q && git push && break; sleep 5; done

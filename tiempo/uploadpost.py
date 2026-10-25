@@ -25,6 +25,8 @@ def disponible() -> bool:
 
 
 def perfil(canal: str = "tiempo") -> str:
+    if canal == "historias":
+        return os.environ.get("UPLOADPOST_PERFIL_HISTORIAS", "").strip() or "torouoso"
     if canal == "economia":
         return os.environ.get("UPLOADPOST_PERFIL_ECONOMIA", "").strip() or "torouoso"
     return os.environ.get("UPLOADPOST_PERFIL", "").strip() or "paraguasochanclas"
@@ -34,18 +36,30 @@ def _cabeceras():
     return {"Authorization": f"Apikey {os.environ['UPLOADPOST_API_KEY'].strip()}"}
 
 
-def publicar_tiktok(video: Path, caption: str, canal: str = "tiempo", espera_max: int = 900) -> dict:
+def publicar_tiktok(video: Path, caption: str, canal: str = "tiempo", espera_max: int = 900,
+                    programado=None, primer_comentario: str | None = None) -> dict:
+    """programado: datetime con zona horaria para dejar la publicación programada en Upload-Post."""
     datos = {
         "user": perfil(canal), "platform[]": "tiktok", "title": caption[:2200], "tiktok_title": caption[:2200],
         "privacy_level": "PUBLIC_TO_EVERYONE", "post_mode": "DIRECT_POST", "is_aigc": "true",
         "is_ai_generated": "true", "cover_timestamp": "0", "async_upload": "true",
     }
+    if primer_comentario:
+        datos["first_comment"] = primer_comentario[:150]
+    if programado is not None:
+        datos["scheduled_date"] = programado.isoformat(timespec="seconds")
+        datos.pop("async_upload")
     with open(video, "rb") as f:
         r = requests.post(f"{API}/upload", headers=_cabeceras(), data=datos,
                           files={"video": (video.name, f, "video/mp4")}, timeout=600)
     if r.status_code >= 400:
         raise RuntimeError(f"Upload-Post HTTP {r.status_code}: {r.text[:300]}")
     j = r.json()
+    if programado is not None:
+        log.info("Upload-Post: programado para %s: %s", programado, str(j)[:300])
+        if j.get("success") is False:
+            raise RuntimeError(f"Upload-Post no aceptó la programación: {str(j)[:300]}")
+        return {"via": "upload-post", "programado": programado.isoformat(), "job_id": j.get("job_id"), "respuesta": j}
     rid = j.get("request_id")
     log.info("Upload-Post: subida iniciada (%s)", rid or j)
     if not rid:  # respuesta síncrona

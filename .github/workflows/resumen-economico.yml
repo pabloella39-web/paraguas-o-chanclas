@@ -1,19 +1,7 @@
 name: Resumen económico diario
 
 on:
-  schedule:
-    # Dos ediciones: mañana (borrador y texto listos a las 7:30) y noche (21:00, de lunes a viernes). GitHub solo usa UTC y a
-    # veces se retrasa, así que hay varios intentos; el primero que cae en la ventana de Madrid hace el vídeo y
-    # los demás ven que ya está hecho (historial_economia/AAAA-MM-DD.json y AAAA-MM-DD-noche.json).
-    - cron: "41 4 * * *"
-    - cron: "11 5 * * *"
-    - cron: "41 5 * * *"
-    - cron: "11 6 * * *"
-    - cron: "41 6 * * *"
-    - cron: "41 17 * * 1-5"
-    - cron: "11 18 * * 1-5"
-    - cron: "41 18 * * 1-5"
-    - cron: "11 19 * * 1-5"
+  # Canal reconvertido en "Lo que Callan las Paredes" (historias/): el resumen económico ya no se programa.
   push:
     # Lanzar a mano desde git: cambiar economia/lanzar.txt. Si contiene la palabra "publicar" se sube a
     # TikTok; si contiene "prueba", el vídeo se guarda en la rama pruebas-economia.
