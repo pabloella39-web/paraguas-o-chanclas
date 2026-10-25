@@ -73,7 +73,7 @@ def fenomeno_del_dia(prev: list[dict], avisos: list[dict] | None = None) -> dict
         a = avisos[0]
         fen = a["fenomeno"].lower()
         icono = next((v for k, v in ICONO_FENOMENO.items() if k in fen), "lluvia")
-        ciudades = _ordenar_publico(_ciudades_en_zonas(prev, a["zonas"]))
+        ciudades = _ordenar_publico(a.get("ciudades") or _ciudades_en_zonas(prev, a["zonas"]))
         zona = ciudades[0] if ciudades else a["zonas"][0].split(" de ")[-1].strip(" ()")
         c = next((x for x in prev if x["nombre"] == zona), None)
         if c and icono == "viento" and (c.get("racha") or 0) >= 40:

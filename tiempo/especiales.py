@@ -416,7 +416,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
 # ================================================================ avisos de AEMET
 NS = {"c": "urn:oasis:names:tc:emergency:cap:1.2"}
 NIVELES = {"amarillo": 1, "naranja": 2, "rojo": 3}
-COLOR_NIVEL = {"naranja": (255, 140, 0), "rojo": (230, 30, 40)}
+COLOR_NIVEL = {"amarillo": (255, 205, 40), "naranja": (255, 140, 0), "rojo": (230, 30, 40)}
 
 
 def descargar_avisos(clave: str) -> list[dict]:
@@ -468,18 +468,21 @@ def _parsear_cap(raiz) -> list[dict]:
     return out
 
 
-def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 36) -> list[dict]:
-    """Naranjas y rojos vigentes o que empiezan en las próximas `horas`."""
+def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) -> list[dict]:
+    """Avisos amarillos, naranjas o rojos vigentes o que empiezan en las próximas `horas` y que afectan a alguna
+    población de más de 100.000 habitantes (su ubicación cae dentro del polígono oficial de la zona)."""
+    from .poblaciones import afectadas
     out = []
     for a in avisos:
-        if NIVELES[a["nivel"]] < 2:
-            continue
         try:
             ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
         except (TypeError, ValueError):
             continue
-        if fin > momento and ini < momento + timedelta(hours=horas):
-            out.append(a)
+        if not (fin > momento and ini < momento + timedelta(hours=horas)):
+            continue
+        ciudades = afectadas([a.get("poligono") or []], a.get("zona", ""))
+        if ciudades:
+            out.append({**a, "ciudades": ciudades})
     return out
 
 
@@ -489,13 +492,17 @@ def agrupar(avisos: list[dict]) -> list[dict]:
         k = (a["fenomeno"], a["nivel"])
         gr = grupos.setdefault(k, {"fenomeno": a["fenomeno"], "nivel": a["nivel"], "zonas": [], "inicio": a["inicio"],
                                    "fin": a["fin"], "descripcion": a["descripcion"], "instruccion": a["instruccion"],
-                                   "poligonos": []})
+                                   "poligonos": [], "ciudades": []})
+        for c in a.get("ciudades", []):
+            if c not in gr["ciudades"]:
+                gr["ciudades"].append(c)
         if a["zona"] not in gr["zonas"]:
             gr["zonas"].append(a["zona"])
         gr["inicio"], gr["fin"] = min(gr["inicio"], a["inicio"]), max(gr["fin"], a["fin"])
         if a["poligono"]:
             gr["poligonos"].append(a["poligono"])
-    return sorted(grupos.values(), key=lambda gr: (-NIVELES[gr["nivel"]], -len(gr["zonas"])))
+    return sorted(grupos.values(), key=lambda gr: (-NIVELES[gr["nivel"]], -len(gr.get("ciudades", [])),
+                                                   -len(gr["zonas"])))
 
 
 def firma(grupos) -> str:
@@ -566,15 +573,15 @@ Hoy es {fecha}. Avisos vigentes o para las próximas horas:
 {avisos}
 
 Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasarse):
-- intro: la PRIMERA FRASE (máx. 10 palabras) es el titular de última hora: zona + nivel + fenómeno ("Atención
-  Valencia: aviso rojo por lluvias torrenciales."). Luego, en una frase, lo más grave que se espera.
+- intro: la PRIMERA FRASE (máx. 10 palabras) es el titular de última hora: CIUDAD (de las grandes ciudades afectadas,
+  la más conocida) + nivel + fenómeno ("Atención Valencia: aviso rojo por lluvias torrenciales."). Luego, en una frase, lo más grave que se espera.
 - zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras).
 - consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
 - cierre: una sola frase: "Compártelo con quien viva allí." (puedes variarla un poco).
 Frases cortas y directas, de tú; números en cifras con "grados", "por ciento", "litros", "kilómetros por hora".
 Nombres de fenómeno naturales: "oleaje" (no "costeros"), "viento", "lluvias", "tormentas", "nieve", "calor".
 
-"titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres (ej. "VALENCIA: AVISO ROJO").
+"titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, con la ciudad (ej. "VALENCIA: AVISO ROJO").
 "consejos_pantalla": 3 consejos MUY cortos (máx. 26 caracteres cada uno) para la pantalla.
 "caption": una frase (máx. 90 caracteres) con 1 emoji ⚠️, sin hashtags.
 
@@ -599,6 +606,7 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     orden = ["intro", "zonas", "consejos", "cierre"]
     palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_AVISO.items()}
     datos = [{"nivel": gr["nivel"], "fenomeno": gr["fenomeno"], "zonas": gr["zonas"][:12],
+              "grandes_ciudades_afectadas": gr.get("ciudades", [])[:8],
               "desde": _hora_txt(gr["inicio"]), "hasta": _hora_txt(gr["fin"]), "descripcion": gr["descripcion"],
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     if not plantilla:
@@ -630,13 +638,17 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
 def caption_aviso(grupos, gancho) -> str:
     lineas = []
     for gr in grupos[:4]:
-        zonas = ", ".join(z.split(" - ")[-1] for z in gr["zonas"][:3])
-        lineas.append(f"{'🔴' if gr['nivel'] == 'rojo' else '🟠'} Aviso {gr['nivel']} por {gr['fenomeno']}: {zonas}"
-                      + (" y más" if len(gr["zonas"]) > 3 else ""))
+        from .gancho import nombre_fenomeno
+        sitios = gr.get("ciudades") or [z.split(" - ")[-1] for z in gr["zonas"]]
+        icono = {"rojo": "🔴", "naranja": "🟠"}.get(gr["nivel"], "🟡")
+        lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:4])}"
+                      + (" y más" if len(sitios) > 4 else ""))
     lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112."]
     tags = ["#aviso", "#AEMET", "#alerta", "#eltiempo", "#tiempo", "#españa", "#parati", "#paraguasochanclas"]
     for gr in grupos[:2]:
         tags.append("#" + re.sub(r"\W", "", gr["fenomeno"].split()[0]))
+        for c in (gr.get("ciudades") or [])[:2]:
+            tags.append("#" + re.sub(r"\W", "", c.split()[0]))
     return (f"{(gancho or '⚠️ Aviso de AEMET: lo que tienes que saber').strip()}\n\n" + "\n".join(lineas)
             + "\n\n" + " ".join(dict.fromkeys(tags)))[:2200]
 
@@ -671,7 +683,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False) -> dict:
                   "consejos": _capa_poligonos(grupos, consejos=consejos), "cierre": _capa_poligonos(grupos)},
         "gancho": _gancho_aviso(grupos),
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
-                        tuple((z.split(" - ")[-1].upper()[:30], COLOR_NIVEL[gr["nivel"]]) for z in gr["zonas"][:2])),
+                        tuple((z.upper()[:30], COLOR_NIVEL.get(gr["nivel"], (255, 205, 40)))
+                              for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),
     }
     with duracion(*DURACION_AVISO):
         video = _producir(f"aviso_{hoy.isoformat()}", guion, plan, total, trozos, kwargs, [], None,
@@ -766,7 +779,7 @@ def main():
             clave = os.environ.get("AEMET_API_KEY", "")
             grupos = agrupar(avisos_relevantes(descargar_avisos(clave), datetime.now().astimezone()))
         if not grupos:
-            log.info("No hay avisos naranjas ni rojos: no se hace especial")
+            log.info("No hay avisos en poblaciones de más de 100.000 habitantes: no se hace especial")
             return
         nivel = max(NIVELES[x["nivel"]] for x in grupos)
         # Un especial al día, salvo que la situación empeore a rojo después de uno naranja
