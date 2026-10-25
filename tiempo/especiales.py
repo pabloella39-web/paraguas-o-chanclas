@@ -469,11 +469,13 @@ def _parsear_cap(raiz) -> list[dict]:
 
 
 def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) -> list[dict]:
-    """Avisos amarillos, naranjas o rojos vigentes o que empiezan en las próximas `horas` y que afectan a alguna
-    población de más de 100.000 habitantes (su ubicación cae dentro del polígono oficial de la zona)."""
+    """Avisos NARANJAS y ROJOS vigentes o que empiezan en las próximas `horas` y que afectan a alguna población de más
+    de 100.000 habitantes (su ubicación cae dentro del polígono oficial de la zona)."""
     from .poblaciones import afectadas
     out = []
     for a in avisos:
+        if NIVELES.get(a["nivel"], 0) < 2:
+            continue
         try:
             ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
         except (TypeError, ValueError):
@@ -660,7 +662,7 @@ def _gancho_aviso(grupos) -> dict:
     return fenomeno_del_dia(prev, grupos)
 
 
-def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False) -> dict:
+def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str = "") -> dict:
     salida.mkdir(parents=True, exist_ok=True)
     trabajo = salida / "trabajo"
     trabajo.mkdir(exist_ok=True)
@@ -687,7 +689,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False) -> dict:
                               for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),
     }
     with duracion(*DURACION_AVISO):
-        video = _producir(f"aviso_{hoy.isoformat()}", guion, plan, total, trozos, kwargs, [], None,
+        video = _producir(f"aviso_{hoy.isoformat()}" + (f"_{sufijo}" if sufijo else ""), guion, plan, total, trozos, kwargs, [], None,
                           g.fecha_larga(hoy).upper(), salida, trabajo)
     caption = caption_aviso(grupos, guion.get("caption") if guion.get("origen") == "claude" else None)
     return {"tipo": "aviso", "fecha": hoy.isoformat(), "video": str(video), "caption": caption,
@@ -771,25 +773,31 @@ def main():
         meta = la_semana(hoy, Path(a.salida), a.demo)
         titulo = "La semana que viene"
     else:
-        hist_aviso = HISTORIAL / f"aviso-{hoy.isoformat()}.json"
-        previo = json.loads(hist_aviso.read_text()) if hist_aviso.exists() else None
         if a.demo:
             grupos = avisos_demo()
         else:
             clave = os.environ.get("AEMET_API_KEY", "")
             grupos = agrupar(avisos_relevantes(descargar_avisos(clave), datetime.now().astimezone()))
         if not grupos:
-            log.info("No hay avisos en poblaciones de más de 100.000 habitantes: no se hace especial")
+            log.info("No hay avisos naranjas ni rojos en poblaciones de más de 100.000 habitantes")
             return
-        nivel = max(NIVELES[x["nivel"]] for x in grupos)
-        # Un especial al día, salvo que la situación empeore a rojo después de uno naranja
-        if previo and not a.demo and (nivel <= previo.get("nivel_max", 0)):
-            log.info("Ya se publicó un especial hoy (%s) y el nivel no ha empeorado", previo.get("firma"))
-            return
-        meta = video_aviso(grupos, hoy, Path(a.salida), a.demo)
-        hist = hist_aviso
-        titulo = f"Aviso {grupos[0]['nivel']}"
+        # Un vídeo por nivel y día: uno con todos los rojos y otro con todos los naranjas
+        for nivel in ("rojo", "naranja"):
+            del_nivel = [x for x in grupos if x["nivel"] == nivel]
+            if not del_nivel:
+                continue
+            hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}.json"
+            if hist_n.exists() and not a.demo:
+                log.info("El vídeo de avisos %ss de hoy ya está publicado", nivel)
+                continue
+            meta = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
+            _cerrar(meta, f"Aviso {nivel}", hist_n, a, hoy)
+        return
 
+    _cerrar(meta, titulo, hist, a, hoy)
+
+
+def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
     log.info("Especial listo: %s (%.2f s, voz %s, guion %s)", meta["video"], meta["duracion"], meta["motor_voz"],
              meta["origen_guion"])
     (Path(a.salida) / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
