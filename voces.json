@@ -1,0 +1,62 @@
+[
+ {
+  "n": 1,
+  "voice_id": "z3kTTwYbQrmL7ckdGcJi",
+  "original": "z3kTTwYbQrmL7ckdGcJi",
+  "nombre": "Martin Osborne - Polished and Intense",
+  "genero": "male",
+  "edad": "middle_aged",
+  "acento": "peninsular",
+  "descripcion": "Middle aged man with a Spanish-Castillian voice. Perfect for Suspense & Intense Characters."
+ },
+ {
+  "n": 2,
+  "voice_id": "8lbMAldPdNgaVy6tKwSs",
+  "original": "8lbMAldPdNgaVy6tKwSs",
+  "nombre": "Mario - Warm and Deep Storyteller",
+  "genero": "male",
+  "edad": "middle_aged",
+  "acento": "peninsular",
+  "descripcion": "Professional Spanish Audiobooks reader. Warm, deep and expressive voice with confident and smooth tone. "
+ },
+ {
+  "n": 3,
+  "voice_id": "hyKxCTlAqtnW188CgltM",
+  "original": "hyKxCTlAqtnW188CgltM",
+  "nombre": "Salva - The Spanish Narrator",
+  "genero": "male",
+  "edad": "middle_aged",
+  "acento": "peninsular",
+  "descripcion": "A deep, evocative and warm Spanish voice with a natural sense of authority and trust. Perfect for narrations and ads."
+ },
+ {
+  "n": 4,
+  "voice_id": "y4o1CguECnmbT8YSuREN",
+  "original": "y4o1CguECnmbT8YSuREN",
+  "nombre": "Rafa - Hoarse, Gripping & Nuanced",
+  "genero": "male",
+  "edad": "middle_aged",
+  "acento": "peninsular",
+  "descripcion": "A gripping Spanish voice built for thrillers, crime stories, and dramatic audio storytelling.\n\nRafa N’s tone is intense, slow-burning, and cinematic—perfect for true crime podcasts, suspense narrations, horror shorts, and Spanish-language dramatic series. Whether it’s a chilling reveal or a tense voiceover, Rafa keeps listeners hooked with precision and depth. Great for social media platforms and TV trailers targeting Spanish-speaking audiences."
+ },
+ {
+  "n": 5,
+  "voice_id": "BXtvkfRgOYGPQKVRgufE",
+  "original": "BXtvkfRgOYGPQKVRgufE",
+  "nombre": "Maite Jiménez - Engaging Narrator",
+  "genero": "female",
+  "edad": "middle_aged",
+  "acento": "peninsular",
+  "descripcion": "Female voice ideal for narrations, corporate ads, E-learning, documentales, podcasts, dialogues, testimonials..."
+ },
+ {
+  "n": 6,
+  "voice_id": "jipeLrCHZ6ByxrU2JP9i",
+  "original": "jipeLrCHZ6ByxrU2JP9i",
+  "nombre": "Maia - Sweet Natural Storyteller",
+  "genero": "female",
+  "edad": "middle_aged",
+  "acento": "peninsular",
+  "descripcion": "A young, warm, and natural female voice. The timbre is soft and clear, with good articulation and a fluid rhythm. It conveys approachability and trustworthiness, ideal for narration, virtual assistants, or explanatory content. The intonation is expressive yet balanced, without exaggeration, and has a professional and pleasant style."
+ }
+]
