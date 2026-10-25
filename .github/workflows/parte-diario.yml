@@ -62,6 +62,10 @@ jobs:
           AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
           GOOGLE_WEATHER_API_KEY: ${{ secrets.GOOGLE_WEATHER_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVEN_VOZ_MASCULINA: ${{ vars.ELEVEN_VOZ_MASCULINA }}
+          ELEVEN_VOZ_FEMENINA: ${{ vars.ELEVEN_VOZ_FEMENINA }}
+          ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
           TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
           TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
