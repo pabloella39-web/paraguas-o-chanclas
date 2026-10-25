@@ -2,21 +2,29 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
 <title>Autorización completada</title>
 <style>
   body{font-family:system-ui,sans-serif;background:#0a1c3d;color:#fff;max-width:640px;margin:40px auto;padding:0 16px}
   code{display:block;background:#12346a;padding:14px;border-radius:10px;word-break:break-all;margin:12px 0}
-  button{background:#ffc42d;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+  button{background:#ffc42d;border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:16px}
+  p{color:#c9d4ea;line-height:1.5}
 </style>
 </head>
 <body>
-<h1>Autorización de TikTok</h1>
-<p id="msg">Copia esta URL completa y pégala en el script <b>obtener_token_tiktok.py</b>:</p>
+<h1 id="titulo">Autorización completada</h1>
+<p id="msg">Copia esta dirección completa y pégala en el workflow de GitHub <b id="wf">Autorizar TikTok</b>:</p>
 <code id="url"></code>
-<button onclick="navigator.clipboard.writeText(location.href)">Copiar URL</button>
+<button id="b">Copiar dirección</button>
 <script>
-  document.getElementById('url').textContent = location.href;
   const p = new URLSearchParams(location.search);
+  const yt = p.get('state') === 'youtube' || (p.get('scope') || '').includes('googleapis');
+  document.getElementById('titulo').textContent = yt ? 'YouTube autorizado' : 'TikTok autorizado';
+  document.getElementById('wf').textContent = yt ? 'Autorizar YouTube' : 'Autorizar TikTok';
+  document.getElementById('url').textContent = location.href;
+  document.getElementById('b').onclick = async () => {
+    try { await navigator.clipboard.writeText(location.href); document.getElementById('b').textContent = '¡Copiada! ✅'; } catch (e) {}
+  };
   if (p.get('error')) document.getElementById('msg').textContent = 'Error: ' + (p.get('error_description') || p.get('error'));
 </script>
 </body>

@@ -215,6 +215,20 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     return meta
 
 
+def publicar_youtube(meta: dict, hoy: date):
+    """YouTube Shorts: público y automático. Un fallo aquí no afecta a TikTok."""
+    from . import youtube
+    if not youtube.hay_credenciales():
+        log.info("YouTube sin configurar: no se sube")
+        return
+    try:
+        titulo, desc, tags = youtube.textos(meta["caption"], meta.get("titular"), g.fecha_larga(hoy))
+        meta["youtube"] = youtube.subir_con_reintentos(Path(meta["video"]), titulo, desc, tags)
+    except Exception as e:  # noqa: BLE001
+        log.error("No se pudo subir a YouTube: %s", e)
+        meta["youtube_error"] = str(e)[:300]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--demo", action="store_true", help="datos inventados, sin claves y sin voz")
@@ -248,6 +262,8 @@ def main():
         res = publicar_con_reintentos(Path(meta["video"]), meta["caption"], meta["portada_ms"])
         meta["tiktok"] = res
         log.info("Publicado en TikTok: %s", res)
+    if a.publicar:
+        publicar_youtube(meta, hoy)
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
             f.write(f"## Parte del {hoy.isoformat()} ({meta['duracion']} s)\n\n"

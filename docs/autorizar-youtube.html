@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Autorizar YouTube</title>
+<style>
+  body{margin:0;background:#0a1c3d;color:#fff;font-family:system-ui,sans-serif;padding:24px 16px}
+  main{max-width:560px;margin:0 auto} p,li{color:#c9d4ea;line-height:1.5}
+  input{width:100%;padding:14px;border-radius:12px;border:0;font-size:16px;margin:8px 0 14px;box-sizing:border-box}
+  button{width:100%;padding:16px;border:0;border-radius:14px;font-size:18px;font-weight:800;background:#ffc42d;color:#0f1932}
+</style>
+</head>
+<body>
+<main>
+  <h1>Autorizar YouTube</h1>
+  <ol>
+    <li>Pega el <b>ID de cliente</b> de Google Cloud (termina en <code>.apps.googleusercontent.com</code>; no es secreto).</li>
+    <li>Entra con la cuenta de Google del canal y elige el canal de Paraguas o Chanclas.</li>
+    <li>Si sale "Google no ha verificado esta aplicación": <i>Configuración avanzada → Ir a … (no seguro)</i>. Es tu propia app.</li>
+    <li>Copia la dirección final y pégala en el workflow <b>Autorizar YouTube</b> de GitHub.</li>
+  </ol>
+  <input id="cid" placeholder="xxxxxxxx.apps.googleusercontent.com" autocomplete="off">
+  <button id="ir" type="button">Abrir la autorización de Google</button>
+</main>
+<script>
+  document.getElementById('ir').onclick = () => {
+    const cid = document.getElementById('cid').value.trim(); if (!cid) return;
+    location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({client_id: cid,
+      redirect_uri: 'https://pabloella39-web.github.io/paraguas-o-chanclas/callback.html', response_type: 'code',
+      scope: 'https://www.googleapis.com/auth/youtube.upload', access_type: 'offline', prompt: 'consent', state: 'youtube'});
+  };
+</script>
+</body>
+</html>

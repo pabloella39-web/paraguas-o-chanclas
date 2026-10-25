@@ -63,6 +63,8 @@ jobs:
           GOOGLE_WEATHER_API_KEY: ${{ secrets.GOOGLE_WEATHER_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           ELEVEN_VOZ_MASCULINA: ${{ vars.ELEVEN_VOZ_MASCULINA }}
           ELEVEN_VOZ_FEMENINA: ${{ vars.ELEVEN_VOZ_FEMENINA }}
           ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}

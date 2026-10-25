@@ -1,0 +1,116 @@
+"""Subida automática a YouTube Shorts (YouTube Data API v3).
+
+Secretos: YT_CLIENT_ID y YT_CLIENT_SECRET (cliente OAuth de Google Cloud) y TIKTOK_CIFRADO (se reutiliza para
+cifrar el token). La autorización se hace una vez con el workflow "Autorizar YouTube" y el refresh_token se
+guarda cifrado en estado/youtube_token.enc.
+
+Los vídeos verticales de menos de 3 minutos se publican automáticamente como Shorts.
+"""
+from __future__ import annotations
+
+import json
+import logging
+import os
+import time
+import urllib.parse
+from pathlib import Path
+
+import requests
+
+from .config import RAIZ
+from .tiktok import _openssl
+
+log = logging.getLogger(__name__)
+ESTADO = RAIZ / "estado" / "youtube_token.enc"
+REDIRECT_URI = "https://pabloella39-web.github.io/paraguas-o-chanclas/callback.html"
+SCOPE = "https://www.googleapis.com/auth/youtube.upload"
+TOKEN_URL = "https://oauth2.googleapis.com/token"
+
+
+def _cliente() -> tuple[str, str]:
+    return os.environ.get("YT_CLIENT_ID", "").strip(), os.environ.get("YT_CLIENT_SECRET", "").strip()
+
+
+def hay_credenciales() -> bool:
+    cid, sec = _cliente()
+    return bool(cid and sec and ESTADO.exists() and os.environ.get("TIKTOK_CIFRADO"))
+
+
+def url_autorizacion(client_id: str) -> str:
+    return "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode({
+        "client_id": client_id, "redirect_uri": REDIRECT_URI, "response_type": "code", "scope": SCOPE,
+        "access_type": "offline", "prompt": "consent", "state": "youtube"})
+
+
+def canjear_codigo(codigo: str) -> dict:
+    cid, sec = _cliente()
+    r = requests.post(TOKEN_URL, data={"code": codigo, "client_id": cid, "client_secret": sec,
+                                       "redirect_uri": REDIRECT_URI, "grant_type": "authorization_code"}, timeout=30)
+    j = r.json()
+    if "refresh_token" not in j:
+        raise RuntimeError(f"Google no devolvió refresh_token: {j.get('error')} {j.get('error_description')}")
+    ESTADO.parent.mkdir(exist_ok=True)
+    ESTADO.write_bytes(_openssl(["-salt"], j["refresh_token"].encode()) + b"\n")
+    return {"scope": j.get("scope")}
+
+
+def _access_token() -> str:
+    cid, sec = _cliente()
+    refresh = _openssl(["-d"], ESTADO.read_bytes().strip()).decode().strip()
+    r = requests.post(TOKEN_URL, data={"client_id": cid, "client_secret": sec, "refresh_token": refresh,
+                                       "grant_type": "refresh_token"}, timeout=30)
+    j = r.json()
+    if "access_token" not in j:
+        raise RuntimeError(f"No se pudo renovar el acceso a YouTube: {j.get('error')} {j.get('error_description')}")
+    return j["access_token"]
+
+
+def subir(video: Path, titulo: str, descripcion: str, etiquetas: list[str]) -> dict:
+    token = _access_token()
+    meta = {
+        "snippet": {"title": titulo[:100], "description": descripcion[:4900], "tags": etiquetas[:15],
+                    "categoryId": "22", "defaultLanguage": "es", "defaultAudioLanguage": "es"},
+        "status": {"privacyStatus": os.environ.get("YT_PRIVACIDAD", "public"), "selfDeclaredMadeForKids": False,
+                   "containsSyntheticMedia": True, "embeddable": True},
+    }
+    tam = video.stat().st_size
+    r = requests.post("https://www.googleapis.com/upload/youtube/v3/videos",
+                      params={"uploadType": "resumable", "part": "snippet,status"},
+                      headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json; charset=UTF-8",
+                               "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(tam)},
+                      data=json.dumps(meta), timeout=60)
+    if r.status_code != 200 or "Location" not in r.headers:
+        raise RuntimeError(f"YouTube (inicio de subida) HTTP {r.status_code}: {r.text[:300]}")
+    with open(video, "rb") as f:
+        r2 = requests.put(r.headers["Location"], data=f, headers={"Content-Type": "video/mp4",
+                                                                  "Content-Length": str(tam)}, timeout=600)
+    if r2.status_code not in (200, 201):
+        raise RuntimeError(f"YouTube (subida) HTTP {r2.status_code}: {r2.text[:300]}")
+    vid = r2.json()["id"]
+    log.info("Subido a YouTube Shorts: https://youtube.com/shorts/%s", vid)
+    return {"id": vid, "url": f"https://youtube.com/shorts/{vid}"}
+
+
+def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: list[str], intentos: int = 3):
+    for i in range(1, intentos + 1):
+        try:
+            return subir(video, titulo, descripcion, etiquetas)
+        except Exception as e:  # noqa: BLE001
+            if i == intentos:
+                raise
+            log.warning("YouTube falló (intento %d/%d): %s", i, intentos, e)
+            time.sleep(60 * i)
+
+
+def textos(caption: str, titular: str | None, fecha_txt: str) -> tuple[str, str, list[str]]:
+    """Título, descripción y etiquetas a partir de la descripción de TikTok."""
+    gancho = caption.split("\n", 1)[0].strip()
+    base = (titular.title() if titular else gancho) or "El tiempo en España"
+    titulo = f"{base} · El tiempo hoy, {fecha_txt} #Shorts"
+    if len(titulo) > 100:
+        titulo = f"{base[:60]} · {fecha_txt} #Shorts"
+    hashtags = [w.lstrip("#") for w in caption.split() if w.startswith("#")]
+    descripcion = (caption + "\n\nPrevisión diaria del tiempo en España con datos de AEMET y Open-Meteo "
+                   "(CC BY 4.0). Voz generada con IA.\nSuscríbete para tener el tiempo de cada día ☂️🩴")
+    etiquetas = ["el tiempo", "tiempo España", "previsión del tiempo", "AEMET", "meteorología", "shorts"] + hashtags
+    return titulo, descripcion, etiquetas

@@ -1,0 +1,46 @@
+name: Autorizar YouTube
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Pega aquí la URL completa que muestra callback.html tras autorizar con Google"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: parte-diario
+  cancel-in-progress: false
+
+jobs:
+  autorizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ocultar el código en los registros
+        env:
+          URL_CALLBACK: ${{ inputs.url }}
+        run: |
+          CODE=$(python3 -c "import os,urllib.parse as u;s=os.environ['URL_CALLBACK'];q=u.parse_qs(u.urlparse(s).query);print(q.get('code',[s])[0])")
+          echo "::add-mask::$CODE"
+          echo "::add-mask::$URL_CALLBACK"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Canjear el código y guardar el token cifrado
+        env:
+          CODIGO_YOUTUBE: ${{ inputs.url }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+        run: python -m tiempo.autorizar_youtube
+      - name: Guardar
+        run: |
+          git config user.name "parte-bot"
+          git config user.email "parte-bot@users.noreply.github.com"
+          git add estado/
+          git commit -m "Token de YouTube (cifrado)"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
