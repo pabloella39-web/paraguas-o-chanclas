@@ -1,0 +1,22 @@
+{
+ "fecha": "2026-10-25",
+ "duracion": 67.23,
+ "caption": "¿Paraguas en el norte o chanclas en el resto? Dinos desde dónde nos ves ☔🩴\n\nEl tiempo en España hoy, domingo 25 de octubre 🇪🇸\n🌧️ Lluvia en A Coruña y Santander\n🔥 Máxima: 29° en Alicante\n🥶 Mínima: 6° en Valladolid\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #ACoruna #Alicante",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Domingo 25 de octubre: ¿paraguas o chanclas? Quédate, que depende de dónde estés.",
+  "general": "Lo más movido hoy está en Canarias, con nubes, algo de lluvia y viento, y en el norte, donde llueve. El resto de España, tranquilo y soleado.",
+  "islas": "Canarias va nublada, con 42 por ciento de lluvia en Santa Cruz de Tenerife, y Las Palmas llega a 26 grados. Palma, tranquila y con 24.",
+  "norte": "Si eres de A Coruña, saca el paraguas, con 75 por ciento de lluvia y rachas de 48 kilómetros por hora. Santander y Bilbao también se mojan, mientras Oviedo se libra.",
+  "interior": "El interior, sin una gota y con 22 grados en Madrid. Si eres de Zaragoza, ojo al cierzo, con rachas de 33 kilómetros por hora.",
+  "mediterraneo": "En el Mediterráneo, sol y nubes sin lluvia. Barcelona marca 21 grados, Valencia 25, y Alicante se va a 29, así que chanclas total.",
+  "sur": "El sur va de sol y nubes sin lluvia, con 29 grados en Málaga y 28 en Sevilla, aunque AEMET y los modelos no se ponen de acuerdo ahí. Ceuta marca 25 y Melilla 24.",
+  "cierre": "Cuéntame en comentarios desde qué ciudad nos ves y sigue Paraguas o Chanclas. Hoy, paraguas en el norte y chanclas en el resto."
+ },
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7700487548547729430",
+  "status": "SEND_TO_USER_INBOX"
+ }
+}
