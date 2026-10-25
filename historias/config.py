@@ -9,7 +9,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 ASSETS = RAIZ / "assets" / "historias"
 HISTORIAL = RAIZ / "historial_historias"
 NOMBRE = "LO QUE CALLAN LAS PAREDES"
-CUENTA = "@loquecallanlasparedes"
+CUENTA = "@loquecallan.lasparedes"
 PERFIL_UPLOADPOST = os.environ.get("UPLOADPOST_PERFIL_HISTORIAS", "").strip() or "torouoso"
 
 ANCHO, ALTO, FPS = 1080, 1920, 30
