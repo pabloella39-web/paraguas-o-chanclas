@@ -237,9 +237,10 @@ class Parte:
                           fill=ROJO + (alfa,))
             else:
                 d.text((ANCHO // 2, 760), "FIN", font=fuente("maquina", 150), fill=BLANCO + (alfa,), anchor="mm")
-                d.text((ANCHO // 2, 900), "Lunes, miércoles, viernes y finde: historia nueva", font=fuente("Bold", 46),
+                d.text((ANCHO // 2, 900), "Nueva historia lunes, miércoles, viernes y finde",
+                       font=_ajustar("Nueva historia lunes, miércoles, viernes y finde", "Bold", 44, 960),
                        fill=BLANCO + (alfa,), anchor="mm")
-                d.text((ANCHO // 2, 975), "Sígueme para no perderte la de mañana", font=fuente("SemiBold", 38),
+                d.text((ANCHO // 2, 975), "Sígueme para no perderte la próxima", font=fuente("SemiBold", 38),
                        fill=ROJO + (alfa,), anchor="mm")
         return img.convert("RGB")
 
