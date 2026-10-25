@@ -247,7 +247,8 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     (ms, _), _ = _mejor_plan(prev_s, prev_d)
     kwargs = {
         "datos_seg": {"sabado": prev_s, "domingo": prev_d, "intro": []},
-        "pills": {"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE"},
+        "pills": {"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
+                  "promesa": "QUÉDATE: AL FINAL, EL MEJOR PLAN DEL FINDE"},
         "portada_txt": ("EL TIEMPO DEL FINDE", "FIN DE SEMANA", rango,
                         ((f"MEJOR PLAN: {ms['nombre'].upper()} {ms['tmax']}°", (255, 196, 45)),
                          (f"MÁX {extremos['calor']['tmax']}° · MÍN {extremos['frio']['tmin']}°", (140, 205, 255)))),
@@ -256,6 +257,138 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
                       f"FIN DE SEMANA {rango}", salida, trabajo)
     caption = caption_finde(prev_s, prev_d, sab, dom, guion.get("caption") if guion.get("origen") == "claude" else None)
     return {"tipo": "finde", "fecha": viernes.isoformat(), "video": str(video), "caption": caption,
+            "titular": guion.get("titular"), "motor_voz": motor, "origen_guion": guion.get("origen"),
+            "duracion": round(voz.duracion(video), 2), "guion": guion["segmentos"]}
+
+
+# ================================================================ la semana que viene (domingo por la noche)
+DIAS_SEMANA = ["lunes", "martes", "miercoles", "jueves", "viernes"]
+NOMBRE_DIA = {"lunes": "LUNES", "martes": "MARTES", "miercoles": "MIÉRCOLES", "jueves": "JUEVES", "viernes": "VIERNES"}
+PALABRAS_SEMANA = {"intro": 20, "lunes": 24, "martes": 22, "miercoles": 22, "jueves": 22, "viernes": 24,
+                   "general": 26, "cierre": 18}
+PROMPT_SEMANA = """Eres el guionista de "Paraguas o Chanclas", un canal de TikTok sobre el tiempo en España con humor
+ligero (sin palabrotas, sin política). Es domingo por la noche: toca el vídeo de LA SEMANA QUE VIENE, para que la gente
+se organice. Usa SOLO estos datos (no inventes). Lo lee {presenta} con voz sintética.
+
+Datos por día y ciudad (grados, lluvia = probabilidad en %):
+{datos}
+
+RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón
+de temperaturas?, ¿semana de sol?) y promete que al final dirás cuál es el mejor día de la semana y cuál el peor.
+Un bloque por día, de lunes a viernes: lo destacado de ese día en España, agrupando zonas, con alguna ciudad concreta
+y un consejo práctico (paraguas, chaqueta, tender la ropa, ir en bici...). Habla de tú, frases que fluyan, nada de
+listas ni dos puntos, números en cifras con "grados" o "por ciento". Ciudades por su nombre.
+- general: la recompensa: el mejor día de la semana y el peor (y por qué), con alguna cifra.
+- cierre: pregunta para comentarios ("¿qué día te toca mojarte?", "¿qué plan tienes esta semana?") y que sigan la
+  cuenta para tener el tiempo de cada día. NUNCA digas horas de publicación.
+Palabras aproximadas por bloque: {palabras}; total ≈ {total}. Es crucial respetarlo.
+
+"titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, sin emojis (ej. "SEMANA PASADA POR AGUA").
+"caption": una frase gancho (máx. 90 caracteres), con 1 o 2 emojis, sin hashtags.
+
+Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "lunes": "...", "martes": "...", "miercoles": "...",
+"jueves": "...", "viernes": "...", "general": "...", "cierre": "..."}}, "titular": "...", "caption": "..."}}"""
+
+
+def _nota_dia(prev):
+    return sum(c["tmax"] - c["lluvia"] / 6 - (6 if c["icono"] in ("lluvia", "tormenta", "nieve") else 0)
+               for c in prev) / max(1, len(prev))
+
+
+def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, plantilla: bool) -> dict:
+    orden = ["intro"] + DIAS_SEMANA + ["general", "cierre"]
+    palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_SEMANA.items()}
+    if not plantilla:
+        try:
+            datos = {f"{d} {fechas[d].day}": _resumen(prevs[d]) for d in DIAS_SEMANA}
+            gg = _claude_json(PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
+                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
+            if all(gg["segmentos"].get(s) for s in orden):
+                gg.update(origen="claude", orden=orden)
+                return gg
+        except Exception as e:  # noqa: BLE001
+            log.warning("Guion de la semana con Claude falló: %s", e)
+    notas = {d: _nota_dia(prevs[d]) for d in DIAS_SEMANA}
+    mejor, peor = max(notas, key=notas.get), min(notas, key=notas.get)
+    seg = {"intro": "¿Semana de paraguas o de chanclas? Te la cuento día a día, y al final, el mejor y el peor día."}
+    for d in DIAS_SEMANA:
+        pr = prevs[d]
+        llueve = [g._nombre(c) for c in pr if c["lluvia"] >= 50]
+        seg[d] = (f"El {d.replace('miercoles', 'miércoles')}, " +
+                  (f"lluvia en {' y '.join(llueve[:2])}" if llueve else "tiempo tranquilo en casi toda España") +
+                  f", con máximas de hasta {max(c['tmax'] for c in pr)} grados.")
+    seg["general"] = (f"Lo prometido: el mejor día, el {mejor.replace('miercoles', 'miércoles')}; y el peor, el "
+                      f"{peor.replace('miercoles', 'miércoles')}. Organízate bien.")
+    seg["cierre"] = "¿Qué día te toca mojarte? Cuéntamelo en comentarios y sígueme para el tiempo de cada día."
+    return {"segmentos": seg, "orden": orden, "titular": "LA SEMANA QUE VIENE",
+            "caption": "Tu semana, día a día: ¿paraguas o chanclas? 👇", "origen": "plantilla"}
+
+
+def caption_semana(prevs: dict, fechas: dict, gancho) -> str:
+    from .descripcion import _estacion
+    iconos = {"sol": "☀️", "sol_nubes": "🌤️", "nubes": "☁️", "lluvia": "🌧️", "chubascos": "🌦️", "tormenta": "⛈️",
+              "nieve": "❄️", "niebla": "🌫️"}
+    lineas = []
+    for d in DIAS_SEMANA:
+        pr = prevs[d]
+        dom = max(set(c["icono"] for c in pr), key=lambda i: sum(1 for c in pr if c["icono"] == i))
+        llueve = [c["nombre"] for c in sorted(pr, key=lambda c: -c["lluvia"]) if c["lluvia"] >= 50][:2]
+        lineas.append(f"{iconos.get(dom, '🌤️')} {NOMBRE_DIA[d].capitalize()} {fechas[d].day}: máx. "
+                      f"{max(c['tmax'] for c in pr)}°" + (f" · lluvia en {', '.join(llueve)}" if llueve else ""))
+    tags = ["#eltiempo", "#tiempo", "#semana", "#prevision", "#españa", "#AEMET", "#parati", "#paraguasochanclas",
+            _estacion(fechas["lunes"])]
+    return (f"{(gancho or 'Tu semana, día a día 👇').strip()}\n\nEl tiempo de la semana que viene en España 🇪🇸\n"
+            + "\n".join(lineas) + "\n\n" + " ".join(tags))[:2200]
+
+
+def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
+    from .fuentes import obtener_previsiones, previsiones_demo
+    fechas = {d: domingo + timedelta(days=k + 1) for k, d in enumerate(DIAS_SEMANA)}
+    salida.mkdir(parents=True, exist_ok=True)
+    trabajo = salida / "trabajo"
+    trabajo.mkdir(exist_ok=True)
+    prevs = {}
+    if demo:
+        base, _ = previsiones_demo()
+        rnd = random.Random(5)
+        for d in DIAS_SEMANA:
+            prevs[d] = copy.deepcopy(base)
+            for c in prevs[d]:
+                c["tmax"] += rnd.choice([-3, -1, 0, 2])
+                c["lluvia"] = min(100, max(0, c["lluvia"] + rnd.choice([-20, 0, 30])))
+    else:
+        # Varios días vista: consenso de modelos de Open-Meteo (AEMET y Google solo se piden para el parte diario)
+        guardadas = {k: os.environ.pop(k, None) for k in ("GOOGLE_WEATHER_API_KEY", "AEMET_API_KEY")}
+        try:
+            for d in DIAS_SEMANA:
+                prevs[d], _ = obtener_previsiones(fechas[d])
+        finally:
+            for k, v in guardadas.items():
+                if v:
+                    os.environ[k] = v
+    tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(domingo)
+    voz.elegir_voz(VOCES[tipo_voz])
+    guion, plan, total, trozos, motor = locutar(
+        lambda f, pl: guion_semana(prevs, fechas, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
+    todos = [c for d in DIAS_SEMANA for c in prevs[d]]
+    extremos = {"calor": max(todos, key=lambda c: c["tmax"]), "frio": min(todos, key=lambda c: c["tmin"])}
+    lun, vie = fechas["lunes"], fechas["viernes"]
+    rango = f"{lun.day} {MESES_CORTOS[lun.month - 1]} · {vie.day} {MESES_CORTOS[vie.month - 1]}"
+    notas = {d: _nota_dia(prevs[d]) for d in DIAS_SEMANA}
+    mejor = max(notas, key=notas.get)
+    kwargs = {
+        "datos_seg": {**{d: prevs[d] for d in DIAS_SEMANA}, "intro": []},
+        "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in DIAS_SEMANA},
+                  "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!",
+                  "promesa": "QUÉDATE: AL FINAL, EL MEJOR Y EL PEOR DÍA"},
+        "portada_txt": ("LA SEMANA QUE VIENE", "DE LUNES A VIERNES", rango,
+                        ((f"MEJOR DÍA: {NOMBRE_DIA[mejor]}", (255, 196, 45)),
+                         (f"MÁX {extremos['calor']['tmax']}° · MÍN {extremos['frio']['tmin']}°", (140, 205, 255)))),
+    }
+    video = _producir(f"semana_{lun.isoformat()}", guion, plan, total, trozos, kwargs, prevs["lunes"], extremos,
+                      f"SEMANA {rango}", salida, trabajo)
+    caption = caption_semana(prevs, fechas, guion.get("caption") if guion.get("origen") == "claude" else None)
+    return {"tipo": "semana", "fecha": domingo.isoformat(), "video": str(video), "caption": caption,
             "titular": guion.get("titular"), "motor_voz": motor, "origen_guion": guion.get("origen"),
             "duracion": round(voz.duracion(video), 2), "guion": guion["segmentos"]}
 
@@ -569,7 +702,7 @@ def _guardar_texto(meta: dict, titulo: str):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("tipo", choices=["finde", "avisos"])
+    ap.add_argument("tipo", choices=["finde", "avisos", "semana"])
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--publicar", action="store_true")
     ap.add_argument("--esperar", action="store_true", help="finde: esperar a las 17:30")
@@ -587,6 +720,13 @@ def main():
             return
         meta = fin_de_semana(hoy, Path(a.salida), a.demo)
         titulo = "Fin de semana"
+    elif a.tipo == "semana":
+        hist = HISTORIAL / f"semana-{hoy.isoformat()}.json"
+        if hist.exists() and not a.demo:
+            log.info("El vídeo de la semana ya está hecho")
+            return
+        meta = la_semana(hoy, Path(a.salida), a.demo)
+        titulo = "La semana que viene"
     else:
         hist_aviso = HISTORIAL / f"aviso-{hoy.isoformat()}.json"
         previo = json.loads(hist_aviso.read_text()) if hist_aviso.exists() else None
@@ -614,13 +754,14 @@ def main():
         return
     _guardar_texto(meta, titulo)
     if a.publicar:
-        if a.esperar and a.tipo == "finde":
+        if a.esperar and a.tipo in ("finde", "semana"):
             from .horario import TZ
             import time as _t
-            objetivo = ahora().replace(hour=17, minute=26, second=0, microsecond=0)
+            h, m = (17, 26) if a.tipo == "finde" else (20, 26)
+            objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0)
             falta = (objetivo - ahora()).total_seconds()
             if 0 < falta < 4 * 3600:
-                log.info("Esperando %.0f min hasta las 17:30", falta / 60)
+                log.info("Esperando %.0f min hasta la hora de publicación", falta / 60)
                 _t.sleep(falta)
         _publicar(meta, hoy)
     hist.write_text(json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1),

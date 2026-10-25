@@ -424,7 +424,7 @@ class Compositor:
                    anchor="mm")
         s = _ease_back((t - 0.9) / 0.4)
         if s > 0.02:
-            txt = "QUÉDATE: AL FINAL, DÓNDE HARÁ MÁS CALOR Y MÁS FRÍO"
+            txt = self.pills.get("promesa") or "QUÉDATE: AL FINAL, DÓNDE HARÁ MÁS CALOR Y MÁS FRÍO"
             f = _ajustar(txt, "ExtraBold", int(34 * min(s, 1.2)), 960)
             w = f.getlength(txt) + 50
             y = MAPA_Y0 + 95 + len(lineas) * 120 - 10
