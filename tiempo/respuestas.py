@@ -140,7 +140,10 @@ def responder_texto(com: dict, mensaje: str):
 PROMPT_DETECTAR = """Estos son comentarios de TikTok en un canal del tiempo en España ("Paraguas o Chanclas").
 Detecta SOLO los que preguntan (o piden) el tiempo de un lugar concreto: ciudad, pueblo, isla, comarca, playa, sierra...
 (ej. "¿y en Cuenca?", "haz Jaca", "qué tiempo hará mañana en Zahara", "y en mi pueblo, Tomelloso"). Ignora el resto
-(saludos, opiniones, insultos, "desde Sevilla te veo" sin pregunta, sitios que no existen, bromas).
+(saludos, opiniones, insultos, sitios que no existen, bromas).
+MUY IMPORTANTE: en el canal se pregunta a menudo "¿desde qué ciudad nos ves?", así que un comentario que SOLO dice un
+sitio ("Málaga", "Desde Vigo", "matalascaña, Huelva", "te veo desde Jaén") NO es una pregunta: ignóralo. Solo cuenta si
+hay intención clara de saber el tiempo de ese sitio (interrogación, "y en...", "haz...", "qué tiempo", "lloverá en...").
 Para cada uno devuelve: id, lugar (nombre limpio y bien escrito), provincia o región si se deduce (o ""), pais
 (código ISO de 2 letras; "ES" si no se dice otra cosa) y dia: "hoy", "mañana" o "" (si no lo dice).
 
@@ -502,8 +505,15 @@ def main():
         preg = detectar(coms)
         print(f"::notice::Preguntas por un lugar: {json.dumps([(q['usuario'], q['lugar']) for q in preg], ensure_ascii=False)}")
         return
+    primera = not ESTADO.exists()
     estado = _cargar()
     hoy_ = ahora()
+    if primera:  # arranque: no se responde a comentarios antiguos, solo a los que lleguen desde ahora
+        coms = comentarios_nuevos(estado)
+        estado["vistos"] += [c["id"] for c in coms]
+        _guardar(estado)
+        print(f"::notice::Primera ejecución: {len(coms)} comentarios antiguos marcados como vistos")
+        return
     hechas_hoy = [h for h in estado["hechas"] if h["fecha"] == hoy_.date().isoformat()]
     coms = comentarios_nuevos(estado)
     preguntas = detectar(coms)
