@@ -1,0 +1,25 @@
+{
+ "fecha": "2026-10-25",
+ "duracion": 65.4,
+ "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida/tiempo_2026-10-25.mp4",
+ "caption": "¿Te vas a la costa cantábrica hoy? 🌊 Mira antes el aviso por oleaje 👀\n\nEl tiempo en España hoy, domingo 25 de octubre 🇪🇸\n🔥 Máxima: 30° en Alicante\n🥶 Mínima: 5° en Salamanca\n👥 Menciona a quien necesite saber si hoy toca paraguas o chanclas\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #calor #otoño #Alicante #Salamanca",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "COSTA CANTÁBRICA: OLEAJE",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Costa cantábrica, aviso amarillo por oleaje hoy. Quédate y verás dónde hará más calor y más frío.",
+  "norte": "Si eres de A Coruña, te esperan 20 grados, lluvia escasa y rachas de 48 kilómetros por hora.",
+  "islas": "Si eres de Las Palmas, nubes, 25 grados y alisio fuerte; en Palma, 24 grados y tranquilidad.",
+  "interior": "Gente de Madrid, 22 grados y poco nuboso; Toledo y Zaragoza llegan a 23.",
+  "mediterraneo": "Alicante marca 30 grados, Valencia 26 y Barcelona 21, sin una gota.",
+  "sur": "Sevilla rondará los 28 grados, aunque AEMET y los modelos no se ponen de acuerdo, y Málaga 29. Ceuta y Melilla, 25 grados.",
+  "general": "Más calor en Alicante, con 30 grados, y más frío en Salamanca, con 5. Y con el cambio de hora, hoy anochece en Madrid a las 18:22.",
+  "cierre": "¿Desde qué ciudad nos ves? Menciona en comentarios a tu amigo sin paraguas y sigue la cuenta. Hoy, chanclas."
+ },
+ "youtube": {
+  "id": "FrkKN9vhEAA",
+  "url": "https://youtube.com/shorts/FrkKN9vhEAA"
+ }
+}
