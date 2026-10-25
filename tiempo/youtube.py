@@ -104,11 +104,10 @@ def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: 
 
 def textos(caption: str, titular: str | None, fecha_txt: str) -> tuple[str, str, list[str]]:
     """Título, descripción y etiquetas a partir de la descripción de TikTok."""
-    gancho = caption.split("\n", 1)[0].strip()
-    base = (titular.title() if titular else gancho) or "El tiempo en España"
-    titulo = f"{base} · El tiempo hoy, {fecha_txt} #Shorts"
+    gancho = caption.split("\n", 1)[0].strip() or "¿Paraguas o chanclas?"
+    titulo = f"{gancho} | El tiempo, {fecha_txt} #Shorts"
     if len(titulo) > 100:
-        titulo = f"{base[:60]} · {fecha_txt} #Shorts"
+        titulo = f"{gancho[:100 - 9].rstrip()} #Shorts"
     hashtags = [w.lstrip("#") for w in caption.split() if w.startswith("#")]
     descripcion = (caption + "\n\nPrevisión diaria del tiempo en España con datos de AEMET y Open-Meteo "
                    "(CC BY 4.0). Voz generada con IA.\nSuscríbete para tener el tiempo de cada día ☂️🩴")
