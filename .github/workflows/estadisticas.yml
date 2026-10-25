@@ -1,0 +1,21 @@
+name: Estadísticas de TikTok
+on:
+  workflow_dispatch:
+    inputs:
+      perfil:
+        default: "paraguasochanclas"
+permissions:
+  contents: write
+jobs:
+  estadisticas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+        run: pip install requests && python scripts/estadisticas.py "${{ inputs.perfil }}" 2>&1 | tee registro.txt; mkdir -p estadisticas; cp registro.txt estadisticas/
+      - run: |
+          cd estadisticas && git init -q -b estadisticas
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Estadísticas"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" estadisticas
