@@ -544,6 +544,13 @@ def main():
                  "usuarios": list(dict.fromkeys(c["usuario"] for c in gr["coms"] if c["usuario"])) or ["ti"],
                  "textos": [c["texto"] for c in gr["coms"]]}
             con_eleven = sum(1 for h in hechas_hoy if h.get("motor") == "elevenlabs") < MAX_ELEVEN_DIA
+            if con_eleven:  # reserva de créditos: primero el parte, luego las historias
+                from historias.locucion import creditos_restantes
+                restante = creditos_restantes()
+                dias = 31 - hoy_.day + 1
+                if restante is not None and restante < dias * (1100 + 3800) + 500:
+                    log.info("Pocos créditos de ElevenLabs (%d): respuesta con voz gratuita", restante)
+                    con_eleven = False
             r = hacer_video(g, salida, con_eleven)
             resumen = (f"{'Hoy' if gr['dia'] == hoy_.date() else 'Mañana'} en {sitio['nombre']}: "
                        f"{prev['tmax']}°/{prev['tmin']}°, {prev['lluvia']} % de lluvia → {g['veredicto'].lower()}.")
