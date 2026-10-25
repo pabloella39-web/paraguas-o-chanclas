@@ -47,6 +47,9 @@ jobs:
           UPLOADPOST_PERFIL_HISTORIAS: ${{ vars.UPLOADPOST_PERFIL_HISTORIAS }}
         run: |
           ARGS="--publicar"
+          # Interruptor: historias/activo.txt = "si" cuando la cuenta de TikTok esté conectada en Upload-Post
+          if [ "${{ github.event_name }}" = "schedule" ] && ! grep -qi "^si" historias/activo.txt; then
+            echo "::notice::Canal de historias en pausa (historias/activo.txt)"; exit 0; fi
           if [ "${{ github.event_name }}" = "push" ] && ! grep -qi publicar historias/lanzar.txt; then ARGS="--prueba"; fi
           mkdir -p salida_historias
           set -o pipefail

@@ -71,7 +71,7 @@ class Parte:
     # ------------------------------------------------------------ capas fijas
     def _grano(self, rnd):
         g = rnd.normal(0, 1, (ALTO // 2, ANCHO // 2)).astype(np.float32)
-        a = np.clip(np.abs(g) * 22, 0, 60).astype(np.uint8)
+        a = np.clip(np.abs(g) * 14, 0, 34).astype(np.uint8)
         im = Image.fromarray(np.where(g > 0, 255, 0).astype(np.uint8)).convert("RGBA").resize((ANCHO, ALTO))
         im.putalpha(Image.fromarray(a).resize((ANCHO, ALTO)))
         return im
@@ -152,7 +152,7 @@ class Parte:
                 k = t - tp
                 img = Image.blend(img, self.negro, 0.55 if k < 0.08 or 0.16 < k < 0.22 else 0.15)
         img = img.convert("RGBA")
-        img.alpha_composite(self.grano[int(t * FPS) % len(self.grano)])
+        img.alpha_composite(self.grano[int(t * FPS / 3) % len(self.grano)])  # cambia cada 3 fotogramas
         img.alpha_composite(self.capa)
         d = ImageDraw.Draw(img)
         # Portada / gancho: título enorme los dos primeros segundos
@@ -209,7 +209,7 @@ class Parte:
 def renderizar(parte: Parte, audio: Path, salida: Path):
     n = round(parte.total * FPS)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{ANCHO}x{ALTO}",
-           "-r", str(FPS), "-i", "-", "-i", str(audio), "-c:v", "libx264", "-preset", "medium", "-crf", "21",
+           "-r", str(FPS), "-i", "-", "-i", str(audio), "-c:v", "libx264", "-preset", "medium", "-crf", "23", "-maxrate", "6M", "-bufsize", "12M",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
            "-t", f"{parte.total:.3f}", "-movflags", "+faststart", str(salida)]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
