@@ -58,10 +58,14 @@ Hoy la locución la lee {presenta}: usa la concordancia de género correcta si h
 
 INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
 - Habla de tú al espectador todo el rato ("si hoy sales a correr...", "tú que estás en Málaga...").
-- RETENCIÓN (lo más importante): la gente decide en 1 segundo si se queda. La intro NO saluda ni lee la fecha
-  (ya sale en pantalla): arranca directamente con lo más llamativo de hoy en la región que va primera, de forma
-  concreta y directa ("Galicia, hoy te toca temporal de los buenos..."), y en la misma intro promete que al final
-  dirás dónde hará más calor y más frío de España ("quédate, que al final te digo..."). Máximo 2 frases.
+- RETENCIÓN (lo más importante): casi la mitad de la gente se va en los 3 primeros segundos. La intro NO saluda ni
+  lee la fecha (ya sale en pantalla). La PRIMERA FRASE (máximo 10 palabras) es el gancho: urgencia + fenómeno +
+  ciudad concreta, como un titular de última hora ("Ojo, Málaga: rachas de 80 kilómetros por hora hoy.",
+  "Madrid, hoy te mojas sí o sí.", "Barcelona, aviso naranja por lluvias."). Usa el GANCHO DE HOY de abajo y nombra
+  primero las ciudades que más nos ven (Madrid, Barcelona, Málaga, Sevilla, Valencia) si están afectadas. La segunda
+  frase amplía en una línea y promete que al final dirás dónde hará más calor y más frío ("quédate, que al final...").
+  Urgencia sí, mentiras no: solo habla de avisos si los hay de verdad.
+GANCHO DE HOY: {gancho}
 - En al menos dos bloques regionales, interpela a la gente de una ciudad concreta ("Si eres de Bilbao,
   hoy...", "Gente de Sevilla, ...").
 - En el cierre, una pregunta concreta para que comenten (varía cada día: ¿paraguas o chanclas?, ¿desde
@@ -94,7 +98,8 @@ horas de publicación ni "mañana a las...".
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
 
 Además escribe "titular": el gancho para la pantalla, en MAYÚSCULAS, de 2 a 5 palabras y máximo 26 caracteres,
-sin emojis (ej. "TEMPORAL EN GALICIA", "VALENCIA, ALERTA POR LLUVIA", "EL SUR SE ACHICHARRA").
+sin emojis, con la CIUDAD o zona y el fenómeno (ej. "MADRID, HOY TE MOJAS", "MÁLAGA: RACHAS DE 80", "BARCELONA,
+AVISO NARANJA", "SEVILLA SE ACHICHARRA").
 
 Y escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), que
 interpele al público con una pregunta o reto relacionado con el tiempo de hoy, con 1 o 2 emojis y SIN
@@ -139,6 +144,10 @@ CIERRES_PLANTILLA = {
 }
 
 
+GANCHO_TEXTO = ""   # lo rellena main.py con tiempo.gancho.para_guion() antes de escribir el guion
+GANCHO = None       # dict de tiempo.gancho.fenomeno_del_dia (también para la plantilla sin IA)
+
+
 def cta_del_dia(hoy: date) -> str:
     return ("mencion", "ciudad", "pregunta", "ciudad", "mencion", "pregunta", "ciudad")[hoy.toordinal() % 7]
 
@@ -155,6 +164,7 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
                                orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],
+                               gancho=GANCHO_TEXTO or "(sin datos: usa lo más llamativo de los datos)",
                                contexto="\n".join(f"- {n}" for n in notas_dia(hoy)) or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))
@@ -328,6 +338,13 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
         gancho, titular = f"Si estás en {nombre_zona}, hoy toca abrigo de verdad al salir.", f"FRÍO EN {tit_zona}"
     else:
         gancho, titular = "¿Paraguas o chanclas? Hoy te lo cuento zona a zona.", "¿PARAGUAS O CHANCLAS?"
+    if GANCHO:
+        ciudad = (GANCHO["ciudades"] or [None])[0]
+        frases = {"tormenta": "llegan tormentas", "lluvia": "hoy te mojas", "nieve": "ojo a la nieve y al hielo",
+                  "viento": "agárrate, que sopla fuerte", "sol": "hoy aprieta el calor", "niebla": "niebla al salir"}
+        if ciudad:
+            gancho = f"Ojo, {ciudad}: {frases.get(GANCHO['icono'], 'hoy toca mirar el cielo')}."
+            titular = f"{ciudad.upper()}: {GANCHO['insignia']}"[:30]
     seg["intro"] = gancho + " Y quédate, que al final te digo dónde hará más calor y más frío de España."
     extra = notas_dia(hoy)
     if extra:

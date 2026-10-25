@@ -332,7 +332,7 @@ class Respuesta:
         e = _ease(min(1, max(0, (t - 0.15) / 0.6)))
         if e > 0:
             tam = max(1, int(330 * e))
-            ic = self.ic.resize((tam, tam))
+            ic = icono(self.g["prev"]["icono"], 330, mapa.fase_de(t)).resize((tam, tam))  # animado
             img.alpha_composite(ic, (290 - tam // 2, self.y_icono + 165 - tam // 2))
             ft = fuente("Black", 150)
             d.text((640, self.y_icono + 70), f"{p['tmax']}°", font=ft, fill=color_temp(p["tmax"]), anchor="la")

@@ -162,6 +162,12 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     trabajo.mkdir(exist_ok=True)
     prev, texto_aemet = previsiones_demo() if demo else obtener_previsiones(hoy)
     (salida / "datos.json").write_text(json.dumps(prev, ensure_ascii=False, indent=1), encoding="utf-8")
+    # Gancho de los primeros segundos: fenómeno del día con datos reales (avisos de AEMET, rachas, lluvia...)
+    from . import gancho as gancho_mod
+    avisos = [] if demo else gancho_mod.avisos_de_hoy(hoy)
+    fen = gancho_mod.fenomeno_del_dia(prev, avisos)
+    g.GANCHO, g.GANCHO_TEXTO = fen, gancho_mod.para_guion(fen)
+    log.info("Gancho: %s · %s · %s", fen["insignia"], fen["dato"], fen["ciudades"])
 
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
     voz.elegir_voz(VOCES[tipo_voz])
@@ -193,7 +199,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     voz.montar_pista(trozos, total, musica.generar(total, hoy), audio)
 
     extremos = {"calor": max(prev, key=lambda c: c["tmax"]), "frio": min(prev, key=lambda c: c["tmin"])}
-    comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy)
+    comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
+                      gancho=fen)
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

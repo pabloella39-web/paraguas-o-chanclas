@@ -175,12 +175,14 @@ class Particulas:
 
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
-                 pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None):
+                 pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
+                 gancho=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
         portada_txt: (marca, texto grande, texto pequeño). capas: {bloque: función(img, proyección, dt)} que dibuja
         encima del mapa. sin_marcadores: bloques sin marcadores de ciudades."""
+        self.gancho = gancho  # fenómeno del día (tiempo.gancho): icono grande, insignia de urgencia y efecto
         self.datos_seg = datos_seg or {}
         self.vistas = vistas or {}
         self.pills = {**PILLS, **(pills or {})}
@@ -208,6 +210,7 @@ class Compositor:
             fin = total if i == len(plan) - 1 else max(p["fin"], plan[i + 1]["inicio"] - 0.35)
             self.ventanas.append((ini, fin, p["seg"]))
         self.cabecera = self._cabecera()
+        self.fin_intro = next((b for a, b, sg in self.ventanas if sg == "intro"), 0.0)
 
     # ------------------------------------------------ capas estáticas
     def _cabecera(self):
@@ -282,10 +285,11 @@ class Compositor:
         if not en_trans and seg_real != "intro":
             t_marc = dt - (TRANSICION if self.vista_de(prev_seg) != self.vista_de(seg) else 0.1)
             estilo, items = self.marcadores(seg)
-            for k, (im, (x, y), (px, py)) in enumerate(items):
+            for k, (_, (x, y), (px, py), ciudad) in enumerate(items):
                 s = _ease_back((t_marc - k * (0.06 if estilo == "mini" else 0.15)) / 0.35)
                 if s <= 0.02:
                     continue
+                im = mapa.marcador(ciudad, estilo, mapa.fase_de(t, k * 0.37))   # icono animado (desfasado)
                 if estilo == "tarjeta":
                     cx, cy = x + im.width / 2, y + im.height
                     d.line([(cx, MAPA_Y0 + cy), (px, MAPA_Y0 + py)], fill=(255, 255, 255, int(200 * min(s, 1))), width=3)
@@ -306,6 +310,8 @@ class Compositor:
         self.particulas.fondo(img)
         img.alpha_composite(self.cabecera)
         img.alpha_composite(capa)
+        if self.gancho and t < self.fin_intro + 0.5:
+            self._efecto(img, t, 1.0 if t < self.fin_intro else 1 - (t - self.fin_intro) / 0.5)
         d = ImageDraw.Draw(img)
         self._pill(img, d, seg_real, dt)
         if seg_real == "intro":
@@ -352,10 +358,12 @@ class Compositor:
         for c in self.prev:
             cuenta[c["icono"]] = cuenta.get(c["icono"], 0) + 1
         orden = sorted(cuenta, key=lambda k: -cuenta[k])[:2]
+        if self.gancho and self.gancho["icono"] not in orden[:1]:
+            orden = [self.gancho["icono"]] + [o for o in orden if o != self.gancho["icono"]][:1]
         tam = 300
         xs = [ANCHO / 2 - tam / 2] if len(orden) == 1 else [ANCHO / 2 - tam - 20, ANCHO / 2 + 20]
         for x, ic in zip(xs, orden):
-            im.alpha_composite(mapa.icono(ic, tam), (int(x), int(cy - 70)))
+            im.alpha_composite(mapa.icono(ic, tam, 0), (int(x), int(cy - 70)))
         if lineas_extra is not None:
             pares = lineas_extra
         else:
@@ -366,11 +374,13 @@ class Compositor:
             f = _ajustar(txt, "Black", 64, 960)
             d.text((ANCHO / 2, cy + 300 + k * 86), txt, font=f, fill=col, anchor="mm")
         # Pastilla con la pregunta del canal
-        txt = "¿PARAGUAS O CHANCLAS?"
-        f3 = fuente("Black", 54)
+        txt = self.gancho["insignia"] if self.gancho and not self.portada_txt else "¿PARAGUAS O CHANCLAS?"
+        col = tuple(self.gancho["color"]) if self.gancho and not self.portada_txt else ACENTO
+        f3 = _ajustar(txt, "Black", 54, 900)
         w = f3.getlength(txt) + 70
-        d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 470, ANCHO / 2 + w / 2, cy + 560], radius=45, fill=ACENTO)
-        d.text((ANCHO / 2, cy + 515), txt, font=f3, fill=(15, 25, 50), anchor="mm")
+        d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 470, ANCHO / 2 + w / 2, cy + 560], radius=45, fill=col)
+        d.text((ANCHO / 2, cy + 515), txt, font=f3, fill=(15, 25, 50) if sum(col) > 500 else (255, 255, 255),
+               anchor="mm")
         self._portada = im
         return im
 
@@ -402,14 +412,78 @@ class Compositor:
             d.text((x0 + 400, y0 + 32), f"{c} {valor}", font=_ajustar(f"{c} {valor}", "Black", 34, 230),
                    fill=(255, 255, 255, int(255 * a)), anchor="rm")
 
+    def _efecto(self, img, t, fuerza):
+        """Efecto a pantalla completa con el fenómeno del día durante el gancho."""
+        if fuerza <= 0:
+            return
+        ef = self.gancho["efecto"]
+        capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
+        d = ImageDraw.Draw(capa)
+        rnd = np.random.default_rng(7)
+        if ef in ("lluvia", "tormenta"):
+            for _ in range(170):
+                x0, y0, v, largo = rnd.uniform(-200, ANCHO), rnd.uniform(0, ALTO), rnd.uniform(1600, 2400), \
+                    rnd.uniform(50, 110)
+                y = (y0 + v * t) % (ALTO + 120) - 120
+                x = x0 + (y - y0) * 0.18
+                d.line([(x, y), (x + largo * 0.18, y + largo)], fill=(170, 205, 255, int(rnd.uniform(70, 150) * fuerza)),
+                       width=3)
+            if ef == "tormenta" and (0.45 < t % 2.2 < 0.55 or 0.65 < t % 2.2 < 0.7):
+                capa.alpha_composite(Image.new("RGBA", (ANCHO, ALTO), (235, 240, 255, int(110 * fuerza))))
+        elif ef == "nieve":
+            for _ in range(140):
+                x0, y0, v, r = rnd.uniform(0, ANCHO), rnd.uniform(0, ALTO), rnd.uniform(90, 220), rnd.uniform(3, 8)
+                y = (y0 + v * t) % (ALTO + 20) - 10
+                x = x0 + 30 * math.sin(t * 1.5 + y0)
+                d.ellipse([x - r, y - r, x + r, y + r], fill=(255, 255, 255, int(200 * fuerza)))
+        elif ef == "viento":
+            for _ in range(60):
+                y, x0, v, largo = rnd.uniform(0, ALTO), rnd.uniform(0, ANCHO), rnd.uniform(1400, 2600), \
+                    rnd.uniform(120, 340)
+                x = (x0 + v * t) % (ANCHO + largo) - largo
+                d.line([(x, y + 6 * math.sin(t * 8 + y)), (x + largo, y)], fill=(255, 255, 255, int(90 * fuerza)), width=3)
+        elif ef == "niebla":
+            for k in range(5):
+                y = 450 + k * 230 + 30 * math.sin(t + k)
+                d.rounded_rectangle([-100 + 80 * math.sin(t * 0.7 + k), y, ANCHO + 100, y + 90], radius=45,
+                                    fill=(225, 230, 240, int(55 * fuerza)))
+        elif ef == "sol":
+            pulso = 0.5 + 0.5 * math.sin(t * 3)
+            y, x = np.ogrid[:ALTO // 4, :ANCHO // 4]
+            dist = np.sqrt((x - ANCHO / 8) ** 2 + (y - 120) ** 2) / (ALTO / 4)
+            alfa = np.clip(1 - dist * 1.6, 0, 1) * (70 + 50 * pulso) * fuerza
+            brillo = Image.new("RGBA", (ANCHO // 4, ALTO // 4), (255, 170, 40, 0))
+            brillo.putalpha(Image.fromarray(alfa.astype(np.uint8)))
+            capa.alpha_composite(brillo.resize((ANCHO, ALTO), Image.BILINEAR))
+        img.alpha_composite(capa)
+
     def _intro(self, img, d, t):
-        """Gancho: titular grande sobre la zona más relevante + promesa de lo que llega al final."""
-        banda = Image.new("RGBA", (ANCHO, 330), (0, 0, 0, 0))
-        alfa = np.linspace(215, 0, 330).astype(np.uint8)
+        """Gancho: insignia de urgencia, titular con ciudad y fenómeno, icono animado gigante y el dato clave."""
+        banda = Image.new("RGBA", (ANCHO, 560), (0, 0, 0, 0))
+        alfa = np.linspace(225, 0, 560).astype(np.uint8)
         banda.putalpha(Image.fromarray(np.repeat(alfa[:, None], ANCHO, axis=1)))
         banda = Image.composite(Image.new("RGBA", banda.size, (5, 12, 30, 255)), banda, banda.getchannel("A"))
         img.alpha_composite(banda, (0, MAPA_Y0))
         d = ImageDraw.Draw(img)
+        gch = self.gancho
+        y_tit = MAPA_Y0 + (165 if gch else 95)
+        # Insignia de urgencia (palpita)
+        if gch:
+            s = _ease_back(t / 0.3)
+            if s > 0.02:
+                pulso = 1 + 0.06 * math.sin(t * 9)
+                txt = gch["insignia"]
+                f = _ajustar(txt, "Black", int(44 * min(s, 1.15) * pulso), 900)
+                w, h = f.getlength(txt) + 120, f.size + 34
+                cx, cy = ANCHO / 2, MAPA_Y0 + 62
+                col = tuple(gch["color"])
+                d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=h / 2, fill=col,
+                                    outline=(255, 255, 255), width=4)
+                tx = cx - w / 2 + 52  # triángulo de aviso
+                d.polygon([(tx - 18, cy + 16), (tx + 18, cy + 16), (tx, cy - 18)], fill=(20, 20, 30))
+                d.text((tx, cy + 6), "!", font=fuente("Black", 26), fill=col, anchor="mm")
+                oscuro = sum(col) > 500
+                d.text((cx + 22, cy), txt, font=f, fill=(20, 20, 30) if oscuro else (255, 255, 255), anchor="mm")
         palabras = self.titular.split()
         lineas = [self.titular] if len(self.titular) <= 16 or len(palabras) < 2 else \
             [" ".join(palabras[:(len(palabras) + 1) // 2]), " ".join(palabras[(len(palabras) + 1) // 2:])]
@@ -418,16 +492,34 @@ class Compositor:
             if s <= 0.02:
                 continue
             f = _ajustar(txt, "Black", max(10, int(112 * s)), int(980 * max(s, 0.1)))
-            y = MAPA_Y0 + 95 + k * 120
+            y = y_tit + k * 120
             d.text((ANCHO / 2 + 4, y + 6), txt, font=f, fill=(0, 0, 0, 160), anchor="mm")
             d.text((ANCHO / 2, y), txt, font=f, fill=(255, 255, 255) if k == 0 and len(lineas) > 1 else ACENTO,
                    anchor="mm")
+        y_prom = y_tit + len(lineas) * 120 - 10
+        # Fenómeno del día en grande (icono animado) y el dato que lo justifica
+        if gch:
+            s = _ease_back((t - 0.25) / 0.45)
+            if s > 0.02:
+                tam = max(8, int(330 * min(s, 1.1)))
+                ic = mapa.icono(gch["icono"], 330, mapa.fase_de(t))
+                if tam != 330:
+                    ic = ic.resize((tam, tam), Image.BILINEAR)
+                cy_ic = y_prom + 250 + 8 * math.sin(t * 3)
+                img.alpha_composite(ic, (int(ANCHO / 2 - tam / 2), int(cy_ic - tam / 2)))
+                d = ImageDraw.Draw(img)
+                if s > 0.8:
+                    txt = gch["dato"]
+                    f = _ajustar(txt, "Black", 52, 960)
+                    yd = cy_ic + 200
+                    d.text((ANCHO / 2 + 3, yd + 4), txt, font=f, fill=(0, 0, 0, 170), anchor="mm")
+                    d.text((ANCHO / 2, yd), txt, font=f, fill=(255, 255, 255), anchor="mm")
         s = _ease_back((t - 0.9) / 0.4)
         if s > 0.02:
             txt = self.pills.get("promesa") or "QUÉDATE: AL FINAL, DÓNDE HARÁ MÁS CALOR Y MÁS FRÍO"
             f = _ajustar(txt, "ExtraBold", int(34 * min(s, 1.2)), 960)
             w = f.getlength(txt) + 50
-            y = MAPA_Y0 + 95 + len(lineas) * 120 - 10
+            y = y_prom
             d.rounded_rectangle([ANCHO / 2 - w / 2, y - 30, ANCHO / 2 + w / 2, y + 30], radius=30,
                                 fill=(255, 255, 255, 235))
             d.text((ANCHO / 2, y), txt, font=f, fill=(15, 25, 50), anchor="mm")
