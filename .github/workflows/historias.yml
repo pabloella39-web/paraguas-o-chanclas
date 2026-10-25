@@ -50,6 +50,9 @@ jobs:
           TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
         run: |
           ARGS="--publicar"
+          if [ "${{ github.event_name }}" = "push" ] && grep -qi "youtube hoy" historias/lanzar.txt; then
+            mkdir -p salida_historias && git fetch -q origin pruebas-historias && mkdir -p /tmp/hoy && git --work-tree=/tmp/hoy checkout origin/pruebas-historias -- . \
+              && git reset -q && python -m historias.main --youtube-desde /tmp/hoy 2>&1 | tee salida_historias/registro.txt; exit 0; fi
           # Interruptor: historias/activo.txt = "si" cuando la cuenta de TikTok esté conectada en Upload-Post
           if [ "${{ github.event_name }}" = "schedule" ] && ! grep -qi "^si" historias/activo.txt; then
             echo "::notice::Canal de historias en pausa (historias/activo.txt)"; exit 0; fi

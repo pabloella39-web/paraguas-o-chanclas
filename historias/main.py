@@ -218,6 +218,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--publicar", action="store_true")
     ap.add_argument("--prueba", action="store_true")
+    ap.add_argument("--youtube-desde", help="sube a YouTube las partes ya hechas (carpeta con meta.json y vídeos)")
     ap.add_argument("--ya", action="store_true", help="con --publicar: publicar al momento en vez de programar")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--fecha")
@@ -225,6 +226,14 @@ def main():
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     hoy = date.fromisoformat(a.fecha) if a.fecha else datetime.now(TZ).date()
+    if a.youtube_desde:  # p. ej. la historia de hoy, ya publicada en TikTok antes de autorizar YouTube
+        carpeta = Path(a.youtube_desde)
+        meta = json.loads((carpeta / "meta.json").read_text(encoding="utf-8"))
+        n = len(meta["partes"])
+        for p in sorted(meta["partes"], key=lambda x: -x["parte"]):
+            p["video"] = str(carpeta / Path(p["video"]).name)
+            publicar_youtube(meta, p, n, None)
+        return
     HISTORIAL.mkdir(exist_ok=True)
     hist = HISTORIAL / f"{hoy.isoformat()}.json"
     if a.publicar and hist.exists():
