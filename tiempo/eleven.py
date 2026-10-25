@@ -7,7 +7,7 @@
   días anteriores) y el ajuste fino de duración se hace con atempo, sin volver a llamar a la API.
 
 Variables: ELEVENLABS_API_KEY (secreto), ELEVEN_VOZ_MASCULINA y ELEVEN_VOZ_FEMENINA (ids de voz),
-ELEVEN_MODEL (por defecto eleven_flash_v2_5: 0,5 créditos por carácter).
+ELEVEN_MODEL (por defecto eleven_v4, el más natural; el plan Starter incluye 75.000 caracteres/mes de v4).
 """
 from __future__ import annotations
 
@@ -29,13 +29,18 @@ RITMO = RAIZ / "estado" / "eleven_ritmo.json"
 CPS_INICIAL = 14.5   # caracteres por segundo hablados (se corrige solo con cada vídeo)
 
 
+# Voces elegidas en la biblioteca de ElevenLabs (español de España), añadidas a "My Voices" de la cuenta
+VOZ_MASCULINA = "Pc51tQpUBlUP7gybDfkb"   # Enrique Soler
+VOZ_FEMENINA = "7sPWPWuzGi4J8JnaQcQw"    # Anabel
+
+
 def modelo() -> str:
-    return os.environ.get("ELEVEN_MODEL") or "eleven_flash_v2_5"
+    return os.environ.get("ELEVEN_MODEL") or "eleven_v4"
 
 
 def voz_id(tipo: str) -> str | None:
-    ids = {"masculina": os.environ.get("ELEVEN_VOZ_MASCULINA", "").strip(),
-           "femenina": os.environ.get("ELEVEN_VOZ_FEMENINA", "").strip()}
+    ids = {"masculina": os.environ.get("ELEVEN_VOZ_MASCULINA", "").strip() or VOZ_MASCULINA,
+           "femenina": os.environ.get("ELEVEN_VOZ_FEMENINA", "").strip() or VOZ_FEMENINA}
     return ids.get(tipo) or ids["femenina"] or ids["masculina"] or None
 
 
@@ -156,7 +161,7 @@ def sintetizar(bloques: list[str], tipo: str, trabajo: Path, etiqueta: str):
     cuerpo = {"text": texto, "model_id": modelo(),
               "voice_settings": {"stability": 0.45, "similarity_boost": 0.8, "style": 0.25,
                                  "use_speaker_boost": True, "speed": 1.05}}
-    if "v2_5" in modelo():
+    if "multilingual_v2" not in modelo():
         cuerpo["language_code"] = "es"
     r = requests.post(f"{API}/text-to-speech/{vid}/with-timestamps", params={"output_format": "mp3_44100_128"},
                       headers={"xi-api-key": os.environ["ELEVENLABS_API_KEY"].strip(),
