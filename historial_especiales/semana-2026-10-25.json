@@ -1,0 +1,79 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-10-25",
+ "caption": "Semana casi seca, pero el martes el norte se moja ☔ ¿Ya tienes plan? 😎\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 26: máx. 30°\n☁️ Martes 27: máx. 27° · lluvia en A Coruña, Santander\n☁️ Miércoles 28: máx. 28° · lluvia en Bilbao\n☁️ Jueves 29: máx. 28°\n☁️ Viernes 30: máx. 28°\n\n#eltiempo #tiempo #semana #prevision #españa #AEMET #parati #paraguasochanclas #otoño",
+ "titular": "MARTES DE PARAGUAS",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 65.4,
+ "guion": {
+  "intro": "¿Vuelve la lluvia el martes? Al final te digo el mejor día de la semana y el peor.",
+  "lunes": "Lunes tranquilo, sin lluvia y con nubes casi por todas partes. Sevilla toca 28 grados, así que aprovecha y tiende la ropa.",
+  "martes": "El martes llega el agua al norte, con un 94 por ciento en A Coruña. Lleva paraguas ahí; en el resto, seco.",
+  "miercoles": "El miércoles sigue la lluvia en Bilbao, con un 57 por ciento. Madrid y el interior tienen sol y 21 grados, ideal para la bici.",
+  "jueves": "El jueves, nubes y casi nada de lluvia. Madrid marca 20 grados, pero en Salamanca amanece a 5 grados. Chaqueta.",
+  "viernes": "El viernes cierra casi seco, con un 16 por ciento en Palma como lo peor. Sevilla llega a 28 grados, perfecto para terraza.",
+  "general": "Mejor día, el lunes, sin lluvia y con 28 grados en Sevilla. Peor, el martes, con un 94 por ciento de lluvia en A Coruña.",
+  "cierre": "¿Qué día te toca mojarte? Cuéntamelo en comentarios y sigue la cuenta para tener el tiempo de cada día."
+ },
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-10-25T19:27:30.982Z"
+     },
+     "success": true,
+     "platform_post_id": "7700689035001335073",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7700689035001335073",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 9471781,
+     "post_title": "Semana casi seca, pero el martes el norte se moja ☔ ¿Ya tienes plan? 😎\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 26: máx. 30°\n☁️ Martes 27: máx. 27° · lluvia en A Coruña, Santander\n☁️ Miércoles 28: máx. 28° · lluvia en Bilbao\n☁️ Jueves 29: máx. 28°\n☁️ Viernes 30: máx. 28°\n\n#eltiempo #tiempo #semana #prevision #españa #AEMET #parati #paraguasochanclas #otoño",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 65.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7700688559745042464",
+     "request_id": "357a80eb6efe4c3788459e6263af52c6",
+     "request_id_logs": "357a80eb6efe4c3788459e6263af52c6",
+     "job_id": "1e1e192c5fd64addb4da69bc0edb3aee",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-10-25T19:27:30.982Z"
+   },
+   "request_id": "357a80eb6efe4c3788459e6263af52c6"
+  }
+ },
+ "youtube": {
+  "id": "Bd6Qv4LR6_c",
+  "url": "https://youtube.com/shorts/Bd6Qv4LR6_c"
+ }
+}
