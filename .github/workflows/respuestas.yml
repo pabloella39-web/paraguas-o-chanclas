@@ -1,0 +1,59 @@
+name: Respuestas en vídeo a comentarios
+
+# Cada hora de 8:00 a 22:00 (hora de Madrid en invierno; en verano, de 9:00 a 23:00) lee los comentarios de
+# TikTok y responde con un vídeo de ~15 s a quien pregunte por el tiempo de un sitio. Necesita Upload-Post.
+on:
+  schedule:
+    - cron: "7 7-21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: respuestas
+  cancel-in-progress: false
+
+jobs:
+  responder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar Upload-Post
+        id: up
+        env:
+          K: ${{ secrets.UPLOADPOST_API_KEY }}
+        run: |
+          if [ -z "$K" ]; then echo "::notice::Respuestas en vídeo en espera: falta el secreto UPLOADPOST_API_KEY"; echo "ok=false" >> "$GITHUB_OUTPUT"; else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-python@v5
+        if: steps.up.outputs.ok == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Instalar dependencias
+        if: steps.up.outputs.ok == 'true'
+        run: |
+          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          pip install -r requirements.txt
+      - name: Responder
+        if: steps.up.outputs.ok == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVEN_VOZ_MASCULINA: ${{ vars.ELEVEN_VOZ_MASCULINA }}
+          ELEVEN_VOZ_FEMENINA: ${{ vars.ELEVEN_VOZ_FEMENINA }}
+          ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+          UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
+          RESPUESTAS_POR_HORA: ${{ vars.RESPUESTAS_POR_HORA || '3' }}
+          RESPUESTAS_POR_DIA: ${{ vars.RESPUESTAS_POR_DIA || '8' }}
+        run: python -m tiempo.respuestas --publicar
+      - name: Guardar estado
+        if: always() && steps.up.outputs.ok == 'true'
+        run: |
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add estado/ assets/musica/ 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Respuestas a comentarios"
+          for i in 1 2 3 4; do git pull --rebase -q && git push && break; sleep 5; done

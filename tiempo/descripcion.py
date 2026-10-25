@@ -66,6 +66,12 @@ def construir(prev: list[dict], hoy: date, gancho_ia: str | None = None) -> str:
         lineas.append(f"🌫️ Niebla en {niebla[0]['nombre']}")
     lineas.append(f"🔥 Máxima: {caliente['tmax']}° en {caliente['nombre']}")
     lineas.append(f"🥶 Mínima: {fria['tmin']}° en {fria['nombre']}")
+    from .guion import cta_del_dia
+    cta = cta_del_dia(hoy)
+    if cta == "mencion":
+        lineas.append("👥 Menciona a quien necesite saber si hoy toca paraguas o chanclas")
+    elif cta == "ciudad":
+        lineas.append("📍 ¿Y en tu pueblo? Pregúntame en comentarios y te respondo con un vídeo")
 
     tags = list(HASHTAGS_FIJOS)
     if lluvia:

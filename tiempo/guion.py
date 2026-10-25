@@ -66,7 +66,7 @@ INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
   hoy...", "Gente de Sevilla, ...").
 - En el cierre, una pregunta concreta para que comenten (varía cada día: ¿paraguas o chanclas?, ¿desde
   qué ciudad nos ves?, ¿qué plan tienes con este tiempo?, ¿acerté ayer?...) y pide que sigan la cuenta.
-  De vez en cuando, que etiqueten a alguien ("etiqueta a ese amigo que siempre va en manga corta").
+  LLAMADA DE HOY (obligatoria en el cierre, con tus palabras y con gracia): {cta}
 
 Escribe la locución en castellano de España, para leer en voz alta por una voz sintética:
 - Escribe los números en cifras seguidos de la palabra "grados" o "por ciento" (ej. "24 grados"). Nada de
@@ -124,6 +124,25 @@ def _claude(prompt: str, clave: str) -> dict:
     return data
 
 
+# Llamada a la acción del cierre: rota cada día (mencionar amigos / pedir tu ciudad / pregunta libre)
+CTAS = {
+    "mencion": 'pide que MENCIONEN EN COMENTARIOS a sus amigos para que estén al tanto del tiempo y sepan si '
+               'necesitan paraguas o chanclas (ej. "menciona a ese amigo que siempre sale sin paraguas").',
+    "ciudad": 'invita a escribir en comentarios su ciudad o pueblo: "y si quieres saber el tiempo de tu pueblo, '
+              'pregúntamelo en comentarios y te respondo con un vídeo".',
+    "pregunta": "una pregunta concreta para que comenten (¿paraguas o chanclas?, ¿desde qué ciudad nos ves?, "
+                "¿qué plan tienes con este tiempo?, ¿acerté ayer?...).",
+}
+CIERRES_PLANTILLA = {
+    "mencion": "Menciona a tus amigos para que sepan si hoy necesitan paraguas o chanclas.",
+    "ciudad": "¿Quieres el tiempo de tu pueblo? Pregúntamelo en comentarios y te respondo con un vídeo.",
+}
+
+
+def cta_del_dia(hoy: date) -> str:
+    return ("mencion", "ciudad", "pregunta", "ciudad", "mencion", "pregunta", "ciudad")[hoy.toordinal() % 7]
+
+
 def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: float = 1.0,
                    presenta: str = "un presentador") -> dict:
     """factor < 1 pide un guion más corto; > 1 más largo (para ajustar la duración)."""
@@ -135,7 +154,7 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
         prompt = PROMPT.format(fecha=fecha_larga(hoy), datos=json.dumps(_resumen_datos(prev), ensure_ascii=False),
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
-                               orden=" → ".join(orden),
+                               orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],
                                contexto="\n".join(f"- {n}" for n in notas_dia(hoy)) or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))
@@ -283,6 +302,7 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
         "¿Qué plan tienes con este tiempo? Cuéntamelo abajo.",
         "Etiqueta a ese amigo que siempre sale en manga corta.",
     ])
+    pregunta = CIERRES_PLANTILLA.get(cta_del_dia(hoy), pregunta)
     seg["cierre"] = f"{pregunta} Y sigue a Paraguas o Chanclas para tener el tiempo de cada día."
     if factor > 1.2:
         seg["cierre"] += " ¡Pásaselo a quien siempre sale sin chaqueta!"

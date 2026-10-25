@@ -38,7 +38,7 @@ def main():
         res = uploadpost.publicar_tiktok(video, caption, "tiempo")
     else:
         os.environ["TIKTOK_MODO"] = "borrador"
-        res = tiktok.publicar_con_reintentos(video, caption, meta.get("portada_ms", 0))
+        res = tiktok.publicar(video, caption, meta.get("portada_ms", 0))  # sin reintentos: evita borradores repetidos
     log.info("Enviado a TikTok: %s", res)
     print(f"::notice::Vídeo {video.name} enviado a TikTok: {str(res)[:200]}")
 
