@@ -190,10 +190,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     log.info("Voz: %s · orden: %s", motor, " → ".join(p["seg"] for p in plan))
 
     audio = trabajo / "pista.wav"
-    voz.montar_pista(trozos, total, musica.generar(total), audio)
+    voz.montar_pista(trozos, total, musica.generar(total, hoy), audio)
 
     extremos = {"calor": max(prev, key=lambda c: c["tmax"]), "frio": min(prev, key=lambda c: c["tmin"])}
-    comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""))
+    comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy)
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

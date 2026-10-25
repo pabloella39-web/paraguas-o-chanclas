@@ -97,7 +97,7 @@ jobs:
         run: |
           git config user.name "parte-bot"
           git config user.email "parte-bot@users.noreply.github.com"
-          git add historial_especiales/ estado/ docs/hoy.json 2>/dev/null || true
+          git add historial_especiales/ estado/ docs/hoy.json assets/musica/ 2>/dev/null || true
           git diff --cached --quiet && exit 0
           git commit -m "Especial del $(date +%F)"
           for i in 1 2 3 4; do git pull --rebase -q && git push && break; sleep 5; done

@@ -88,9 +88,94 @@ def _trocear_subtitulos(texto: str, max_car=30):
     return trozos
 
 
+class Particulas:
+    """Adornos de la estación que caen o flotan por el fondo: hojas (otoño), nieve (invierno), pétalos (primavera)
+    y destellos de sol (verano). Sutiles: no tapan datos ni subtítulos."""
+
+    def __init__(self, est: str, semilla: int = 7):
+        rnd = np.random.default_rng(semilla)
+        self.est = est
+        n = {"otono": 16, "invierno": 46, "primavera": 18, "verano": 22}[est]
+        self.p = [{"x": rnd.uniform(0, ANCHO), "y": rnd.uniform(0, ALTO), "v": rnd.uniform(40, 110),
+                   "amp": rnd.uniform(15, 60), "w": rnd.uniform(0.4, 1.2), "fase": rnd.uniform(0, 6.3),
+                   "giro": rnd.uniform(-90, 90), "tipo": int(rnd.integers(0, 4)), "tam": rnd.uniform(0.6, 1.25)}
+                  for _ in range(n)]
+        self.sprites = {}
+
+    def _sprite(self, tipo, tam_idx, ang_idx):
+        k = (tipo, tam_idx, ang_idx)
+        if k in self.sprites:
+            return self.sprites[k]
+        escala = (0.6 + tam_idx * 0.13) * {"otono": 1.8, "primavera": 1.5, "invierno": 1.25}.get(self.est, 1.2)
+        s = 3
+        if self.est == "otono":
+            cols = [(214, 120, 40), (190, 70, 30), (232, 172, 60), (160, 90, 45)]
+            W, H = int(46 * escala * s), int(28 * escala * s)
+            im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            d = ImageDraw.Draw(im)
+            d.polygon([(0, H / 2), (W * 0.35, 0), (W, H / 2), (W * 0.35, H)], fill=cols[tipo] + (185,))
+            d.line([(0, H / 2), (W, H / 2)], fill=(110, 50, 20, 160), width=s)
+        elif self.est == "invierno":
+            R = int(8 * escala * s)
+            im = Image.new("RGBA", (2 * R, 2 * R), (0, 0, 0, 0))
+            ImageDraw.Draw(im).ellipse([0, 0, 2 * R - 1, 2 * R - 1], fill=(255, 255, 255, 190))
+        elif self.est == "primavera":
+            cols = [(255, 182, 206), (255, 220, 232), (250, 160, 190), (255, 240, 245)]
+            W, H = int(30 * escala * s), int(18 * escala * s)
+            im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            ImageDraw.Draw(im).ellipse([0, 0, W - 1, H - 1], fill=cols[tipo] + (190,))
+        else:  # verano: destello cálido difuminado
+            R = int(14 * escala * s)
+            im = Image.new("RGBA", (2 * R, 2 * R), (0, 0, 0, 0))
+            d = ImageDraw.Draw(im)
+            for k2 in range(6, 0, -1):
+                d.ellipse([R - R * k2 / 6, R - R * k2 / 6, R + R * k2 / 6, R + R * k2 / 6],
+                          fill=(255, 214, 110, int(40 + 25 * (6 - k2))))
+        im = im.resize((max(1, im.width // s), max(1, im.height // s)), Image.LANCZOS)
+        if self.est in ("otono", "primavera"):
+            im = im.rotate(ang_idx * 30, expand=True, resample=Image.BICUBIC)
+        self.sprites[k] = im
+        return im
+
+    COLOR = {"otono": (214, 120, 40), "invierno": (150, 200, 255), "primavera": (250, 150, 190),
+             "verano": (255, 196, 45)}
+
+    def fondo(self, img: Image.Image):
+        """Bruma del color de la estación en la parte baja + etiqueta con la estación."""
+        if getattr(self, "_fondo", None) is None:
+            capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
+            h = ALTO - MAPA_Y1
+            alfa = (np.linspace(0, 95, h) ** 1.0).astype(np.uint8)
+            banda = Image.new("RGBA", (ANCHO, h), self.COLOR[self.est] + (0,))
+            banda.putalpha(Image.fromarray(np.repeat(alfa[:, None], ANCHO, axis=1)))
+            capa.alpha_composite(banda, (0, MAPA_Y1))
+            from .estacion import NOMBRES
+            d = ImageDraw.Draw(capa)
+            txt = NOMBRES[self.est]
+            f = fuente("Black", 30)
+            w = f.getlength(txt) + 74
+            d.rounded_rectangle([30, 292, 30 + w, 340], radius=24, fill=(8, 20, 45, 200),
+                                outline=self.COLOR[self.est] + (255,), width=3)
+            sp = self._sprite(1, 2, 1)
+            sp = sp.resize((min(40, sp.width), min(40, sp.height)))
+            capa.alpha_composite(sp, (42, 296 + (44 - sp.height) // 2))
+            d.text((30 + 58, 316), txt, font=f, fill=self.COLOR[self.est] + (255,), anchor="lm")
+            self._fondo = capa
+        img.alpha_composite(self._fondo)
+
+    def dibujar(self, img: Image.Image, t: float):
+        sube = self.est == "verano"
+        for p in self.p:
+            y = (p["y"] + (-1 if sube else 1) * p["v"] * t * (0.45 if self.est == "invierno" else 1)) % (ALTO + 80) - 40
+            x = (p["x"] + p["amp"] * math.sin(p["w"] * t + p["fase"])) % ANCHO
+            ang = int(((p["giro"] * t) % 360) // 30)
+            sp = self._sprite(p["tipo"], int((p["tam"] - 0.6) / 0.65 * 5), ang)
+            img.paste(sp, (int(x), int(y)), sp)
+
+
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
-                 pills=None, portada_txt=None, capas=None, sin_marcadores=()):
+                 pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
@@ -102,6 +187,8 @@ class Compositor:
         self.portada_txt = portada_txt
         self.capas = capas or {}
         self.sin_marcadores = set(sin_marcadores)
+        from .estacion import estacion
+        self.particulas = Particulas(estacion_override or estacion(fecha or __import__("datetime").date.today()))
         self.prev = prev
         self.titular = (titular or "¿PARAGUAS O CHANCLAS?").upper()
         # La intro se dibuja ya sobre la región más relevante (la que va justo después)
@@ -187,6 +274,7 @@ class Compositor:
         else:
             m = self.mapa_estatico(seg)
         img.paste(m, (0, MAPA_Y0))
+        self.particulas.dibujar(img, t)
         capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
         d = ImageDraw.Draw(capa)
 
@@ -215,6 +303,7 @@ class Compositor:
             self._chips_extremos(capa, d, dt)
 
         img = img.convert("RGBA")
+        self.particulas.fondo(img)
         img.alpha_composite(self.cabecera)
         img.alpha_composite(capa)
         d = ImageDraw.Draw(img)

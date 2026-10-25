@@ -116,7 +116,7 @@ jobs:
         run: |
           git config user.name "parte-bot"
           git config user.email "parte-bot@users.noreply.github.com"
-          git add historial/ estado/ docs/hoy.json 2>/dev/null || git add historial/
+          git add historial/ estado/ docs/hoy.json assets/musica/ 2>/dev/null || git add historial/
           git diff --cached --quiet && exit 0
           git commit -m "Parte del $(date +%F)"
           # El canal económico también sube cambios: se integra lo remoto antes de subir (si no, se perdería el

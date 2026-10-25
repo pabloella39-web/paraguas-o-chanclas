@@ -111,8 +111,9 @@ def _producir(nombre: str, guion, plan, total, trozos, comp_kwargs: dict, prev, 
     for p in plan:
         p["texto"] = guion["segmentos"][p["seg"]]
     audio = trabajo / "pista.wav"
-    voz.montar_pista(trozos, total, musica.generar(total), audio)
-    comp = Compositor(prev, plan, total, cabecera, extremos, guion.get("titular", ""), **comp_kwargs)
+    voz.montar_pista(trozos, total, musica.generar(total, ahora().date()), audio)
+    comp = Compositor(prev, plan, total, cabecera, extremos, guion.get("titular", ""), fecha=ahora().date(),
+                      **comp_kwargs)
     video = salida / f"{nombre}.mp4"
     log.info("Renderizando %.2f s…", total)
     renderizar(comp, audio, video, total)

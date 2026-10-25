@@ -30,7 +30,66 @@ def _nota(f, dur, ataque=0.01, caida=3.0, armonicos=(1, 0.35, 0.15)):
     return onda * env
 
 
-def generar(segundos: float) -> np.ndarray:
+# Música de cada estación generada con ElevenLabs Music (uso comercial incluido en el plan Starter).
+# Se guarda en assets/musica/<estación>/ y se va rotando; si hay menos de PISTAS_POR_ESTACION, cada día se compone
+# una nueva (≈75 s de los 40 min de música al mes del plan), así la biblioteca crece sola al cambiar de estación.
+PISTAS_POR_ESTACION = 5
+PROMPTS = {
+    "otono": "Warm, cozy autumn instrumental for a light-hearted daily weather show: soft acoustic guitar, "
+             "gentle piano, light percussion, upbeat but relaxed, 100 bpm, no vocals, seamless background loop",
+    "invierno": "Bright cozy winter instrumental for a cheerful daily weather show: glockenspiel, pizzicato strings, "
+                "soft piano, light sleigh-bell shaker, upbeat, 100 bpm, no vocals, background loop",
+    "primavera": "Fresh spring instrumental for a cheerful daily weather show: ukulele, whistling-style synth, light "
+                 "claps, marimba, happy and bouncy, 105 bpm, no vocals, background loop",
+    "verano": "Sunny summer instrumental for a fun daily weather show: tropical house, steel drums, light guitar, "
+              "relaxed beach vibe, 102 bpm, no vocals, background loop",
+}
+
+
+def _biblioteca(hoy) -> np.ndarray | None:
+    import logging
+    import os
+
+    import requests
+
+    from .estacion import estacion
+    log = logging.getLogger(__name__)
+    est = estacion(hoy)
+    carpeta = ASSETS / "musica" / est
+    carpeta.mkdir(parents=True, exist_ok=True)
+    pistas = sorted(carpeta.glob("*.mp3"))
+    clave = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+    if len(pistas) < PISTAS_POR_ESTACION and clave:
+        try:
+            r = requests.post("https://api.elevenlabs.io/v1/music", params={"output_format": "mp3_44100_128"},
+                              headers={"xi-api-key": clave, "Content-Type": "application/json"},
+                              json={"prompt": PROMPTS[est], "music_length_ms": 75000, "force_instrumental": True},
+                              timeout=300)
+            if r.status_code == 200 and len(r.content) > 50_000:
+                nueva = carpeta / f"{est}_{hoy.isoformat()}.mp3"
+                nueva.write_bytes(r.content)
+                log.info("Nueva pista de música de %s compuesta con ElevenLabs (%s)", est, nueva.name)
+                pistas = sorted(carpeta.glob("*.mp3"))
+            else:
+                log.warning("ElevenLabs Music HTTP %s: %s", r.status_code, r.text[:200])
+        except Exception as e:  # noqa: BLE001
+            log.warning("No se pudo componer música: %s", e)
+    if not pistas:
+        return None
+    pista = pistas[hoy.toordinal() % len(pistas)]
+    tmp = Path(f"/tmp/musica_{pista.stem}.wav")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(pista), "-ar", str(SR), "-ac", "1",
+                    "-af", "loudnorm=I=-20:TP=-2", str(tmp)], check=True)
+    log.info("Música: %s", pista.name)
+    return leer_wav(tmp) * 0.9
+
+
+def generar(segundos: float, hoy=None) -> np.ndarray:
+    """hoy: si se pasa (canal del tiempo), se usa la biblioteca de música de la estación."""
+    if hoy is not None:
+        musica = _biblioteca(hoy)
+        if musica is not None:
+            return musica
     propia = next((p for p in (ASSETS / "musica.mp3", ASSETS / "musica.wav") if p.exists()), None)
     if propia:
         tmp = Path("/tmp/musica_propia.wav")

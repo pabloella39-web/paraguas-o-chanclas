@@ -11,6 +11,7 @@ from datetime import date
 import requests
 
 from .config import MODELO_CLAUDE, SEGMENTOS
+from .contexto import notas as notas_dia
 from .prioridad import orden_regiones
 
 log = logging.getLogger(__name__)
@@ -49,6 +50,9 @@ icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuent
 
 Texto de AEMET para hoy (contexto, puede venir vacío):
 {texto_aemet}
+
+CONTEXTO DEL DÍA (menciónalo de pasada, con gracia, en la intro, en "general" o en el cierre; si está vacío, nada):
+{contexto}
 
 Hoy la locución la lee {presenta}: usa la concordancia de género correcta si hablas de ti.
 
@@ -132,6 +136,7 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
                                orden=" → ".join(orden),
+                               contexto="\n".join(f"- {n}" for n in notas_dia(hoy)) or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))
         for intento in range(2):
@@ -304,4 +309,7 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     else:
         gancho, titular = "¿Paraguas o chanclas? Hoy te lo cuento zona a zona.", "¿PARAGUAS O CHANCLAS?"
     seg["intro"] = gancho + " Y quédate, que al final te digo dónde hará más calor y más frío de España."
+    extra = notas_dia(hoy)
+    if extra:
+        seg["cierre"] = extra[0] + " " + seg["cierre"]
     return {"segmentos": seg, "caption": caption, "orden": orden, "titular": titular[:30]}
