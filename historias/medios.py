@@ -7,6 +7,7 @@ import io
 import logging
 import os
 import random
+import re
 import subprocess
 from pathlib import Path
 
@@ -47,7 +48,10 @@ def buscar_imagenes(consulta: str, n: int = 3) -> list[dict]:
         lic = str((meta.get("LicenseShortName") or {}).get("value", "")).lower()
         if not any(lic.startswith(l) or l in lic for l in LIBRES) or "by" in lic.replace("by-sa", "by"):
             continue
-        if ii.get("mime") not in ("image/jpeg", "image/png") or (ii.get("width") or 0) < 800:
+        if ii.get("mime") != "image/jpeg" or (ii.get("width") or 0) < 800:  # PNG suele ser carteles y gráficos
+            continue
+        if re.search(r"poster|logo|map|mapa|diagram|chart|cover|flag|bandera|coat of arms|escudo|book|page|text|"
+                     r"stamp|sello|card|portrait|retrato|ad\b|advert", pg.get("title", ""), re.I):
             continue
         res.append({"id": pg.get("pageid"), "title": pg.get("title", ""), "license": lic, "url": ii.get("thumburl"),
                     "thumbnail": ii.get("url"), "width": ii.get("width"), "height": ii.get("height"),
