@@ -23,11 +23,17 @@ HORA_PARTE_1 = (21, 0)
 SEPARACION_MIN = 12
 
 # Voz del narrador (ElevenLabs). Se fija con la variable HISTORIAS_VOZ tras escuchar las muestras.
-VOZ_DEFECTO = "y4o1CguECnmbT8YSuREN"  # Rafa (provisional hasta que se elija)
+# Voz según quién narra la historia (primera persona): hombre → Rafa; mujer → Maite o Maia (se alternan)
+VOZ_HOMBRE = "y4o1CguECnmbT8YSuREN"     # Rafa - Hoarse, Gripping & Nuanced
+VOCES_MUJER = ["BXtvkfRgOYGPQKVRgufE",  # Maite Jiménez
+               "jipeLrCHZ6ByxrU2JP9i"]  # Maia
+VOZ_DEFECTO = VOZ_HOMBRE
 
 
-def voz() -> str:
-    return os.environ.get("HISTORIAS_VOZ", "").strip() or VOZ_DEFECTO
+def voz(narrador: str = "hombre", d: date | None = None) -> str:
+    if narrador == "mujer":
+        return VOCES_MUJER[(d.toordinal() // 2 if d else 0) % len(VOCES_MUJER)]
+    return os.environ.get("HISTORIAS_VOZ", "").strip() or VOZ_HOMBRE
 
 
 def tipo_del_dia(d: date) -> str:

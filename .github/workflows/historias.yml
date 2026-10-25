@@ -51,6 +51,7 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] && ! grep -qi "^si" historias/activo.txt; then
             echo "::notice::Canal de historias en pausa (historias/activo.txt)"; exit 0; fi
           if [ "${{ github.event_name }}" = "push" ] && ! grep -qi publicar historias/lanzar.txt; then ARGS="--prueba"; fi
+          if [ "${{ github.event_name }}" = "push" ] && grep -qi " ya" historias/lanzar.txt; then ARGS="--publicar --ya"; fi
           mkdir -p salida_historias
           set -o pipefail
           python -m historias.main $ARGS 2>&1 | grep -v " Render " | tee salida_historias/registro.txt

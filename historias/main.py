@@ -95,7 +95,6 @@ def caption(h: dict, k: int, n: int) -> str:
 def construir(hoy: date, salida: Path, demo: bool) -> dict:
     salida.mkdir(parents=True, exist_ok=True)
     trabajo = Path(tempfile.mkdtemp())
-    v = voz()
     gratis = demo
     if not demo:
         restante = locucion.creditos_restantes()
@@ -105,9 +104,11 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
             log.warning("Quedan %d créditos de ElevenLabs y el parte necesita reservarlos: voz gratuita hoy", restante)
             print(f"::warning::Historias con voz gratuita: quedan {restante} créditos de ElevenLabs")
             gratis = True
-    pps = locucion.ritmo(v)
+    pps = locucion.ritmo(voz())
     palabras = int(round(pps * (sum(VOZ_OBJETIVO) / 2)))
     h = guion.historia_demo() if demo else guion.escribir(hoy, palabras)
+    v = voz(h.get("narrador", "hombre"), hoy)
+    log.info("Narrador: %s → voz %s", h.get("narrador", "hombre"), v)
     n = len(h["partes"])
     usadas: set = set()
     semilla = medios.clave_estable(h["titulo"], hoy)
@@ -157,11 +158,12 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
             "guion": h}
 
 
-def publicar(meta: dict) -> list:
+def publicar(meta: dict, ya: bool = False) -> list:
+    """ya=True: se publican al momento (de la última parte a la primera, una tras otra)."""
     from tiempo import uploadpost
     ahora = datetime.now(TZ)
     n = len(meta["partes"])
-    horas = horas_publicacion(n, ahora)
+    horas = [None] * n if ya else horas_publicacion(n, ahora)
     res = []
     for p in sorted(meta["partes"], key=lambda x: -x["parte"]):  # de la última a la primera
         cuando = horas[p["parte"] - 1]
@@ -169,7 +171,8 @@ def publicar(meta: dict) -> list:
                                        primer_comentario=meta.get("pregunta"))
         p["publicacion"] = r
         res.append(r)
-        print(f"::notice::Parte {p['parte']}/{n} programada para las {cuando:%H:%M}")
+        print(f"::notice::Parte {p['parte']}/{n} " + (f"programada para las {cuando:%H:%M}" if cuando else
+                                                         f"publicada: {str(r)[:150]}"))
     return res
 
 
@@ -177,6 +180,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--publicar", action="store_true")
     ap.add_argument("--prueba", action="store_true")
+    ap.add_argument("--ya", action="store_true", help="con --publicar: publicar al momento en vez de programar")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--fecha")
     ap.add_argument("--salida", default=str(RAIZ / "salida_historias"))
@@ -191,7 +195,7 @@ def main():
     meta = construir(hoy, Path(a.salida), a.demo)
     (Path(a.salida) / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     if a.publicar:
-        publicar(meta)
+        publicar(meta, a.ya)
         hist.write_text(json.dumps({k: v for k, v in meta.items() if k != "guion"}, ensure_ascii=False, indent=1),
                         encoding="utf-8")
     print(f"::notice::Historia: {meta['titulo']} ({meta['tipo']}), {len(meta['partes'])} partes: "

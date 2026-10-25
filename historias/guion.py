@@ -57,11 +57,13 @@ Para cada parte, además del texto:
 Y en general:
 - "titulo": 2 a 5 palabras en MAYÚSCULAS, intrigante (ej. "LA HABITACIÓN 14", "EL VECINO DEL QUINTO").
 - "caption": una frase gancho para la descripción (máx. 100 caracteres) con 1 emoji, sin hashtags.
+- "narrador": "mujer" si la historia la cuenta una mujer en primera persona o la protagonista es una mujer y se
+  narra desde su punto de vista; "hombre" en el resto de casos.
 - "pregunta": pregunta para el primer comentario fijado (máx. 90 caracteres).
 - "hashtags": 4 o 5 hashtags específicos de esta historia (los genéricos se añaden solos).
 
 Responde SOLO con JSON válido:
-{{"titulo": "...", "caption": "...", "pregunta": "...", "hashtags": ["#..."],
+{{"titulo": "...", "narrador": "hombre", "caption": "...", "pregunta": "...", "hashtags": ["#..."],
 "partes": [{{"texto": "...", "escenas": ["..."], "ambiente": "..."}}]}}"""
 
 
