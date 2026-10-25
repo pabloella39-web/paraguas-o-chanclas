@@ -20,7 +20,7 @@ MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto
          "octubre", "noviembre", "diciembre"]
 
 # Palabras objetivo por bloque (≈170 palabras ≈ 63 s a ritmo ágil; la velocidad de la voz se ajusta sola)
-PALABRAS = {"intro": 12, "general": 26, "norte": 24, "interior": 22, "mediterraneo": 22,
+PALABRAS = {"intro": 22, "general": 20, "norte": 24, "interior": 22, "mediterraneo": 22,
             "sur": 26, "islas": 22, "cierre": 18}
 
 
@@ -54,7 +54,10 @@ Hoy la locución la lee {presenta}: usa la concordancia de género correcta si h
 
 INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
 - Habla de tú al espectador todo el rato ("si hoy sales a correr...", "tú que estás en Málaga...").
-- En la intro, un gancho directo que obligue a quedarse o a responder (una pregunta o un reto).
+- RETENCIÓN (lo más importante): la gente decide en 1 segundo si se queda. La intro NO saluda ni lee la fecha
+  (ya sale en pantalla): arranca directamente con lo más llamativo de hoy en la región que va primera, de forma
+  concreta y directa ("Galicia, hoy te toca temporal de los buenos..."), y en la misma intro promete que al final
+  dirás dónde hará más calor y más frío de España ("quédate, que al final te digo..."). Máximo 2 frases.
 - En al menos dos bloques regionales, interpela a la gente de una ciudad concreta ("Si eres de Bilbao,
   hoy...", "Gente de Sevilla, ...").
 - En el cierre, una pregunta concreta para que comenten (varía cada día: ¿paraguas o chanclas?, ¿desde
@@ -76,23 +79,26 @@ ORDEN DE HOY: los bloques regionales NO van siempre igual: se cuentan de más a 
 {orden}. Motivos detectados en los datos: {motivos}. Empieza el primero con fuerza (es la noticia del día) y
 enlaza cada región con la siguiente con naturalidad; no digas "empezamos por el norte" si no toca.
 
-Bloques:
-- intro: saludo con la fecha y gancho para que no deslicen el vídeo.
-- general: resumen de España en una frase o dos, EMPEZANDO por lo más destacado del día (lo de la región que va
-  primero en el orden de hoy).
+Bloques (en este orden: intro, las regiones en el orden de hoy, general y cierre):
+- intro: el gancho (ver RETENCIÓN), sobre la región que va primera.
+- general: va AL FINAL, justo antes del cierre: es la recompensa prometida. Dónde hará más calor y dónde más
+  frío de España (con las cifras) y, si acaso, un remate de una frase.
 - norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias). En "sur" \
 nombra SIEMPRE Ceuta y Melilla (aunque sea en una frase corta): la gente de allí lo pide.
 - cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para tener el tiempo de cada día. NUNCA digas \
 horas de publicación ni "mañana a las...".
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
 
-Además escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), que
+Además escribe "titular": el gancho para la pantalla, en MAYÚSCULAS, de 2 a 5 palabras y máximo 26 caracteres,
+sin emojis (ej. "TEMPORAL EN GALICIA", "VALENCIA, ALERTA POR LLUVIA", "EL SUR SE ACHICHARRA").
+
+Y escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), que
 interpele al público con una pregunta o reto relacionado con el tiempo de hoy, con 1 o 2 emojis y SIN
 hashtags (los hashtags y el resumen se añaden automáticamente).
 
 Responde SOLO con JSON válido con esta forma:
 {{"segmentos": {{"intro": "...", "general": "...", "norte": "...", "interior": "...", "mediterraneo": "...",
-"sur": "...", "islas": "...", "cierre": "..."}}, "caption": "..."}}"""
+"sur": "...", "islas": "...", "cierre": "..."}}, "titular": "...", "caption": "..."}}"""
 
 
 def _claude(prompt: str, clave: str) -> dict:
@@ -208,20 +214,16 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     fria = min(prev, key=lambda p: p["tmin"])
     lluviosas = [_nombre(p) for p in prev if p["lluvia"] >= 50]
     # Con factor 1 hay comentario en 3 regiones; si hay que alargar, en todas; si acortar, en ninguna
-    con_chiste = {"norte", "mediterraneo", "islas"}
-    con_alusion = {"interior", "sur"}
+    con_chiste = {"norte", "islas"}
+    con_alusion = {"sur"}
     if factor > 1.1:
         con_chiste = {"norte", "interior", "mediterraneo", "sur", "islas"}
     elif factor < 0.9:
         con_chiste = {"norte"}
     seg = {
-        "intro": rnd.choice([
-            f"¡Buenos días! Es {fecha_larga(hoy)}. Quédate hasta el final, que hoy te toca elegir: ¿paraguas o chanclas?",
-            f"¡Buenos días! Es {fecha_larga(hoy)}. Antes de salir de casa, mira esto, que te ahorro un disgusto.",
-            f"¡Buenos días! Es {fecha_larga(hoy)}. Dime desde dónde nos ves, que hoy hay de todo en España.",
-        ]),
-        "general": (f"Lo más caluroso, {_nombre(caliente)} con {caliente['tmax']} grados, y lo más frío al "
-                    f"amanecer, {_nombre(fria)} con {fria['tmin']}. "
+        "intro": "",  # se rellena abajo, cuando se sabe qué región va primera
+        "general": (f"Y lo prometido: lo más caluroso de hoy, {_nombre(caliente)} con {caliente['tmax']} grados, y lo "
+                    f"más frío al amanecer, {_nombre(fria)} con {fria['tmin']}. "
                     + (f"Ojo con la lluvia en {' y '.join(lluviosas[:2])}." if lluviosas
                        else "De lluvia, poca cosa.")),
     }
@@ -231,8 +233,7 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     intros = {}
     for k, r in enumerate(orden):
         if k == 0:
-            intros[r] = (f"Lo más destacado de hoy está en {zonas[r]}" if info[r]["motivos"]
-                         else f"Empezamos por {zonas[r]}")
+            intros[r] = f"Empezamos por {zonas[r]}"
         elif k == len(orden) - 1:
             intros[r] = f"Y para terminar, en {zonas[r]}"
         else:
@@ -282,4 +283,25 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
         seg["cierre"] += " ¡Pásaselo a quien siempre sale sin chaqueta!"
     caption = (f"El tiempo en España hoy, {fecha_larga(hoy)} ☀️🌧️ ¿Tú hoy eres de paraguas o de chanclas? 👇 "
                "#eltiempo #AEMET #meteo #tiempoespaña #paraguasochanclas")
-    return {"segmentos": seg, "caption": caption, "orden": orden}
+    # Gancho: lo más llamativo de la región que abre el vídeo + promesa del final
+    top = orden[0]
+    lista = reg.get(top, [])
+    nombre_zona = {"norte": "el norte", "interior": "el interior", "mediterraneo": "el Mediterráneo",
+                   "sur": "el sur", "islas": "las islas"}[top]
+    tit_zona = nombre_zona.upper()
+    tmax_c = max(lista, key=lambda c: c["tmax"]) if lista else caliente
+    if any(c["icono"] == "tormenta" for c in lista):
+        gancho, titular = f"Ojo, {nombre_zona}, que hoy vienen tormentas.", f"TORMENTAS EN {tit_zona}"
+    elif any(c["icono"] == "nieve" for c in lista):
+        gancho, titular = f"Ojo, {nombre_zona}, que hoy puede nevar.", f"NIEVE EN {tit_zona}"
+    elif lista and max(c["lluvia"] for c in lista) >= 60:
+        gancho, titular = f"Si estás en {nombre_zona}, hoy el paraguas no es opcional.", f"LLUVIA EN {tit_zona}"
+    elif lista and tmax_c["tmax"] >= 30:
+        gancho, titular = (f"{_nombre(tmax_c)} se va hoy a {tmax_c['tmax']} grados, ¿quién dijo otoño?",
+                           f"CALOR EN {tit_zona}")
+    elif lista and min(c["tmin"] for c in lista) <= 3:
+        gancho, titular = f"Si estás en {nombre_zona}, hoy toca abrigo de verdad al salir.", f"FRÍO EN {tit_zona}"
+    else:
+        gancho, titular = "¿Paraguas o chanclas? Hoy te lo cuento zona a zona.", "¿PARAGUAS O CHANCLAS?"
+    seg["intro"] = gancho + " Y quédate, que al final te digo dónde hará más calor y más frío de España."
+    return {"segmentos": seg, "caption": caption, "orden": orden, "titular": titular[:30]}

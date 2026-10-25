@@ -22,10 +22,12 @@ MAPA_H = MAPA_Y1 - MAPA_Y0
 AREA_MARCADORES = (24, 20, 930, MAPA_H - 10)  # relativo al mapa; x<930 deja libre la columna de botones de TikTok
 SUB_Y = 1515
 TRANSICION = 0.6
-PORTADA_FIJA, PORTADA_FIN = 0.5, 0.9   # la portada se ve entera 0,5 s y se desvanece hasta 0,9 s
+# La portada (miniatura con la fecha) solo ocupa los 2 primeros fotogramas: TikTok la usa de miniatura, pero
+# el espectador ya ve movimiento y oye la voz desde el primer instante (un segundo quieto = deslizar).
+PORTADA_FIJA = PORTADA_FIN = 2 / 30
 ACENTO = (255, 196, 45)
 
-PILLS = {"intro": None, "general": "HOY EN ESPAÑA", "cierre": "¡HASTA MAÑANA!"}
+PILLS = {"intro": None, "general": "MÁS CALOR Y MÁS FRÍO", "cierre": "¡HASTA MAÑANA!"}
 
 
 def vista_de(seg):
@@ -87,24 +89,19 @@ def _trocear_subtitulos(texto: str, max_car=30):
 
 
 class Compositor:
-    def __init__(self, prev, plan, total, fecha_txt, extremos):
+    def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = ""):
         self.prev = prev
+        self.titular = (titular or "¿PARAGUAS O CHANCLAS?").upper()
+        # La intro se dibuja ya sobre la región más relevante (la que va justo después)
+        regiones = [p["seg"] for p in plan if p["seg"] in REGIONES]
+        self.alias = {"intro": regiones[0]} if regiones else {}
         self.plan = plan  # [{seg, inicio, fin, texto}]
         self.total = total
         self.fecha_txt = fecha_txt.upper()
         self.extremos = extremos
         self._cache_mapa = {}
         self._cache_marc = {}
-        self._subs = []
-        for p in plan:
-            trozos = _trocear_subtitulos(p["texto"])
-            pesos = [len(t) + 4 for t in trozos]
-            dur = p["fin"] - p["inicio"]
-            t = p["inicio"]
-            for tr, w in zip(trozos, pesos):
-                d = dur * w / sum(pesos)
-                self._subs.append((t, t + d, tr))
-                t += d
+        self._subs = _subtitulos_karaoke(plan)
         # Ventanas visuales: cada bloque empieza un poco antes que su voz
         self.ventanas = []
         for i, p in enumerate(plan):
@@ -159,8 +156,9 @@ class Compositor:
         return 0, 0, self.ventanas[0][2]
 
     def fotograma(self, t) -> Image.Image:
-        i, ini, seg = self.ventana(t)
-        prev_seg = self.ventanas[i - 1][2] if i > 0 else seg
+        i, ini, seg_real = self.ventana(t)
+        prev_real = self.ventanas[i - 1][2] if i > 0 else seg_real
+        seg, prev_seg = self.alias.get(seg_real, seg_real), self.alias.get(prev_real, prev_real)
         img = _fondo()
         dt = t - ini
         en_trans = vista_de(prev_seg) != vista_de(seg) and dt < TRANSICION
@@ -173,8 +171,8 @@ class Compositor:
         capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
         d = ImageDraw.Draw(capa)
 
-        # Marcadores con animación de entrada escalonada
-        if not en_trans:
+        # Marcadores con animación de entrada escalonada (en el gancho no: solo el titular sobre el mapa)
+        if not en_trans and seg_real != "intro":
             t_marc = dt - (TRANSICION if vista_de(prev_seg) != vista_de(seg) else 0.1)
             estilo, items = self.marcadores(seg)
             for k, (im, (x, y), (px, py)) in enumerate(items):
@@ -191,17 +189,17 @@ class Compositor:
                 capa.alpha_composite(imr, (int(x + (im.width - w) / 2), int(MAPA_Y0 + y + (im.height - h) / 2)))
 
         # Extremos del día en el bloque general
-        if seg == "general" and not en_trans:
+        if seg_real == "general" and not en_trans:
             self._chips_extremos(capa, d, dt)
 
         img = img.convert("RGBA")
         img.alpha_composite(self.cabecera)
         img.alpha_composite(capa)
         d = ImageDraw.Draw(img)
-        self._pill(img, d, seg, dt)
-        if seg == "intro":
+        self._pill(img, d, seg_real, dt)
+        if seg_real == "intro":
             self._intro(img, d, t)
-        if seg == "cierre":
+        if seg_real == "cierre":
             self._cierre(img, d, dt)
         self._atribucion(d)
         self._subtitulo(img, d, t)
@@ -287,25 +285,34 @@ class Compositor:
                    fill=(255, 255, 255, int(255 * a)), anchor="rm")
 
     def _intro(self, img, d, t):
-        velo = Image.new("RGBA", (ANCHO, MAPA_H), (5, 14, 34, 150))
-        img.alpha_composite(velo, (0, MAPA_Y0))
+        """Gancho: titular grande sobre la zona más relevante + promesa de lo que llega al final."""
+        banda = Image.new("RGBA", (ANCHO, 330), (0, 0, 0, 0))
+        alfa = np.linspace(215, 0, 330).astype(np.uint8)
+        banda.putalpha(Image.fromarray(np.repeat(alfa[:, None], ANCHO, axis=1)))
+        banda = Image.composite(Image.new("RGBA", banda.size, (5, 12, 30, 255)), banda, banda.getchannel("A"))
+        img.alpha_composite(banda, (0, MAPA_Y0))
         d = ImageDraw.Draw(img)
-        for k, (txt, tam) in enumerate((("¿QUÉ TIEMPO", 110), ("HACE HOY?", 110))):
-            s = _ease_back((t - 0.1 - k * 0.15) / 0.45)
+        palabras = self.titular.split()
+        lineas = [self.titular] if len(self.titular) <= 16 or len(palabras) < 2 else \
+            [" ".join(palabras[:(len(palabras) + 1) // 2]), " ".join(palabras[(len(palabras) + 1) // 2:])]
+        for k, txt in enumerate(lineas):
+            s = _ease_back((t - 0.05 - k * 0.12) / 0.35)
             if s <= 0.02:
                 continue
-            f = fuente("Black", max(10, int(tam * s)))
-            y = MAPA_Y0 + 300 + k * 130
-            d.text((ANCHO / 2 + 4, y + 6), txt, font=f, fill=(0, 0, 0, 140), anchor="mm")
-            d.text((ANCHO / 2, y), txt, font=f, fill=(255, 255, 255) if k == 0 else ACENTO, anchor="mm")
-        for k, ic in enumerate(("sol", "sol_nubes", "lluvia", "nieve")):
-            s = _ease_back((t - 0.5 - k * 0.12) / 0.4)
-            if s <= 0.02:
-                continue
-            tam = int(130 * s)
-            bote = math.sin((t - k * 0.3) * 4) * 10
-            img.alpha_composite(mapa.icono(ic, 130).resize((max(1, tam), max(1, tam))),
-                                (int(130 + k * 210 + (130 - tam) / 2), int(MAPA_Y0 + 560 + bote)))
+            f = _ajustar(txt, "Black", max(10, int(112 * s)), int(980 * max(s, 0.1)))
+            y = MAPA_Y0 + 95 + k * 120
+            d.text((ANCHO / 2 + 4, y + 6), txt, font=f, fill=(0, 0, 0, 160), anchor="mm")
+            d.text((ANCHO / 2, y), txt, font=f, fill=(255, 255, 255) if k == 0 and len(lineas) > 1 else ACENTO,
+                   anchor="mm")
+        s = _ease_back((t - 0.9) / 0.4)
+        if s > 0.02:
+            txt = "QUÉDATE: AL FINAL, DÓNDE HARÁ MÁS CALOR Y MÁS FRÍO"
+            f = _ajustar(txt, "ExtraBold", int(34 * min(s, 1.2)), 960)
+            w = f.getlength(txt) + 50
+            y = MAPA_Y0 + 95 + len(lineas) * 120 - 10
+            d.rounded_rectangle([ANCHO / 2 - w / 2, y - 30, ANCHO / 2 + w / 2, y + 30], radius=30,
+                                fill=(255, 255, 255, 235))
+            d.text((ANCHO / 2, y), txt, font=f, fill=(15, 25, 50), anchor="mm")
 
     def _cierre(self, img, d, dt):
         s = _ease_back((dt - 0.4) / 0.4)
@@ -324,27 +331,74 @@ class Compositor:
                    anchor="mm")
 
     def _subtitulo(self, img, d, t):
-        txt = next((s for a, b, s in self._subs if a <= t < b), None)
-        if not txt:
+        """Frase corta en pantalla con la palabra que se está diciendo resaltada (estilo karaoke)."""
+        trozo = next((c for c in self._subs if c["ini"] <= t < c["fin"]), None)
+        if not trozo:
             return
-        f = _ajustar(txt, "Black", 56, 880)
-        lineas = [txt]
-        if f.size < 46 and len(txt.split()) > 2:  # en dos líneas si no cabe grande
-            pal = txt.split()
-            mitad = len(pal) // 2
-            lineas = [" ".join(pal[:mitad]), " ".join(pal[mitad:])]
-            f = _ajustar(max(lineas, key=len), "Black", 56, 880)
-        alto = len(lineas) * (f.size + 14)
-        anchomax = max(f.getlength(l) for l in lineas)
-        d.rounded_rectangle([ANCHO / 2 - anchomax / 2 - 28, SUB_Y - 18, ANCHO / 2 + anchomax / 2 + 28,
-                             SUB_Y + alto + 8], radius=26, fill=(0, 0, 0, 165))
-        for k, l in enumerate(lineas):
-            x = ANCHO / 2 - f.getlength(l) / 2
-            y = SUB_Y + k * (f.size + 14)
-            for palabra in l.split(" "):
-                color = ACENTO if re.search(r"\d", palabra) else (255, 255, 255)
-                d.text((x, y), palabra, font=f, fill=color)
-                x += f.getlength(palabra + " ")
+        palabras = trozo["palabras"]
+        txt = " ".join(w for _, _, w in palabras)
+        f = _ajustar(txt, "Black", 62, 900)
+        lineas = [palabras]
+        if f.size < 50 and len(palabras) > 2:
+            mitad = (len(palabras) + 1) // 2
+            lineas = [palabras[:mitad], palabras[mitad:]]
+            f = _ajustar(max((" ".join(w for _, _, w in l) for l in lineas), key=len), "Black", 62, 900)
+        actual = max((k for k, (a, _, _) in enumerate(palabras) if a <= t), default=0)
+        alto = len(lineas) * (f.size + 16)
+        anchomax = max(f.getlength(" ".join(w for _, _, w in l)) for l in lineas) * 1.04
+        d.rounded_rectangle([ANCHO / 2 - anchomax / 2 - 30, SUB_Y - 20, ANCHO / 2 + anchomax / 2 + 30,
+                             SUB_Y + alto + 8], radius=28, fill=(0, 0, 0, 175))
+        k_global = 0
+        espacio = f.getlength(" ") * 1.5   # algo más de aire para que el resaltado no pegue las palabras
+        for n, l in enumerate(lineas):
+            ancho_linea = sum(f.getlength(w) for _, _, w in l) + espacio * (len(l) - 1)
+            x = ANCHO / 2 - ancho_linea / 2
+            y = SUB_Y + n * (f.size + 16)
+            for _, _, palabra in l:
+                ancho = f.getlength(palabra)
+                if k_global == actual:
+                    d.rounded_rectangle([x - 5, y - 2, x + ancho + 5, y + f.size + 10], radius=12, fill=ACENTO)
+                    d.text((x, y), palabra, font=f, fill=(15, 25, 50))
+                else:
+                    d.text((x, y), palabra, font=f, fill=(255, 255, 255))
+                x += ancho + espacio
+                k_global += 1
+
+
+def _palabras_aproximadas(p) -> list:
+    """Si la voz no trae marcas de tiempo por palabra, se reparten según la longitud de cada palabra."""
+    pal = p["texto"].split()
+    pesos = [len(w) + 2 for w in pal]
+    dur, t, out = p["fin"] - p["inicio"], p["inicio"], []
+    for w, pe in zip(pal, pesos):
+        dd = dur * pe / sum(pesos)
+        out.append((t, t + dd, w))
+        t += dd
+    return out
+
+
+def _subtitulos_karaoke(plan) -> list[dict]:
+    """Agrupa las palabras en frases cortas (máx. ~26 caracteres, corte en signos de puntuación)."""
+    trozos = []
+    for p in plan:
+        palabras = p.get("palabras") or _palabras_aproximadas(p)
+        actual = []
+        for w in palabras:
+            prueba = " ".join(x[2] for x in actual + [w])
+            if actual and (len(prueba) > 26 or re.search(r"[.,;:!?]$", actual[-1][2])):
+                trozos.append(actual)
+                actual = [w]
+            else:
+                actual.append(w)
+        if actual:
+            trozos.append(actual)
+    out = []
+    for i, tr in enumerate(trozos):
+        fin = trozos[i + 1][0][0] if i + 1 < len(trozos) else tr[-1][1] + 0.4
+        if fin - tr[-1][1] > 0.6:  # pausa larga: el texto no se queda colgado
+            fin = tr[-1][1] + 0.3
+        out.append({"ini": tr[0][0] - 0.05, "fin": fin, "palabras": tr})
+    return out
 
 
 def renderizar(comp: Compositor, audio: Path, salida: Path, total: float):

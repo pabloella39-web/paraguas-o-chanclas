@@ -16,7 +16,7 @@ from pathlib import Path
 
 from . import descripcion
 from . import guion as g
-from . import musica, voz
+from . import eleven, musica, voz
 from .config import (DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, FPS, RAIZ, SEGMENTOS, VOCES,
                      voz_del_dia)
 from .fuentes import obtener_previsiones, previsiones_demo
@@ -25,10 +25,68 @@ from .video import Compositor, renderizar
 
 log = logging.getLogger("tiempo")
 
-INICIO = 0.45      # la voz arranca tras el golpe de título
+INICIO = 0.12      # la voz arranca desde el primer instante (retención: nada de segundos muertos)
+COLA_ELEVEN = 1.3  # cola tras la despedida con la toma continua de ElevenLabs
 PAUSA = 0.35       # respiración entre bloques (fija: ya no se estira para rellenar)
 COLA_MIN = 1.2     # tras la despedida (tarjeta de "sígueme")
 VEL_MIN, VEL_MAX = 10, 35  # nunca más lenta de +10 %: si sobra tiempo, se alarga el guion
+
+
+def secuencia(guion: dict) -> list[str]:
+    """Gancho, regiones de más a menos relevantes, la 'recompensa' (más calor y más frío) y la despedida."""
+    orden = guion.get("orden") or [s for s in SEGMENTOS if s not in ("intro", "general", "cierre")]
+    return [s for s in ("intro", *orden, "general", "cierre") if str(guion["segmentos"].get(s, "")).strip()]
+
+
+def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
+    """Guion de la longitud justa ANTES de sintetizar (para gastar los mínimos créditos) y una sola toma."""
+    objetivo = DURACION_OBJETIVO - INICIO - COLA_ELEVEN - 0.2
+    meta = eleven.ritmo(eleven.voz_id(tipo_voz)) * objetivo   # caracteres que caben
+    factor, guion, bloques = 1.0, None, []
+    for intento in range(3):
+        guion = g.escribir_guion(prev, hoy, texto_aemet, factor, VOCES[tipo_voz]["presenta"])
+        bloques = secuencia(guion)
+        largo = eleven.longitud_hablada([guion["segmentos"][s] for s in bloques])
+        log.info("Guion %d (%s): %d caracteres hablados (objetivo ≈ %d)", intento + 1, guion.get("origen"), largo, meta)
+        if abs(largo - meta) / meta <= 0.08 or guion.get("origen") != "claude":
+            break
+        factor *= meta / largo
+    textos = [guion["segmentos"][s] for s in bloques]
+    wav, dur, lim, pal = eleven.sintetizar(textos, tipo_voz, trabajo, "1")
+    if not 0.88 * objetivo <= dur <= 1.12 * objetivo and guion.get("origen") == "claude":
+        # Muy lejos de la duración (raro): un segundo intento con el ritmo ya corregido
+        log.info("Toma de %.1f s (objetivo %.1f): se ajusta el guion y se repite una vez", dur, objetivo)
+        guion = g.escribir_guion(prev, hoy, texto_aemet, factor * objetivo / dur, VOCES[tipo_voz]["presenta"])
+        bloques = secuencia(guion)
+        textos = [guion["segmentos"][s] for s in bloques]
+        wav, dur, lim, pal = eleven.sintetizar(textos, tipo_voz, trabajo, "2")
+    return guion, bloques, wav, dur, lim, pal
+
+
+def plan_eleven(bloques, wav, dur, lim, pal):
+    """Encaja la toma en 65-70 s: ajuste fino con atempo (sin cambiar el tono) y cola al final."""
+    max_habla = DURACION_MAX - 0.6 - INICIO - COLA_ELEVEN
+    min_habla = DURACION_MIN + 0.4 - INICIO - 4.0   # como mucho 4 s de tarjeta final
+    tempo = 1.0
+    if dur > max_habla:
+        tempo = dur / max_habla
+    elif dur < min_habla:
+        tempo = max(dur / min_habla, 0.92)
+    if tempo > 1.15:
+        raise RuntimeError(f"La locución dura {dur:.1f} s: demasiado larga")
+    if abs(tempo - 1) > 0.002:
+        log.info("Ajustando la toma x%.3f", tempo)
+        wav = voz.acelerar(wav, tempo)
+        dur = voz.duracion(wav)
+        lim = [(a / tempo, b / tempo) for a, b in lim]
+        pal = [[(a / tempo, b / tempo, w) for a, b, w in p] for p in pal]
+    plan = [{"seg": s, "inicio": INICIO + a, "fin": INICIO + b, "wav": None,
+             "palabras": [(INICIO + x, INICIO + y, w) for x, y, w in p]} for s, (a, b), p in zip(bloques, lim, pal)]
+    plan[-1]["fin"] = INICIO + dur
+    total = round(max(INICIO + dur + COLA_ELEVEN, DURACION_MIN + 0.4) * FPS) / FPS
+    if not DURACION_MIN + 0.2 <= total <= DURACION_MAX - 0.2:
+        raise RuntimeError(f"Duración fuera de rango: {total:.2f} s")
+    return plan, total, wav
 
 
 def _habla_objetivo(n_bloques: int) -> float:
@@ -44,9 +102,8 @@ def generar_locucion(prev, hoy, texto_aemet, trabajo: Path, demo: bool, tipo_voz
                  else g.escribir_guion(prev, hoy, texto_aemet, factor, VOCES[tipo_voz]["presenta"]))
         if plantilla:
             guion["origen"] = "plantilla"
-        # Regiones en el orden de relevancia del día (lo más destacado primero)
-        secuencia = ["intro", "general", *guion.get("orden", SEGMENTOS[2:-1]), "cierre"]
-        bloques = [s for s in secuencia if guion["segmentos"].get(s, "").strip()]
+        # Gancho, regiones en orden de relevancia, recompensa final y despedida
+        bloques = secuencia(guion)
         objetivo = _habla_objetivo(len(bloques))
         vel = voz.velocidad_base()
         for ajuste in range(3):
@@ -109,21 +166,34 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
     voz.elegir_voz(VOCES[tipo_voz])
     log.info("Voz del día: %s (%s)", tipo_voz, VOCES[tipo_voz]["edge"])
-    guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz)
-    try:
-        plan, total = planificar(bloques, wavs, durs)
-    except RuntimeError as e:
-        log.warning("%s → se usa la plantilla", e)  # red de seguridad: el parte sale igual
-        guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz, plantilla=True)
-        plan, total = planificar(bloques, wavs, durs)
+    plan, motor = None, "edge-tts"
+    if not demo and eleven.disponible(tipo_voz):
+        try:
+            guion, bloques, wav, dur, lim, pal = generar_eleven(prev, hoy, texto_aemet, trabajo, tipo_voz)
+            plan, total, wav = plan_eleven(bloques, wav, dur, lim, pal)
+            trozos, motor = [(wav, INICIO)], f"elevenlabs ({eleven.modelo()})"
+        except Exception as e:  # noqa: BLE001
+            log.warning("ElevenLabs no disponible (%s): se usa la voz gratuita", e)
+            plan = None
+    if plan is None:
+        guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz)
+        try:
+            plan, total = planificar(bloques, wavs, durs)
+        except RuntimeError as e:
+            log.warning("%s → se usa la plantilla", e)  # red de seguridad: el parte sale igual
+            guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz,
+                                                          plantilla=True)
+            plan, total = planificar(bloques, wavs, durs)
+        trozos = [(p["wav"], p["inicio"]) for p in plan]
     for p in plan:
         p["texto"] = guion["segmentos"][p["seg"]]
+    log.info("Voz: %s · orden: %s", motor, " → ".join(p["seg"] for p in plan))
 
     audio = trabajo / "pista.wav"
-    voz.montar_pista([(p["wav"], p["inicio"]) for p in plan], total, musica.generar(total), audio)
+    voz.montar_pista(trozos, total, musica.generar(total), audio)
 
     extremos = {"calor": max(prev, key=lambda c: c["tmax"]), "frio": min(prev, key=lambda c: c["tmin"])}
-    comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos)
+    comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)
@@ -136,6 +206,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     meta = {"fecha": hoy.isoformat(), "duracion": round(real, 2), "video": str(video), "caption": caption,
             "portada_ms": 0,  # el primer fotograma es la portada con la fecha
             "origen_guion": guion.get("origen"),
+            "motor_voz": motor,
+            "titular": guion.get("titular"),
             "voz": tipo_voz,
             "guion": {p["seg"]: p["texto"] for p in plan}}
     (salida / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
