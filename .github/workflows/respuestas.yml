@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "7 7-21 * * *"
   workflow_dispatch:
+    inputs:
+      comprobar:
+        description: "Solo comprobar (leer comentarios, sin publicar)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -48,7 +53,12 @@ jobs:
           UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
           RESPUESTAS_POR_HORA: ${{ vars.RESPUESTAS_POR_HORA || '3' }}
           RESPUESTAS_POR_DIA: ${{ vars.RESPUESTAS_POR_DIA || '6' }}
-        run: python -m tiempo.respuestas --publicar
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then
+            python -m tiempo.respuestas --comprobar
+          else
+            python -m tiempo.respuestas --publicar
+          fi
       - name: Guardar estado
         if: always() && steps.up.outputs.ok == 'true'
         run: |

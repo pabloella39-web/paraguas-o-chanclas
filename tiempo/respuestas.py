@@ -462,6 +462,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--publicar", action="store_true")
     ap.add_argument("--demo", action="store_true", help="vídeo de ejemplo sin red")
+    ap.add_argument("--comprobar", action="store_true", help="solo lee vídeos y comentarios (no publica nada)")
     ap.add_argument("--salida", default=str(RAIZ / "salida_respuestas"))
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -484,6 +485,22 @@ def main():
 
     if not uploadpost.disponible():
         print("::notice::Respuestas en vídeo: falta UPLOADPOST_API_KEY (Upload-Post lee los comentarios de TikTok)")
+        return
+    if a.comprobar:
+        perfil = uploadpost.perfil("tiempo")
+        for ruta, params in (("uploadposts/media", {"platform": "tiktok", "user": perfil, "limit": 5}),):
+            try:
+                j = _get(ruta, **params)
+                print(f"::notice::{ruta}: claves {list(j)[:8]} · {json.dumps(j, ensure_ascii=False)[:600]}")
+            except Exception as e:  # noqa: BLE001
+                print(f"::error::{ruta}: {e}")
+        ids = videos_recientes()
+        print(f"::notice::Vídeos de TikTok encontrados: {ids}")
+        coms = comentarios_nuevos({"vistos": []})
+        print(f"::notice::Comentarios leídos: {len(coms)} · ejemplos: "
+              f"{json.dumps([c['texto'][:60] for c in coms[:6]], ensure_ascii=False)}")
+        preg = detectar(coms)
+        print(f"::notice::Preguntas por un lugar: {json.dumps([(q['usuario'], q['lugar']) for q in preg], ensure_ascii=False)}")
         return
     estado = _cargar()
     hoy_ = ahora()
