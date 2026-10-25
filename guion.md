@@ -1,0 +1,37 @@
+# EL POSTE QUE NO EXISTE (ficcion, narra: hombre)
+
+## PARTE 1 — pantalla: ME LLAMÓ UN POSTE QUE NO EXISTE
+
+A las dos y diez, me llamó un poste que no existe. Me llamo Andrés, llevo la grúa de guardia en Soria y conozco cada curva de la carretera vieja.  [foto: orange emergency phone road]
+La centralita me pasó la llamada sin pensar. Una voz de mujer, rota, con el viento silbando detrás:  [foto: telephone switchboard night]
+«Kilómetro cuarenta y uno. Mi hija duerme atrás. Dese prisa... que viene él.» Y se cortó. Un pitido largo.  [foto: highway emergency call box]
+Escucha bien. Esa carretera la cerraron cuando abrieron la autovía. Los postes naranjas los arrancaron todos. Yo mismo cargué alguno en la grúa.  [foto: abandoned road spain]
+Y aun así fui. Tú también habrías ido. Una niña dormida en un coche, a cuatro grados bajo cero.  [foto: frost car window]
+El asfalto estaba lleno de grietas. El parachoques abollado de la grúa vibraba, ese golpe que nunca llegué a arreglar.  [foto: cracked asphalt road night]
+En la curva del cuarenta y uno, unas luces de emergencia parpadeaban. Un Seat Ibiza rojo. Motor apagado. Puerta trasera abierta.  [foto: car hazard lights night]
+La sillita estaba vacía. Y todavía caliente. Sobre el salpicadero había una tarjeta de mi empresa, de las antiguas, de hace ocho años.  [foto: empty child car seat]
+💥 Le di la vuelta. Alguien había escrito detrás, con letra temblorosa: «Andrés... esta vez no la remolques.»  [foto: old business card]
+
+## PARTE 2 — pantalla: LA LLAMADA SALIÓ DE MI MÓVIL
+
+«Esta vez.» Me quedé mirando esas dos palabras mientras las luces de emergencia me teñían las manos de naranja.  [foto: hazard lights orange glow]
+Llamé a la central. Marisa contestó medio dormida: «¿Qué llamada, Andrés? Esta noche no ha entrado nada. Nada.»  [foto: dispatch office night]
+Pero yo había hablado con esa mujer. Le dije que mirara el registro. Silencio. Teclas. Y luego su voz, distinta:  [foto: computer keyboard dark]
+💥 «Hay una llamada a las dos y diez. Pero no la ha recibido la central, Andrés. Ha salido de tu móvil.»  [foto: mobile phone dark]
+Colgué. Me temblaba la linterna. La enfoqué hacia la matrícula del Ibiza, y el estómago se me cerró como un puño.  [foto: flashlight license plate]
+La conocía. Hace ocho años remolqué ese mismo coche desde esta misma curva. Un accidente. Una mujer muerta. Yo fui el primero en llegar.  [foto: mountain road curve]
+Y la niña... a la niña no la encontraron nunca. Ni en el coche, ni en el monte. Tampoco su zapatilla rosa.  [foto: foggy pine forest night]
+Esa noche yo había bebido. No recuerdo cómo llegué. Solo recuerdo el frío. Detrás de mí, en la cabina de la grúa, algo crujió.  [foto: tow truck cab night]
+💥 La cortina de la litera se movió. Y una vocecita, muy bajito, dijo: «¿Ya ha venido mi mamá?»  [foto: truck sleeper curtain]
+
+## PARTE 3 — pantalla: OCHO AÑOS DURMIENDO ENCIMA DE ELLA
+
+Abrí la cortina de un tirón. La litera estaba vacía. Pero las sábanas tenían la forma de un cuerpo pequeño.  [foto: empty bunk bed sheets]
+💥 Y debajo de la almohada, donde nunca miro, había algo de tela. Rosa. Con el cordón deshecho. Una zapatilla de niña.  [foto: pink child sneaker]
+Llevaba ocho años durmiendo encima de ella. Me sonó el móvil. Número oculto. Era la mujer otra vez.  [foto: phone ringing dark]
+«No te llamé para que vinieras a ayudarme, Andrés. Te llamé para que recordaras. Mira tu parachoques.»  [foto: dented truck bumper]
+Lo enfoqué. Ese golpe que nunca arreglé. Tenía restos de pintura. Roja. El mismo rojo del Ibiza. Y entonces volvió todo.  [foto: red paint scratch metal]
+💥 La curva. Las copas de más. El impacto. Y yo, remolcando el coche yo mismo antes de que llegara nadie. Él era yo.  [foto: sharp road curve night]
+Lo que pasó con la niña después... eso no lo recuerdo. Y no quiero saber por qué su zapatilla dormía conmigo.  [foto: dark forest road fog]
+Al amanecer llegaron las luces azules de la Guardia Civil. Marisa los había avisado. Ahora te cuento esto desde una celda.  [foto: police lights night]
+Pero cada noche, a las dos y diez, el teléfono suena. Y una niña pregunta si ya ha venido su mamá. ¿Tú habrías ido a esa curva?  [foto: old wall telephone corridor]
