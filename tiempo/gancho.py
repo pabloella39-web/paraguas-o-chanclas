@@ -21,6 +21,16 @@ ICONO_FENOMENO = {"tormentas": "tormenta", "lluvias": "lluvia", "nevadas": "niev
                   "nieblas": "niebla", "polvo": "niebla", "aludes": "nieve"}
 
 
+# Cómo se dice cada fenómeno de AEMET (en pantalla y en voz)
+NOMBRE_FENOMENO = {"costeros": "oleaje", "vientos": "viento", "lluvias": "lluvia", "tormentas": "tormentas",
+                   "nevadas": "nieve", "temperaturas máximas": "calor", "temperaturas mínimas": "frío",
+                   "nieblas": "niebla", "polvo": "polvo en suspensión", "aludes": "aludes", "galernas": "galerna"}
+
+
+def nombre_fenomeno(f: str) -> str:
+    return NOMBRE_FENOMENO.get(f.lower().strip(), f.lower())
+
+
 def avisos_de_hoy(hoy) -> list[dict]:
     """Avisos de AEMET (amarillos, naranjas y rojos) vigentes hoy, agrupados por fenómeno y nivel."""
     clave = os.environ.get("AEMET_API_KEY", "").strip()
@@ -75,9 +85,9 @@ def fenomeno_del_dia(prev: list[dict], avisos: list[dict] | None = None) -> dict
         else:
             resto = len(a["zonas"]) - 1
             dato = zona.upper() + (f" Y {resto} ZONA{'S' if resto > 1 else ''} MÁS" if resto else "")
-        return {"icono": icono, "efecto": icono, "insignia": f"AVISO {a['nivel'].upper()} · {a['fenomeno'].upper()}",
+        return {"icono": icono, "efecto": icono, "insignia": f"AVISO {a['nivel'].upper()} · {nombre_fenomeno(a['fenomeno']).upper()}",
                 "color": COLOR_NIVEL[a["nivel"]], "dato": dato,
-                "ciudades": ciudades, "motivo": f"aviso {a['nivel']} por {a['fenomeno']} en {', '.join(a['zonas'][:4])}",
+                "ciudades": ciudades, "motivo": f"aviso {a['nivel']} por {nombre_fenomeno(a['fenomeno'])} en {', '.join(a['zonas'][:4])}",
                 "nivel": a["nivel"]}
     def top(clave, filtro, rev=True):
         lista = [c for c in prev if filtro(c)]

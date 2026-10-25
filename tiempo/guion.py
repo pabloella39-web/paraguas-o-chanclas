@@ -157,6 +157,10 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
     """factor < 1 pide un guion más corto; > 1 más largo (para ajustar la duración)."""
     palabras = {k: max(6, round(v * factor)) for k, v in PALABRAS.items()}
     orden, info = orden_regiones(prev, texto_aemet, hoy)
+    if GANCHO and GANCHO.get("ciudades"):  # la región del gancho va primero (el mapa acompaña a la voz)
+        region = next((c["region"] for c in prev if c["nombre"] == GANCHO["ciudades"][0]), None)
+        if region in orden:
+            orden = [region] + [r for r in orden if r != region]
     log.info("Orden de regiones hoy: %s", ", ".join(f"{r} ({info[r]['puntos']})" for r in orden))
     clave = os.environ.get("ANTHROPIC_API_KEY", "")
     if clave:
@@ -262,6 +266,10 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
                        else "De lluvia, poca cosa.")),
     }
     orden, info = orden_regiones(prev, texto_aemet, hoy)
+    if GANCHO and GANCHO.get("ciudades"):  # la región del gancho va primero (el mapa acompaña a la voz)
+        region = next((c["region"] for c in prev if c["nombre"] == GANCHO["ciudades"][0]), None)
+        if region in orden:
+            orden = [region] + [r for r in orden if r != region]
     zonas = {"norte": "el norte", "interior": "el interior", "mediterraneo": "el Mediterráneo", "sur": "el sur",
              "islas": "las islas"}
     intros = {}
