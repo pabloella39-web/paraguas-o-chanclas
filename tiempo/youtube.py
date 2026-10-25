@@ -93,9 +93,11 @@ def subir(video: Path, titulo: str, descripcion: str, etiquetas: list[str], cana
                                                                   "Content-Length": str(tam)}, timeout=600)
     if r2.status_code not in (200, 201):
         raise RuntimeError(f"YouTube (subida) HTTP {r2.status_code}: {r2.text[:300]}")
-    vid = r2.json()["id"]
-    log.info("Subido a YouTube Shorts: https://youtube.com/shorts/%s", vid)
-    return {"id": vid, "url": f"https://youtube.com/shorts/{vid}"}
+    j2 = r2.json()
+    vid = j2["id"]
+    canal_yt = (j2.get("snippet") or {}).get("channelTitle")
+    log.info("Subido a YouTube Shorts (%s): https://youtube.com/shorts/%s", canal_yt, vid)
+    return {"id": vid, "url": f"https://youtube.com/shorts/{vid}", "canal": canal_yt}
 
 
 def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: list[str], intentos: int = 3,
