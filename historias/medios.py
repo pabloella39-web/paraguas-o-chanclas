@@ -88,21 +88,26 @@ def tratar(im: Image.Image, tipo: str) -> Image.Image:
     return Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8))
 
 
-def imagenes_para(escenas: list[str], tipo: str, usadas: set[str]) -> list[Image.Image]:
+def imagenes_para(escenas: list[str], tipo: str, usadas: set) -> list[Image.Image | None]:
+    """Una imagen por escena, en el mismo orden (None si no se encontró ninguna)."""
     out = []
     for esc in escenas:
         candidatos = buscar_imagenes(esc)
         if not candidatos and len(esc.split()) > 1:  # segundo intento, más general ("dark mill interior" → "mill interior")
             candidatos = buscar_imagenes(" ".join(esc.split()[-2:])) or buscar_imagenes(esc.split()[-1])
+        elegida = None
         for info in candidatos:
             if info.get("id") in usadas:
                 continue
             im = descargar(info)
             if im is not None:
                 usadas.add(info.get("id"))
-                out.append(tratar(im, tipo))
+                elegida = tratar(im, tipo)
                 log.info("Imagen '%s': %s (%s)", esc, info.get("title", "")[:50], info.get("license"))
                 break
+        if elegida is None:
+            log.info("Sin imagen para '%s'", esc)
+        out.append(elegida)
     return out
 
 
@@ -230,7 +235,7 @@ if __name__ == "__main__":  # prueba: python -m historias.medios "abandoned hous
     logging.basicConfig(level=logging.INFO)
     salida = Path("muestras_imagenes")
     salida.mkdir(exist_ok=True)
-    ims = imagenes_para(sys.argv[1:], "ficcion", set())
+    ims = [i for i in imagenes_para(sys.argv[1:], "ficcion", set()) if i is not None]
     for k, im in enumerate(ims):
         im.resize((540, 960)).save(salida / f"{k:02d}.jpg", quality=80)
     print(f"{len(ims)} de {len(sys.argv) - 1} imágenes")

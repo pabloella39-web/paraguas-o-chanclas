@@ -53,14 +53,24 @@ def _partir(txt, f, ancho):
 
 class Parte:
     def __init__(self, imagenes: list[Image.Image], palabras: list, voz_dur: float, total: float, *, titulo: str,
-                 n: int, de: int, tipo: str, semilla: int = 1):
+                 n: int, de: int, tipo: str, semilla: int = 1, inicios: list[float] | None = None,
+                 ambiente: str = ""):
         self.imgs, self.total, self.voz_dur = imagenes, total, voz_dur
         self.titulo, self.n, self.de, self.tipo = titulo, n, de, tipo
         self.palabras = [(a + INICIO_VOZ, b + INICIO_VOZ, w) for a, b, w in palabras]
         self.fin_voz = INICIO_VOZ + voz_dur
         rnd = np.random.default_rng(semilla)
-        # Cada foto ocupa el mismo tiempo de la narración; la última sigue bajo la tarjeta final
-        self.tramo = max(4.0, self.fin_voz / max(1, len(imagenes)))
+        # Cada foto entra cuando la narración llega al tramo de texto que ilustra (inicios, en s de locución);
+        # sin inicios, reparto uniforme. La última sigue bajo la tarjeta final.
+        if inicios and len(inicios) == len(imagenes):
+            self.inicios = [0.0] + [INICIO_VOZ + x for x in inicios[1:]]
+        else:
+            paso = max(4.0, self.fin_voz / max(1, len(imagenes)))
+            self.inicios = [k * paso for k in range(len(imagenes))]
+        self.inicios.append(total + TARJETA)
+        self.niebla = self._niebla(rnd)
+        self.lluvia = ambiente in ("lluvia", "tormenta")
+        self.relampagos = sorted(rnd.uniform(4, max(5, total - 6), size=3)) if ambiente == "tormenta" else []
         self.mov = [(rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.choice([1, -1])) for _ in imagenes]
         self.parpadeos = sorted(rnd.uniform(3, max(4, total - 5), size=max(2, int(total / 14))))
         self.grano = [self._grano(rnd) for _ in range(6)]
@@ -69,6 +79,26 @@ class Parte:
         self.grupos = self._grupos()
 
     # ------------------------------------------------------------ capas fijas
+    def _niebla(self, rnd):
+        base = rnd.random((ALTO // 48, ANCHO // 24)).astype(np.float32)
+        im = Image.fromarray((base * 255).astype(np.uint8)).resize((ANCHO * 2, ALTO), Image.BICUBIC)
+        im = im.filter(ImageFilter.GaussianBlur(40))
+        a = np.asarray(im).astype(np.float32) / 255
+        alfa = (np.clip(a - 0.35, 0, 1) * 150).astype(np.uint8)
+        capa = Image.new("RGBA", (ANCHO * 2, ALTO), (200, 205, 215, 0))
+        capa.putalpha(Image.fromarray(alfa))
+        return capa
+
+    def _gotas(self, t):
+        capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
+        d = ImageDraw.Draw(capa)
+        rnd = np.random.default_rng(int(t * FPS))
+        for _ in range(110):
+            x, y = rnd.uniform(-100, ANCHO), rnd.uniform(0, ALTO)
+            largo = rnd.uniform(40, 90)
+            d.line([(x, y), (x + largo * 0.25, y + largo)], fill=(200, 210, 225, int(rnd.uniform(40, 95))), width=2)
+        return capa
+
     def _grano(self, rnd):
         g = rnd.normal(0, 1, (ALTO // 2, ANCHO // 2)).astype(np.float32)
         a = np.clip(np.abs(g) * 14, 0, 34).astype(np.uint8)
@@ -128,10 +158,11 @@ class Parte:
 
     # ------------------------------------------------------------ fotogramas
     def _foto(self, i: int, t: float) -> Image.Image:
-        im = self.imgs[min(i, len(self.imgs) - 1)]
+        i = min(i, len(self.imgs) - 1)
+        im = self.imgs[i]
         W, H = im.size
-        local = max(0.0, t - i * self.tramo)
-        p = min(1.0, local / (self.tramo + FUNDIDO + (TARJETA if i == len(self.imgs) - 1 else 0)))
+        local = max(0.0, t - self.inicios[i] + FUNDIDO)
+        p = min(1.0, local / (self.inicios[i + 1] - self.inicios[i] + 2 * FUNDIDO))
         dx, dy, zdir = self.mov[min(i, len(self.mov) - 1)]
         z = 1.0 + 0.07 * (p if zdir > 0 else 1 - p)
         cw, ch = W / 1.18 / z * 1.0, H / 1.18 / z
@@ -141,17 +172,24 @@ class Parte:
         return im.resize((ANCHO, ALTO), Image.BILINEAR, box=caja)
 
     def fotograma(self, t: float) -> Image.Image:
-        i = min(int(t // self.tramo), len(self.imgs) - 1)
+        i = max(k for k in range(len(self.imgs)) if self.inicios[k] <= t)
         img = self._foto(i, t)
         if i + 1 < len(self.imgs):
-            resto = (i + 1) * self.tramo - t
+            resto = self.inicios[i + 1] - t
             if resto < FUNDIDO:
                 img = Image.blend(img, self._foto(i + 1, t), 1 - resto / FUNDIDO)
+        for tr in self.relampagos:  # relámpago
+            if 0 <= t - tr < 0.25:
+                img = Image.blend(img, Image.new("RGB", (ANCHO, ALTO), (235, 240, 255)), 0.45 * (1 - (t - tr) / 0.25))
         for tp in self.parpadeos:  # parpadeo de luz
             if 0 <= t - tp < 0.35:
                 k = t - tp
                 img = Image.blend(img, self.negro, 0.55 if k < 0.08 or 0.16 < k < 0.22 else 0.15)
         img = img.convert("RGBA")
+        desp = int((t * 22) % ANCHO)  # niebla que se desplaza despacio
+        img.alpha_composite(self.niebla.crop((desp, 0, desp + ANCHO, ALTO)))
+        if self.lluvia:
+            img.alpha_composite(self._gotas(t))
         img.alpha_composite(self.grano[int(t * FPS / 3) % len(self.grano)])  # cambia cada 3 fotogramas
         img.alpha_composite(self.capa)
         d = ImageDraw.Draw(img)

@@ -140,13 +140,27 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
             pal = [(a / f, b / f, w) for a, b, w in pal]
             wav, dur = lenta, locucion.duracion(lenta)
         total = round(max(DURACION_MIN_PARTE + 0.4, INICIO_VOZ + dur + TARJETA), 2)
-        imgs = [] if demo else medios.imagenes_para(p["escenas"], h["tipo"], usadas)
-        while len(imgs) < 4:
-            imgs.append(medios.fondo_procedural(semilla + len(imgs) + 10 * k, h["tipo"]))
+        # Una imagen por tramo de texto, que entra cuando la voz empieza ese tramo
+        tramos = p.get("tramos") or [{"texto": p["texto"]}]
+        escenas = p.get("escenas") or ["dark night"] * len(tramos)
+        crudas = [None] * len(tramos) if demo else medios.imagenes_para(escenas, h["tipo"], usadas)
+        imgs, inicios, previa, idx = [], [], None, 0
+        for t_, im in zip(tramos, crudas):
+            t0 = pal[min(idx, len(pal) - 1)][0] if pal else 0.0
+            idx += len(t_["texto"].split())
+            if im is None:
+                if previa is not None:
+                    continue  # sin foto para este tramo: sigue la anterior
+                im = medios.fondo_procedural(semilla + 10 * k + len(imgs), h["tipo"])
+            imgs.append(im)
+            inicios.append(t0)
+            previa = im
+        log.info("Parte %d: %d de %d tramos con foto propia", k, sum(c is not None for c in crudas), len(tramos))
         audio = trabajo / f"mezcla{k}.wav"
         mezclar(wav, total, p["ambiente"], semilla + k, k < n, audio)
         video = salida / f"historia_{hoy.isoformat()}_parte{k}.mp4"
-        parte = Parte(imgs, pal, dur, total, titulo=h["titulo"], n=k, de=n, tipo=h["tipo"], semilla=semilla + k)
+        parte = Parte(imgs, pal, dur, total, titulo=h["titulo"], n=k, de=n, tipo=h["tipo"], semilla=semilla + k,
+                      inicios=inicios, ambiente=p["ambiente"])
         log.info("Parte %d/%d: %.1f s de voz, %.1f s de vídeo, %d imágenes", k, n, dur, total, len(imgs))
         renderizar(parte, audio, video)
         real = locucion.duracion(video)
