@@ -44,7 +44,8 @@ def _leer(ruta: Path) -> np.ndarray:
         return np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
 
 
-def mezclar(voz_wav: Path, total: float, ambiente: str, semilla: int, cliffhanger: bool, salida: Path):
+def mezclar(voz_wav: Path, total: float, ambiente: str, semilla: int, cliffhanger: bool, salida: Path,
+            sustos: list[float] = ()):
     SR = medios.SR
     n = int(total * SR)
     v = np.zeros(n, np.float32)
@@ -65,6 +66,11 @@ def mezclar(voz_wav: Path, total: float, ambiente: str, semilla: int, cliffhange
         j = int((fin_voz + 0.15) * SR)
         trozo = g[: max(0, n - j)]
         mezcla[j:j + len(trozo)] += trozo * 0.9
+    g2 = medios.golpe() if sustos else None
+    for ts in sustos:  # golpe en los momentos de susto (un poco más bajo que el del final)
+        j = int(max(0.0, ts - 0.05) * SR)
+        trozo = g2[: max(0, n - j)]
+        mezcla[j:j + len(trozo)] += trozo * 0.6
     fo = int(1.2 * SR)
     mezcla[-fo:] *= np.linspace(1, 0, fo)
     pico = np.max(np.abs(mezcla)) or 1
@@ -144,9 +150,11 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
         tramos = p.get("tramos") or [{"texto": p["texto"]}]
         escenas = p.get("escenas") or ["dark night"] * len(tramos)
         crudas = [None] * len(tramos) if demo else medios.imagenes_para(escenas, h["tipo"], usadas)
-        imgs, inicios, previa, idx = [], [], None, 0
+        imgs, inicios, previa, idx, sustos = [], [], None, 0, []
         for t_, im in zip(tramos, crudas):
             t0 = pal[min(idx, len(pal) - 1)][0] if pal else 0.0
+            if t_.get("susto") and len(sustos) < 2 and t0 > 3:
+                sustos.append(INICIO_VOZ + t0)
             idx += len(t_["texto"].split())
             if im is None:
                 if previa is not None:
@@ -157,10 +165,10 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
             previa = im
         log.info("Parte %d: %d de %d tramos con foto propia", k, sum(c is not None for c in crudas), len(tramos))
         audio = trabajo / f"mezcla{k}.wav"
-        mezclar(wav, total, p["ambiente"], semilla + k, k < n, audio)
+        mezclar(wav, total, p["ambiente"], semilla + k, k < n, audio, sustos)
         video = salida / f"historia_{hoy.isoformat()}_parte{k}.mp4"
         parte = Parte(imgs, pal, dur, total, titulo=h["titulo"], n=k, de=n, tipo=h["tipo"], semilla=semilla + k,
-                      inicios=inicios, ambiente=p["ambiente"])
+                      inicios=inicios, ambiente=p["ambiente"], gancho=p.get("gancho"), sustos=sustos)
         log.info("Parte %d/%d: %.1f s de voz, %.1f s de vídeo, %d imágenes", k, n, dur, total, len(imgs))
         renderizar(parte, audio, video)
         real = locucion.duracion(video)
@@ -218,6 +226,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--publicar", action="store_true")
     ap.add_argument("--prueba", action="store_true")
+    ap.add_argument("--solo-guion", action="store_true", help="escribe la historia y la guarda en texto (sin vídeo)")
     ap.add_argument("--youtube-desde", help="sube a YouTube las partes ya hechas (carpeta con meta.json y vídeos)")
     ap.add_argument("--ya", action="store_true", help="con --publicar: publicar al momento en vez de programar")
     ap.add_argument("--demo", action="store_true")
@@ -226,6 +235,17 @@ def main():
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     hoy = date.fromisoformat(a.fecha) if a.fecha else datetime.now(TZ).date()
+    if a.solo_guion:
+        h = guion.escribir(hoy, int(round(locucion.ritmo(voz()) * (sum(VOZ_OBJETIVO) / 2))))
+        txt = [f"# {h['titulo']} ({h['tipo']}, narra: {h.get('narrador')})", ""]
+        for k, p in enumerate(h["partes"], 1):
+            txt += [f"## PARTE {k} — pantalla: {p.get('gancho')}", ""]
+            txt += [("💥 " if t.get("susto") else "") + t["texto"] + f"  [foto: {t.get('imagen')}]" for t in p["tramos"]]
+            txt.append("")
+        Path(a.salida).mkdir(parents=True, exist_ok=True)
+        (Path(a.salida) / "guion.md").write_text("\n".join(txt), encoding="utf-8")
+        print("\n".join(txt))
+        return
     if a.youtube_desde:  # p. ej. la historia de hoy, ya publicada en TikTok antes de autorizar YouTube
         carpeta = Path(a.youtube_desde)
         meta = json.loads((carpeta / "meta.json").read_text(encoding="utf-8"))

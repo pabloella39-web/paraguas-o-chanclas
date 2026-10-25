@@ -57,8 +57,8 @@ def narrar(texto: str, voz: str, destino: Path):
                       headers={"xi-api-key": os.environ["ELEVENLABS_API_KEY"].strip(), "Content-Type": "application/json"},
                       json={"text": texto, "model_id": os.environ.get("ELEVEN_MODEL") or "eleven_v4",
                             "language_code": "es",
-                            "voice_settings": {"stability": 0.38, "similarity_boost": 0.8, "style": 0.45,
-                                               "use_speaker_boost": True, "speed": 0.97}}, timeout=300)
+                            "voice_settings": {"stability": 0.30, "similarity_boost": 0.8, "style": 0.62,
+                                               "use_speaker_boost": True, "speed": 1.0}}, timeout=300)
     if r.status_code != 200:
         raise RuntimeError(f"ElevenLabs HTTP {r.status_code}: {r.text[:300]}")
     j = r.json()

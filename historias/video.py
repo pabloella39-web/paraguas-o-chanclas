@@ -54,7 +54,7 @@ def _partir(txt, f, ancho):
 class Parte:
     def __init__(self, imagenes: list[Image.Image], palabras: list, voz_dur: float, total: float, *, titulo: str,
                  n: int, de: int, tipo: str, semilla: int = 1, inicios: list[float] | None = None,
-                 ambiente: str = ""):
+                 ambiente: str = "", gancho: str | None = None, sustos: list[float] = ()):
         self.imgs, self.total, self.voz_dur = imagenes, total, voz_dur
         self.titulo, self.n, self.de, self.tipo = titulo, n, de, tipo
         self.palabras = [(a + INICIO_VOZ, b + INICIO_VOZ, w) for a, b, w in palabras]
@@ -69,6 +69,8 @@ class Parte:
             self.inicios = [k * paso for k in range(len(imagenes))]
         self.inicios.append(total + TARJETA)
         self.niebla = self._niebla(rnd)
+        self.gancho = (gancho or "").strip().upper()
+        self.sustos = list(sustos)  # momentos de sobresalto: fogonazo, zoom brusco y temblor
         self.lluvia = ambiente in ("lluvia", "tormenta")
         self.relampagos = sorted(rnd.uniform(4, max(5, total - 6), size=3)) if ambiente == "tormenta" else []
         self.mov = [(rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.choice([1, -1])) for _ in imagenes]
@@ -168,8 +170,21 @@ class Parte:
         cw, ch = W / 1.18 / z * 1.0, H / 1.18 / z
         cx = W / 2 + dx * (W - cw) / 2 * (p - 0.5)
         cy = H / 2 + dy * (H - ch) / 2 * (p - 0.5)
+        golpe = self._golpe(t)
+        if golpe > 0:  # zoom brusco y temblor en el susto
+            z2 = 1 + 0.16 * golpe
+            cw, ch = cw / z2, ch / z2
+            cx += math.sin(t * 90) * 18 * golpe
+            cy += math.cos(t * 77) * 14 * golpe
         caja = (cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2)
         return im.resize((ANCHO, ALTO), Image.BILINEAR, box=caja)
+
+    def _golpe(self, t: float) -> float:
+        """1 justo en el susto y cae a 0 en 0,6 s."""
+        for ts in self.sustos:
+            if 0 <= t - ts < 0.6:
+                return (1 - (t - ts) / 0.6) ** 2
+        return 0.0
 
     def fotograma(self, t: float) -> Image.Image:
         i = max(k for k in range(len(self.imgs)) if self.inicios[k] <= t)
@@ -178,6 +193,10 @@ class Parte:
             resto = self.inicios[i + 1] - t
             if resto < FUNDIDO:
                 img = Image.blend(img, self._foto(i + 1, t), 1 - resto / FUNDIDO)
+        golpe = self._golpe(t)
+        if golpe > 0.55:  # fogonazo: blanco y luego rojo
+            img = Image.blend(img, Image.new("RGB", (ANCHO, ALTO), (255, 255, 255) if golpe > 0.85 else (150, 0, 0)),
+                              0.55 * golpe)
         for tr in self.relampagos:  # relámpago
             if 0 <= t - tr < 0.25:
                 img = Image.blend(img, Image.new("RGB", (ANCHO, ALTO), (235, 240, 255)), 0.45 * (1 - (t - tr) / 0.25))
@@ -199,13 +218,26 @@ class Parte:
             ov = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, int(150 * a)))
             img.alpha_composite(ov)
             d = ImageDraw.Draw(img)
-            f = _ajustar(self.titulo, "maquina", 120, 960)
-            lineas = _partir(self.titulo, f, 960)
-            y = ALTO // 2 - len(lineas) * (f.size + 10) // 2 - 60
+            # La frase gancho manda (golpe de zoom al entrar); el título y la parte, debajo y más pequeños
+            principal = self.gancho or self.titulo
+            entra = min(1.0, t / 0.25)
+            tam = int(118 * (1.25 - 0.25 * entra))
+            f = fuente("maquina", tam)
+            lineas = _partir(principal, f, 960)
+            while (len(lineas) > 4 or max(f.getlength(l) for l in lineas) > 980) and tam > 50:
+                tam -= 6
+                f = fuente("maquina", tam)
+                lineas = _partir(principal, f, 960)
+            y = ALTO // 2 - len(lineas) * (f.size + 12) // 2 - 120
             for k, ln in enumerate(lineas):
-                d.text((ANCHO // 2, y + k * (f.size + 10)), ln, font=f, fill=BLANCO + (int(255 * a),), anchor="ma",
-                       stroke_width=4, stroke_fill=(0, 0, 0, int(255 * a)))
-            d.text((ANCHO // 2, y + len(lineas) * (f.size + 10) + 40), f"PARTE {self.n}", font=fuente("Black", 64),
+                d.text((ANCHO // 2, y + k * (f.size + 12)), ln, font=f, fill=BLANCO + (int(255 * a),), anchor="ma",
+                       stroke_width=5, stroke_fill=(0, 0, 0, int(255 * a)))
+            y2 = y + len(lineas) * (f.size + 12) + 50
+            if self.gancho:
+                ft = _ajustar(self.titulo, "Black", 46, 900)
+                d.text((ANCHO // 2, y2), self.titulo, font=ft, fill=(220, 220, 220, int(255 * a)), anchor="ma")
+                y2 += ft.size + 24
+            d.text((ANCHO // 2, y2), f"PARTE {self.n} DE {self.de}", font=fuente("Black", 60),
                    fill=ROJO + (int(255 * a),), anchor="ma")
         # Subtítulos
         elif t < self.fin_voz + 0.3:

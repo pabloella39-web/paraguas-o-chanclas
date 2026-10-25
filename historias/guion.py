@@ -12,7 +12,8 @@ import requests
 from .config import HISTORIAL, PALABRAS_PARTE, tipo_del_dia
 
 log = logging.getLogger(__name__)
-MODELO = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5-5")
+# El modelo más capaz para escribir: la calidad de la historia es lo que retiene al público
+MODELO = os.environ.get("HISTORIAS_MODELO", "claude-opus-5-5")
 
 AMBIENTES = ["lluvia", "tormenta", "viento", "bosque_noche", "casa_crujidos", "sotano_goteo", "ciudad_noche",
              "carretera_noche", "mar_noche", "pueblo_silencio", "hospital", "iglesia"]
@@ -37,24 +38,48 @@ Historias ya contadas (NO repitas tema ni giro): {usadas}
 
 FORMATO: la historia se divide en {partes_txt} partes que se publican el mismo día; cada parte es un vídeo de algo
 más de un minuto. Cada parte tiene ENTRE {pmin} Y {pmax} PALABRAS (es crucial: menos de {pmin} no llega al minuto).
-- Parte 1: la PRIMERA FRASE es el gancho: algo inquietante y concreto que obligue a quedarse (nada de "hola" ni
-  "hoy os traigo"; empieza en mitad de la tensión). Presenta personaje, lugar y época con detalles sensoriales.
-- Partes intermedias: empiezan con UNA frase que recuerda dónde lo dejamos (sin decir "en la parte anterior").
-- Todas las partes menos la última acaban en un momento de máxima tensión (cliffhanger), cortado en seco.
-- La última parte da un final redondo con un giro o un remate escalofriante, y termina con una frase corta que
-  invite a comentar (ej. "¿Tú habrías abierto esa puerta?").
-ESTILO: narración oral para voz sintética: frases cortas y medias, ritmo que se acelera en la tensión, pausas con
-puntos suspensivos (sin abusar), segunda persona de vez en cuando para meter al espectador. Nada de listas, siglas,
-símbolos, emojis ni acotaciones entre corchetes o paréntesis. Números escritos con letras. Sin gore explícito ni
-violencia sexual: el miedo viene de lo que se insinúa. Apto para mayores de 16.
+
+OBJETIVO: que NADIE deslice. La gente decide en un segundo y se va a los tres si se aburre. Nada de historias
+paradas, descriptivas o previsibles: tiene que ser ESPECTACULAR, adictiva y crear expectación real.
+
+ESTRUCTURA OBLIGATORIA DE CADA PARTE:
+- Segundo 0: la PRIMERA FRASE (máx. 12 palabras) es un puñetazo: un hecho imposible, una amenaza, una cuenta atrás
+  o un detalle que no encaja ("A las tres y doce, alguien llamó desde dentro de mi casa."). Nunca empieces con
+  presentaciones, el tiempo que hacía o "me llamo...". En la parte 1 la presentación del personaje llega DESPUÉS del
+  gancho y en una sola frase.
+- Bucle abierto: en las primeras líneas deja una pregunta sin responder que obligue a seguir (qué hay detrás de la
+  puerta, quién envía los mensajes, por qué falta una foto...). Respóndela tarde o nunca dentro de la parte.
+- Escalada: cada tramo sube la tensión; nada de relleno. Mínimo DOS giros o revelaciones por parte (algo que cambie
+  lo que creíamos: un nombre que no debería estar ahí, una fecha imposible, alguien que ya estaba muerto...).
+- Reloj: siempre hay algo en juego y poco tiempo (una noche, una llamada que se corta, alguien que se acerca).
+- Ritmo de thriller: frases cortas en los momentos de tensión, a veces de una o dos palabras ("Silencio." "Otra
+  vez."). Alterna con alguna frase más larga para respirar. Diálogos breves y directos entre comillas, con voz
+  propia. Detalles sensoriales concretos (un olor, un ruido exacto, el frío del pomo), nunca adjetivos vacíos.
+- Habla a quien escucha de vez en cuando ("Y tú habrías hecho lo mismo." "Escucha bien lo que viene ahora.").
+- FINAL DE PARTE (menos la última): cliffhanger brutal, cortado en seco en mitad de la revelación (una voz que dice
+  tu nombre, una puerta que se abre sola, el mensaje que llega desde un número que no existe). Última frase corta.
+- Partes 2 y 3: empiezan EN la acción, retomando el cliffhanger en una frase, sin resumir ni decir "en la parte
+  anterior".
+- ÚLTIMA PARTE: un giro final que nadie vea venir pero que encaje con pistas sembradas antes, y una última imagen
+  que se quede en la cabeza. Termina con una frase corta que invite a comentar ("¿Tú habrías abierto esa puerta?").
+ESTILO: narración oral para voz sintética, intensa, como un buen narrador de radio a medianoche. Puntos suspensivos
+solo en pausas dramáticas. Nada de listas, siglas, símbolos, emojis ni acotaciones entre corchetes o paréntesis.
+Números escritos con letras. Sin gore explícito ni violencia sexual: el miedo viene de lo que se insinúa y de lo que
+no se ve. Apto para mayores de 16.
+ANTES DE RESPONDER, revisa: ¿la primera frase de cada parte engancharía a alguien que va deslizando? ¿hay al menos
+dos giros por parte? ¿el final de cada parte obliga a ir a por la siguiente? Si no, reescríbelo.
 
 Cada parte se entrega dividida en "tramos" CONSECUTIVOS (entre 7 y 9 por parte, de 15 a 30 palabras cada uno): al
 unir los textos de los tramos sale la parte completa. Cada tramo lleva "imagen": una búsqueda en INGLÉS de 2 a 4
 palabras para encontrar una FOTO real que muestre EXACTAMENTE lo que se cuenta en ese tramo (el lugar, el objeto o la
 atmósfera concreta: "old stone mill river", "rusty mailbox rural", "candle on wooden table", "flooded basement
-stairs", "foggy village street night"). Piensa en fotos que existan en un archivo libre (Wikimedia Commons): cosas,
+stairs", "foggy village street night"). Marca con "susto": true el tramo donde ocurre el momento más impactante de la
+parte (uno o dos por parte como mucho): en el vídeo sonará un golpe y la imagen dará un sobresalto justo ahí. Piensa en fotos que existan en un archivo libre (Wikimedia Commons): cosas,
 edificios, paisajes y ambientes; NUNCA personas concretas, caras, víctimas ni escenas de violencia.
 Además, en cada parte: "ambiente": uno de {ambientes}
+
+Y en cada parte, "gancho": la frase de pantalla para el primer segundo, en MAYÚSCULAS, máximo 7 palabras, que haga
+imposible deslizar (ej. "ALGUIEN LLAMÓ DESDE DENTRO", "NO ESTABA SOLA EN CASA", "LA FOTO TENÍA UNA PERSONA MÁS").
 
 Y en general:
 - "titulo": 2 a 5 palabras en MAYÚSCULAS, intrigante (ej. "LA HABITACIÓN 14", "EL VECINO DEL QUINTO").
@@ -66,7 +91,7 @@ Y en general:
 
 Responde SOLO con JSON válido:
 {{"titulo": "...", "narrador": "hombre", "caption": "...", "pregunta": "...", "hashtags": ["#..."],
-"partes": [{{"tramos": [{{"texto": "...", "imagen": "..."}}], "ambiente": "..."}}]}}"""
+"partes": [{{"gancho": "...", "tramos": [{{"texto": "...", "imagen": "...", "susto": false}}], "ambiente": "..."}}]}}"""
 
 
 def usadas(n: int = 40) -> list[str]:
