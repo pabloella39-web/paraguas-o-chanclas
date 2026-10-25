@@ -37,8 +37,8 @@ log = logging.getLogger("tiempo.respuestas")
 ESTADO = RAIZ / "estado" / "respuestas.json"
 API = uploadpost.API
 MAX_EJECUCION = int(os.environ.get("RESPUESTAS_POR_HORA", "3"))
-MAX_DIA = int(os.environ.get("RESPUESTAS_POR_DIA", "8"))
-MAX_ELEVEN_DIA = int(os.environ.get("RESPUESTAS_ELEVEN_DIA", "4"))  # el resto, voz gratuita (ahorra créditos)
+MAX_DIA = int(os.environ.get("RESPUESTAS_POR_DIA", "6"))
+MAX_ELEVEN_DIA = int(os.environ.get("RESPUESTAS_ELEVEN_DIA", "6"))  # misma voz que el parte; si se acaban los créditos, voz gratuita
 ACENTO = (255, 196, 45)
 MIA = CUENTA_TIKTOK.lstrip("@").lower()
 

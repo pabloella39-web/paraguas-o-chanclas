@@ -47,7 +47,7 @@ jobs:
           UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
           UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
           RESPUESTAS_POR_HORA: ${{ vars.RESPUESTAS_POR_HORA || '3' }}
-          RESPUESTAS_POR_DIA: ${{ vars.RESPUESTAS_POR_DIA || '8' }}
+          RESPUESTAS_POR_DIA: ${{ vars.RESPUESTAS_POR_DIA || '6' }}
         run: python -m tiempo.respuestas --publicar
       - name: Guardar estado
         if: always() && steps.up.outputs.ok == 'true'
