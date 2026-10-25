@@ -9,5 +9,9 @@ subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i", "colo
                 "-c:a", "aac", str(v)], check=True)
 import os
 os.environ["YT_PRIVACIDAD"] = "private"
-r = youtube.subir(v, "Prueba de conexión (borrar)", "Prueba automática. Se puede borrar.", [], canal=canal)
+try:
+    r = youtube.subir(v, "Prueba de conexión (borrar)", "Prueba automática. Se puede borrar.", [], canal=canal)
+except Exception as e:  # noqa: BLE001
+    print(f"::error::{e}")
+    raise
 print(f"::notice::Canal de YouTube autorizado para '{canal}': {r['canal']} · vídeo privado {r['url']}")
