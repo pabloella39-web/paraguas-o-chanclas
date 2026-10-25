@@ -251,7 +251,8 @@ def main():
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
     meta = construir(hoy, Path(a.salida), demo=a.demo)
     if a.prueba:
-        os.environ["YT_PRIVACIDAD"] = "private"
+        # "prueba youtube publico": se sube público a YouTube (sin TikTok ni historial)
+        os.environ["YT_PRIVACIDAD"] = "public" if os.environ.get("PRUEBA_PUBLICA") else "private"
         publicar_youtube(meta, hoy)
         (Path(a.salida) / "meta.json").write_text(json.dumps({k: v for k, v in meta.items()}, ensure_ascii=False,
                                                              indent=1), encoding="utf-8")

@@ -85,6 +85,7 @@ jobs:
             ARGS="--publicar"
             # "prueba" en lanzar.txt: vídeo real subido a YouTube como privado, sin TikTok ni historial
             grep -qi prueba lanzar.txt && ARGS="--prueba"
+            grep -qi "youtube publico" lanzar.txt && export PRUEBA_PUBLICA=1
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
