@@ -19,4 +19,4 @@ jobs:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
-        run: python scripts/prueba_youtube.py "${{ inputs.canal }}"
+        run: PYTHONPATH=. python scripts/prueba_youtube.py "${{ inputs.canal }}"
