@@ -1,0 +1,179 @@
+{
+ "titulo": "LA SANTA COMPAÑA",
+ "tipo": "leyenda",
+ "narrador": "hombre",
+ "caption": "Si a medianoche hueles a cera en un camino gallego, no mires atrás 🕯️",
+ "pregunta": "¿Qué habrías hecho tú con la cruz?",
+ "hashtags": [
+  "#santacompaña",
+  "#galicia",
+  "#leyendasdeespaña",
+  "#nochededifuntos",
+  "#terrorgallego"
+ ],
+ "partes": [
+  {
+   "gancho": "LA PROCESIÓN QUE NO DEBES MIRAR",
+   "ambiente": "bosque_noche",
+   "tramos": [
+    {
+     "texto": "Cuentan que, si a medianoche hueles a cera en un camino de Galicia, ya es tarde para darte la vuelta.",
+     "imagen": "foggy forest path night",
+     "susto": false
+    },
+    {
+     "texto": "En los pueblos de Ourense lo saben desde siempre. Es la Santa Compaña: una procesión de difuntos que busca a alguien que todavía respira.",
+     "imagen": "galician village fog",
+     "susto": false
+    },
+    {
+     "texto": "Delante va un vivo. Un vecino cualquiera, con una cruz y un caldero de agua bendita. No sabe que lo es. De día no recuerda nada.",
+     "imagen": "old stone cross",
+     "susto": false
+    },
+    {
+     "texto": "Solo adelgaza. Cada semana un poco más. Y no puede dejar de caminar de noche, hasta que encuentra a otro que le quite la cruz.",
+     "imagen": "empty country road night",
+     "susto": false
+    },
+    {
+     "texto": "En Lobios contaban la historia de un carretero llamado Xan. Una noche de difuntos volvía tarde de la feria, con el carro vacío.",
+     "imagen": "ox cart old road",
+     "susto": false
+    },
+    {
+     "texto": "Entonces lo oyó. Una campanilla. Lejos, entre los robles. Y un olor dulce, espeso, a velas recién apagadas.",
+     "imagen": "candles smoke dark",
+     "susto": false
+    },
+    {
+     "texto": "El buey se paró en seco. No había forma de moverlo. Temblaba entero.",
+     "imagen": "oak forest night fog",
+     "susto": false
+    },
+    {
+     "texto": "Xan levantó el farol. Al fondo del camino brillaban luces. Muchas. En fila. Avanzando hacia él sin hacer un solo ruido sobre las piedras.",
+     "imagen": "lights in fog night",
+     "susto": false
+    },
+    {
+     "texto": "Y la figura que iba delante, la que llevaba la cruz... tenía la cara de su propia mujer.",
+     "imagen": "wooden cross dark",
+     "susto": true
+    }
+   ]
+  },
+  {
+   "gancho": "SU MUJER LLEVABA LA CRUZ",
+   "ambiente": "viento",
+   "tramos": [
+    {
+     "texto": "Era Rosa. Su Rosa. Descalza sobre la escarcha, con los ojos abiertos y vacíos, mirando a ninguna parte.",
+     "imagen": "frost on stones night",
+     "susto": false
+    },
+    {
+     "texto": "Detrás de ella, las luces. No eran farolillos. Eran velas que flotaban solas, a la altura de unas manos que no estaban.",
+     "imagen": "floating candle lights darkness",
+     "susto": false
+    },
+    {
+     "texto": "Xan conocía las reglas que le enseñó su abuela. No hablar. No mirarles a los ojos. Y, sobre todo, no aceptar nunca nada que te ofrezcan.",
+     "imagen": "rosary on old table",
+     "susto": false
+    },
+    {
+     "texto": "Se tiró a la cuneta y dibujó un círculo en la tierra con la vara. Se metió dentro. Y rezó.",
+     "imagen": "circle drawn in dirt",
+     "susto": false
+    },
+    {
+     "texto": "La procesión llegó a su altura. El frío era tan fuerte que el aliento se le helaba en la barba.",
+     "imagen": "frozen grass night",
+     "susto": false
+    },
+    {
+     "texto": "Rosa se detuvo. Justo en el borde del círculo. Despacio, muy despacio, le tendió la cruz.",
+     "imagen": "wooden cross close up",
+     "susto": true
+    },
+    {
+     "texto": "Y habló, con una voz que no era la suya. Una voz hecha de muchas voces. «Xan. Cógela. Ella ya no puede más.»",
+     "imagen": "dark forest mist",
+     "susto": false
+    },
+    {
+     "texto": "Porque Rosa llevaba semanas sin comer. Y cada noche, al despertarse, Xan encontraba su lado de la cama vacío. Y frío.",
+     "imagen": "empty bed old room",
+     "susto": false
+    },
+    {
+     "texto": "Ahora lo entendía. Si no cogía la cruz, Rosa caminaría hasta morir. Si la cogía, el siguiente sería él.",
+     "imagen": "dark country lane night",
+     "susto": false
+    },
+    {
+     "texto": "Entonces la campanilla sonó otra vez. Justo detrás de su nuca.",
+     "imagen": "old bronze bell",
+     "susto": true
+    }
+   ]
+  },
+  {
+   "gancho": "NO MIRES LO QUE CAMINA DETRÁS",
+   "ambiente": "pueblo_silencio",
+   "tramos": [
+    {
+     "texto": "Xan no se dio la vuelta. Sabía que, si miraba, la Compaña tendría dos vivos en vez de uno.",
+     "imagen": "foggy road night",
+     "susto": false
+    },
+    {
+     "texto": "Recordó lo último que le dijo su abuela antes de morir. «Si un día te ofrecen la cruz, cógela. Y suéltala dentro del círculo.»",
+     "imagen": "old stone house window",
+     "susto": false
+    },
+    {
+     "texto": "Extendió las manos. Agarró la madera. Estaba tan fría que le quemó la piel, como si llevara siglos a la intemperie.",
+     "imagen": "weathered wood texture",
+     "susto": false
+    },
+    {
+     "texto": "Rosa cayó de rodillas, despierta de golpe, gritando su nombre. Las velas se agitaron. Todas a la vez. Como si respiraran.",
+     "imagen": "candle flames flickering",
+     "susto": false
+    },
+    {
+     "texto": "Y Xan dejó caer la cruz dentro del círculo, sin salir de él. La tierra crujió bajo sus pies.",
+     "imagen": "cracked earth ground",
+     "susto": true
+    },
+    {
+     "texto": "Las luces se apagaron una tras otra, en fila, como velas sopladas por una sola boca. Volvió el silencio. El buey mugió. Había terminado.",
+     "imagen": "dark road after rain",
+     "susto": false
+    },
+    {
+     "texto": "Volvieron a casa abrazados, sin decir nada. Y durante años, en Lobios, se contó que Xan había vencido a la Santa Compaña.",
+     "imagen": "galician stone village",
+     "susto": false
+    },
+    {
+     "texto": "Pero hay un detalle que el pueblo prefiere callar. Desde aquella noche, a Xan nadie lo volvió a ver comer.",
+     "imagen": "empty plate wooden table",
+     "susto": false
+    },
+    {
+     "texto": "Y cada noche de difuntos, alguien ve un carro sin buey avanzando solo por el camino viejo, con una luz delante... y una cruz.",
+     "imagen": "old cart foggy road",
+     "susto": true
+    },
+    {
+     "texto": "Tú, si esta noche hueles a cera, ¿te darías la vuelta?",
+     "imagen": "candle in the dark",
+     "susto": false
+    }
+   ]
+  }
+ ]
+}

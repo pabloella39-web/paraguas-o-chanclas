@@ -128,9 +128,16 @@ def escribir(hoy: date, palabras_parte: int = PALABRAS_PARTE, tipo: str | None =
     prompt = PROMPT.format(tipo_txt=TIPOS[tipo], usadas="; ".join(usadas()) or "(ninguna todavía)",
                            partes_txt=partes_txt, pmin=pmin, pmax=pmax, ambientes=", ".join(AMBIENTES))
     ultimo = None
+    # Guion ya escrito (en el chat, sin gastar API): historias/guiones/AAAA-MM-DD.json
+    precargado = HISTORIAL.parent / "historias" / "guiones" / f"{hoy.isoformat()}.json"
     for intento in range(3):
         try:
-            g = _claude(prompt)
+            if precargado.exists():
+                log.info("Usando el guion ya escrito %s", precargado.name)
+                g = json.loads(precargado.read_text(encoding="utf-8"))
+                g.setdefault("tipo", tipo)
+            else:
+                g = _claude(prompt)
             partes = g.get("partes") or []
             for p in partes:  # los tramos forman el texto y marcan cuándo cambia la imagen
                 if p.get("tramos"):
@@ -151,7 +158,7 @@ def escribir(hoy: date, palabras_parte: int = PALABRAS_PARTE, tipo: str | None =
                 p["texto"] = " ".join(t["texto"] for t in p["tramos"])
                 if p.get("ambiente") not in AMBIENTES:
                     p["ambiente"] = "viento"
-            g["tipo"] = tipo
+            g["tipo"] = g.get("tipo") or tipo
             log.info("Historia: %s (%s), %d partes de %s palabras", g["titulo"], tipo, len(partes),
                      [palabras(p["texto"]) for p in partes])
             return g
