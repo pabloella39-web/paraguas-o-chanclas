@@ -541,8 +541,14 @@ def main():
         coms = comentarios_nuevos({"vistos": []})
         print(f"::notice::Comentarios leídos: {len(coms)} · ejemplos: "
               f"{json.dumps([c['texto'][:60] for c in coms[:6]], ensure_ascii=False)}")
-        preg = detectar(coms)
-        print(f"::notice::Preguntas por un lugar: {json.dumps([(q['usuario'], q['lugar']) for q in preg], ensure_ascii=False)}")
+        for q in clasificar(coms)[:20]:
+            msg = q.get("respuesta") or ""
+            if q.get("tipo") == "ciudad":
+                try:
+                    msg = texto_ciudad(q, ahora())
+                except Exception as e:  # noqa: BLE001
+                    msg = f"(error {e})"
+            print(f"::notice::[{q.get('tipo')}] «{q['texto'][:50]}» → {msg}")
         return
     primera = not ESTADO.exists()
     estado = _cargar()
