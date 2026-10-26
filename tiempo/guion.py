@@ -178,55 +178,13 @@ def cta_del_dia(hoy: date) -> str:
     return ("mencion", "ciudad", "pregunta", "ciudad", "mencion", "pregunta", "ciudad")[hoy.toordinal() % 7]
 
 
-_ESPERADO = False
-
-
 def _guion_precargado(hoy: date, prompt: str) -> dict | None:
-    """Guion escrito a mano (en el chat, sin gastar API) en tiempo/guiones/AAAA-MM-DD.json. Con ESPERAR_GUION, la
-    primera vez publica los datos del día en la rama datos-parte y espera a que llegue el guion (hasta GUION_LIMITE,
-    hora de Madrid, por defecto 19:50)."""
-    global _ESPERADO
-    import subprocess
-    import time
-    from datetime import datetime
-    from zoneinfo import ZoneInfo
-    from .config import RAIZ
-    rel = f"tiempo/guiones/{hoy.isoformat()}.json"
-    ruta = RAIZ / rel
-
-    def traer():
-        subprocess.run(["git", "fetch", "-q", "origin", "main"], cwd=RAIZ, check=False)
-        subprocess.run(["git", "checkout", "origin/main", "--", rel], cwd=RAIZ, check=False,
-                       stderr=subprocess.DEVNULL)
-
-    if not ruta.exists() and os.environ.get("ESPERAR_GUION") and not _ESPERADO:
-        _ESPERADO = True
-        token, repo = os.environ.get("GH_PUSH_TOKEN", ""), os.environ.get("GITHUB_REPOSITORY", "")
-        if token and repo:
-            import tempfile
-            d = tempfile.mkdtemp()
-            open(os.path.join(d, "prompt.txt"), "w", encoding="utf-8").write(prompt)
-            cmd = (f"cd {d} && git init -q -b datos-parte && git -c user.name=parte-bot -c user.email=bot@x add -A && "
-                   f"git -c user.name=parte-bot -c user.email=bot@x commit -qm datos && "
-                   f"git push -qf https://x-access-token:{token}@github.com/{repo} datos-parte")
-            subprocess.run(cmd, shell=True, check=False)
-            log.info("Datos del parte publicados en la rama datos-parte; esperando el guion %s", rel)
-        h, m = map(int, os.environ.get("GUION_LIMITE", "19:50").split(":"))
-        tz = ZoneInfo("Europe/Madrid")
-        while not ruta.exists():
-            ahora = datetime.now(tz)
-            if (ahora.hour, ahora.minute) >= (h, m):
-                log.warning("No llegó el guion escrito a mano: se usa la API o la plantilla")
-                break
-            time.sleep(60)
-            traer()
-    if ruta.exists():
-        g = json.loads(ruta.read_text(encoding="utf-8"))
-        if set(g.get("segmentos", {})) >= set(SEGMENTOS):
-            log.info("Usando el guion escrito a mano %s", rel)
-            g["origen"] = "manual"
-            return g
-        log.warning("Guion manual incompleto: %s", rel)
+    """Guion escrito con el plan de Claude (tarea programada), sin gastar API: ver tiempo/manual.py."""
+    from . import manual
+    g = manual.responder(f"parte-{hoy.isoformat()}", prompt, "19:50" if os.environ.get("VISPERA") else "07:05")
+    if g and set(g.get("segmentos", {})) >= set(SEGMENTOS):
+        g["origen"] = "manual"
+        return g
     return None
 
 
@@ -269,6 +227,8 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                 return g
             except Exception as e:  # noqa: BLE001
                 log.warning("Guion con Claude falló (intento %d): %s", intento + 1, e)
+    if not os.environ.get("PERMITIR_PLANTILLA"):
+        raise RuntimeError("Sin guion escrito ni API disponible: no se publica la plantilla básica")
     g = guion_plantilla(prev, hoy, factor, texto_aemet)
     g["origen"] = "plantilla"
     return g

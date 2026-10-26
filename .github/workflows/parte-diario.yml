@@ -2,18 +2,16 @@ name: Parte diario del tiempo
 
 on:
   schedule:
-    # GitHub solo usa UTC y a veces retrasa o se salta ejecuciones programadas. Por eso hay varios
-    # intentos cada 30 min: el primero que arranca entre las 6:00 y las 8:45 (hora de Madrid) hace el
-    # parte y los demás, al ver que ya está hecho (historial/AAAA-MM-DD.json), no hacen nada.
-    - cron: "17 4 * * *"
-    - cron: "47 4 * * *"
-    - cron: "17 5 * * *"
-    - cron: "47 5 * * *"
-    - cron: "17 6 * * *"
-    - cron: "47 6 * * *"
-    # Prueba de franja de noche: el parte del martes 27 se publica el lunes 26 a las 20:30 (víspera)
-    - cron: "50 17 26 10 *"
-    - cron: "20 18 26 10 *"
+    # El parte de MAÑANA se publica esta noche a las 20:30 (Madrid) en TikTok y YouTube. GitHub solo usa UTC y a veces
+    # retrasa ejecuciones: varios intentos; tiempo.horario deja pasar el primero entre las 17:00 y las 20:20 de Madrid
+    # si el parte de mañana no existe. La ejecución publica los datos (rama pendiente/parte-FECHA) y espera hasta las
+    # 19:50 el guion escrito por la tarea programada de Claude (plan, sin API); si no llega, API de respaldo.
+    - cron: "20 15 * * *"
+    - cron: "50 15 * * *"
+    - cron: "20 16 * * *"
+    - cron: "50 16 * * *"
+    - cron: "20 17 * * *"
+    - cron: "50 17 * * *"
   push:
     # Lanzar un parte a mano desde git: cambiar el archivo lanzar.txt
     branches: [main]
@@ -39,7 +37,7 @@ concurrency:
 jobs:
   parte:
     runs-on: ubuntu-latest
-    timeout-minutes: 170
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
       - name: Sincronizar con lo último de main (evita repetir lo que otra ejecución acaba de publicar)
@@ -86,15 +84,14 @@ jobs:
         run: |
           ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            ARGS="--publicar --esperar"
-            case "${{ github.event.schedule }}" in "50 17 26 10 *"|"20 18 26 10 *") ARGS="--publicar --vispera --esperar"; export ESPERAR_GUION=1;; esac
+            ARGS="--publicar --vispera --esperar"
           elif [ "${{ github.event_name }}" = "push" ]; then
             ARGS="--publicar"
             # "prueba" en lanzar.txt: vídeo real subido a YouTube como privado, sin TikTok ni historial
-            grep -qi prueba lanzar.txt && ARGS="--prueba"
+            grep -qi prueba lanzar.txt && ARGS="--prueba" && export ESPERAR_GUION=0
             grep -qi "youtube publico" lanzar.txt && export PRUEBA_PUBLICA=1
             # "vispera" en lanzar.txt: el parte de mañana, publicado hoy a las 20:30
-            grep -qi vispera lanzar.txt && ARGS="--publicar --vispera --esperar" && export ESPERAR_GUION=1
+            grep -qi vispera lanzar.txt && ARGS="--publicar --vispera --esperar"
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"

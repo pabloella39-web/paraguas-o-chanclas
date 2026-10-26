@@ -13,7 +13,8 @@ from .config import HISTORIAL, PALABRAS_PARTE, tipo_del_dia
 
 log = logging.getLogger(__name__)
 # El modelo más capaz para escribir: la calidad de la historia es lo que retiene al público
-MODELO = os.environ.get("HISTORIAS_MODELO", "claude-opus-5-5")
+# (solo respaldo: lo normal es que la escriba la tarea programada con el plan de Claude)
+MODELO = os.environ.get("HISTORIAS_MODELO", "claude-sonnet-5-5")
 
 AMBIENTES = ["lluvia", "tormenta", "viento", "bosque_noche", "casa_crujidos", "sotano_goteo", "ciudad_noche",
              "carretera_noche", "mar_noche", "pueblo_silencio", "hospital", "iglesia"]
@@ -129,12 +130,13 @@ def escribir(hoy: date, palabras_parte: int = PALABRAS_PARTE, tipo: str | None =
                            partes_txt=partes_txt, pmin=pmin, pmax=pmax, ambientes=", ".join(AMBIENTES))
     ultimo = None
     # Guion ya escrito (en el chat, sin gastar API): historias/guiones/AAAA-MM-DD.json
-    precargado = HISTORIAL.parent / "historias" / "guiones" / f"{hoy.isoformat()}.json"
+    # Primero, la historia escrita con el plan de Claude (tarea programada, sin API): tiempo/manual.py
+    from tiempo import manual
+    escrita = manual.responder(f"historia-{hoy.isoformat()}", prompt, "19:30")
     for intento in range(3):
         try:
-            if precargado.exists():
-                log.info("Usando el guion ya escrito %s", precargado.name)
-                g = json.loads(precargado.read_text(encoding="utf-8"))
+            if escrita is not None:
+                g, escrita = escrita, None   # si no pasa la validación, el siguiente intento va a la API
                 g.setdefault("tipo", tipo)
             else:
                 g = _claude(prompt)

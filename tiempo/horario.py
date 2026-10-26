@@ -25,22 +25,17 @@ def ahora():
 
 
 def debe_ejecutarse(evento: str, cron: str = "") -> bool:
-    """Las ejecuciones programadas solo trabajan entre las 6:00 y las 8:45 de Madrid y si hoy aún no hay parte."""
+    """Desde el 27/10/2026 el parte sale la víspera a las 20:30: las ejecuciones programadas trabajan entre las 17:00 y
+    las 20:20 de Madrid si el parte de mañana aún no existe (hay varios intentos por los retrasos de GitHub)."""
     if evento != "schedule":
         return True
     t = ahora()
-    if cron in ("50 17 26 10 *", "20 18 26 10 *"):  # víspera (parte de mañana a las 20:30)
-        from datetime import timedelta
-        ok = (17, 30) <= (t.hour, t.minute) <= (20, 20) and \
-            not (RAIZ / "historial" / f"{(t.date() + timedelta(days=1)).isoformat()}.json").exists()
-        print("Víspera: " + ("se hace" if ok else "no toca"))
-        return ok
-    if not ((6, 0) <= (t.hour, t.minute) <= (8, 45)):
-        print(f"Fuera de la ventana de publicación ({t:%H:%M} en Madrid)")
+    manana = RAIZ / "historial" / f"{(t.date() + timedelta(days=1)).isoformat()}.json"
+    if not ((17, 0) <= (t.hour, t.minute) <= (20, 20)):
+        print(f"Fuera de la ventana de la víspera ({t:%H:%M} en Madrid)")
         return False
-    hecho = RAIZ / "historial" / f"{t.date().isoformat()}.json"
-    if hecho.exists():
-        print(f"El parte de hoy ya está hecho ({hecho.name})")
+    if manana.exists():
+        print(f"El parte de mañana ya está hecho ({manana.name})")
         return False
     return True
 

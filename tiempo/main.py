@@ -186,6 +186,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         try:
             plan, total = planificar(bloques, wavs, durs)
         except RuntimeError as e:
+            if not os.environ.get("PERMITIR_PLANTILLA"):
+                raise
             log.warning("%s → se usa la plantilla", e)  # red de seguridad: el parte sale igual
             guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz,
                                                           plantilla=True)
@@ -209,7 +211,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     if not DURACION_MIN <= real <= DURACION_MAX:
         raise RuntimeError(f"El vídeo final dura {real:.2f} s (debe estar entre 65 y 70)")
     general = next((p for p in plan if p["seg"] == "general"), plan[0])
-    caption = descripcion.construir(prev, hoy, guion["caption"] if guion.get("origen") == "claude" else None)
+    caption = descripcion.construir(prev, hoy, guion["caption"] if guion.get("origen") in ("claude", "manual") else None)
     meta = {"fecha": hoy.isoformat(), "duracion": round(real, 2), "video": str(video), "caption": caption,
             "portada_ms": 0,  # el primer fotograma es la portada con la fecha
             "origen_guion": guion.get("origen"),

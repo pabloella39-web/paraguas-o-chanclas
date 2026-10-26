@@ -24,7 +24,7 @@ concurrency:
 jobs:
   historia:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 220
     steps:
       - uses: actions/checkout@v4
       - name: Sincronizar con lo último de main (evita repetir lo que otra ejecución acaba de publicar)
@@ -64,7 +64,7 @@ jobs:
           # Interruptor: historias/activo.txt = "si" cuando la cuenta de TikTok esté conectada en Upload-Post
           if [ "${{ github.event_name }}" = "schedule" ] && ! grep -qi "^si" historias/activo.txt; then
             echo "::notice::Canal de historias en pausa (historias/activo.txt)"; exit 0; fi
-          if [ "${{ github.event_name }}" = "push" ] && ! grep -qi publicar historias/lanzar.txt; then ARGS="--prueba"; fi
+          if [ "${{ github.event_name }}" = "push" ] && ! grep -qi publicar historias/lanzar.txt; then ARGS="--prueba"; export ESPERAR_GUION=0; fi
           if [ "${{ github.event_name }}" = "push" ] && grep -qi " ya" historias/lanzar.txt; then ARGS="--publicar --ya"; fi
           mkdir -p salida_historias
           set -o pipefail

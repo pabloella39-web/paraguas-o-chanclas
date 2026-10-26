@@ -5,13 +5,18 @@ on:
     # Avisos de AEMET: se comprueban cada 2 horas (si hay naranjas o rojos nuevos, vídeo especial)
     - cron: "23 6-20/2 * * *"
     # Fin de semana: viernes por la tarde (varios intentos; el primero que llega lo hace y espera a las 17:30)
+    - cron: "11 14 * * 5"
     - cron: "41 14 * * 5"
     - cron: "11 15 * * 5"
     - cron: "41 15 * * 5"
-    # La semana que viene: domingo por la noche (sale a las 20:30 de Madrid; varios intentos)
+    # La semana que viene: domingo por la noche (sale a las 21:30 de Madrid, después del parte diario de las 20:30)
+    - cron: "41 17 * * 0"
+    - cron: "11 18 * * 0"
     - cron: "41 18 * * 0"
     - cron: "11 19 * * 0"
-    # Lo que queda de semana (+ finde): miércoles por la noche, a las 20:30 de Madrid
+    # Lo que queda de semana (+ finde): miércoles por la noche, a las 21:30 de Madrid
+    - cron: "41 17 * * 3"
+    - cron: "11 18 * * 3"
     - cron: "41 18 * * 3"
     - cron: "11 19 * * 3"
   push:
@@ -29,7 +34,7 @@ concurrency:
 jobs:
   especial:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 220
     steps:
       - uses: actions/checkout@v4
       - name: Sincronizar con lo último de main (evita repetir lo que otra ejecución acaba de publicar)
@@ -45,7 +50,7 @@ jobs:
             grep -qi publicar lanzar_especial.txt && P="--publicar" || P=""
           else
             # Viernes entre las 15:00 y las 18:30 (Madrid) → fin de semana; si no, revisión de avisos
-            T=$(python3 -c "from datetime import datetime;from zoneinfo import ZoneInfo as Z;t=datetime.now(Z('Europe/Madrid'));c='${{ github.event.schedule }}'!='23 6-20/2 * * *';hm=(t.hour,t.minute);print('finde' if c and t.weekday()==4 and (15,0)<=hm<=(18,30) else 'semana' if c and t.weekday()==6 and (19,0)<=hm<=(22,30) else 'resto' if c and t.weekday()==2 and (19,0)<=hm<=(22,30) else 'avisos')")
+            T=$(python3 -c "from datetime import datetime;from zoneinfo import ZoneInfo as Z;t=datetime.now(Z('Europe/Madrid'));c='${{ github.event.schedule }}'!='23 6-20/2 * * *';hm=(t.hour,t.minute);print('finde' if c and t.weekday()==4 and (15,0)<=hm<=(18,30) else 'semana' if c and t.weekday()==6 and (18,30)<=hm<=(21,0) else 'resto' if c and t.weekday()==2 and (18,30)<=hm<=(21,0) else 'avisos')")
             P="--publicar --esperar"
           fi
           echo "tipo=$T" >> $GITHUB_OUTPUT

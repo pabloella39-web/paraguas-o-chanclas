@@ -105,6 +105,8 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     try:
         plan, total = planificar(bloques, wavs, durs)
     except RuntimeError as e:
+        if not demo and not os.environ.get("PERMITIR_PLANTILLA"):
+            raise
         log.warning("%s → plantilla", e)
         guion = escribir(0.85, True)
         bloques = [s for s in guion["orden"] if guion["segmentos"].get(s, "").strip()]
@@ -113,7 +115,15 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     return guion, plan, total, [(p["wav"], p["inicio"]) for p in plan], "edge-tts"
 
 
-def _claude_json(prompt: str) -> dict:
+def _claude_json(manual_clave, limite, prompt: str = None) -> dict:
+    """Primero el guion escrito con el plan de Claude (tiempo/manual.py); si no llega, la API."""
+    if prompt is None:  # llamada antigua: _claude_json(prompt)
+        manual_clave, limite, prompt = None, None, manual_clave
+    if manual_clave:
+        from . import manual
+        g_ = manual.responder(manual_clave, prompt, limite)
+        if g_:
+            return g_
     clave = os.environ.get("ANTHROPIC_API_KEY", "").strip()
     if not clave:
         raise RuntimeError("Sin ANTHROPIC_API_KEY")
@@ -192,7 +202,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
     palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_FINDE.items()}
     if not plantilla:
         try:
-            gg = _claude_json(PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
+            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "16:50", PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
@@ -201,6 +211,8 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del finde con Claude falló: %s", e)
+    if not plantilla and not os.environ.get("PERMITIR_PLANTILLA"):
+        raise RuntimeError("Sin guion escrito ni API: no se publica la plantilla básica")
     (ms, md), (ps, pd) = _mejor_plan(prev_s, prev_d)
     lluvia_s = [g._nombre(c) for c in prev_s if c["lluvia"] >= 50]
     lluvia_d = [g._nombre(c) for c in prev_d if c["lluvia"] >= 50]
@@ -343,7 +355,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
         try:
             datos = {f"{d} {fechas[d].day}": _resumen(prevs[d]) for d in _dias()}
             m = MODOS_SEMANA[MODO_SEMANA]
-            gg = _claude_json(PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
+            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "20:45", PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
                                                    palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                    cuando=m["cuando"], rango_txt=m["rango_txt"],
                                                    claves_dias=", ".join(f'"{d}": "..."' for d in _dias())))
@@ -352,6 +364,8 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion de la semana con Claude falló: %s", e)
+    if not plantilla and not os.environ.get("PERMITIR_PLANTILLA"):
+        raise RuntimeError("Sin guion escrito ni API: no se publica la plantilla básica")
     notas = {d: _nota_dia(prevs[d]) for d in _dias()}
     mejor, peor = max(notas, key=notas.get), min(notas, key=notas.get)
     seg = {"intro": "¿Semana de paraguas o de chanclas? Te la cuento día a día, y al final, el mejor y el peor día."}
@@ -640,7 +654,7 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     if not plantilla:
         try:
-            gg = _claude_json(PROMPT_AVISO.format(presenta=presenta, fecha=g.fecha_larga(hoy),
+            gg = _claude_json(None, None, PROMPT_AVISO.format(presenta=presenta, fecha=g.fecha_larga(hoy),
                                                   avisos=json.dumps(datos, ensure_ascii=False, indent=1),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
             if all(gg["segmentos"].get(s) for s in orden):
@@ -648,6 +662,8 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del aviso con Claude falló: %s", e)
+    if not plantilla and not os.environ.get("PERMITIR_PLANTILLA"):
+        raise RuntimeError("Sin guion escrito ni API: no se publica la plantilla básica")
     gr = grupos[0]
     zonas = ", ".join(z.split(" - ")[-1] for z in gr["zonas"][:4])
     from .gancho import nombre_fenomeno
@@ -837,7 +853,7 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
         if a.esperar and a.tipo in ("finde", "semana", "resto"):
             from .horario import TZ
             import time as _t
-            h, m = (17, 26) if a.tipo == "finde" else (20, 26)
+            h, m = (17, 26) if a.tipo == "finde" else (21, 26)   # el parte diario sale a las 20:30
             objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0)
             falta = (objetivo - ahora()).total_seconds()
             if 0 < falta < 4 * 3600:
