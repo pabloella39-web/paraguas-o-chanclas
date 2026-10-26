@@ -1,0 +1,19 @@
+name: Comparar voces femeninas
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  voces:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: (which ffmpeg || (sudo apt-get update -q && sudo apt-get install -y -q ffmpeg)) && pip install requests numpy
+      - env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}
+        run: python scripts/eco_voces.py 2>&1 | tee registro.txt; mkdir -p muestras; cp registro.txt muestras/
+      - run: |
+          cd muestras && git init -q -b muestras-eco
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Muestras" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" muestras-eco
