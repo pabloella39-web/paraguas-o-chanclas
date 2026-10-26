@@ -39,8 +39,9 @@ for ruta, p in (("analytics", {"profile_username": perfil, "platforms": "tiktok"
 (out / "analiticas.json").write_text(json.dumps(analit, ensure_ascii=False, indent=1))
 print("ejemplo analítica:", json.dumps(next(iter(analit.values()), {}), ensure_ascii=False)[:800])
 
-# Comentarios de los 3 vídeos con más visitas
+# Comentarios de los 3 vídeos con más visitas y de los 2 más recientes
 top = sorted(media, key=lambda m: -((analit.get(m["id"], {}).get("platforms") or {}).get("tiktok", {}).get("post_metrics", {}).get("views", 0)))[:3]
+top += [m for m in media[:2] if m not in top]
 coms = {}
 for m in top:
     st, j = get("uploadposts/comments", platform="tiktok", user=perfil, post_id=m["id"], limit=50)
