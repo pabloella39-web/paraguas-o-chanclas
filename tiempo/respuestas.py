@@ -38,6 +38,7 @@ ESTADO = RAIZ / "estado" / "respuestas.json"
 API = uploadpost.API
 MAX_EJECUCION = int(os.environ.get("RESPUESTAS_POR_HORA", "3"))
 MAX_DIA = int(os.environ.get("RESPUESTAS_POR_DIA", "6"))
+MAX_TEXTO = int(os.environ.get("RESPUESTAS_TEXTO_POR_HORA", "25"))  # respuestas escritas por ejecución
 MAX_ELEVEN_DIA = int(os.environ.get("RESPUESTAS_ELEVEN_DIA", "6"))  # misma voz que el parte; si se acaban los créditos, voz gratuita
 ACENTO = (255, 196, 45)
 MIA = CUENTA_TIKTOK.lstrip("@").lower()
@@ -137,40 +138,78 @@ def responder_texto(com: dict, mensaje: str):
 
 
 # ================================================================ detección (Claude)
-PROMPT_DETECTAR = """Estos son comentarios de TikTok en un canal del tiempo en España ("Paraguas o Chanclas").
-Detecta SOLO los que preguntan (o piden) el tiempo de un lugar concreto: ciudad, pueblo, isla, comarca, playa, sierra...
-(ej. "¿y en Cuenca?", "haz Jaca", "qué tiempo hará mañana en Zahara", "y en mi pueblo, Tomelloso"). Ignora el resto
-(saludos, opiniones, insultos, sitios que no existen, bromas).
-MUY IMPORTANTE: en el canal se pregunta a menudo "¿desde qué ciudad nos ves?", así que un comentario que SOLO dice un
-sitio ("Málaga", "Desde Vigo", "matalascaña, Huelva", "te veo desde Jaén") NO es una pregunta: ignóralo. Solo cuenta si
-hay intención clara de saber el tiempo de ese sitio (interrogación, "y en...", "haz...", "qué tiempo", "lloverá en...").
-Para cada uno devuelve: id, lugar (nombre limpio y bien escrito), provincia o región si se deduce (o ""), pais
-(código ISO de 2 letras; "ES" si no se dice otra cosa) y dia: "hoy", "mañana" o "" (si no lo dice).
+PROMPT_DETECTAR = """Estos son comentarios nuevos de TikTok en "Paraguas o Chanclas", un canal del tiempo en España con
+humor ligero y cercano. Clasifica CADA comentario en uno de estos tipos:
+- "pregunta": pide el tiempo de un lugar concreto ("¿y en Cuenca?", "haz Jaca", "qué tiempo hará en Zahara") → se le
+  contestará con un VÍDEO.
+- "ciudad": solo dice un sitio, normalmente contestando a "¿desde qué ciudad nos ves?" o "dime tu pueblo" ("Málaga",
+  "desde Vigo", "Tomelloso, Ciudad Real") → se le contestará con la previsión de ese sitio por escrito.
+- "otro": cualquier otro comentario al que merezca la pena contestar (opiniones, bromas, "¿acertaste?", quejas del
+  tiempo, emojis de apoyo...). Escribe tú la "respuesta": máximo 120 caracteres, de tú, simpática, con 1 emoji, sin
+  inventar datos del tiempo, y si encaja invita a decir su pueblo para darle su previsión.
+- "ignorar": insultos, spam, enlaces o cosas sin sentido.
+Para "pregunta" y "ciudad" devuelve también: lugar (nombre limpio y bien escrito), provincia o región si se deduce (o
+""), pais (ISO de 2 letras; "ES" si no se dice otra cosa) y dia: "hoy", "mañana" o "".
 
 Comentarios:
 {comentarios}
 
-Responde SOLO con JSON: {{"preguntas": [{{"id": "...", "lugar": "...", "provincia": "...", "pais": "ES", "dia": ""}}]}}"""
+Responde SOLO con JSON: {{"comentarios": [{{"id": "...", "tipo": "ciudad", "lugar": "...", "provincia": "",
+"pais": "ES", "dia": "", "respuesta": ""}}]}}"""
 
 
-def detectar(coms: list[dict]) -> list[dict]:
+def clasificar(coms: list[dict]) -> list[dict]:
+    """Cada comentario con su tipo (pregunta / ciudad / otro / ignorar)."""
     if not coms:
         return []
     from .especiales import _claude_json
     txt = "\n".join(json.dumps({"id": c["id"], "texto": c["texto"]}, ensure_ascii=False) for c in coms)
     try:
-        res = _claude_json(PROMPT_DETECTAR.format(comentarios=txt)).get("preguntas", [])
+        res = _claude_json(PROMPT_DETECTAR.format(comentarios=txt)).get("comentarios", [])
     except Exception as e:  # noqa: BLE001
         log.warning("Claude no pudo clasificar (%s): detector sencillo", e)
         res = []
         for c in coms:
-            m = re.search(r"(?:tiempo|y|qu[eé] tal|hace?)\s+(?:hoy|mañana)?\s*en\s+([A-ZÁÉÍÓÚÑ][\wáéíóúñü\- ]{2,30})",
-                          c["texto"])
-            if m and "?" in c["texto"]:
-                res.append({"id": c["id"], "lugar": m.group(1).strip(" ?!."), "provincia": "", "pais": "ES",
-                            "dia": "mañana" if "mañana" in c["texto"].lower() else ""})
+            t = c["texto"].strip()
+            m = re.search(r"(?:tiempo|y|qu[eé] tal|hace?)\s+(?:hoy|mañana)?\s*en\s+([A-ZÁÉÍÓÚÑ][\wáéíóúñü\- ]{2,30})", t)
+            if m and "?" in t:
+                res.append({"id": c["id"], "tipo": "pregunta", "lugar": m.group(1).strip(" ?!."), "pais": "ES"})
+            elif len(t.split()) <= 4 and re.fullmatch(r"(?:desde\s+)?[A-Za-zÁÉÍÓÚÑáéíóúñü' \-]{3,30}(?:,\s*[A-Za-zÁÉÍÓÚÑáéíóúñü ]{3,30})?", t):
+                lugar, _, prov = t.partition(",")
+                res.append({"id": c["id"], "tipo": "ciudad", "lugar": re.sub(r"(?i)^desde\s+", "", lugar).strip(),
+                            "provincia": prov.strip(), "pais": "ES"})
     por_id = {c["id"]: c for c in coms}
-    return [{**por_id[p["id"]], **p} for p in res if p.get("id") in por_id and p.get("lugar")]
+    return [{**por_id[p["id"]], **p} for p in res if p.get("id") in por_id]
+
+
+def detectar(coms: list[dict]) -> list[dict]:
+    """Solo las preguntas por un lugar (para el modo --comprobar)."""
+    return [q for q in clasificar(coms) if q.get("tipo") == "pregunta" and q.get("lugar")]
+
+
+FRASES_CIUDAD = [
+    "¡Hola, {sitio}! {cuando}: {tmax}°/{tmin}° y {lluvia} % de lluvia → {veredicto} {emoji}",
+    "{sitio}, aquí lo tienes: {cuando_min} {tmax}° de máxima, {tmin}° de mínima y {lluvia} % de lluvia. {Veredicto} {emoji}",
+    "¡Saludos a {sitio}! {cuando} toca {veredicto}: {tmax}°/{tmin}° y {lluvia} % de lluvia {emoji}",
+    "{cuando} en {sitio}: {tmax}° y {lluvia} % de probabilidad de lluvia. Veredicto: {veredicto} {emoji}",
+]
+EMOJI_VEREDICTO = {"PARAGUAS": "☔", "CHANCLAS": "🩴", "BOTAS Y BUFANDA": "🧣"}
+
+
+def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
+    sitio = geocodificar(q["lugar"], q.get("provincia", ""), q.get("pais", "ES"))
+    if not sitio:
+        return None
+    dia = hoy_.date() + timedelta(days=1) if (q.get("dia") == "mañana" or (q.get("dia") != "hoy" and hoy_.hour >= 15)) \
+        else hoy_.date()
+    p = prevision(sitio, dia)
+    ver = veredicto(p)
+    corto = {"NI UNO NI OTRO: CHAQUETA": "chaqueta"}.get(ver, ver.lower())
+    cuando = "Hoy" if dia == hoy_.date() else "Mañana"
+    frase = FRASES_CIUDAD[int(q["id"][-3:] or 0) % len(FRASES_CIUDAD)] if q["id"][-3:].isdigit() else FRASES_CIUDAD[0]
+    return frase.format(sitio=sitio["nombre"], cuando=cuando, cuando_min=cuando.lower(), tmax=p["tmax"], tmin=p["tmin"],
+                        lluvia=p["lluvia"], veredicto=corto, Veredicto=corto.capitalize(),
+                        emoji=EMOJI_VEREDICTO.get(ver, "🧥"))[:150]
 
 
 # ================================================================ previsión (Open-Meteo)
@@ -514,10 +553,32 @@ def main():
         _guardar(estado)
         print(f"::notice::Primera ejecución: {len(coms)} comentarios antiguos marcados como vistos")
         return
+    if not estado.get("v2"):  # nueva versión: también se contesta por escrito; se repasan los comentarios recientes
+        estado["vistos"], estado["v2"] = [], True
     hechas_hoy = [h for h in estado["hechas"] if h["fecha"] == hoy_.date().isoformat()]
     coms = comentarios_nuevos(estado)
-    preguntas = detectar(coms)
-    log.info("Preguntas por un lugar: %d de %d comentarios", len(preguntas), len(coms))
+    clasif = clasificar(coms)
+    preguntas = [q for q in clasif if q.get("tipo") == "pregunta" and q.get("lugar")]
+    log.info("Comentarios: %d · preguntas: %d · ciudades: %d · otros: %d", len(coms), len(preguntas),
+             sum(q.get("tipo") == "ciudad" for q in clasif), sum(q.get("tipo") == "otro" for q in clasif))
+    # Respuestas por escrito: a quien dice su ciudad, la previsión de su sitio; al resto, una respuesta simpática
+    escritas = 0
+    for q in clasif:
+        if escritas >= MAX_TEXTO:
+            break
+        try:
+            msg = None
+            if q.get("tipo") == "ciudad" and q.get("lugar"):
+                msg = texto_ciudad(q, hoy_)
+            elif q.get("tipo") == "otro" and (q.get("respuesta") or "").strip():
+                msg = q["respuesta"].strip()[:150]
+            if msg:
+                if a.publicar:
+                    responder_texto(q, msg)
+                escritas += 1
+                log.info("Respuesta escrita a @%s («%s»): %s", q["usuario"], q["texto"][:40], msg)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Respuesta escrita a %s falló: %s", q["id"], e)
     estado["vistos"] += [c["id"] for c in coms if c["id"] not in {q["id"] for q in preguntas}]
     _guardar(estado)
 

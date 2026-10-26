@@ -61,6 +61,9 @@ def duracion(dmin: float, dmax: float, dobj: float):
             m.DURACION_MIN, m.DURACION_MAX, m.DURACION_OBJETIVO = a, b, c
 
 
+DURACION_SEMANA = (85.0, 95.0, 90.0)
+
+
 # ================================================================ voz (común)
 def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     """escribir(factor, plantilla) -> guion con 'segmentos' y 'orden'. Devuelve (guion, plan, total, trozos, motor)."""
@@ -115,7 +118,7 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     return guion, plan, total, [(p["wav"], p["inicio"]) for p in plan], "edge-tts"
 
 
-def _claude_json(manual_clave, limite, prompt: str = None) -> dict:
+def _claude_json(manual_clave, limite=None, prompt: str = None) -> dict:
     """Primero el guion escrito con el plan de Claude (tiempo/manual.py); si no llega, la API."""
     if prompt is None:  # llamada antigua: _claude_json(prompt)
         manual_clave, limite, prompt = None, None, manual_clave
@@ -353,9 +356,9 @@ def _nota_dia(prev):
 def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, plantilla: bool) -> dict:
     orden = ["intro"] + _dias() + ["general", "cierre"]
     # El primer día (mañana) hace de parte diario: bloque largo; los demás, más breves
-    resto_dias = round(78 / (len(_dias()) - 1))
-    base = {"intro": 20, **{d: resto_dias for d in _dias()}, "general": 24, "cierre": 16}
-    base[_dias()[0]] = 40
+    resto_dias = round(116 / (len(_dias()) - 1))   # ≈90 s en total: el vídeo estrella de la semana
+    base = {"intro": 24, **{d: resto_dias for d in _dias()}, "general": 30, "cierre": 18}
+    base[_dias()[0]] = 54
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     if not plantilla:
         try:
@@ -448,6 +451,10 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR Y EL PEOR DÍA"},
+        # Portada reconocible en el perfil: fondo granate, borde dorado y la tira de días con su icono y máxima
+        "dias_portada": [(NOMBRE_DIA[d][:3].upper(), max(set(c["icono"] for c in prevs[d]),
+                                                         key=lambda i, pr=prevs[d]: sum(1 for c in pr if c["icono"] == i)),
+                          max(c["tmax"] for c in prevs[d])) for d in _dias()],
         "portada_txt": (MODOS_SEMANA[MODO_SEMANA]["titulo"], MODOS_SEMANA[MODO_SEMANA]["subtitulo"], rango,
                         ((f"MEJOR DÍA: {NOMBRE_DIA[mejor]}", (255, 196, 45)),
                          (f"MÁX {extremos['calor']['tmax']}° · MÍN {extremos['frio']['tmin']}°", (140, 205, 255)))),
@@ -822,7 +829,8 @@ def main():
         if hist.exists() and not a.demo:
             log.info("El vídeo de %s ya está hecho", a.tipo)
             return
-        meta = la_semana(hoy, Path(a.salida), a.demo)
+        with duracion(*DURACION_SEMANA):  # el vídeo estrella: más largo (y hace de parte de mañana)
+            meta = la_semana(hoy, Path(a.salida), a.demo)
         titulo = "La semana que viene" if a.tipo == "semana" else "Lo que queda de semana"
     else:
         if a.demo:

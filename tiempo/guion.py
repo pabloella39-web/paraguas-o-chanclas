@@ -133,14 +133,14 @@ def _claude(prompt: str, clave: str) -> dict:
 CTAS = {
     "mencion": 'pide que MENCIONEN EN COMENTARIOS a sus amigos para que estén al tanto del tiempo y sepan si '
                'necesitan paraguas o chanclas (ej. "menciona a ese amigo que siempre sale sin paraguas").',
-    "ciudad": 'invita a escribir en comentarios su ciudad o pueblo: "y si quieres saber el tiempo de tu pueblo, '
-              'pregúntamelo en comentarios y te respondo con un vídeo".',
+    "ciudad": 'invita a escribir en comentarios su pueblo o ciudad para contestarle con su previsión: "dime en '
+              'comentarios tu pueblo y te digo si allí toca paraguas o chanclas".',
     "pregunta": "una pregunta concreta para que comenten (¿paraguas o chanclas?, ¿desde qué ciudad nos ves?, "
                 "¿qué plan tienes con este tiempo?, ¿acerté ayer?...).",
 }
 CIERRES_PLANTILLA = {
     "mencion": "Menciona a tus amigos para que sepan si hoy necesitan paraguas o chanclas.",
-    "ciudad": "¿Quieres el tiempo de tu pueblo? Pregúntamelo en comentarios y te respondo con un vídeo.",
+    "ciudad": "Dime en comentarios tu pueblo y te digo si allí toca paraguas o chanclas.",
 }
 
 
@@ -175,7 +175,8 @@ def continuidad(hoy: date) -> str | None:
 
 
 def cta_del_dia(hoy: date) -> str:
-    return ("mencion", "ciudad", "pregunta", "ciudad", "mencion", "pregunta", "ciudad")[hoy.toordinal() % 7]
+    # "Dime tu pueblo" es lo que más conversación genera (y se contesta a todos): 4 de cada 7 días
+    return ("ciudad", "mencion", "ciudad", "pregunta", "ciudad", "ciudad", "mencion")[hoy.toordinal() % 7]
 
 
 def _guion_precargado(hoy: date, prompt: str) -> dict | None:

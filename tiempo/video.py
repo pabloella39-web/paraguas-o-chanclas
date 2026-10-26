@@ -176,12 +176,13 @@ class Particulas:
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
-                 gancho=None):
+                 gancho=None, dias_portada=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
         portada_txt: (marca, texto grande, texto pequeño). capas: {bloque: función(img, proyección, dt)} que dibuja
         encima del mapa. sin_marcadores: bloques sin marcadores de ciudades."""
+        self.dias_portada = dias_portada  # [(día, icono, máx)]: portada del vídeo semanal
         self.gancho = gancho  # fenómeno del día (tiempo.gancho): icono grande, insignia de urgencia y efecto
         self.datos_seg = datos_seg or {}
         self.vistas = vistas or {}
@@ -335,8 +336,10 @@ class Compositor:
         """Miniatura legible en la cuadrícula del perfil (que recorta a 3:4: todo va en la franja central)."""
         if getattr(self, "_portada", None) is not None:
             return self._portada
-        im = Image.new("RGBA", (ANCHO, ALTO), (6, 16, 38, 238))
+        im = Image.new("RGBA", (ANCHO, ALTO), (70, 8, 30, 246) if self.dias_portada else (6, 16, 38, 238))
         d = ImageDraw.Draw(im)
+        if self.dias_portada:  # marco dorado: se distingue a simple vista en la cuadrícula del perfil
+            d.rounded_rectangle([40, ALTO / 2 - 640, ANCHO - 40, ALTO / 2 + 640], radius=48, outline=ACENTO, width=14)
         partes = self.fecha_txt.split(" ", 1)  # "MARTES", "20 DE OCTUBRE"
         dia_sem, resto = partes[0], (partes[1] if len(partes) > 1 else "")
         marca = "EL TIEMPO DE MAÑANA" if __import__("os").environ.get("VISPERA") else "EL TIEMPO EN ESPAÑA"
@@ -360,10 +363,22 @@ class Compositor:
         orden = sorted(cuenta, key=lambda k: -cuenta[k])[:2]
         if self.gancho and self.gancho["icono"] not in orden[:1]:
             orden = [self.gancho["icono"]] + [o for o in orden if o != self.gancho["icono"]][:1]
-        tam = 300
-        xs = [ANCHO / 2 - tam / 2] if len(orden) == 1 else [ANCHO / 2 - tam - 20, ANCHO / 2 + 20]
-        for x, ic in zip(xs, orden):
-            im.alpha_composite(mapa.icono(ic, tam, 0), (int(x), int(cy - 70)))
+        if self.dias_portada:  # tira de días: icono y máxima de cada uno
+            n = len(self.dias_portada)
+            ancho = (ANCHO - 140) / n
+            for k, (dia, ic, tmax) in enumerate(self.dias_portada):
+                x = 70 + k * ancho
+                d.rounded_rectangle([x + 6, cy - 90, x + ancho - 6, cy + 230], radius=26, fill=(35, 4, 16, 255), outline=(255, 255, 255, 70), width=2)
+                d.text((x + ancho / 2, cy - 50), dia, font=fuente("Black", 46), fill=ACENTO, anchor="mm")
+                t = int(min(150, ancho - 30))
+                im.alpha_composite(mapa.icono(ic, t, 0), (int(x + ancho / 2 - t / 2), int(cy - 15)))
+                d.text((x + ancho / 2, cy + 185), f"{tmax}°", font=fuente("Black", 58), fill=mapa.color_temp(tmax),
+                       anchor="mm")
+        else:
+            tam = 300
+            xs = [ANCHO / 2 - tam / 2] if len(orden) == 1 else [ANCHO / 2 - tam - 20, ANCHO / 2 + 20]
+            for x, ic in zip(xs, orden):
+                im.alpha_composite(mapa.icono(ic, tam, 0), (int(x), int(cy - 70)))
         if lineas_extra is not None:
             pares = lineas_extra
         else:
