@@ -39,8 +39,11 @@ def modelo() -> str:
 
 
 def voz_id(tipo: str) -> str | None:
+    fem = os.environ.get("ELEVEN_VOZ_FEMENINA", "").strip()
+    if fem in ("7sPWPWuzGi4J8JnaQcQw",):  # Anabel: descartada por el eco de su grabación
+        fem = ""
     ids = {"masculina": os.environ.get("ELEVEN_VOZ_MASCULINA", "").strip() or VOZ_MASCULINA,
-           "femenina": os.environ.get("ELEVEN_VOZ_FEMENINA", "").strip() or VOZ_FEMENINA}
+           "femenina": fem or VOZ_FEMENINA}
     return ids.get(tipo) or ids["femenina"] or ids["masculina"] or None
 
 
