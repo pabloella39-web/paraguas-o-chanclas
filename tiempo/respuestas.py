@@ -146,7 +146,8 @@ humor ligero y cercano. Clasifica CADA comentario en uno de estos tipos:
   "desde Vigo", "Tomelloso, Ciudad Real") → se le contestará con la previsión de ese sitio por escrito.
 - "otro": cualquier otro comentario al que merezca la pena contestar (opiniones, bromas, "¿acertaste?", quejas del
   tiempo, emojis de apoyo...). Escribe tú la "respuesta": máximo 120 caracteres, de tú, simpática, con 1 emoji, sin
-  inventar datos del tiempo, y si encaja invita a decir su pueblo para darle su previsión.
+  inventar datos del tiempo. Varía las respuestas (no empieces todas igual) y solo en UNA de cada tres invita a decir su
+  pueblo para darle su previsión.
 - "ignorar": insultos, spam, enlaces o cosas sin sentido.
 Para "pregunta" y "ciudad" devuelve también: lugar (nombre limpio y bien escrito), provincia o región si se deduce (o
 ""), pais (ISO de 2 letras; "ES" si no se dice otra cosa) y dia: "hoy", "mañana" o "".
@@ -265,7 +266,7 @@ def prevision(sitio: dict, dia: date) -> dict:
 
 
 def veredicto(p: dict) -> str:
-    if p["lluvia"] >= 50 or p["mm"] >= 1 or p["icono"] in ("lluvia", "tormenta", "chubascos"):
+    if p["lluvia"] >= 50 or p["mm"] >= 1 or (p["icono"] in ("lluvia", "tormenta", "chubascos") and p["lluvia"] >= 30):
         return "PARAGUAS"
     if p["icono"] == "nieve":
         return "BOTAS Y BUFANDA"
