@@ -82,18 +82,19 @@ jobs:
           UPLOADPOST_PERFIL_ECONOMIA: ${{ vars.UPLOADPOST_PERFIL_ECONOMIA }}
           TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}
           TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
+          GH_PUSH_TOKEN: ${{ github.token }}
         run: |
           ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             ARGS="--publicar --esperar"
-            case "${{ github.event.schedule }}" in "50 17 26 10 *"|"20 18 26 10 *") ARGS="--publicar --vispera --esperar";; esac
+            case "${{ github.event.schedule }}" in "50 17 26 10 *"|"20 18 26 10 *") ARGS="--publicar --vispera --esperar"; export ESPERAR_GUION=1;; esac
           elif [ "${{ github.event_name }}" = "push" ]; then
             ARGS="--publicar"
             # "prueba" en lanzar.txt: vídeo real subido a YouTube como privado, sin TikTok ni historial
             grep -qi prueba lanzar.txt && ARGS="--prueba"
             grep -qi "youtube publico" lanzar.txt && export PRUEBA_PUBLICA=1
             # "vispera" en lanzar.txt: el parte de mañana, publicado hoy a las 20:30
-            grep -qi vispera lanzar.txt && ARGS="--publicar --vispera --esperar"
+            grep -qi vispera lanzar.txt && ARGS="--publicar --vispera --esperar" && export ESPERAR_GUION=1
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
