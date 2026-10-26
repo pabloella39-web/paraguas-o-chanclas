@@ -25,6 +25,8 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - name: Sincronizar con lo último de main (evita repetir lo que otra ejecución acaba de publicar)
+        run: git fetch -q origin main && git reset -q --hard origin/main
       - name: Comprobar Upload-Post
         id: up
         env:

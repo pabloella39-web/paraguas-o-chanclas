@@ -32,6 +32,8 @@ jobs:
     timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
+      - name: Sincronizar con lo último de main (evita repetir lo que otra ejecución acaba de publicar)
+        run: git fetch -q origin main && git reset -q --hard origin/main
 
       - name: Comprobar horario de Madrid
         id: horario
