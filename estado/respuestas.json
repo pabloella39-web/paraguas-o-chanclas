@@ -1,8 +1,48 @@
 {
  "vistos": [
   "7701077758394286870",
-  "7701074447890334496"
+  "7701074447890334496",
+  "7701010264346788631",
+  "7700972948710507296",
+  "7700955688649884438",
+  "7700926647287448343",
+  "7700914098901893910",
+  "7700581265388749590",
+  "7700581236629570327",
+  "7700581230941487894",
+  "7700581206388245271",
+  "7699754809280578336",
+  "7699543625403450134",
+  "7699384538661389078",
+  "7699374904584225558",
+  "7699127445454226198",
+  "7699015076779442976",
+  "7701002525775971094",
+  "7699821785025643297"
  ],
- "hechas": [],
+ "hechas": [
+  {
+   "fecha": "2026-10-26",
+   "clave": "valencia|2026-10-27",
+   "lugar": "Valencia",
+   "usuarios": [
+    "joseantoniogarrid036"
+   ],
+   "motor": "edge-tts",
+   "resumen": "Mañana en Valencia: 26°/12°, 0 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-10-26",
+   "clave": "las palmas de gran canaria|2026-10-27",
+   "lugar": "Las Palmas de Gran Canaria",
+   "usuarios": [
+    "pilarsantospea3"
+   ],
+   "motor": "edge-tts",
+   "resumen": "Mañana en Las Palmas de Gran Canaria: 26°/23°, 3 % de lluvia → chanclas.",
+   "publicado": true
+  }
+ ],
  "v2": true
 }
