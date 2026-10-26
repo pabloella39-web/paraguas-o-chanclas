@@ -510,6 +510,25 @@ def caption(g: dict) -> str:
             f"#eltiempo #tiempo {tag} #paraguasochanclas #parati")[:2200]
 
 
+def creditos_para_respuesta(hoy_: datetime) -> bool:
+    """¿Quedan créditos de ElevenLabs para una respuesta (~250) sin quitárselos al parte y a las historias hasta la
+    próxima recarga del plan?"""
+    try:
+        r = requests.get("https://api.elevenlabs.io/v1/user/subscription",
+                         headers={"xi-api-key": os.environ["ELEVENLABS_API_KEY"].strip()}, timeout=30)
+        j = r.json()
+        restante = int(j["character_limit"]) - int(j["character_count"])
+        recarga = datetime.fromtimestamp(int(j.get("next_character_count_reset_unix") or 0)).date()
+    except Exception as e:  # noqa: BLE001
+        log.warning("No se pudo consultar ElevenLabs: %s", e)
+        return False
+    dias = max(1, (recarga - hoy_.date()).days) if recarga > hoy_.date() else 30
+    historias = sum(1 for k in range(dias) if (hoy_.date() + timedelta(days=k)).weekday() in (0, 2, 4, 5, 6))
+    necesarios = dias * 1300 + historias * 3800 + 300
+    log.info("ElevenLabs: %d créditos, recarga el %s; reserva %d", restante, recarga, necesarios)
+    return restante - necesarios >= 250
+
+
 # ================================================================ principal
 def agrupar(preguntas: list[dict], hoy_: datetime) -> list[dict]:
     grupos = {}
@@ -647,18 +666,16 @@ def main():
             g = {"sitio": sitio, "dia": gr["dia"], "prev": prev, "veredicto": veredicto(prev),
                  "usuarios": list(dict.fromkeys(c["usuario"] for c in gr["coms"] if c["usuario"])) or ["ti"],
                  "textos": [c["texto"] for c in gr["coms"]]}
-            con_eleven = sum(1 for h in hechas_hoy if h.get("motor") == "elevenlabs") < MAX_ELEVEN_DIA
-            if con_eleven:  # reserva de créditos: primero el parte, luego las historias
-                from historias.locucion import creditos_restantes
-                restante = creditos_restantes()
-                dias = 31 - hoy_.day + 1
-                if restante is not None and restante < dias * (1100 + 3800) + 500:
-                    log.info("Pocos créditos de ElevenLabs (%d): respuesta con voz gratuita", restante)
-                    con_eleven = False
-            r = hacer_video(g, salida, con_eleven)
             resumen = (f"{'Hoy' if gr['dia'] == hoy_.date() else 'Mañana'} en {sitio['nombre']}: "
                        f"{prev['tmax']}°/{prev['tmin']}°, {prev['lluvia']} % de lluvia → {g['veredicto'].lower()}.")
-            if a.publicar:
+            # Solo vídeos con la voz de ElevenLabs (la del canal); si no hay créditos de sobra, respuesta escrita
+            r = hacer_video(g, salida, True) if creditos_para_respuesta(hoy_) else {"motor": "sin créditos"}
+            if r["motor"] != "elevenlabs":
+                log.info("Sin voz de ElevenLabs para %s (%s): se contesta por escrito", sitio["nombre"], r["motor"])
+                if a.publicar:
+                    for c in gr["coms"]:
+                        responder_texto(c, f"¡Aquí lo tienes! {resumen}")
+            elif a.publicar:
                 uploadpost.publicar_tiktok(r["video"], caption(g), "tiempo")
                 for c in gr["coms"]:
                     responder_texto(c, f"¡Te respondo en vídeo! 🎥 {resumen}")
