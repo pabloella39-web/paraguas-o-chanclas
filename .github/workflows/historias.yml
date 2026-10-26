@@ -72,7 +72,13 @@ jobs:
       - name: Guardar vídeos en la rama pruebas-historias
         if: always()
         run: |
-          ls salida_historias/*.mp4 >/dev/null 2>&1 || exit 0   # sin vídeos nuevos no se toca la rama
+          if ! ls salida_historias/*.mp4 >/dev/null 2>&1; then   # sin vídeos: solo se guarda el registro (para ver fallos)
+            [ -f salida_historias/registro.txt ] || exit 0
+            mkdir -p /tmp/r && cp salida_historias/registro.txt /tmp/r/ && cd /tmp/r && git init -q -b registro-historias
+            git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+            git add -A && git commit -qm "Registro $(date +%F-%H%M)" && \
+            git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" registro-historias
+            exit 0; fi
           mkdir -p /tmp/p && cp salida_historias/*.mp4 salida_historias/meta.json salida_historias/registro.txt /tmp/p/ 2>/dev/null || true
           cd /tmp/p && git init -q -b pruebas-historias
           git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
