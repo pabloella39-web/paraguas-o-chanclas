@@ -31,7 +31,7 @@ CPS_INICIAL = 14.5   # caracteres por segundo hablados (se corrige solo con cada
 
 # Voces elegidas en la biblioteca de ElevenLabs (español de España), añadidas a "My Voices" de la cuenta
 VOZ_MASCULINA = "Pc51tQpUBlUP7gybDfkb"   # Enrique Soler
-VOZ_FEMENINA = "7sPWPWuzGi4J8JnaQcQw"    # Anabel
+VOZ_FEMENINA = "BXtvkfRgOYGPQKVRgufE"    # Maite Jiménez (Anabel tenía eco en la grabación: 19 % de cola frente a 5 %)
 
 
 def modelo() -> str:
