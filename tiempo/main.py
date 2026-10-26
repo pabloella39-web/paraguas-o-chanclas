@@ -231,7 +231,8 @@ def publicar_youtube(meta: dict, hoy: date):
         log.info("YouTube sin configurar: no se sube")
         return
     try:
-        titulo, desc, tags = youtube.textos(meta["caption"], meta.get("titular"), g.fecha_larga(hoy))
+        titulo, desc, tags = youtube.textos(meta["caption"], meta.get("titular"), g.fecha_larga(hoy),
+                                            meta.get("tipo_youtube") or ("manana" if os.environ.get("VISPERA") else "hoy"))
         meta["youtube"] = youtube.subir_con_reintentos(Path(meta["video"]), titulo, desc, tags)
     except Exception as e:  # noqa: BLE001
         log.error("No se pudo subir a YouTube: %s", e)
@@ -291,7 +292,9 @@ def main():
         if a.esperar:
             esperar_hasta_publicacion()
         try:
-            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo")
+            meta["primer_comentario"] = uploadpost.COMENTARIO_PUEBLO
+            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo",
+                                                        primer_comentario=meta["primer_comentario"])
         except Exception as e:  # noqa: BLE001
             log.error("Upload-Post falló (%s): se envía como borrador", e)
             from .tiktok import publicar_con_reintentos

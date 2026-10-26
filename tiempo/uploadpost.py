@@ -36,6 +36,10 @@ def _cabeceras():
     return {"Authorization": f"Apikey {os.environ['UPLOADPOST_API_KEY'].strip()}"}
 
 
+# Primer comentario del canal en cada vídeo del tiempo: arranca la conversación y pide lo que luego contestamos
+COMENTARIO_PUEBLO = "📍 Escribe tu pueblo y te digo si mañana toca paraguas o chanclas 👇"
+
+
 def publicar_tiktok(video: Path, caption: str, canal: str = "tiempo", espera_max: int = 900,
                     programado=None, primer_comentario: str | None = None) -> dict:
     """programado: datetime con zona horaria para dejar la publicación programada en Upload-Post."""

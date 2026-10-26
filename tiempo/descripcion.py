@@ -72,26 +72,16 @@ def construir(prev: list[dict], hoy: date, gancho_ia: str | None = None) -> str:
     if cta == "mencion":
         lineas.append("👥 Menciona a quien necesite saber si hoy toca paraguas o chanclas")
     elif cta == "ciudad":
-        lineas.append("📍 ¿Y en tu pueblo? Pregúntame en comentarios y te respondo con un vídeo")
+        lineas.append("📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas")
 
-    tags = list(HASHTAGS_FIJOS)
-    if lluvia:
-        tags.append("#lluvia")
-    if tormenta:
-        tags.append("#tormenta")
-    if nieve:
-        tags.append("#nieve")
-    if caliente["tmax"] >= 28:
-        tags.append("#calor")
-    if fria["tmin"] <= 3:
-        tags.append("#frio")
-    tags.append(_estacion(hoy))
-    # Ciudades destacadas: atraen búsquedas locales ("tiempo Sevilla")
-    for p in (lluvia[:1] + [caliente, fria]):
-        h = _hashtag(p["nombre"])
-        if h not in tags:
-            tags.append(h)
-    tags = tags[:12]
+    # Pocos y concretos (4-5): genéricos como #parati o #españa ya no ayudan y diluyen el tema del vídeo
+    tags = ["#eltiempo", "#tiempomañana" if os.environ.get("VISPERA") else "#tiempohoy", "#paraguasochanclas"]
+    fen = ("#tormenta" if tormenta else "#nieve" if nieve else "#lluvia" if lluvia else
+           "#calor" if caliente["tmax"] >= 28 else "#frio" if fria["tmin"] <= 3 else None)
+    if fen:
+        tags.append(fen)
+    protagonista = (lluvia[:1] or tormenta[:1] or [caliente])[0]   # la ciudad de la noticia: búsquedas locales
+    tags.append(_hashtag(protagonista["nombre"]))
 
     texto = f"{gancho}\n\n" + "\n".join(lineas) + "\n\n" + " ".join(tags)
     return texto[:2200]

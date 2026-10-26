@@ -112,12 +112,17 @@ def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: 
             time.sleep(60 * i)
 
 
-def textos(caption: str, titular: str | None, fecha_txt: str) -> tuple[str, str, list[str]]:
-    """Título, descripción y etiquetas a partir de la descripción de TikTok."""
-    gancho = caption.split("\n", 1)[0].strip() or "¿Paraguas o chanclas?"
-    titulo = f"{gancho} | El tiempo, {fecha_txt} #Shorts"
+def textos(caption: str, titular: str | None, fecha_txt: str, tipo: str = "hoy") -> tuple[str, str, list[str]]:
+    """Título (pensado para el buscador de YouTube: lo que la gente escribe), descripción y etiquetas."""
+    gancho = caption.split("\n", 1)[0].strip() or "¿Paraguas o chanclas?"   # frase gancho (mayúsculas normales)
+    busqueda = {"manana": f"El tiempo para mañana, {fecha_txt}, en España",
+                "hoy": f"El tiempo hoy, {fecha_txt}, en España",
+                "semana": f"El tiempo de la semana en España ({fecha_txt})",
+                "finde": f"El tiempo del fin de semana en España ({fecha_txt})",
+                "aviso": f"Aviso de AEMET: {fecha_txt}"}.get(tipo, f"El tiempo en España, {fecha_txt}")
+    titulo = f"{busqueda} | {gancho}"
     if len(titulo) > 100:
-        titulo = f"{gancho[:100 - 9].rstrip()} #Shorts"
+        titulo = busqueda[:100]
     hashtags = [w.lstrip("#") for w in caption.split() if w.startswith("#")]
     descripcion = (caption + "\n\nPrevisión diaria del tiempo en España con datos de AEMET y Open-Meteo "
                    "(CC BY 4.0). Voz generada con IA.\nSuscríbete para tener el tiempo de cada día ☂️🩴")

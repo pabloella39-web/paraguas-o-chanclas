@@ -245,8 +245,7 @@ def caption_finde(prev_s, prev_d, sab, dom, gancho) -> str:
     llueve = sorted({c["nombre"] for c in prev_s + prev_d if c["lluvia"] >= 50})
     if llueve:
         lineas.append("🌧️ Lluvia en " + ", ".join(llueve[:3]))
-    tags = ["#finde", "#findesemana", "#eltiempo", "#tiempo", "#españa", "#AEMET", "#parati", "#paraguasochanclas",
-            _estacion(sab)]
+    tags = ["#eltiempo", "#finde", "#tiempofindesemana", "#paraguasochanclas"]
     return (f"{(gancho or '¿Playa, monte o sofá? 👇').strip()}\n\n" + "\n".join(lineas) + "\n\n" + " ".join(tags))[:2200]
 
 
@@ -403,8 +402,7 @@ def caption_semana(prevs: dict, fechas: dict, gancho) -> str:
         llueve = [c["nombre"] for c in sorted(pr, key=lambda c: -c["lluvia"]) if c["lluvia"] >= 50][:2]
         lineas.append(f"{iconos.get(dom, '🌤️')} {NOMBRE_DIA[d].capitalize()} {fechas[d].day}: máx. "
                       f"{max(c['tmax'] for c in pr)}°" + (f" · lluvia en {', '.join(llueve)}" if llueve else ""))
-    tags = ["#eltiempo", "#tiempo", "#semana", "#prevision", "#españa", "#AEMET", "#parati", "#paraguasochanclas",
-            _estacion(fechas[_dias()[0]])]
+    tags = ["#eltiempo", "#tiempomañana", "#tiemposemana", "#paraguasochanclas"]
     cab = ("El tiempo de la semana que viene en España 🇪🇸" if MODO_SEMANA == "semana"
            else "Lo que queda de semana y el finde en España 🇪🇸")
     return (f"{(gancho or 'Tu semana, día a día 👇').strip()}\n\n{cab}\n"
@@ -703,10 +701,9 @@ def caption_aviso(grupos, gancho) -> str:
         lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:4])}"
                       + (" y más" if len(sitios) > 4 else ""))
     lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112."]
-    tags = ["#aviso", "#AEMET", "#alerta", "#eltiempo", "#tiempo", "#españa", "#parati", "#paraguasochanclas"]
-    for gr in grupos[:2]:
-        tags.append("#" + re.sub(r"\W", "", gr["fenomeno"].split()[0]))
-        for c in (gr.get("ciudades") or [])[:2]:
+    tags = ["#aviso", "#AEMET", "#eltiempo", "#paraguasochanclas"]
+    for gr in grupos[:1]:
+        for c in (gr.get("ciudades") or [])[:1]:
             tags.append("#" + re.sub(r"\W", "", c.split()[0]))
     return (f"{(gancho or '⚠️ Aviso de AEMET: lo que tienes que saber').strip()}\n\n" + "\n".join(lineas)
             + "\n\n" + " ".join(dict.fromkeys(tags)))[:2200]
@@ -777,12 +774,15 @@ def _publicar(meta: dict, hoy: date):
     hecho = False
     if uploadpost.disponible():
         try:
-            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo")
+            meta["primer_comentario"] = None if meta.get("tipo") == "aviso" else uploadpost.COMENTARIO_PUEBLO
+            meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo",
+                                                        primer_comentario=meta["primer_comentario"])
             hecho = True
         except Exception as e:  # noqa: BLE001
             log.error("Upload-Post falló (%s): borrador", e)
     if not hecho and not hay_credenciales():
         meta["tiktok"] = publicar_con_reintentos(Path(meta["video"]), meta["caption"], 0)
+    meta["tipo_youtube"] = {"semana": "semana", "resto": "semana", "finde": "finde"}.get(meta.get("tipo"), "aviso")
     publicar_youtube(meta, hoy)
 
 

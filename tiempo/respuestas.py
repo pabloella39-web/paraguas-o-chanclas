@@ -215,7 +215,7 @@ def videos_que_piden_lugar() -> set[str]:
         except Exception:  # noqa: BLE001
             continue
         textos = list((d.get("guion") or {}).values()) if isinstance(d.get("guion"), dict) else [str(d.get("guion", ""))]
-        textos.append(d.get("caption", ""))
+        textos += [d.get("caption", ""), d.get("primer_comentario") or ""]
         if any(PIDE_LUGAR.search(str(t)) for t in textos):
             ids.update(re.findall(r'"platform_post_id": "(\d{15,22})"', json.dumps(d.get("tiktok", {}))))
             ids.update(re.findall(r"/video/(\d{15,22})", json.dumps(d.get("tiktok", {}))))
