@@ -1,0 +1,81 @@
+{
+ "fecha": "2026-10-26",
+ "duracion": 65.4,
+ "caption": "¿Paraguas o chanclas en tu pueblo? Escríbelo y te respondo con un vídeo ☔🩴\n\nEl tiempo en España hoy, lunes 26 de octubre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife\n🔥 Máxima: 30° en Sevilla\n🥶 Mínima: 5° en Salamanca\n📍 ¿Y en tu pueblo? Pregúntame en comentarios y te respondo con un vídeo\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #Tenerife #Sevilla",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "TENERIFE, HOY PARAGUAS",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Santa Cruz de Tenerife, hoy sí toca paraguas. Quédate y te digo dónde pega más el calor.",
+  "islas": "En Santa Cruz de Tenerife, 58 por ciento de lluvia y 29 grados. Palma, tranquila, con 24.",
+  "interior": "Si eres de Madrid, 23 grados y nubes altas. Salamanca amanece a 5 grados, así que abrígate un poco.",
+  "norte": "Gente de Bilbao, hasta 26 grados y sin lluvia. En A Coruña, ojo al viento, con rachas de 42 kilómetros por hora.",
+  "sur": "Sevilla llega a 30 grados, aunque AEMET y los modelos no se ponen de acuerdo. Málaga, 27, y Ceuta y Melilla, con sol.",
+  "mediterraneo": "Barcelona, con nubes y 22 grados. Valencia, 25, y Alicante y Murcia, 27. Hoy el paraguas descansa.",
+  "general": "Lo más cálido, Sevilla con 30 grados; lo más fresco, Salamanca con 5 de mínima. Y anochece a las 18:20 en Madrid.",
+  "cierre": "Cuéntame en comentarios tu ciudad o pueblo y te respondo con un vídeo. Sigue Paraguas o Chanclas: hoy, chanclas, salvo en Tenerife."
+ },
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-10-26T06:27:28.386Z"
+     },
+     "success": true,
+     "platform_post_id": "7700859104197283104",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7700859104197283104",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13062966,
+     "post_title": "¿Paraguas o chanclas en tu pueblo? Escríbelo y te respondo con un vídeo ☔🩴\n\nEl tiempo en España hoy, lunes 26 de octubre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife\n🔥 Máxima: 30° en Sevilla\n🥶 Mínima: 5° en Salamanca\n📍 ¿Y en tu pueblo? Pregúntame en comentarios y te respondo con un vídeo\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #Tenerife #Sevilla",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 65.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7700857644537579553",
+     "request_id": "a643899b70a4462795afa3fe6dcad714",
+     "request_id_logs": "a643899b70a4462795afa3fe6dcad714",
+     "job_id": "14ac4a4551714c7881481729c3de1565",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-10-26T06:27:28.386Z"
+   },
+   "request_id": "a643899b70a4462795afa3fe6dcad714"
+  }
+ },
+ "youtube": {
+  "id": "eYeZIQqhi_I",
+  "url": "https://youtube.com/shorts/eYeZIQqhi_I",
+  "canal": "Paraguas o Chanclas"
+ }
+}
