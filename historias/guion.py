@@ -111,7 +111,8 @@ def _claude(prompt: str) -> dict:
                       headers={"x-api-key": clave, "anthropic-version": "2023-06-01", "content-type": "application/json"},
                       json={"model": MODELO, "max_tokens": 16000, "messages": [{"role": "user", "content": prompt}]},
                       timeout=300)
-    r.raise_for_status()
+    if r.status_code != 200:
+        raise RuntimeError(f"Claude HTTP {r.status_code}: {r.text[:400]}")
     texto = "".join(b.get("text", "") for b in r.json()["content"] if b.get("type") == "text")
     return json.loads(re.search(r"\{.*\}", texto, re.S).group(0))
 
