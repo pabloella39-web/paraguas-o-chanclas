@@ -59,7 +59,7 @@ jobs:
           UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
           RESPUESTAS_POR_HORA: ${{ vars.RESPUESTAS_POR_HORA || '3' }}
           RESPUESTAS_POR_DIA: ${{ vars.RESPUESTAS_POR_DIA || '6' }}
-          RESPUESTAS_TEXTO_POR_HORA: ${{ vars.RESPUESTAS_TEXTO_POR_HORA || '0' }}
+          RESPUESTAS_TEXTO_POR_HORA: ${{ vars.RESPUESTAS_TEXTO_POR_HORA || '25' }}
           SOLO_VIDEO: ${{ inputs.solo_video }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then

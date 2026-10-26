@@ -40,7 +40,7 @@ MAX_EJECUCION = int(os.environ.get("RESPUESTAS_POR_HORA", "3"))
 MAX_DIA = int(os.environ.get("RESPUESTAS_POR_DIA", "6"))
 # Respuestas escritas (solo a quien dice su pueblo/ciudad). En pruebas: 0 en las ejecuciones programadas y
 # activadas a mano para un vídeo concreto (SOLO_VIDEO).
-MAX_TEXTO = int(os.environ.get("RESPUESTAS_TEXTO_POR_HORA", "0"))
+MAX_TEXTO = int(os.environ.get("RESPUESTAS_TEXTO_POR_HORA", "25"))
 SOLO_VIDEO = os.environ.get("SOLO_VIDEO", "").strip()
 MAX_ELEVEN_DIA = int(os.environ.get("RESPUESTAS_ELEVEN_DIA", "6"))  # misma voz que el parte; si se acaban los créditos, voz gratuita
 ACENTO = (255, 196, 45)
@@ -198,6 +198,26 @@ FRASES_CIUDAD = [
     "{cuando} en {sitio}: {tmax}° y {lluvia} % de probabilidad de lluvia. Veredicto: {veredicto} {emoji}",
 ]
 EMOJI_VEREDICTO = {"PARAGUAS": "☔", "CHANCLAS": "🩴", "BOTAS Y BUFANDA": "🧣"}
+
+
+PIDE_LUGAR = re.compile(r"desde (?:qu[eé]|d[oó]nde)|(?:tu|vuestro) (?:pueblo|ciudad|sitio|barrio)|"
+                        r"de d[oó]nde (?:nos ves|eres|sois)|qu[eé] (?:ciudad|pueblo)", re.I)
+
+
+def videos_que_piden_lugar() -> set[str]:
+    """Ids de TikTok de los vídeos cuyo guion (locución o descripción) pedía el pueblo o la ciudad."""
+    ids = set()
+    for f in list((RAIZ / "historial").glob("*.json")) + list((RAIZ / "historial_especiales").glob("*.json")):
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        textos = list((d.get("guion") or {}).values()) if isinstance(d.get("guion"), dict) else [str(d.get("guion", ""))]
+        textos.append(d.get("caption", ""))
+        if any(PIDE_LUGAR.search(str(t)) for t in textos):
+            ids.update(re.findall(r'"platform_post_id": "(\d{15,22})"', json.dumps(d.get("tiktok", {}))))
+            ids.update(re.findall(r"/video/(\d{15,22})", json.dumps(d.get("tiktok", {}))))
+    return ids
 
 
 def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
@@ -573,8 +593,11 @@ def main():
              sum(q.get("tipo") == "ciudad" for q in clasif), sum(q.get("tipo") == "otro" for q in clasif))
     # Respuestas por escrito: a quien dice su ciudad, la previsión de su sitio; al resto, una respuesta simpática
     escritas = 0
+    piden = videos_que_piden_lugar()
     for q in clasif:
         if SOLO_VIDEO and q["video"] != SOLO_VIDEO:
+            continue
+        if not SOLO_VIDEO and q["video"] not in piden:  # solo en los vídeos que pidieron el pueblo o la ciudad
             continue
         if escritas >= (25 if SOLO_VIDEO else MAX_TEXTO):
             break
@@ -589,13 +612,16 @@ def main():
                 log.info("Respuesta escrita a @%s («%s»): %s", q["usuario"], q["texto"][:40], msg)
         except Exception as e:  # noqa: BLE001
             log.warning("Respuesta escrita a %s falló: %s", q["id"], e)
+        if a.publicar and q.get("tipo") == "ciudad":  # intentado (contestado o lugar no encontrado): no se repite
+            estado.setdefault("escritas", []).append(q["id"])
     if SOLO_VIDEO:  # prueba: solo las respuestas escritas de ese vídeo
         estado["vistos"] += [q["id"] for q in clasif if q["video"] == SOLO_VIDEO]
         _guardar(estado)
         return
-    if not MAX_TEXTO:  # los comentarios de ciudad quedan sin marcar para cuando se activen las respuestas escritas
-        ciudades = {q["id"] for q in clasif if q.get("tipo") == "ciudad"}
-        coms = [c for c in coms if c["id"] not in ciudades]
+    # Los comentarios de ciudad que no se contestaron por el límite quedan para la siguiente hora
+    contestables = {q["id"] for q in clasif if q.get("tipo") == "ciudad" and q["video"] in piden}
+    hechas_txt = set(estado.setdefault("escritas", []))
+    coms = [c for c in coms if c["id"] not in contestables or c["id"] in hechas_txt]
     estado["vistos"] += [c["id"] for c in coms if c["id"] not in {q["id"] for q in preguntas}]
     _guardar(estado)
 
