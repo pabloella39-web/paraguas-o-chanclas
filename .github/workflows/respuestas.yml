@@ -11,6 +11,10 @@ on:
         description: "Solo comprobar (leer comentarios, sin publicar)"
         type: boolean
         default: true
+      solo_video:
+        description: "Responder por escrito a los comentarios de ciudad de este vídeo (id de TikTok)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -55,6 +59,8 @@ jobs:
           UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
           RESPUESTAS_POR_HORA: ${{ vars.RESPUESTAS_POR_HORA || '3' }}
           RESPUESTAS_POR_DIA: ${{ vars.RESPUESTAS_POR_DIA || '6' }}
+          RESPUESTAS_TEXTO_POR_HORA: ${{ vars.RESPUESTAS_TEXTO_POR_HORA || '0' }}
+          SOLO_VIDEO: ${{ inputs.solo_video }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then
             python -m tiempo.respuestas --comprobar

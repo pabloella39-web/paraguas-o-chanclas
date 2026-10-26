@@ -38,7 +38,10 @@ ESTADO = RAIZ / "estado" / "respuestas.json"
 API = uploadpost.API
 MAX_EJECUCION = int(os.environ.get("RESPUESTAS_POR_HORA", "3"))
 MAX_DIA = int(os.environ.get("RESPUESTAS_POR_DIA", "6"))
-MAX_TEXTO = int(os.environ.get("RESPUESTAS_TEXTO_POR_HORA", "25"))  # respuestas escritas por ejecución
+# Respuestas escritas (solo a quien dice su pueblo/ciudad). En pruebas: 0 en las ejecuciones programadas y
+# activadas a mano para un vídeo concreto (SOLO_VIDEO).
+MAX_TEXTO = int(os.environ.get("RESPUESTAS_TEXTO_POR_HORA", "0"))
+SOLO_VIDEO = os.environ.get("SOLO_VIDEO", "").strip()
 MAX_ELEVEN_DIA = int(os.environ.get("RESPUESTAS_ELEVEN_DIA", "6"))  # misma voz que el parte; si se acaban los créditos, voz gratuita
 ACENTO = (255, 196, 45)
 MIA = CUENTA_TIKTOK.lstrip("@").lower()
@@ -571,14 +574,14 @@ def main():
     # Respuestas por escrito: a quien dice su ciudad, la previsión de su sitio; al resto, una respuesta simpática
     escritas = 0
     for q in clasif:
-        if escritas >= MAX_TEXTO:
+        if SOLO_VIDEO and q["video"] != SOLO_VIDEO:
+            continue
+        if escritas >= (25 if SOLO_VIDEO else MAX_TEXTO):
             break
         try:
             msg = None
             if q.get("tipo") == "ciudad" and q.get("lugar"):
                 msg = texto_ciudad(q, hoy_)
-            elif q.get("tipo") == "otro" and (q.get("respuesta") or "").strip():
-                msg = q["respuesta"].strip()[:150]
             if msg:
                 if a.publicar:
                     responder_texto(q, msg)
@@ -586,6 +589,13 @@ def main():
                 log.info("Respuesta escrita a @%s («%s»): %s", q["usuario"], q["texto"][:40], msg)
         except Exception as e:  # noqa: BLE001
             log.warning("Respuesta escrita a %s falló: %s", q["id"], e)
+    if SOLO_VIDEO:  # prueba: solo las respuestas escritas de ese vídeo
+        estado["vistos"] += [q["id"] for q in clasif if q["video"] == SOLO_VIDEO]
+        _guardar(estado)
+        return
+    if not MAX_TEXTO:  # los comentarios de ciudad quedan sin marcar para cuando se activen las respuestas escritas
+        ciudades = {q["id"] for q in clasif if q.get("tipo") == "ciudad"}
+        coms = [c for c in coms if c["id"] not in ciudades]
     estado["vistos"] += [c["id"] for c in coms if c["id"] not in {q["id"] for q in preguntas}]
     _guardar(estado)
 
