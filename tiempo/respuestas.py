@@ -669,7 +669,12 @@ def main():
             resumen = (f"{'Hoy' if gr['dia'] == hoy_.date() else 'Mañana'} en {sitio['nombre']}: "
                        f"{prev['tmax']}°/{prev['tmin']}°, {prev['lluvia']} % de lluvia → {g['veredicto'].lower()}.")
             # Solo vídeos con la voz de ElevenLabs (la del canal); si no hay créditos de sobra, respuesta escrita
-            r = hacer_video(g, salida, True) if creditos_para_respuesta(hoy_) else {"motor": "sin créditos"}
+            # Los vídeos de respuesta salen como publicaciones normales del perfil (la API de TikTok no permite la
+            # respuesta en vídeo nativa), así que están DESACTIVADOS: se contesta por escrito. RESPUESTAS_VIDEO=1 los activa.
+            if os.environ.get("RESPUESTAS_VIDEO") == "1" and creditos_para_respuesta(hoy_):
+                r = hacer_video(g, salida, True)
+            else:
+                r = {"motor": "solo texto"}
             if r["motor"] != "elevenlabs":
                 log.info("Sin voz de ElevenLabs para %s (%s): se contesta por escrito", sitio["nombre"], r["motor"])
                 if a.publicar:
