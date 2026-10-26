@@ -200,6 +200,11 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))
+        if os.environ.get("VISPERA"):
+            prompt = ("IMPORTANTE: este vídeo se publica LA NOCHE ANTERIOR, a las 20:30: es la previsión de MAÑANA, "
+                      f"{fecha_larga(hoy)}. Donde abajo pone 'hoy', tú habla de 'mañana' (en la locución, el titular y "
+                      "la caption). Nunca digas 'hoy' para el día de la previsión. La continuidad con el vídeo semanal "
+                      "también se refiere a mañana.\n\n") + prompt
         for intento in range(2):
             try:
                 g = _claude(prompt, clave)

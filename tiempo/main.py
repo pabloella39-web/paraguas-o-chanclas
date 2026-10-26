@@ -241,6 +241,8 @@ def main():
     ap.add_argument("--demo", action="store_true", help="datos inventados, sin claves y sin voz")
     ap.add_argument("--publicar", action="store_true", help="subir a TikTok")
     ap.add_argument("--esperar", action="store_true", help="esperar a las 7:30 (Madrid) antes de publicar")
+    ap.add_argument("--vispera", action="store_true",
+                    help="el parte de MAÑANA, publicado esta noche a las 20:30 (el de mañana a las 7:30 ya no sale)")
     ap.add_argument("--prueba", action="store_true",
                     help="prueba real: genera el vídeo y lo sube a YouTube como PRIVADO; ni TikTok ni historial")
     ap.add_argument("--salida", default=str(RAIZ / "salida"))
@@ -249,6 +251,13 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     hoy = date.fromisoformat(a.fecha) if a.fecha else ahora().date()
+    if a.vispera:
+        from datetime import timedelta as _td
+        os.environ["VISPERA"] = "1"
+        hoy = ahora().date() + _td(days=1)
+        if (RAIZ / "historial" / f"{hoy.isoformat()}.json").exists():
+            log.info("El parte de mañana ya está publicado")
+            return
     meta = construir(hoy, Path(a.salida), demo=a.demo)
     if a.prueba:
         # "prueba youtube publico": se sube público a YouTube (sin TikTok ni historial)

@@ -54,7 +54,8 @@ def construir(prev: list[dict], hoy: date, gancho_ia: str | None = None) -> str:
     gancho = (gancho_ia or "").strip() or rnd.choice(GANCHOS)
     gancho = re.sub(r"\s*#\S+", "", gancho).strip()  # los hashtags van al final
 
-    lineas = [f"El tiempo en España hoy, {_dia(hoy)} 🇪🇸"]
+    import os
+    lineas = [f"El tiempo en España {'mañana' if os.environ.get('VISPERA') else 'hoy'}, {_dia(hoy)} 🇪🇸"]
     if lluvia:
         nombres = " y ".join(p["nombre"] for p in lluvia[:2])
         lineas.append(f"🌧️ Lluvia en {nombres}")

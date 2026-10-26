@@ -29,6 +29,12 @@ def debe_ejecutarse(evento: str, cron: str = "") -> bool:
     if evento != "schedule":
         return True
     t = ahora()
+    if cron in ("50 17 26 10 *", "20 18 26 10 *"):  # víspera (parte de mañana a las 20:30)
+        from datetime import timedelta
+        ok = (17, 30) <= (t.hour, t.minute) <= (20, 20) and \
+            not (RAIZ / "historial" / f"{(t.date() + timedelta(days=1)).isoformat()}.json").exists()
+        print("Víspera: " + ("se hace" if ok else "no toca"))
+        return ok
     if not ((6, 0) <= (t.hour, t.minute) <= (8, 45)):
         print(f"Fuera de la ventana de publicación ({t:%H:%M} en Madrid)")
         return False
@@ -40,7 +46,8 @@ def debe_ejecutarse(evento: str, cron: str = "") -> bool:
 
 
 def esperar_hasta_publicacion():
-    h, m = HORA_PUBLICACION
+    import os
+    h, m = (20, 30) if os.environ.get("VISPERA") else HORA_PUBLICACION
     # Se empieza a subir unos minutos antes: TikTok tarda ~2-3 min en procesar y el borrador debe estar a la hora
     objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0) - timedelta(minutes=4)
     falta = (objetivo - ahora()).total_seconds()

@@ -44,6 +44,9 @@ def avisos_de_hoy(hoy) -> list[dict]:
         return []
     ahora = datetime.now().astimezone()
     fin_dia = ahora.replace(hour=23, minute=59) + timedelta(hours=2)
+    if os.environ.get("VISPERA"):  # parte de mañana: avisos que afectan a mañana
+        ahora = ahora.replace(hour=0, minute=0) + timedelta(days=1)
+        fin_dia = ahora.replace(hour=23, minute=59)
     vigentes = []
     for a in avisos:
         try:

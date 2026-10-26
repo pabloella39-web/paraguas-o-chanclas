@@ -11,6 +11,9 @@ on:
     - cron: "47 5 * * *"
     - cron: "17 6 * * *"
     - cron: "47 6 * * *"
+    # Prueba de franja de noche: el parte del martes 27 se publica el lunes 26 a las 20:30 (víspera)
+    - cron: "50 17 26 10 *"
+    - cron: "20 18 26 10 *"
   push:
     # Lanzar un parte a mano desde git: cambiar el archivo lanzar.txt
     branches: [main]
@@ -36,7 +39,7 @@ concurrency:
 jobs:
   parte:
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
       - name: Sincronizar con lo último de main (evita repetir lo que otra ejecución acaba de publicar)
@@ -83,11 +86,14 @@ jobs:
           ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ]; then
             ARGS="--publicar --esperar"
+            case "${{ github.event.schedule }}" in "50 17 26 10 *"|"20 18 26 10 *") ARGS="--publicar --vispera --esperar";; esac
           elif [ "${{ github.event_name }}" = "push" ]; then
             ARGS="--publicar"
             # "prueba" en lanzar.txt: vídeo real subido a YouTube como privado, sin TikTok ni historial
             grep -qi prueba lanzar.txt && ARGS="--prueba"
             grep -qi "youtube publico" lanzar.txt && export PRUEBA_PUBLICA=1
+            # "vispera" en lanzar.txt: el parte de mañana, publicado hoy a las 20:30
+            grep -qi vispera lanzar.txt && ARGS="--publicar --vispera --esperar"
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"

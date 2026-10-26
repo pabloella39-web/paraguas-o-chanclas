@@ -339,7 +339,7 @@ class Compositor:
         d = ImageDraw.Draw(im)
         partes = self.fecha_txt.split(" ", 1)  # "MARTES", "20 DE OCTUBRE"
         dia_sem, resto = partes[0], (partes[1] if len(partes) > 1 else "")
-        marca = "EL TIEMPO EN ESPAÑA"
+        marca = "EL TIEMPO DE MAÑANA" if __import__("os").environ.get("VISPERA") else "EL TIEMPO EN ESPAÑA"
         lineas_extra = None
         if self.portada_txt:
             marca, dia_sem, resto = self.portada_txt[:3]
