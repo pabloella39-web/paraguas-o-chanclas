@@ -1,0 +1,6 @@
+Anabel (actual): eco 19.0
+Maite Jimenez: eco 5.0
+Maia: eco 10.2
+Sofia: eco 18.9
+Cristina: eco 21.0
+::notice::Anabel (actual): 19.0 | Maite Jimenez: 5.0 | Maia: 10.2 | Sofia: 18.9 | Cristina: 21.0
