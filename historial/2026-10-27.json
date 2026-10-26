@@ -1,0 +1,81 @@
+{
+ "fecha": "2026-10-27",
+ "duracion": 69.4,
+ "caption": "¿Acerté ayer? Dímelo en comentarios 👇\n\nEl tiempo en España mañana, martes 27 de octubre 🇪🇸\n🌧️ Lluvia en A Coruña y Bilbao\n🔥 Máxima: 29° en Murcia\n🥶 Mínima: 8° en Valladolid\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #ACoruna #Murcia",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "A CORUÑA, MAÑANA TE MOJAS",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Ojo, A Coruña: mañana llueve sí o sí. Te lo dije el domingo. Quédate, que al final te digo dónde hará más calor.",
+  "norte": "Un 99 por ciento de lluvia en A Coruña: el paraguas no es opcional. Gente de Bilbao, Santander y Oviedo, chubascos también. Pamplona se libra.",
+  "interior": "En el interior, todo seco: Madrid y Valladolid, 22 grados y sol. Eso sí, en Zaragoza, rachas de 52 kilómetros por hora.",
+  "islas": "En Canarias, noches de verano: Las Palmas y Santa Cruz de Tenerife no bajan de 23 grados, y en Tenerife, alguna gota. Palma, 24 grados.",
+  "mediterraneo": "En el Mediterráneo, chanclas: Barcelona con 24 grados, Valencia con 26 y Alicante con 27. Finales de octubre y ni rastro del otoño.",
+  "sur": "Gente de Sevilla, muchas nubes pero ni una gota, con 26 grados, y Málaga sube a 27. Ceuta y Melilla, 24 grados.",
+  "general": "Lo prometido: lo más caluroso, Murcia, con 29 grados. Y lo más frío, las madrugadas de Valladolid y Salamanca, con 8 grados.",
+  "cierre": "Y tú, ¿desde qué ciudad nos ves? Dímelo en comentarios y sigue a Paraguas o Chanclas. Mañana, paraguas en el norte y chanclas en el resto."
+ },
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-10-26T19:27:31.549Z"
+     },
+     "success": true,
+     "platform_post_id": "7701060123736722720",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7701060123736722720",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13675550,
+     "post_title": "¿Acerté ayer? Dímelo en comentarios 👇\n\nEl tiempo en España mañana, martes 27 de octubre 🇪🇸\n🌧️ Lluvia en A Coruña y Bilbao\n🔥 Máxima: 29° en Murcia\n🥶 Mínima: 8° en Valladolid\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #ACoruna #Murcia",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7701059900100855841",
+     "request_id": "5860af22d9cb415dbad14184fcb7a3f9",
+     "request_id_logs": "5860af22d9cb415dbad14184fcb7a3f9",
+     "job_id": "7f984aa32a8b485591f837b2b8cc7eae",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-10-26T19:27:31.549Z"
+   },
+   "request_id": "5860af22d9cb415dbad14184fcb7a3f9"
+  }
+ },
+ "youtube": {
+  "id": "wEk4U7SBNuo",
+  "url": "https://youtube.com/shorts/wEk4U7SBNuo",
+  "canal": "Paraguas o Chanclas"
+ }
+}
