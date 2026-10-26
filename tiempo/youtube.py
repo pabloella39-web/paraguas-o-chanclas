@@ -122,7 +122,9 @@ def textos(caption: str, titular: str | None, fecha_txt: str, tipo: str = "hoy")
                 "aviso": f"Aviso de AEMET: {fecha_txt}"}.get(tipo, f"El tiempo en España, {fecha_txt}")
     titulo = f"{busqueda} | {gancho}"
     if len(titulo) > 100:
-        titulo = busqueda[:100]
+        sitio = 100 - len(busqueda) - 4
+        corto = gancho[:sitio].rsplit(" ", 1)[0].rstrip(",.;:") if sitio > 20 else ""
+        titulo = f"{busqueda} | {corto}…" if corto else busqueda[:100]
     hashtags = [w.lstrip("#") for w in caption.split() if w.startswith("#")]
     descripcion = (caption + "\n\nPrevisión diaria del tiempo en España con datos de AEMET y Open-Meteo "
                    "(CC BY 4.0). Voz generada con IA.\nSuscríbete para tener el tiempo de cada día ☂️🩴")
