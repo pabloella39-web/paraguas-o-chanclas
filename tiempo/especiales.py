@@ -332,6 +332,10 @@ listas ni dos puntos, números en cifras con "grados" o "por ciento". Ciudades p
 - general: la recompensa: el mejor día de la semana y el peor (y por qué), con alguna cifra.
 - cierre: pregunta para comentarios ("¿qué día te toca mojarte?", "¿qué plan tienes esta semana?") y que sigan la
   cuenta para tener el tiempo de cada día. NUNCA digas horas de publicación.
+IMPORTANTE: hoy NO sale el parte diario: este vídeo es TAMBIÉN el parte de MAÑANA ({primero}). Su bloque es el
+más largo y detallado: recorre España por zonas (norte, interior, Mediterráneo, sur, islas) con las ciudades
+destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla aunque sea en media frase. Los demás días, más breves:
+solo lo destacado. Si mañana pasa algo llamativo (lluvia fuerte, rachas, calor, frío), la intro puede abrir con ello.
 Palabras aproximadas por bloque: {palabras}; total ≈ {total}. Es crucial respetarlo.
 
 "titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, sin emojis (ej. "SEMANA PASADA POR AGUA").
@@ -348,17 +352,20 @@ def _nota_dia(prev):
 
 def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, plantilla: bool) -> dict:
     orden = ["intro"] + _dias() + ["general", "cierre"]
-    por_dia = round(112 / len(_dias()))
-    base = {"intro": 20, **{d: por_dia for d in _dias()}, "general": 26, "cierre": 18}
+    # El primer día (mañana) hace de parte diario: bloque largo; los demás, más breves
+    resto_dias = round(78 / (len(_dias()) - 1))
+    base = {"intro": 20, **{d: resto_dias for d in _dias()}, "general": 24, "cierre": 16}
+    base[_dias()[0]] = 40
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     if not plantilla:
         try:
             datos = {f"{d} {fechas[d].day}": _resumen(prevs[d]) for d in _dias()}
             m = MODOS_SEMANA[MODO_SEMANA]
-            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "20:45", PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
+            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "19:50", PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
                                                    palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                    cuando=m["cuando"], rango_txt=m["rango_txt"],
-                                                   claves_dias=", ".join(f'"{d}": "..."' for d in _dias())))
+                                                   claves_dias=", ".join(f'"{d}": "..."' for d in _dias()),
+                                                   primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}"))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 return gg
@@ -853,7 +860,7 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
         if a.esperar and a.tipo in ("finde", "semana", "resto"):
             from .horario import TZ
             import time as _t
-            h, m = (17, 26) if a.tipo == "finde" else (21, 26)   # el parte diario sale a las 20:30
+            h, m = (17, 26) if a.tipo == "finde" else (20, 26)   # domingo y miércoles no hay parte: este lo sustituye
             objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0)
             falta = (objetivo - ahora()).total_seconds()
             if 0 < falta < 4 * 3600:

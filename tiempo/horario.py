@@ -34,6 +34,9 @@ def debe_ejecutarse(evento: str, cron: str = "") -> bool:
     if not ((17, 0) <= (t.hour, t.minute) <= (20, 20)):
         print(f"Fuera de la ventana de la víspera ({t:%H:%M} en Madrid)")
         return False
+    if t.weekday() in (6, 2):  # domingo y miércoles el vídeo semanal de las 20:30 hace también de parte de mañana
+        print("Domingo/miércoles: el parte de mañana va dentro del vídeo semanal")
+        return False
     if manana.exists():
         print(f"El parte de mañana ya está hecho ({manana.name})")
         return False
