@@ -191,12 +191,14 @@ def detectar(coms: list[dict]) -> list[dict]:
     return [q for q in clasificar(coms) if q.get("tipo") == "pregunta" and q.get("lugar")]
 
 
-FRASES_CIUDAD = [
-    "¡Hola, {sitio}! {cuando}: {tmax}°/{tmin}° y {lluvia} % de lluvia → {veredicto} {emoji}",
-    "{sitio}, aquí lo tienes: {cuando_min} {tmax}° de máxima, {tmin}° de mínima y {lluvia} % de lluvia. {Veredicto} {emoji}",
-    "¡Saludos a {sitio}! {cuando} toca {veredicto}: {tmax}°/{tmin}° y {lluvia} % de lluvia {emoji}",
-    "{cuando} en {sitio}: {tmax}° y {lluvia} % de probabilidad de lluvia. Veredicto: {veredicto} {emoji}",
+FRASES_CIUDAD = [  # saludo variado + ficha con emojis
+    "¡Hola, {sitio}! 👋 {ficha}",
+    "¡Saludos a {sitio}! 🙌 {ficha}",
+    "¡Gracias por vernos desde {sitio}! 😊 {ficha}",
+    "¡Va por ti, {sitio}! 💪 {ficha}",
 ]
+ICONO_EMOJI = {"sol": "☀️", "sol_nubes": "🌤️", "nubes": "☁️", "lluvia": "🌧️", "chubascos": "🌦️", "tormenta": "⛈️",
+               "nieve": "❄️", "niebla": "🌫️"}
 EMOJI_VEREDICTO = {"PARAGUAS": "☔", "CHANCLAS": "🩴", "BOTAS Y BUFANDA": "🧣"}
 
 
@@ -230,17 +232,10 @@ def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
     ver = veredicto(p)
     corto = {"NI UNO NI OTRO: CHAQUETA": "chaqueta"}.get(ver, ver.lower())
     cuando = "Hoy" if dia == hoy_.date() else "Mañana"
-    frase = FRASES_CIUDAD[int(q["id"][-3:] or 0) % len(FRASES_CIUDAD)] if q["id"][-3:].isdigit() else FRASES_CIUDAD[0]
-    return frase.format(sitio=sitio["nombre"], cuando=cuando, cuando_min=cuando.lower(), tmax=p["tmax"], tmin=p["tmin"],
-                        lluvia=p["lluvia"], veredicto=corto, Veredicto=corto.capitalize(),
-                        emoji=EMOJI_VEREDICTO.get(ver, "🧥"))[:150]
-
-
-# ================================================================ previsión (Open-Meteo)
-WMO = {0: "sol", 1: "sol", 2: "sol_nubes", 3: "nubes", 45: "niebla", 48: "niebla", 51: "lluvia", 53: "lluvia",
-       55: "lluvia", 56: "lluvia", 57: "lluvia", 61: "lluvia", 63: "lluvia", 65: "lluvia", 66: "lluvia", 67: "lluvia",
-       71: "nieve", 73: "nieve", 75: "nieve", 77: "nieve", 80: "chubascos", 81: "chubascos", 82: "chubascos",
-       85: "nieve", 86: "nieve", 95: "tormenta", 96: "tormenta", 99: "tormenta"}
+    ficha = (f"📍{cuando} {ICONO_EMOJI.get(p['icono'], '🌤️')} {p['tmax']}° / {p['tmin']}° · 💧{p['lluvia']} % "
+             f"→ ¡{corto}! {EMOJI_VEREDICTO.get(ver, '🧥')}")
+    n = int(q["id"][-3:]) if q["id"][-3:].isdigit() else 0
+    return FRASES_CIUDAD[n % len(FRASES_CIUDAD)].format(sitio=sitio["nombre"], ficha=ficha)[:150]
 
 
 def geocodificar(lugar: str, provincia: str = "", pais: str = "ES") -> dict | None:
@@ -679,7 +674,9 @@ def main():
                 log.info("Sin voz de ElevenLabs para %s (%s): se contesta por escrito", sitio["nombre"], r["motor"])
                 if a.publicar:
                     for c in gr["coms"]:
-                        responder_texto(c, f"¡Aquí lo tienes! {resumen}")
+                        responder_texto(c, texto_ciudad({**c, "lugar": gr["lugar"], "provincia": gr["provincia"],
+                                                          "pais": gr["pais"], "dia": c.get("dia", "")}, hoy_)
+                                        or f"¡Aquí lo tienes! {resumen}")
             elif a.publicar:
                 uploadpost.publicar_tiktok(r["video"], caption(g), "tiempo")
                 for c in gr["coms"]:
