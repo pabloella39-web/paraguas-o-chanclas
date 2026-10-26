@@ -774,7 +774,7 @@ def _publicar(meta: dict, hoy: date):
     hecho = False
     if uploadpost.disponible():
         try:
-            meta["primer_comentario"] = None if meta.get("tipo") == "aviso" else uploadpost.COMENTARIO_PUEBLO
+            meta["primer_comentario"] = None if meta.get("tipo") == "aviso" else uploadpost.comentario_pueblo(hoy)
             meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo",
                                                         primer_comentario=meta["primer_comentario"])
             hecho = True

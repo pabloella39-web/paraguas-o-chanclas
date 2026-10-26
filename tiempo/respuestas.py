@@ -203,7 +203,7 @@ EMOJI_VEREDICTO = {"PARAGUAS": "☔", "CHANCLAS": "🩴", "BOTAS Y BUFANDA": "�
 
 
 PIDE_LUGAR = re.compile(r"desde (?:qu[eé]|d[oó]nde)|(?:tu|vuestro) (?:pueblo|ciudad|sitio|barrio)|"
-                        r"de d[oó]nde (?:nos ves|eres|sois)|qu[eé] (?:ciudad|pueblo)", re.I)
+                        r"de d[oó]nde (?:nos ves|eres|sois)|qu[eé] (?:ciudad|pueblo)|dime el pueblo", re.I)
 
 
 def videos_que_piden_lugar() -> set[str]:

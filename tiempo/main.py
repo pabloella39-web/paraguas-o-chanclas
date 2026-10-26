@@ -292,7 +292,7 @@ def main():
         if a.esperar:
             esperar_hasta_publicacion()
         try:
-            meta["primer_comentario"] = uploadpost.COMENTARIO_PUEBLO
+            meta["primer_comentario"] = uploadpost.comentario_pueblo(hoy)
             meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo",
                                                         primer_comentario=meta["primer_comentario"])
         except Exception as e:  # noqa: BLE001

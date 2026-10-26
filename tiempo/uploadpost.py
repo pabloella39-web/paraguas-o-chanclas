@@ -37,7 +37,24 @@ def _cabeceras():
 
 
 # Primer comentario del canal en cada vídeo del tiempo: arranca la conversación y pide lo que luego contestamos
-COMENTARIO_PUEBLO = "📍 Escribe tu pueblo y te digo si mañana toca paraguas o chanclas 👇"
+# Cambia cada día; todos piden el pueblo o la ciudad (así el sistema sabe que en ese vídeo hay que contestar)
+COMENTARIOS_PUEBLO = [
+    "📍 Escribe tu pueblo y te digo si mañana toca paraguas o chanclas 👇",
+    "¿Desde qué pueblo nos ves? Te contesto con tu previsión de mañana 🌦️👇",
+    "☔ o 🩴 Dime tu ciudad y te digo cuál te toca mañana",
+    "¿Acerté en tu pueblo? Cuéntame cómo está el cielo por ahí y te doy la previsión de mañana 👀",
+    "Reto: dime el pueblo más pequeño que conozcas y te digo qué tiempo hará mañana allí 😏📍",
+    "¿Qué tal por tu ciudad? Escríbela y te digo si mañana sales con paraguas o con chanclas 👇",
+    "📍 Tu pueblo + 👇 = tu previsión de mañana. ¡Prueba!",
+    "¿Llueve, hace sol o ni fu ni fa por tu pueblo? Dímelo y te cuento lo de mañana 🌤️",
+    "Gente de los pueblos: ¡vuestro momento! Escribid vuestro pueblo y os digo el tiempo de mañana 🙌",
+    "¿Paraguas o chanclas mañana en tu ciudad? Escríbela y salimos de dudas 👇",
+]
+
+
+def comentario_pueblo(d=None) -> str:
+    from datetime import date as _d
+    return COMENTARIOS_PUEBLO[(d or _d.today()).toordinal() % len(COMENTARIOS_PUEBLO)]
 
 
 def publicar_tiktok(video: Path, caption: str, canal: str = "tiempo", espera_max: int = 900,
