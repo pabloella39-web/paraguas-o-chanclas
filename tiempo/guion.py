@@ -148,6 +148,32 @@ GANCHO_TEXTO = ""   # lo rellena main.py con tiempo.gancho.para_guion() antes de
 GANCHO = None       # dict de tiempo.gancho.fenomeno_del_dia (también para la plantilla sin IA)
 
 
+DIAS_CLAVE = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
+
+
+def continuidad(hoy: date) -> str | None:
+    """Lo que adelantó sobre hoy el último vídeo semanal (domingo) o de mitad de semana (miércoles)."""
+    import json as _json
+    from datetime import timedelta as _td
+    from .config import RAIZ
+    dia = DIAS_CLAVE[hoy.weekday()]
+    for atras in range(1, 7):
+        f = hoy - _td(days=atras)
+        for tipo, quien in (("resto", "el miércoles"), ("semana", "el domingo")):
+            ruta = RAIZ / "historial_especiales" / f"{tipo}-{f.isoformat()}.json"
+            if ruta.exists():
+                try:
+                    texto = (_json.loads(ruta.read_text(encoding="utf-8")).get("guion") or {}).get(dia)
+                except Exception:  # noqa: BLE001
+                    texto = None
+                if texto:
+                    return (f"CONTINUIDAD: {quien} adelantamos sobre hoy: «{texto}». Compáralo con los datos de hoy: si se "
+                            f"cumple, dilo en la intro justo después del gancho, con orgullo y en una frase ('Te lo dije "
+                            f"{quien}: hoy el norte se moja'); si ha cambiado, avísalo ('Cambio de planes respecto a lo "
+                            f"que te dije {quien}: ...'). Nunca inventes lo que se dijo.")
+    return None
+
+
 def cta_del_dia(hoy: date) -> str:
     return ("mencion", "ciudad", "pregunta", "ciudad", "mencion", "pregunta", "ciudad")[hoy.toordinal() % 7]
 
@@ -169,7 +195,9 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
                                orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],
                                gancho=GANCHO_TEXTO or "(sin datos: usa lo más llamativo de los datos)",
-                               contexto="\n".join(f"- {n}" for n in notas_dia(hoy)) or "(nada especial)",
+                               contexto="\n".join(f"- {n}" for n in notas_dia(hoy) + ([continuidad(hoy)]
+                                                                                       if continuidad(hoy) else []))
+                               or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))
         for intento in range(2):
