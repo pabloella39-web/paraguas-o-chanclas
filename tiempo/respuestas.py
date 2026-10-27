@@ -594,6 +594,11 @@ def main():
     if not uploadpost.disponible():
         print("::notice::Respuestas en vídeo: falta UPLOADPOST_API_KEY (Upload-Post lee los comentarios de TikTok)")
         return
+    manual = os.environ.get("RESPUESTA_MANUAL", "").strip()   # "id_video|id_comentario|texto" (a mano, una vez)
+    if manual:
+        vid, cid, texto = manual.split("|", 2)
+        responder_texto({"video": vid.strip(), "id": cid.strip(), "usuario": "manual"}, texto.strip())
+        return
     if a.comprobar:
         perfil = uploadpost.perfil("tiempo")
         for ruta, params in (("uploadposts/media", {"platform": "tiktok", "user": perfil, "limit": 5}),):

@@ -162,7 +162,8 @@ ligero (sin palabrotas, sin política). Es viernes por la tarde: toca el vídeo 
 (no inventes temperaturas, lluvias ni avisos). Lo lee {presenta} con voz sintética.
 
 Sábado {sab} y domingo {dom}. Datos por ciudad (grados, lluvia = probabilidad máxima del día en %, lluvia_mm = litros previstos;
-con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca digas lluvia segura):
+con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca digas lluvia segura;
+con 5 litros o más di cuántos litros por metro cuadrado caerán):
 SÁBADO: {datos_sab}
 DOMINGO: {datos_dom}
 
@@ -327,7 +328,7 @@ ligero (sin palabrotas, sin política). {cuando}, para que la gente se organice.
 
 Datos por día y ciudad (grados, lluvia = probabilidad máxima del día en %, lluvia_mm = litros previstos;
 con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca digas lluvia segura; a varios días vista
-mejor 'posibles chubascos' que afirmaciones rotundas):
+mejor 'posibles chubascos' que afirmaciones rotundas; con 5 litros o más di cuántos litros por metro cuadrado):
 {datos}
 
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón

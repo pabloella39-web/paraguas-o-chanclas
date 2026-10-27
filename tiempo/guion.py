@@ -52,6 +52,8 @@ PRECISIÓN CON LA LLUVIA (la gente se queja si no acertamos; mejor matizar que e
 - Si "lluvia_mm" es menor de 1, son lloviznas o "cuatro gotas": no lo vendas como día de lluvia.
 - "Sí o sí", "te mojas seguro" o similares, solo con 80 % o más en mañana o tarde Y al menos 2 litros.
 - Con 30-60 % habla de "posibles chubascos" o "puede caer algo", nunca de lluvia segura.
+- Cuando la lluvia sea abundante ("lluvia_mm" de 5 o más), di cuántos litros por metro cuadrado caerán, redondeando
+  ("hasta 15 litros por metro cuadrado en Bilbao"): es el dato que la gente entiende y comprueba.
 
 Hoy es {fecha}. Datos por región (temperaturas en grados, lluvia = probabilidad en %, viento en km/h;
 icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuentes: AEMET (oficial) y Open-Meteo (consenso de varios modelos: europeo, alemán, francés y americano).
