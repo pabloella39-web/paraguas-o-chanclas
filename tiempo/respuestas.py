@@ -244,6 +244,13 @@ def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
     return FRASES_CIUDAD[n % len(FRASES_CIUDAD)].format(sitio=sitio["nombre"], ficha=ficha)[:150]
 
 
+# ================================================================ previsión (Open-Meteo)
+WMO = {0: "sol", 1: "sol", 2: "sol_nubes", 3: "nubes", 45: "niebla", 48: "niebla", 51: "lluvia", 53: "lluvia",
+       55: "lluvia", 56: "lluvia", 57: "lluvia", 61: "lluvia", 63: "lluvia", 65: "lluvia", 66: "lluvia", 67: "lluvia",
+       71: "nieve", 73: "nieve", 75: "nieve", 77: "nieve", 80: "chubascos", 81: "chubascos", 82: "chubascos",
+       85: "nieve", 86: "nieve", 95: "tormenta", 96: "tormenta", 99: "tormenta"}
+
+
 def geocodificar(lugar: str, provincia: str = "", pais: str = "ES") -> dict | None:
     r = requests.get("https://geocoding-api.open-meteo.com/v1/search",
                      params={"name": lugar, "count": 10, "language": "es", "format": "json"}, timeout=30)
