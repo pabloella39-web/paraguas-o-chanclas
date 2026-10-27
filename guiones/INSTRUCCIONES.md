@@ -7,7 +7,7 @@ Si no respondes a tiempo usan la API de pago (respaldo), así que **responde rá
 ## Claves y horas límite (Madrid)
 | clave | qué es | aparece | límite |
 |---|---|---|---|
-| `historia-AAAA-MM-DD` | Lo que Callan las Paredes (L, X, V, S, D) | ~17:05-18:00 | 19:30 |
+| `historia-AAAA-MM-DD` | canal de historias: UN vídeo POV de historia (L, X, V, S, D), sale a las 21:00 | ~17:05-18:00 | 19:30 |
 | `parte-AAAA-MM-DD` | parte de MAÑANA (fecha = mañana), sale a las 20:30; NO hay los domingos ni los miércoles | ~17:20-18:50 | 19:50 |
 | `semana-AAAA-MM-DD` / `resto-AAAA-MM-DD` | domingo / miércoles, sale a las 20:30 y hace también de parte de mañana (bloque del primer día largo y por zonas) | ~18:45-19:15 | 19:50 |
 | `finde-AAAA-MM-DD` | viernes, sale a las 17:30 | ~15:15-16:10 | 16:50 |
@@ -32,8 +32,11 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   prompt la trae ("Te lo dije el domingo"), promesa de "al final te digo dónde hará más calor", interpelar a la gente
   de dos ciudades, cierre con pregunta y "paraguas en ... y chanclas en ...". En víspera se dice "mañana", nunca "hoy".
   Números en cifras + "grados"/"por ciento". Nada de inventar datos ni avisos.
-- Historia: mira `guiones/historia-2026-10-26.json` como modelo. Cada parte: primera frase puñetazo, bucle abierto,
-  dos giros, reloj, cliffhanger seco; la última, giro final con pistas sembradas y pregunta al público. Tramos de
-  15-30 palabras con búsqueda de foto en inglés que ilustre ESE tramo (cosas, lugares, ambientes; nunca personas).
-  No repitas temas de las historias ya contadas que lista el prompt.
+- Historia (POV, desde el 28/10/2026): mira `guiones/historia-2026-10-28.json` como modelo. UN solo vídeo en
+  segunda persona: primera frase con fecha + lugar + quién eres; bucle abierto (el espectador sabe lo que viene y el
+  protagonista no); detalles sensoriales reales; uno o dos momentos de impacto ("susto"); final con lo que pasó de
+  verdad (una cifra real) y una pregunta. RIGOR: fechas, lugares y cifras ciertos; si dudas de un dato, fuera. Sin
+  gore, con respeto a las víctimas, nunca el punto de vista de un terrorista o verdugo, sin tomar partido político.
+  Tramos de 12-25 palabras; cada "imagen" es una búsqueda en inglés de una foto HISTÓRICA real de Wikimedia
+  ("Berlin 1945 ruins", "Omaha Beach landing 1944"): lugar + año, sin cadáveres. No repitas temas ya contados.
 - Revisa antes de entregar: ¿la primera frase engancharía a alguien que va deslizando?

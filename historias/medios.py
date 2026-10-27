@@ -53,7 +53,7 @@ def buscar_imagenes(consulta: str, n: int = 3) -> list[dict]:
         if ii.get("mime") != "image/jpeg" or (ii.get("width") or 0) < 800:  # PNG suele ser carteles y gráficos
             continue
         if re.search(r"poster|logo|map|mapa|diagram|chart|cover|flag|bandera|coat of arms|escudo|book|page|text|"
-                     r"stamp|sello|card|portrait|retrato|ad\b|advert", pg.get("title", ""), re.I):
+                     r"stamp|sello|card|portrait|retrato|ad\b|advert|magazine|puck|cartoon|caricatur|comic|dpla", pg.get("title", ""), re.I):
             continue
         res.append({"id": pg.get("pageid"), "title": pg.get("title", ""), "license": lic, "url": ii.get("thumburl"),
                     "thumbnail": ii.get("url"), "width": ii.get("width"), "height": ii.get("height"),
@@ -86,7 +86,7 @@ def tratar(im: Image.Image, tipo: str) -> Image.Image:
         im = ImageEnhance.Color(im).enhance(0.15)
         im = ImageEnhance.Contrast(im).enhance(1.18)
         a = np.asarray(im).astype(np.float32) / 255
-        a = a ** 1.12 * 0.88 * np.array(SEPIA)
+        a = a ** 1.15 * 0.80 * np.array(SEPIA)
         return Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8))
     im = ImageEnhance.Color(im).enhance(0.35)
     im = ImageEnhance.Contrast(im).enhance(1.25)

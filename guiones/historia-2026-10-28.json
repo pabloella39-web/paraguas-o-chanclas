@@ -1,0 +1,66 @@
+{
+ "titulo": "POV: DESEMBARCAS EN OMAHA",
+ "gancho": "TIENES 19 AÑOS Y ES EL DÍA D",
+ "etiqueta": "NORMANDÍA · 6 DE JUNIO DE 1944",
+ "narrador": "hombre",
+ "caption": "Tienes 19 años y la rampa está a punto de caer 🌊",
+ "pregunta": "¿Tú habrías saltado de la barcaza?",
+ "hashtags": [
+  "#segundaguerramundial",
+  "#diad",
+  "#normandia"
+ ],
+ "tipo": "guerra_mundial",
+ "partes": [
+  {
+   "ambiente": "guerra",
+   "tramos": [
+    {
+     "texto": "Seis de junio de mil novecientos cuarenta y cuatro. Tienes diecinueve años y llevas tres horas vomitando en una barcaza.",
+     "imagen": "Normandy landing craft 1944",
+     "susto": false
+    },
+    {
+     "texto": "El mar de Normandía está gris y helado. Treinta hombres apretados, tu casco chocando con el del compañero.",
+     "imagen": "LCVP Normandy 1944 soldiers",
+     "susto": false
+    },
+    {
+     "texto": "Nadie habla. Alguien reza en voz baja. Tú solo piensas en no soltar el fusil.",
+     "imagen": "soldiers landing craft 1944",
+     "susto": false
+    },
+    {
+     "texto": "Te han dicho que los aviones y los barcos habrán destrozado las defensas. Que será fácil.",
+     "imagen": "battleship firing Normandy 1944",
+     "susto": false
+    },
+    {
+     "texto": "Lo que no sabes es que casi todos los tanques que debían cubrirte se han hundido antes de llegar a la orilla.",
+     "imagen": "Omaha Beach 1944 obstacles",
+     "susto": false
+    },
+    {
+     "texto": "Seis y media de la mañana. La rampa cae. Y la playa entera abre fuego.",
+     "imagen": "Omaha Beach landing 1944",
+     "susto": true
+    },
+    {
+     "texto": "Saltas. El agua te llega al pecho, la mochila tira de ti hacia el fondo y no ves la arena.",
+     "imagen": "soldiers wading ashore Normandy",
+     "susto": false
+    },
+    {
+     "texto": "Avanzas de obstáculo en obstáculo. Doscientos metros de playa. Una eternidad. Hasta que tocas el muro.",
+     "imagen": "Omaha Beach 1944 seawall",
+     "susto": false
+    },
+    {
+     "texto": "Aquel día, en Omaha, cayeron unos dos mil cuatrocientos soldados. Pero al anochecer, la playa era suya. ¿Tú habrías saltado?",
+     "imagen": "Normandy American cemetery",
+     "susto": false
+    }
+   ]
+  }
+ ]
+}
