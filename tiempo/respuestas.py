@@ -251,9 +251,23 @@ WMO = {0: "sol", 1: "sol", 2: "sol_nubes", 3: "nubes", 45: "niebla", 48: "niebla
        85: "nieve", 86: "nieve", 95: "tormenta", 96: "tormenta", 99: "tormenta"}
 
 
+def _get_reintentos(url: str, params: dict, intentos: int = 4):
+    """Open-Meteo a veces tarda: hasta 4 intentos con espera creciente."""
+    import time
+    for k in range(intentos):
+        try:
+            r = requests.get(url, params=params, timeout=30)
+            r.raise_for_status()
+            return r
+        except Exception:  # noqa: BLE001
+            if k == intentos - 1:
+                raise
+            time.sleep(5 * (k + 1))
+
+
 def geocodificar(lugar: str, provincia: str = "", pais: str = "ES") -> dict | None:
-    r = requests.get("https://geocoding-api.open-meteo.com/v1/search",
-                     params={"name": lugar, "count": 10, "language": "es", "format": "json"}, timeout=30)
+    r = _get_reintentos("https://geocoding-api.open-meteo.com/v1/search",
+                        {"name": lugar, "count": 10, "language": "es", "format": "json"})
     res = r.json().get("results") or []
     if not res:
         return None
@@ -276,13 +290,12 @@ def geocodificar(lugar: str, provincia: str = "", pais: str = "ES") -> dict | No
 
 
 def prevision(sitio: dict, dia: date) -> dict:
-    r = requests.get("https://api.open-meteo.com/v1/forecast", params={
+    r = _get_reintentos("https://api.open-meteo.com/v1/forecast", {
         "latitude": sitio["lat"], "longitude": sitio["lon"], "timezone": "Europe/Madrid",
         "start_date": dia.isoformat(), "end_date": dia.isoformat(), "wind_speed_unit": "kmh",
         "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,"
                  "weather_code,wind_gusts_10m_max",
-        "hourly": "temperature_2m,precipitation_probability,weather_code"}, timeout=30)
-    r.raise_for_status()
+        "hourly": "temperature_2m,precipitation_probability,weather_code"})
     j = r.json()
     d, h = j["daily"], j["hourly"]
 
