@@ -66,6 +66,8 @@ jobs:
             echo "::notice::Canal de historias en pausa (historias/activo.txt)"; exit 0; fi
           if [ "${{ github.event_name }}" = "push" ] && ! grep -qi publicar historias/lanzar.txt; then ARGS="--prueba"; export ESPERAR_GUION=0; fi
           if [ "${{ github.event_name }}" = "push" ] && grep -qi " ya" historias/lanzar.txt; then ARGS="--publicar --ya"; fi
+          # "fecha=AAAA-MM-DD" en lanzar.txt: genera la historia de ese día (p. ej. probar un guion ya escrito)
+          F=$(grep -o "fecha=[0-9-]*" historias/lanzar.txt | cut -d= -f2); [ "${{ github.event_name }}" = "push" ] && [ -n "$F" ] && ARGS="$ARGS --fecha $F"
           mkdir -p salida_historias
           set -o pipefail
           python -m historias.main $ARGS 2>&1 | grep -v " Render " | tee salida_historias/registro.txt
