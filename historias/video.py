@@ -15,6 +15,7 @@ from .config import ALTO, ANCHO, ASSETS, CUENTA, ETIQUETA_TIPO, FPS, NOMBRE, RAI
 
 log = logging.getLogger(__name__)
 ROJO = (214, 30, 40)
+ORO = (232, 186, 82)   # acento del formato POV de historia
 BLANCO = (245, 242, 236)
 INICIO_VOZ = 0.25
 TARJETA = 3.6
@@ -54,8 +55,11 @@ def _partir(txt, f, ancho):
 class Parte:
     def __init__(self, imagenes: list[Image.Image], palabras: list, voz_dur: float, total: float, *, titulo: str,
                  n: int, de: int, tipo: str, semilla: int = 1, inicios: list[float] | None = None,
-                 ambiente: str = "", gancho: str | None = None, sustos: list[float] = ()):
+                 ambiente: str = "", gancho: str | None = None, sustos: list[float] = (), etiqueta: str = ""):
         self.imgs, self.total, self.voz_dur = imagenes, total, voz_dur
+        self.pov = de == 1          # formato POV de historia: un solo vídeo, estética de archivo
+        self.acento = ORO if self.pov else ROJO
+        self.etiqueta = (etiqueta or "").strip().upper()
         self.titulo, self.n, self.de, self.tipo = titulo, n, de, tipo
         self.palabras = [(a + INICIO_VOZ, b + INICIO_VOZ, w) for a, b, w in palabras]
         self.fin_voz = INICIO_VOZ + voz_dur
@@ -74,7 +78,7 @@ class Parte:
         self.lluvia = ambiente in ("lluvia", "tormenta")
         self.relampagos = sorted(rnd.uniform(4, max(5, total - 6), size=3)) if ambiente == "tormenta" else []
         self.mov = [(rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.choice([1, -1])) for _ in imagenes]
-        self.parpadeos = sorted(rnd.uniform(3, max(4, total - 5), size=max(2, int(total / 14))))
+        self.parpadeos = [] if self.pov else sorted(rnd.uniform(3, max(4, total - 5), size=max(2, int(total / 14))))
         self.grano = [self._grano(rnd) for _ in range(6)]
         self.capa = self._capa_fija()
         self.negro = Image.new("RGB", (ANCHO, ALTO), (0, 0, 0))
@@ -124,21 +128,22 @@ class Parte:
         d = ImageDraw.Draw(capa)
         f = fuente("Bold", 30)
         txt = " ".join(NOMBRE)  # espaciado
-        d.text((ANCHO // 2, 118), txt, font=f, fill=ROJO + (255,), anchor="mm")
+        d.text((ANCHO // 2, 118), txt, font=f, fill=self.acento + (255,), anchor="mm")
         ft = _ajustar(self.titulo, "maquina", 74, 900)
         for k, ln in enumerate(_partir(self.titulo, ft, 900)[:2]):
             d.text((ANCHO // 2, 190 + k * (ft.size + 8)), ln, font=ft, fill=BLANCO + (255,), anchor="ma",
                    stroke_width=3, stroke_fill=(0, 0, 0, 255))
-        pill = f"PARTE {self.n} DE {self.de}"
-        fp = fuente("Black", 34)
+        pill = (self.etiqueta or "HISTORIA REAL") if self.pov else f"PARTE {self.n} DE {self.de}"
+        fp = _ajustar(pill, "Black", 34, 700)
         w = fp.getlength(pill) + 48
         y = 190 + 2 * (ft.size + 8) + 12 if len(_partir(self.titulo, ft, 900)) > 1 else 190 + ft.size + 30
-        etiqueta = ETIQUETA_TIPO.get(self.tipo, "")
+        etiqueta = "" if self.pov else ETIQUETA_TIPO.get(self.tipo, "")
         fe = fuente("Bold", 26)
         we = fe.getlength(etiqueta) + 36 if etiqueta else 0
         x0 = ANCHO // 2 - (w + we + 16) // 2
-        d.rounded_rectangle([x0, y, x0 + w, y + 58], radius=29, fill=ROJO + (255,))
-        d.text((x0 + w / 2, y + 29), pill, font=fp, fill=(255, 255, 255, 255), anchor="mm")
+        d.rounded_rectangle([x0, y, x0 + w, y + 58], radius=29, fill=self.acento + (255,))
+        d.text((x0 + w / 2, y + 29), pill, font=fp, fill=(20, 16, 10, 255) if self.pov else (255, 255, 255, 255),
+               anchor="mm")
         if etiqueta:
             x1 = x0 + w + 16
             d.rounded_rectangle([x1, y + 6, x1 + we, y + 52], radius=23, outline=(230, 230, 230, 220), width=2)
@@ -194,9 +199,9 @@ class Parte:
             if resto < FUNDIDO:
                 img = Image.blend(img, self._foto(i + 1, t), 1 - resto / FUNDIDO)
         golpe = self._golpe(t)
-        if golpe > 0.55:  # fogonazo: blanco y luego rojo
-            img = Image.blend(img, Image.new("RGB", (ANCHO, ALTO), (255, 255, 255) if golpe > 0.85 else (150, 0, 0)),
-                              0.55 * golpe)
+        if golpe > 0.55:  # fogonazo: blanco y luego rojo (en historia, solo destello blanco)
+            color = (255, 255, 255) if golpe > 0.85 or self.pov else (150, 0, 0)
+            img = Image.blend(img, Image.new("RGB", (ANCHO, ALTO), color), (0.4 if self.pov else 0.55) * golpe)
         for tr in self.relampagos:  # relámpago
             if 0 <= t - tr < 0.25:
                 img = Image.blend(img, Image.new("RGB", (ANCHO, ALTO), (235, 240, 255)), 0.45 * (1 - (t - tr) / 0.25))
@@ -205,8 +210,9 @@ class Parte:
                 k = t - tp
                 img = Image.blend(img, self.negro, 0.55 if k < 0.08 or 0.16 < k < 0.22 else 0.15)
         img = img.convert("RGBA")
-        desp = int((t * 22) % ANCHO)  # niebla que se desplaza despacio
-        img.alpha_composite(self.niebla.crop((desp, 0, desp + ANCHO, ALTO)))
+        if not self.pov:
+            desp = int((t * 22) % ANCHO)  # niebla que se desplaza despacio
+            img.alpha_composite(self.niebla.crop((desp, 0, desp + ANCHO, ALTO)))
         if self.lluvia:
             img.alpha_composite(self._gotas(t))
         img.alpha_composite(self.grano[int(t * FPS / 3) % len(self.grano)])  # cambia cada 3 fotogramas
@@ -237,8 +243,9 @@ class Parte:
                 ft = _ajustar(self.titulo, "Black", 46, 900)
                 d.text((ANCHO // 2, y2), self.titulo, font=ft, fill=(220, 220, 220, int(255 * a)), anchor="ma")
                 y2 += ft.size + 24
-            d.text((ANCHO // 2, y2), f"PARTE {self.n} DE {self.de}", font=fuente("Black", 60),
-                   fill=ROJO + (int(255 * a),), anchor="ma")
+            d.text((ANCHO // 2, y2), self.etiqueta if self.pov else f"PARTE {self.n} DE {self.de}",
+                   font=_ajustar(self.etiqueta, "Black", 60, 960) if self.pov else fuente("Black", 60),
+                   fill=self.acento + (int(255 * a),), anchor="ma")
         # Subtítulos
         elif t < self.fin_voz + 0.3:
             g = next((g for g in self.grupos if g[0][0] - 0.05 <= t <= g[-1][1] + 0.25), None)
@@ -250,7 +257,7 @@ class Parte:
                 for w in g:
                     pal = w[2] + " "
                     activo = w[0] - 0.05 <= t <= w[1] + 0.05
-                    d.text((x, y), pal, font=f, fill=(ROJO if activo else BLANCO) + (255,), stroke_width=7,
+                    d.text((x, y), pal, font=f, fill=(self.acento if activo else BLANCO) + (255,), stroke_width=7,
                            stroke_fill=(0, 0, 0, 255))
                     x += f.getlength(pal)
         # Tarjeta final
@@ -259,7 +266,17 @@ class Parte:
             img.alpha_composite(Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, int(200 * k))))
             d = ImageDraw.Draw(img)
             alfa = int(255 * k)
-            if self.n < self.de:
+            if self.pov:
+                d.text((ANCHO // 2, 700), "HISTORIA REAL", font=fuente("maquina", 96), fill=BLANCO + (alfa,),
+                       anchor="mm")
+                if self.etiqueta:
+                    d.text((ANCHO // 2, 810), self.etiqueta, font=_ajustar(self.etiqueta, "Bold", 44, 960),
+                           fill=self.acento + (alfa,), anchor="mm")
+                d.text((ANCHO // 2, 930), "Cada día, un momento de la historia", font=fuente("Bold", 44),
+                       fill=BLANCO + (alfa,), anchor="mm")
+                d.text((ANCHO // 2, 1000), "Sígueme para vivir el próximo", font=fuente("SemiBold", 38),
+                       fill=self.acento + (alfa,), anchor="mm")
+            elif self.n < self.de:
                 d.text((ANCHO // 2, 760), "CONTINUARÁ...", font=fuente("maquina", 104), fill=BLANCO + (alfa,),
                        anchor="mm")
                 d.text((ANCHO // 2, 900), f"La PARTE {self.n + 1} ya está en mi perfil", font=fuente("Bold", 46),

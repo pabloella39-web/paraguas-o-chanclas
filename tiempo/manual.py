@@ -111,8 +111,8 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
         lo, hi = int(m.group(1)), int(m.group(2))
         for k, p in enumerate(g.get("partes") or [], 1):
             n = sum(len(t.get("texto", "").split()) for t in p.get("tramos") or [])
-            if not lo - 5 <= n <= hi + 20:
-                errores.append(f"parte {k}: {n} palabras (pide entre {lo} y {hi})")
+            if not lo - 5 <= n <= hi + 12:
+                errores.append(f"{n} palabras (pide entre {lo} y {hi})")
     m = re.search(r"Total ≈ (\d+) palabras", prompt)
     if m and isinstance(g.get("segmentos"), dict):
         objetivo = int(m.group(1))
@@ -123,18 +123,18 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
     tipo = clave.split("-")[0]
     if tipo == "historia":
         partes = g.get("partes") or []
-        if not 2 <= len(partes) <= 3:
-            errores.append(f"{len(partes)} partes (deben ser 2 o 3)")
+        if len(partes) != 1:
+            errores.append(f"{len(partes)} partes (debe ser UN solo vídeo)")
         for k, p in enumerate(partes, 1):
             tr = p.get("tramos") or []
             n = sum(len(t.get("texto", "").split()) for t in tr)
-            if not 7 <= len(tr) <= 10:
-                errores.append(f"parte {k}: {len(tr)} tramos (7 a 9)")
-            if n < 150:
-                errores.append(f"parte {k}: {n} palabras (mínimo ~160)")
-            if not p.get("gancho"):
-                errores.append(f"parte {k}: falta gancho")
-        for c in ("titulo", "caption", "pregunta", "hashtags", "narrador"):
+            if not 8 <= len(tr) <= 11:
+                errores.append(f"{len(tr)} tramos (8 a 11)")
+            if n < 130:
+                errores.append(f"{n} palabras (mínimo ~145)")
+            if any(not t.get("imagen") for t in tr):
+                errores.append("hay tramos sin 'imagen'")
+        for c in ("titulo", "gancho", "etiqueta", "caption", "pregunta", "hashtags", "narrador"):
             if not g.get(c):
                 errores.append(f"falta {c}")
     else:

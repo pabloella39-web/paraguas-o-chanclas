@@ -24,6 +24,8 @@ ELEVEN = "https://api.elevenlabs.io/v1"
 
 # ---------------------------------------------------------------- imágenes
 TINTES = {"ficcion": (0.80, 0.95, 1.10), "leyenda": (1.10, 0.95, 0.78), "real": (1.04, 1.0, 0.92)}
+SEPIA = (1.12, 0.98, 0.78)   # historia: tono de foto antigua
+HISTORICOS = ("guerra_mundial", "espana", "asia", "siglo_xx", "antigua", "pueblos")
 
 
 LIBRES = ("cc0", "public domain", "pd", "no restrictions", "copyrighted free use")
@@ -80,6 +82,12 @@ def tratar(im: Image.Image, tipo: str) -> Image.Image:
     """Recorta a vertical (con margen para el movimiento) y le da el aspecto oscuro y frío del canal."""
     W, H = int(ANCHO * 1.18), int(ALTO * 1.18)
     im = ImageOps.fit(im, (W, H), Image.LANCZOS)
+    if tipo in HISTORICOS:  # foto de archivo: sepia suave, contraste y algo de oscuridad para leer los textos
+        im = ImageEnhance.Color(im).enhance(0.15)
+        im = ImageEnhance.Contrast(im).enhance(1.18)
+        a = np.asarray(im).astype(np.float32) / 255
+        a = a ** 1.12 * 0.88 * np.array(SEPIA)
+        return Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8))
     im = ImageEnhance.Color(im).enhance(0.35)
     im = ImageEnhance.Contrast(im).enhance(1.25)
     a = np.asarray(im).astype(np.float32) / 255
@@ -118,7 +126,7 @@ def fondo_procedural(semilla: int, tipo: str) -> Image.Image:
     base = rnd.random((H // 16, W // 16)).astype(np.float32)
     im = Image.fromarray((base * 255).astype(np.uint8)).resize((W, H), Image.BICUBIC).filter(ImageFilter.GaussianBlur(30))
     a = np.asarray(im).astype(np.float32) / 255 * 0.32
-    rgb = np.stack([a, a, a], -1) * np.array(TINTES.get(tipo, TINTES["ficcion"]))
+    rgb = np.stack([a, a, a], -1) * np.array(SEPIA if tipo in HISTORICOS else TINTES.get(tipo, TINTES["ficcion"]))
     return Image.fromarray(np.clip(rgb * 255, 0, 255).astype(np.uint8))
 
 
@@ -144,6 +152,10 @@ AMBIENTES = {
     "pueblo_silencio": "silent village at night, faint wind, distant church bell, dog howling far away",
     "hospital": "abandoned hospital corridor, flickering fluorescent buzz, distant footsteps echo",
     "iglesia": "empty old church at night, deep reverb, faint whispers, candle crackle, wind",
+    "guerra": "distant war ambience, artillery explosions far away, rumbling, occasional gunfire, wind, no music",
+    "multitud": "anxious crowd murmuring in a historic city square, distant shouts, footsteps, bells, no music",
+    "ciudad_antigua": "old town street early 20th century, horse carriage on cobblestones, distant church bells, "
+                      "vendors, no music",
 }
 GOLPE = "deep cinematic horror impact boom with reverb tail, dark and sudden"
 
@@ -235,7 +247,7 @@ if __name__ == "__main__":  # prueba: python -m historias.medios "abandoned hous
     logging.basicConfig(level=logging.INFO)
     salida = Path("muestras_imagenes")
     salida.mkdir(exist_ok=True)
-    ims = [i for i in imagenes_para(sys.argv[1:], "ficcion", set()) if i is not None]
+    ims = [i for i in imagenes_para(sys.argv[1:], "guerra_mundial", set()) if i is not None]
     for k, im in enumerate(ims):
         im.resize((540, 960)).save(salida / f"{k:02d}.jpg", quality=80)
     print(f"{len(ims)} de {len(sys.argv) - 1} imágenes")

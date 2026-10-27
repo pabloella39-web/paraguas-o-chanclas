@@ -1,4 +1,4 @@
-"""Historia del día para "Lo que Callan las Paredes".
+"""Historia del día del canal de historias (desde el 28/10/2026: un vídeo POV de historia al día).
 
 python -m historias.main [--publicar] [--prueba] [--demo] [--fecha AAAA-MM-DD]
   --publicar  genera las 2-3 partes y las deja programadas en TikTok (Upload-Post): primero la última parte y la
@@ -26,7 +26,7 @@ from .video import INICIO_VOZ, TARJETA, Parte, renderizar
 log = logging.getLogger("historias")
 TZ = ZoneInfo("Europe/Madrid")
 CARACTERES_PARTE_DIARIO = 1100   # lo que gasta el parte del tiempo cada día (tiene prioridad)
-HASHTAGS = ["#terror", "#historiasdeterror", "#misterio", "#suspense", "#relatos", "#parati"]
+HASHTAGS = ["#historia", "#pov", "#historiareal"]
 
 
 def _wav(datos: np.ndarray, ruta: Path):
@@ -88,14 +88,12 @@ def horas_publicacion(n: int, ahora: datetime) -> list[datetime]:
 
 
 def caption(h: dict, k: int, n: int) -> str:
+    tags = list(dict.fromkeys(HASHTAGS + [t if t.startswith("#") else "#" + t for t in h.get("hashtags", [])]))
+    if n == 1:  # formato POV de historia: un solo vídeo
+        return (f"{h['caption']}\n\n📍 {h.get('etiqueta', '').title()}\nHechos reales; protagonista recreado. Voz IA.\n"
+                f"Cada día, un momento de la historia: sígueme para vivir el próximo.\n\n" + " ".join(tags[:6]))[:2200]
     sig = (f"👉 La PARTE {k + 1} ya está en mi perfil" if k < n else "🔚 Final. ¿Te perdiste el principio? Parte 1 en mi perfil")
-    aviso = {"real": "Caso real narrado con voz generada por IA.", "leyenda": "Leyenda popular dramatizada. Voz IA.",
-             "ficcion": "Relato de ficción. Voz generada por IA."}[h["tipo"]]
-    extra = {"real": ["#casoreal", "#truecrime"], "leyenda": ["#leyendas", "#leyendasurbanas"],
-             "ficcion": ["#creepypasta", "#historiasdemiedo"]}[h["tipo"]]
-    tags = list(dict.fromkeys(HASHTAGS + extra + [t if t.startswith("#") else "#" + t for t in h.get("hashtags", [])]))
-    return (f"{h['caption']}\n\n📖 {h['titulo'].title()} · Parte {k}/{n}\n{sig}\n{aviso}\n\n"
-            + " ".join(tags[:12]))[:2200]
+    return (f"{h['caption']}\n\n📖 {h['titulo'].title()} · Parte {k}/{n}\n{sig}\n\n" + " ".join(tags[:8]))[:2200]
 
 
 def construir(hoy: date, salida: Path, demo: bool) -> dict:
@@ -105,7 +103,7 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
     if not demo:
         restante = locucion.creditos_restantes()
         dias = 31 - hoy.day + 1
-        necesarios = 3 * 1250 + CARACTERES_PARTE_DIARIO * dias
+        necesarios = 1100 + CARACTERES_PARTE_DIARIO * dias
         if restante is not None and restante < necesarios:
             log.warning("Quedan %d créditos de ElevenLabs y el parte necesita reservarlos: voz gratuita hoy", restante)
             print(f"::warning::Historias con voz gratuita: quedan {restante} créditos de ElevenLabs")
@@ -168,7 +166,8 @@ def construir(hoy: date, salida: Path, demo: bool) -> dict:
         mezclar(wav, total, p["ambiente"], semilla + k, k < n, audio, sustos)
         video = salida / f"historia_{hoy.isoformat()}_parte{k}.mp4"
         parte = Parte(imgs, pal, dur, total, titulo=h["titulo"], n=k, de=n, tipo=h["tipo"], semilla=semilla + k,
-                      inicios=inicios, ambiente=p["ambiente"], gancho=p.get("gancho"), sustos=sustos)
+                      inicios=inicios, ambiente=p["ambiente"], gancho=p.get("gancho") or h.get("gancho"),
+                      sustos=sustos, etiqueta=h.get("etiqueta", ""))
         log.info("Parte %d/%d: %.1f s de voz, %.1f s de vídeo, %d imágenes", k, n, dur, total, len(imgs))
         renderizar(parte, audio, video)
         real = locucion.duracion(video)
@@ -205,16 +204,20 @@ def publicar_youtube(meta: dict, p: dict, n: int, cuando):
     if not youtube.hay_credenciales("historias"):
         log.info("YouTube de historias sin autorizar: se omite")
         return None
-    titulo = f"{meta['titulo'].title()} · Parte {p['parte']}/{n} | Historia de terror #Shorts"
-    if len(titulo) > 100:
-        titulo = f"{meta['titulo'].title()[:60]} · Parte {p['parte']}/{n} #Shorts"
-    desc = p["caption"].replace("ya está en mi perfil", "está en el canal") + \
-        "\n\nCada lunes, miércoles, viernes, sábado y domingo, una historia nueva. Suscríbete 🕯️"
-    tags = ["historias de terror", "terror", "misterio", "suspense", "relatos", "creepypasta", "true crime",
-            "leyendas", "shorts"]
+    if n == 1:  # POV de historia
+        g = meta.get("guion") or {}
+        titulo = f"{meta['titulo']} | {g.get('etiqueta', '').title()} #historia #Shorts".replace(" | #", " #")
+        titulo = titulo if len(titulo) <= 100 else f"{meta['titulo'][:80]} #Shorts"
+        desc = p["caption"] + "\n\nCada día, un momento de la historia contado en primera persona. Suscríbete 📜"
+        tags = ["historia", "pov historia", "historia real", "segunda guerra mundial", "historia de España",
+                "curiosidades históricas", "shorts"]
+    else:
+        titulo = f"{meta['titulo'].title()} · Parte {p['parte']}/{n} | Historia #Shorts"
+        desc = p["caption"].replace("ya está en mi perfil", "está en el canal")
+        tags = ["historias", "relatos", "shorts"]
     try:
         r = youtube.subir_con_reintentos(Path(p["video"]), titulo, desc, tags, canal="historias", publicar_en=cuando,
-                                         categoria="24")
+                                         categoria="27" if n == 1 else "24")
         print(f"::notice::YouTube parte {p['parte']}: {r['url']}")
         return r
     except Exception as e:  # noqa: BLE001
