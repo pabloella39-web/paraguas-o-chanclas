@@ -93,10 +93,23 @@ def aemet_ciudad(ciudad: dict, clave: str, hoy: date) -> dict:
     prob = _periodo(dia.get("probPrecipitacion"))
     probs = [int(x["value"]) for x in dia.get("probPrecipitacion", []) if str(x.get("value", "")).isdigit()]
     vientos = [int(x.get("velocidad") or 0) for x in dia.get("viento", []) if str(x.get("velocidad", "")).isdigit()]
+    # Probabilidad por franjas: la del día entero (00-24) incluye la madrugada y la noche, y decir "paraguas" por
+    # cuatro gotas a las 23:00 se percibe como un fallo. El dato principal es el de las horas de calle (06-18).
+    franjas = {}
+    for x in dia.get("probPrecipitacion", []):
+        if str(x.get("value", "")).isdigit():
+            franjas[x.get("periodo", "00-24")] = int(x["value"])
+    lluvia_franjas = {n: franjas[p] for n, p in (("madrugada", "00-06"), ("mañana", "06-12"), ("tarde", "12-18"),
+                                                ("noche", "18-24")) if p in franjas}
+    if "mañana" in lluvia_franjas or "tarde" in lluvia_franjas:
+        lluvia = max(lluvia_franjas.get("mañana", 0), lluvia_franjas.get("tarde", 0))
+    else:
+        lluvia = int(prob["value"]) if prob else (max(probs) if probs else 0)
     return {
         "tmax": int(dia["temperatura"]["maxima"]),
         "tmin": int(dia["temperatura"]["minima"]),
-        "lluvia": int(prob["value"]) if prob else (max(probs) if probs else 0),
+        "lluvia": lluvia,
+        "lluvia_franjas": lluvia_franjas or None,
         "viento": max(vientos) if vientos else None,
         "icono": _aemet_cielo(str(cielo["value"])) if cielo else None,
         "cielo": cielo.get("descripcion") if cielo else None,
@@ -251,6 +264,8 @@ def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
         "tmax": campo("tmax"), "tmin": campo("tmin"),
         "lluvia": campo("lluvia") or 0, "viento": campo("viento"),
         "racha": _ponderada({k: d.get("racha") for k, d in f.items() if k != "AEMET"}),
+        "lluvia_mm": (f.get("Open-Meteo") or {}).get("lluvia_mm"),          # litros previstos (mediana de modelos)
+        "lluvia_franjas": (f.get("AEMET") or {}).get("lluvia_franjas"),      # % por mañana / tarde / noche
         "icono": icono,
         "cielo": next((f[k].get("cielo") for k in ("AEMET", "Google") if k in f and f[k].get("cielo")), None),
         "fuentes": list(f),

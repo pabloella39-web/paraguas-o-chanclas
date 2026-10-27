@@ -33,8 +33,8 @@ def _resumen_datos(prev: list[dict]) -> dict:
     por_region = {}
     for p in prev:
         por_region.setdefault(p["region"], []).append(
-            {k: p.get(k) for k in ("nombre", "tmax", "tmin", "lluvia", "viento", "racha", "icono", "cielo",
-                                   "discrepancia_tmax")})
+            {k: p.get(k) for k in ("nombre", "tmax", "tmin", "lluvia", "lluvia_franjas", "lluvia_mm", "viento",
+                                   "racha", "icono", "cielo", "discrepancia_tmax") if p.get(k) is not None})
     return por_region
 
 
@@ -43,6 +43,15 @@ PROMPT = """Eres el guionista de "Paraguas o Chanclas" (@paraguasochanclas), un 
 ingenioso, con chascarrillos y comparaciones cotidianas muy españolas, pero SIN palabrotas, sin insultos,
 sin política y sin burlarte de nadie. La información meteorológica debe ser exacta: usa SOLO los datos
 que te doy (no inventes temperaturas, lluvias ni avisos).
+
+PRECISIÓN CON LA LLUVIA (la gente se queja si no acertamos; mejor matizar que exagerar):
+- "lluvia" es la probabilidad en las horas de calle (mañana y tarde); "lluvia_franjas" la da por madrugada, mañana,
+  tarde y noche, y "lluvia_mm" son los litros previstos.
+- Di CUÁNDO llueve: si solo es por la noche o de madrugada, dilo así ("por la noche puede caer algo") y no digas
+  "paraguas sí o sí" ni "te mojas".
+- Si "lluvia_mm" es menor de 1, son lloviznas o "cuatro gotas": no lo vendas como día de lluvia.
+- "Sí o sí", "te mojas seguro" o similares, solo con 80 % o más en mañana o tarde Y al menos 2 litros.
+- Con 30-60 % habla de "posibles chubascos" o "puede caer algo", nunca de lluvia segura.
 
 Hoy es {fecha}. Datos por región (temperaturas en grados, lluvia = probabilidad en %, viento en km/h;
 icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuentes: AEMET (oficial) y Open-Meteo (consenso de varios modelos: europeo, alemán, francés y americano).

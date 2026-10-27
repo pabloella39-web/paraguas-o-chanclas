@@ -161,7 +161,8 @@ PROMPT_FINDE = """Eres el guionista de "Paraguas o Chanclas", un canal de TikTok
 ligero (sin palabrotas, sin política). Es viernes por la tarde: toca el vídeo del FIN DE SEMANA. Usa SOLO estos datos
 (no inventes temperaturas, lluvias ni avisos). Lo lee {presenta} con voz sintética.
 
-Sábado {sab} y domingo {dom}. Datos por ciudad (grados, lluvia = probabilidad en %):
+Sábado {sab} y domingo {dom}. Datos por ciudad (grados, lluvia = probabilidad máxima del día en %, lluvia_mm = litros previstos;
+con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca digas lluvia segura):
 SÁBADO: {datos_sab}
 DOMINGO: {datos_dom}
 
@@ -188,7 +189,8 @@ PALABRAS_FINDE = {"intro": 22, "sabado": 42, "domingo": 42, "general": 36, "cier
 
 
 def _resumen(prev):
-    return [{k: c[k] for k in ("nombre", "tmax", "tmin", "lluvia", "icono")} for c in prev]
+    return [{k: c[k] for k in ("nombre", "tmax", "tmin", "lluvia", "lluvia_mm", "icono") if c.get(k) is not None}
+            for c in prev]
 
 
 def _mejor_plan(prev_s, prev_d):
@@ -323,7 +325,9 @@ PALABRAS_SEMANA = {"intro": 20, "lunes": 24, "martes": 22, "miercoles": 22, "jue
 PROMPT_SEMANA = """Eres el guionista de "Paraguas o Chanclas", un canal de TikTok sobre el tiempo en España con humor
 ligero (sin palabrotas, sin política). {cuando}, para que la gente se organice. Usa SOLO estos datos (no inventes). Lo lee {presenta} con voz sintética.
 
-Datos por día y ciudad (grados, lluvia = probabilidad en %):
+Datos por día y ciudad (grados, lluvia = probabilidad máxima del día en %, lluvia_mm = litros previstos;
+con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca digas lluvia segura; a varios días vista
+mejor 'posibles chubascos' que afirmaciones rotundas):
 {datos}
 
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón

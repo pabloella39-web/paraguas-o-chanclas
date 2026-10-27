@@ -304,7 +304,9 @@ def prevision(sitio: dict, dia: date) -> dict:
                 "icono": WMO.get(int(h["weather_code"][hora]), "nubes")}
 
     return {"tmax": round(d["temperature_2m_max"][0]), "tmin": round(d["temperature_2m_min"][0]),
-            "lluvia": int(d["precipitation_probability_max"][0] or 0), "mm": d["precipitation_sum"][0] or 0,
+            # probabilidad en horas de calle (8-21 h), no la máxima del día (que incluye la madrugada)
+            "lluvia": int(max((h["precipitation_probability"][k] or 0) for k in range(8, 22))),
+            "mm": d["precipitation_sum"][0] or 0,
             "racha": round(d["wind_gusts_10m_max"][0] or 0), "icono": WMO.get(int(d["weather_code"][0]), "nubes"),
             "franjas": {"MAÑANA": franja(9), "TARDE": franja(16), "NOCHE": franja(21)}}
 
