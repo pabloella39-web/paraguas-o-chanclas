@@ -136,8 +136,14 @@ def responder_texto(com: dict, mensaje: str):
     r = requests.post(f"{API}/uploadposts/comments/create", headers=uploadpost._cabeceras(), json={
         "platform": "tiktok", "user": uploadpost.perfil("tiempo"), "post_id": com["video"],
         "comment_id": com["id"], "message": mensaje[:150]}, timeout=40)
-    if r.status_code >= 400:
-        log.warning("No se pudo contestar al comentario %s: %s", com["id"], r.text[:200])
+    ok = r.status_code < 400
+    try:
+        ok = ok and r.json().get("success", True) is not False
+    except Exception:  # noqa: BLE001
+        pass
+    print(f"::notice::Respuesta a {com['id']} ({com.get('usuario')}): HTTP {r.status_code} {r.text[:250]}")
+    if not ok:
+        raise RuntimeError(f"Upload-Post no publicó la respuesta: HTTP {r.status_code} {r.text[:200]}")
 
 
 # ================================================================ detección (Claude)
@@ -615,6 +621,7 @@ def main():
             continue
         if escritas >= (25 if SOLO_VIDEO else MAX_TEXTO):
             break
+        fallo = False
         try:
             msg = None
             if q.get("tipo") == "ciudad" and q.get("lugar"):
@@ -626,7 +633,12 @@ def main():
                 log.info("Respuesta escrita a @%s («%s»): %s", q["usuario"], q["texto"][:40], msg)
         except Exception as e:  # noqa: BLE001
             log.warning("Respuesta escrita a %s falló: %s", q["id"], e)
-        if a.publicar and q.get("tipo") == "ciudad":  # intentado (contestado o lugar no encontrado): no se repite
+            print(f"::warning::Respuesta escrita a {q['id']} falló: {e}")
+            fallo = True
+            intentos = estado.setdefault("fallos", {})
+            intentos[q["id"]] = intentos.get(q["id"], 0) + 1
+            fallo = intentos[q["id"]] < 3   # tras 3 fallos se da por perdido
+        if a.publicar and q.get("tipo") == "ciudad" and not fallo:  # contestado o lugar no encontrado: no se repite
             estado.setdefault("escritas", []).append(q["id"])
     if SOLO_VIDEO:  # prueba: solo las respuestas escritas de ese vídeo
         estado["vistos"] += [q["id"] for q in clasif if q["video"] == SOLO_VIDEO]
