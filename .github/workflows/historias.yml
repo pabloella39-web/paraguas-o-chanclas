@@ -35,7 +35,7 @@ jobs:
           cache: pip
       - name: Dependencias
         run: |
-          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          bash scripts/instalar_ffmpeg.sh
           pip install -r requirements.txt
           [ -f assets/historias/SpecialElite-Regular.ttf ] || curl -sfL -o assets/historias/SpecialElite-Regular.ttf \
             https://raw.githubusercontent.com/google/fonts/main/apache/specialelite/SpecialElite-Regular.ttf || true

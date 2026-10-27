@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: (which ffmpeg || (sudo apt-get update -q && sudo apt-get install -y -q ffmpeg)) && pip install requests numpy
+      - run: bash scripts/instalar_ffmpeg.sh && pip install requests numpy
       - env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVEN_MODEL: ${{ vars.ELEVEN_MODEL }}

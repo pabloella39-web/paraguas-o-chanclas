@@ -45,7 +45,7 @@ jobs:
       - name: Instalar dependencias
         if: steps.up.outputs.ok == 'true'
         run: |
-          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          bash scripts/instalar_ffmpeg.sh
           pip install -r requirements.txt
       - name: Responder
         if: steps.up.outputs.ok == 'true'

@@ -56,7 +56,7 @@ jobs:
       - name: Instalar dependencias
         if: steps.horario.outputs.ejecutar == 'true'
         run: |
-          which ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          bash scripts/instalar_ffmpeg.sh
           pip install -r requirements.txt
 
       - name: Generar vídeo y publicar
