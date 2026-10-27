@@ -9,8 +9,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 ASSETS = RAIZ / "assets" / "historias"
 HISTORIAL = RAIZ / "historial_historias"
 # Formato: POV de historia (desde el 28/10/2026). Nombre y cuenta se cambian aquí cuando estén decididos.
-NOMBRE = os.environ.get("HISTORIAS_NOMBRE", "").strip() or "TÚ ESTUVISTE ALLÍ"
-CUENTA = os.environ.get("HISTORIAS_CUENTA", "").strip() or "@loquecallan.lasparedes"
+NOMBRE = os.environ.get("HISTORIAS_NOMBRE", "").strip() or "POV: HISTORIA"
+CUENTA = os.environ.get("HISTORIAS_CUENTA", "").strip() or "@pov.historia"
 PERFIL_UPLOADPOST = os.environ.get("UPLOADPOST_PERFIL_HISTORIAS", "").strip() or "torouoso"
 
 ANCHO, ALTO, FPS = 1080, 1920, 30
