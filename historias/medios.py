@@ -53,7 +53,7 @@ def buscar_imagenes(consulta: str, n: int = 3) -> list[dict]:
         if ii.get("mime") != "image/jpeg" or (ii.get("width") or 0) < 800:  # PNG suele ser carteles y gráficos
             continue
         if re.search(r"poster|logo|map|mapa|diagram|chart|cover|flag|bandera|coat of arms|escudo|book|page|text|"
-                     r"stamp|sello|card|portrait|retrato|ad\b|advert|magazine|puck|cartoon|caricatur|comic|dpla", pg.get("title", ""), re.I):
+                     r"stamp|sello|card|portrait|retrato|ad\b|advert|magazine|puck|cartoon|caricatur|comic|dpla|plaque|placa", pg.get("title", ""), re.I):
             continue
         res.append({"id": pg.get("pageid"), "title": pg.get("title", ""), "license": lic, "url": ii.get("thumburl"),
                     "thumbnail": ii.get("url"), "width": ii.get("width"), "height": ii.get("height"),
