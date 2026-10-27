@@ -1,0 +1,9 @@
+INFO:__main__:Imagen 'Berlin 1945 ruins': File:Ruins of the Reichstag in Berlin, 3 June 1945 (public domain)
+INFO:__main__:Imagen 'Hiroshima 1945 city': File:Hiroshima aerial view after atomic bomb 8-194 (public domain)
+INFO:__main__:Imagen 'Titanic lifeboat 1912': File:Titanic lifeboat number 6.jpeg (public domain)
+INFO:__main__:Imagen 'Madrid 1936 barricade': File:Barcelone 19 juillet 1936.jpg (public domain)
+INFO:__main__:Imagen 'Pompeii excavation street': File:Pompeii, its life and art (1902) (14578135269 (no restrictions)
+INFO:__main__:Imagen 'Chernobyl 1986': File:Chernobyl ship 2019 G3.jpg (public domain)
+INFO:__main__:Imagen 'Normandy landing 1944': File:Into the Jaws of Death 23-0455M edit.jpg (public domain)
+INFO:__main__:Imagen 'Forbidden City Beijing': File:Forbidden City in Smog.jpg (cc0)
+8 de 8 imágenes
