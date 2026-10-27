@@ -1,0 +1,83 @@
+{
+ "fecha": "2026-10-28",
+ "duracion": 69.4,
+ "caption": "Bilbao con paraguas y Sevilla en chanclas… ¿en qué bando te toca mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 28 de octubre 🇪🇸\n🌧️ Lluvia en Bilbao y S.C. Tenerife\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 6° en Pamplona\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Bilbao",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "MURCIA, AVISO AMARILLO",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Ojo, Murcia: aviso amarillo por lluvia mañana. Te lo dije el domingo: Bilbao se moja. Quédate, que al final te digo dónde hará más calor.",
+  "norte": "Gente de Bilbao, 81 por ciento de lluvia: paraguas sí o sí. Santander también se moja, mientras que A Coruña y Oviedo, por una vez, ven el sol.",
+  "islas": "Canarias tampoco se libra: Santa Cruz de Tenerife, 64 por ciento de lluvia, eso sí, con 27 grados. Palma, seca y con 24.",
+  "interior": "En el interior, sol para regalar: Madrid con 22 grados y Toledo con 23. Eso sí, si eres de Zaragoza, rachas de 51 kilómetros por hora.",
+  "sur": "Gente de Sevilla, 28 grados a finales de octubre, y Málaga y Badajoz, 26. Ceuta, 24 grados y sol, y Melilla, despejado con 25.",
+  "mediterraneo": "Y volvemos a Murcia: nubes, algo de lluvia y aviso amarillo en el Campo de Cartagena. Barcelona y Valencia, tranquilas con 23 grados.",
+  "general": "Lo prometido: lo más caluroso, Sevilla, con 28 grados. Y lo más frío, las madrugadas de Pamplona y Salamanca, con 6.",
+  "cierre": "¿Acerté el domingo? Dímelo en comentarios y sigue a Paraguas o Chanclas. Mañana, paraguas en Bilbao y chanclas en Sevilla."
+ },
+ "primer_comentario": "¿Llueve, hace sol o ni fu ni fa por tu pueblo? Dímelo y te cuento lo de mañana 🌤️",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-10-27T19:27:32.106Z"
+     },
+     "success": true,
+     "platform_post_id": "7701431200539364640",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7701431200539364640",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 14622694,
+     "post_title": "Bilbao con paraguas y Sevilla en chanclas… ¿en qué bando te toca mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 28 de octubre 🇪🇸\n🌧️ Lluvia en Bilbao y S.C. Tenerife\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 6° en Pamplona\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Bilbao",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7701430852642916385",
+     "first_comment_posted": true,
+     "request_id": "f55012353a7d4fa4be2d736c4d7d1eb8",
+     "request_id_logs": "f55012353a7d4fa4be2d736c4d7d1eb8",
+     "job_id": "d74d074dcd32419cb41b50b862a6046c",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-10-27T19:27:32.106Z"
+   },
+   "request_id": "f55012353a7d4fa4be2d736c4d7d1eb8"
+  }
+ },
+ "youtube": {
+  "id": "buz47aTqvtE",
+  "url": "https://youtube.com/shorts/buz47aTqvtE",
+  "canal": "Paraguas o Chanclas"
+ }
+}
