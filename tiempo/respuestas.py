@@ -648,7 +648,9 @@ def main():
         if a.publicar and q.get("tipo") == "ciudad" and not fallo:  # contestado o lugar no encontrado: no se repite
             estado.setdefault("escritas", []).append(q["id"])
     if SOLO_VIDEO:  # prueba: solo las respuestas escritas de ese vídeo
-        estado["vistos"] += [q["id"] for q in clasif if q["video"] == SOLO_VIDEO]
+        hechas_txt = set(estado.get("escritas", []))
+        estado["vistos"] += [q["id"] for q in clasif if q["video"] == SOLO_VIDEO
+                             and (q.get("tipo") != "ciudad" or q["id"] in hechas_txt)]
         _guardar(estado)
         return
     # Los comentarios de ciudad que no se contestaron por el límite quedan para la siguiente hora
