@@ -1,0 +1,82 @@
+{
+ "tipo": "resto",
+ "fecha": "2026-10-28",
+ "caption": "Halloween casi sin lluvia… salvo si eres de Valencia 🎃☔\n\nLo que queda de semana y el finde en España 🇪🇸\n☁️ Jueves 29: máx. 28°\n☁️ Viernes 30: máx. 27°\n☁️ Sábado 31: máx. 27° · lluvia en Valencia\n☀️ Domingo 1: máx. 26° · lluvia en S.C. Tenerife\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "FINDE SECO MENOS VALENCIA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 89.5,
+ "guion": {
+  "intro": "Ojo, Valencia: el sábado puede tocarte paraguas. El resto de España, finde casi seco. Quédate, que al final te digo el mejor día y el peor.",
+  "jueves": "Mañana jueves, nubes sin lluvia en el norte, con 20 grados en Bilbao y Vigo. En el interior, Madrid 21 y Toledo 23, pero madrugada fresca en León, con 5 grados. Mediterráneo templado, Valencia 24. Y el sur manda, Sevilla y Jerez 28 grados, aunque en Cádiz soplan rachas de 40. Ceuta y Melilla, 22 y 24.",
+  "viernes": "El viernes, Valencia con un 39 por ciento de chubascos y Alicante, 29 por ciento, así que no tiendas la ropa a ciegas. En el resto, tranquilo: Sevilla 27 grados y Madrid 22.",
+  "sabado": "El sábado, Halloween, es el día más gris en Valencia, 58 por ciento de lluvia y unos 3 litros. Alicante y Murcia, posibles chubascos. Si te disfrazas en Sevilla, 27 grados y sin chaqueta.",
+  "domingo": "El domingo cambia la cosa en Canarias, Santa Cruz de Tenerife con un 73 por ciento de lluvia y Las Palmas, 45. En la península, sol y frío al amanecer, Salamanca baja a 3 grados.",
+  "general": "Lo prometido: el mejor día, el jueves, seco casi en toda España y con 28 grados en Sevilla. El peor, el sábado, con lluvia en Valencia y chubascos en el sureste.",
+  "cierre": "Y tú, ¿qué plan tienes para Halloween? Cuéntamelo en comentarios y sigue la cuenta para tener el tiempo de cada día."
+ },
+ "primer_comentario": "¿Llueve, hace sol o ni fu ni fa por tu pueblo? Dímelo y te cuento lo de mañana 🌤️",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-10-28T19:27:30.100Z"
+     },
+     "success": true,
+     "platform_post_id": "7701802289224256801",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7701802289224256801",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 12725133,
+     "post_title": "Halloween casi sin lluvia… salvo si eres de Valencia 🎃☔\n\nLo que queda de semana y el finde en España 🇪🇸\n☁️ Jueves 29: máx. 28°\n☁️ Viernes 30: máx. 27°\n☁️ Sábado 31: máx. 27° · lluvia en Valencia\n☀️ Domingo 1: máx. 26° · lluvia en S.C. Tenerife\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 89.5,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7701802053458446368",
+     "first_comment_posted": true,
+     "request_id": "f950e1b69a3d4ed59dc3a28b6ea306f1",
+     "request_id_logs": "f950e1b69a3d4ed59dc3a28b6ea306f1",
+     "job_id": "7145a722df6849cea22d7e2edd02425b",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-10-28T19:27:30.100Z"
+   },
+   "request_id": "f950e1b69a3d4ed59dc3a28b6ea306f1"
+  }
+ },
+ "tipo_youtube": "semana",
+ "youtube": {
+  "id": "Pets9fHyDEE",
+  "url": "https://youtube.com/shorts/Pets9fHyDEE",
+  "canal": "Paraguas o Chanclas"
+ }
+}
