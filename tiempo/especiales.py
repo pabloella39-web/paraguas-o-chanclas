@@ -343,6 +343,11 @@ IMPORTANTE: hoy NO sale el parte diario: este vídeo es TAMBIÉN el parte de MA�
 más largo y detallado: recorre España por zonas (norte, interior, Mediterráneo, sur, islas) con las ciudades
 destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla aunque sea en media frase. Los demás días, más breves:
 solo lo destacado. Si mañana pasa algo llamativo (lluvia fuerte, rachas, calor, frío), la intro puede abrir con ello.
+Para el bloque de mañana tienes además otras ciudades de cada región: {extra}
+VARIEDAD: no nombres siempre las mismas capitales; si una de estas otras ciudades tiene algo más llamativo (más
+lluvia, más calor o frío, más viento), nómbrala a ella (Vigo, Ourense o Pontevedra en vez de A Coruña; Gijón en vez de
+Oviedo; Córdoba o Jaén en vez de Sevilla; Burgos o León en el interior...). Más repetidas en los últimos vídeos (solo
+si son la noticia): {repetidas}.
 Palabras aproximadas por bloque: {palabras}; total ≈ {total}. Es crucial respetarlo.
 
 "titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, sin emojis (ej. "SEMANA PASADA POR AGUA").
@@ -350,6 +355,16 @@ Palabras aproximadas por bloque: {palabras}; total ≈ {total}. Es crucial respe
 
 Responde SOLO con JSON: {{"segmentos": {{"intro": "...", {claves_dias}, "general": "...", "cierre": "..."}},
 "titular": "...", "caption": "..."}}"""
+
+
+EXTRA_SEMANA: list = []
+
+
+def _extra_por_region() -> dict:
+    out = {}
+    for c in EXTRA_SEMANA:
+        out.setdefault(c["region"], []).append({k: v for k, v in c.items() if k != "region"})
+    return out or {"aviso": "no disponibles"}
 
 
 def _nota_dia(prev):
@@ -372,7 +387,11 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
                                                    palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                    cuando=m["cuando"], rango_txt=m["rango_txt"],
                                                    claves_dias=", ".join(f'"{d}": "..."' for d in _dias()),
-                                                   primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}"))
+                                                   primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}",
+                                                   extra=json.dumps(_extra_por_region(), ensure_ascii=False),
+                                                   repetidas=", ".join(g.ciudades_repetidas(fechas[_dias()[0]],
+                                                                                            prevs[_dias()[0]]))
+                                                   or "(ninguna)"))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 return gg
@@ -435,6 +454,9 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         try:
             for d in _dias():
                 prevs[d], _ = obtener_previsiones(fechas[d])
+                if d == _dias()[0]:  # otras ciudades para el bloque largo de mañana
+                    from .fuentes import EXTRA
+                    EXTRA_SEMANA[:] = list(EXTRA)
         finally:
             for k, v in guardadas.items():
                 if v:
