@@ -1,0 +1,27 @@
+2026-10-28 18:40:40,205 INFO Fuentes usadas: Open-Meteo
+2026-10-28 18:40:41,100 INFO Fuentes usadas: Open-Meteo
+2026-10-28 18:40:42,771 INFO Fuentes usadas: Open-Meteo
+2026-10-28 18:40:43,698 INFO Fuentes usadas: Open-Meteo
+2026-10-28 18:40:46,332 INFO Prompt publicado en la rama pendiente/resto-2026-10-28
+2026-10-28 18:41:32,604 INFO Usando el guion escrito con el plan de Claude: guiones/resto-2026-10-28.json
+2026-10-28 18:41:56,897 INFO ElevenLabs (BXtvkfRgOYGPQKVRgufE, eleven_v4): 1427 caracteres, 88.1 s
+2026-10-28 18:44:17,730 INFO Nueva pista de música de otono compuesta con ElevenLabs (otono_2026-10-28.mp3)
+2026-10-28 18:44:19,855 INFO Música: otono_2026-10-26.mp3
+2026-10-28 18:44:31,081 INFO Renderizando 89.50 s…
+2026-10-28 18:44:31,392 INFO Render 0/2685
+2026-10-28 18:44:41,677 INFO Render 300/2685
+2026-10-28 18:44:50,380 INFO Render 600/2685
+2026-10-28 18:44:58,763 INFO Render 900/2685
+2026-10-28 18:45:07,347 INFO Render 1200/2685
+2026-10-28 18:45:15,867 INFO Render 1500/2685
+2026-10-28 18:45:24,397 INFO Render 1800/2685
+2026-10-28 18:45:32,884 INFO Render 2100/2685
+2026-10-28 18:45:41,812 INFO Render 2400/2685
+2026-10-28 18:45:50,664 INFO Especial listo: /home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_especial/resto_2026-10-29.mp4 (89.50 s, voz elevenlabs (eleven_v4), guion claude)
+Created autostash: b344aae
+Applied autostash.
+2026-10-28 18:46:33,999 INFO Texto del post publicado en la web (Texto del especial: Lo que queda de semana)
+2026-10-28 18:46:33,999 INFO Esperando 39 min hasta la hora de publicación
+2026-10-28 19:26:03,002 INFO Upload-Post: subida iniciada (f950e1b69a3d4ed59dc3a28b6ea306f1)
+2026-10-28 19:27:35,193 INFO Publicado en TikTok vía Upload-Post: {'status': 'completed', 'completed': 1, 'total': 1, 'results': [{'user_email': 'tiempotiktok39@gmail.com', 'profile_username': 'paraguasochanclas', 'platform': 'tiktok', 'media_type': 'video', 'upload_timestamp': {'$date': '2026-10-28T19:27:30.100Z'}, 'success': True, 'platform_post_id': '7701802289
+2026-10-28 19:27:37,040 INFO Subido a YouTube Shorts (Paraguas o Chanclas): https://youtube.com/shorts/Pets9fHyDEE
