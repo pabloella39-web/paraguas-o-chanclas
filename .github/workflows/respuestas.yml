@@ -11,6 +11,10 @@ on:
         description: "Solo comprobar (leer comentarios, sin publicar)"
         type: boolean
         default: true
+      repasar_bandeja:
+        description: "Llenar la bandeja de comentarios con los ya leídos"
+        type: boolean
+        default: false
       respuesta_manual:
         description: "Respuesta escrita a mano: id_video|id_comentario|texto"
         type: string
@@ -66,6 +70,7 @@ jobs:
           RESPUESTAS_TEXTO_POR_HORA: ${{ vars.RESPUESTAS_TEXTO_POR_HORA || '25' }}
           SOLO_VIDEO: ${{ inputs.solo_video }}
           RESPUESTA_MANUAL: ${{ inputs.respuesta_manual }}
+          REPASAR_BANDEJA: ${{ inputs.repasar_bandeja && '1' || '' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then
             python -m tiempo.respuestas --comprobar

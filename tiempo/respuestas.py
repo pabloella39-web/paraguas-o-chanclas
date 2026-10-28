@@ -638,6 +638,12 @@ def main():
     if not uploadpost.disponible():
         print("::notice::Respuestas en vídeo: falta UPLOADPOST_API_KEY (Upload-Post lee los comentarios de TikTok)")
         return
+    if os.environ.get("REPASAR_BANDEJA"):  # una vez: llena la bandeja con los comentarios ya leídos (sin contestar)
+        todos = comentarios_nuevos({"vistos": []})
+        mios = {q for q in _cargar().get("escritas", [])}
+        guardar_bandeja([q for q in clasificar([c for c in todos if c["id"] not in mios])
+                         if q.get("tipo") == "otro" and q.get("merece")])
+        return
     manual = os.environ.get("RESPUESTA_MANUAL", "").strip()   # "id_video|id_comentario|texto" (a mano, una vez)
     if manual:
         vid, cid, texto = manual.split("|", 2)
