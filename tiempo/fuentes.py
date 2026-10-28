@@ -185,7 +185,19 @@ def _mediana(vals):
 
 
 def openmeteo_todas(ciudades: list[dict], hoy: date) -> dict[str, dict]:
-    """Una sola petición para todas las ciudades y todos los modelos."""
+    """Una sola petición para todas las ciudades y todos los modelos (con reintentos: a veces tarda)."""
+    import time
+    for intento in range(4):
+        try:
+            return _openmeteo_todas(ciudades, hoy)
+        except Exception as e:  # noqa: BLE001
+            if intento == 3:
+                raise
+            log.warning("Open-Meteo falló (%s): reintento en %d s", e, 15 * (intento + 1))
+            time.sleep(15 * (intento + 1))
+
+
+def _openmeteo_todas(ciudades: list[dict], hoy: date) -> dict[str, dict]:
     r = requests.get(OPENMETEO_URL, params={
         "latitude": ",".join(str(c["lat"]) for c in ciudades),
         "longitude": ",".join(str(c["lon"]) for c in ciudades),
