@@ -116,7 +116,7 @@ def centros(lons, lats, p, z=None, radio: int = 3):
                 vz_ven = z[max(0, i - radio):i + radio + 1, max(0, j - radio):j + radio + 1]
                 # cerrada: más baja que todo su entorno y al menos 40 m por debajo del borde de la ventana
                 borde = np.concatenate([vz_ven[0], vz_ven[-1], vz_ven[:, 0], vz_ven[:, -1]])
-                if vz == vz_ven.min() and borde.min() - vz >= 40 and vz < 5700:
+                if vz == vz_ven.min() and borde.min() - vz >= 25 and vz < 5750:
                     out.append(("DANA", lons[j], lats[i], vz))
     return _sin_repetir(out)
 
@@ -127,7 +127,7 @@ def componer(dia: date, salida: Path | None = None) -> tuple[Image.Image, dict]:
     import matplotlib.pyplot as plt
     sat, dia_sat = imagen_satelite(dia)
     W, H = sat.size
-    lons, lats, p, z = presion(dia)
+    lons, lats, p, z = presion(dia_sat)   # la situación del mismo día que la foto
     # Isobaras cada 4 hPa con matplotlib sobre un lienzo transparente del mismo tamaño
     fig = plt.figure(figsize=(W / 100, H / 100), dpi=100)
     ax = fig.add_axes([0, 0, 1, 1])
@@ -164,6 +164,7 @@ def componer(dia: date, salida: Path | None = None) -> tuple[Image.Image, dict]:
     cs_ = centros(lons, lats, p, z)
     for tipo, lo, la, v in cs_:
         x, y = xy(lo, la)
+        x, y = min(max(x, 90), W - 90), min(max(y, 70), H - 130)   # que no se corte en el borde
         if tipo == "DANA":
             w = fuente("Black", 54).getlength("DANA") + 50
             d.rounded_rectangle([x - w / 2, y - 44, x + w / 2, y + 44], radius=44, fill=(150, 40, 200, 235),
@@ -187,5 +188,36 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     dia = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
     sal = Path(sys.argv[2] if len(sys.argv) > 2 else "satelite.jpg")
-    _, info = componer(dia, sal)
+    im, info = componer(dia, sal)
     print(json.dumps(info))
+    clip_muestra(im, sal.with_suffix(".mp4"))
+
+
+def clip_muestra(img: Image.Image, salida: Path, segundos: float = 5.0):
+    """Clip vertical de muestra: título arriba, la imagen con un acercamiento lento y la atribución."""
+    import subprocess
+    from .mapa import fuente
+    W, H, fps = 1080, 1920, 30
+    base = img.convert("RGB")
+    esc = W / base.width
+    base = base.resize((W, round(base.height * esc)), Image.LANCZOS)
+    proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s",
+                             f"{W}x{H}", "-r", str(fps), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                             "-crf", "22", str(salida)], stdin=subprocess.PIPE)
+    for k in range(int(segundos * fps)):
+        t = k / (segundos * fps)
+        z = 1 + 0.12 * t
+        bw, bh = round(W * z), round(base.height * z)
+        im = base.resize((bw, bh), Image.BILINEAR).crop(((bw - W) // 2, (bh - base.height) // 2,
+                                                         (bw - W) // 2 + W, (bh - base.height) // 2 + base.height))
+        f = Image.new("RGB", (W, H), (6, 16, 38))
+        y0 = (H - base.height) // 2 + 60
+        f.paste(im, (0, y0))
+        d = ImageDraw.Draw(f)
+        d.text((W // 2, y0 - 120), "ASÍ LO VE EL SATÉLITE", font=fuente("Black", 76), fill=(255, 196, 45),
+               anchor="mm")
+        d.text((W // 2, y0 - 50), "Altas (A) y bajas (B) presiones", font=fuente("Bold", 40), fill=(220, 230, 255),
+               anchor="mm")
+        proc.stdin.write(f.tobytes())
+    proc.stdin.close()
+    proc.wait()

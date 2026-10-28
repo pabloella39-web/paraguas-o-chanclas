@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install -r requirements.txt matplotlib scipy
+      - run: bash scripts/instalar_ffmpeg.sh && pip install -r requirements.txt matplotlib scipy
       - run: |
           mkdir -p muestras_satelite
           python -m tiempo.satelite "$(date +%F)" muestras_satelite/hoy.jpg 2>&1 | tee muestras_satelite/registro.txt
