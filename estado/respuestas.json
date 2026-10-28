@@ -76,7 +76,9 @@
   "7701627880712192800",
   "7701645109426651937",
   "7701680278843474710",
-  "7701697967790981910"
+  "7701697967790981910",
+  "7701707556092494614",
+  "7701710041003524897"
  ],
  "hechas": [
   {
@@ -99,6 +101,17 @@
    ],
    "motor": "edge-tts",
    "resumen": "Mañana en Las Palmas de Gran Canaria: 26°/23°, 3 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-10-28",
+   "clave": "los alcazares|2026-10-28",
+   "lugar": "Los Alcázares",
+   "usuarios": [
+    "salmasaiyd53"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Los Alcázares: 24°/15°, 28 % de lluvia → chanclas.",
    "publicado": true
   }
  ],
