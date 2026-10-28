@@ -168,6 +168,21 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     fen = gancho_mod.fenomeno_del_dia(prev, avisos)
     g.GANCHO, g.GANCHO_TEXTO = fen, gancho_mod.para_guion(fen)
     log.info("Gancho: %s · %s · %s", fen["insignia"], fen["dato"], fen["ciudades"])
+    # Satélite con el viento animado: solo los días que lo merecen (borrasca, DANA, aviso naranja/rojo...)
+    sat = None
+    if not demo or os.environ.get("SATELITE_DEMO"):
+        try:
+            from . import satelite
+            toca, motivo = satelite.merece_satelite(hoy, fen)
+            if toca:
+                sat, info_sat = satelite.preparar(hoy)
+                log.info("Satélite en el vídeo (%s): %s", motivo, info_sat)
+                g.GANCHO_TEXTO += (f" HOY SE VE EL SATÉLITE ({motivo}): justo después de la intro aparece la foto de "
+                                   "satélite con el viento animado; en la primera frase del primer bloque regional "
+                                   "invita a mirarlo con naturalidad ('mira el satélite: así entra...').")
+        except Exception as e:  # noqa: BLE001
+            log.warning("Sin satélite hoy: %s", e)
+            sat = None
 
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
     voz.elegir_voz(VOCES[tipo_voz])
@@ -202,7 +217,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
 
     extremos = {"calor": max(prev, key=lambda c: c["tmax"]), "frio": min(prev, key=lambda c: c["tmin"])}
     comp = Compositor(prev, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
-                      gancho=fen)
+                      gancho=fen, satelite=sat)
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

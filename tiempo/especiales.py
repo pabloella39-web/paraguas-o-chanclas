@@ -449,7 +449,18 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     rango = f"{lun.day} {MESES_CORTOS[lun.month - 1]} · {vie.day} {MESES_CORTOS[vie.month - 1]}"
     notas = {d: _nota_dia(prevs[d]) for d in _dias()}
     mejor = max(notas, key=notas.get)
+    sat = None
+    if not demo:  # el vídeo semanal también enseña el satélite si mañana viene algo gordo
+        try:
+            from . import satelite
+            toca, motivo = satelite.merece_satelite(fechas[_dias()[0]])
+            if toca:
+                sat, info_sat = satelite.preparar(fechas[_dias()[0]])
+                log.info("Satélite en el vídeo semanal (%s): %s", motivo, info_sat)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Sin satélite: %s", e)
     kwargs = {
+        "satelite": sat,
         "datos_seg": {**{d: prevs[d] for d in _dias()}, "intro": []},
         "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",

@@ -81,10 +81,9 @@ def presion(dia: date, paso: float = 1.5):
     lons = np.arange(LON0, LON1 + 0.01, paso)
     lats = np.arange(LAT0, LAT1 + 0.01, paso)
     LO, LA = np.meshgrid(lons, lats)
-    r = requests.get("https://api.open-meteo.com/v1/forecast", timeout=120, params={
+    r = _get_reintentos("https://api.open-meteo.com/v1/forecast", params={
         "latitude": ",".join(f"{x:.2f}" for x in LA.ravel()), "longitude": ",".join(f"{x:.2f}" for x in LO.ravel()),
         "hourly": "pressure_msl,geopotential_height_500hPa", "timezone": "UTC", "start_date": dia.isoformat(), "end_date": dia.isoformat()})
-    r.raise_for_status()
     d = r.json()
     d = d if isinstance(d, list) else [d]
     p = np.array([x["hourly"]["pressure_msl"][12] for x in d], dtype=float).reshape(LA.shape)  # 12 UTC
@@ -219,11 +218,10 @@ def viento(dia: date, nivel: str = "700hPa", paso: float = 1.5, hora: int = 12):
     lons = np.arange(LON0, LON1 + 0.01, paso)
     lats = np.arange(LAT0, LAT1 + 0.01, paso)
     LO, LA = np.meshgrid(lons, lats)
-    r = requests.get("https://api.open-meteo.com/v1/forecast", timeout=120, params={
+    r = _get_reintentos("https://api.open-meteo.com/v1/forecast", params={
         "latitude": ",".join(f"{x:.2f}" for x in LA.ravel()), "longitude": ",".join(f"{x:.2f}" for x in LO.ravel()),
         "hourly": f"wind_speed_{nivel},wind_direction_{nivel}", "timezone": "UTC", "wind_speed_unit": "kmh",
         "start_date": dia.isoformat(), "end_date": dia.isoformat()})
-    r.raise_for_status()
     d = r.json()
     d = d if isinstance(d, list) else [d]
     vel = np.array([x["hourly"][f"wind_speed_{nivel}"][hora] for x in d], dtype=float).reshape(LA.shape)
@@ -233,81 +231,145 @@ def viento(dia: date, nivel: str = "700hPa", paso: float = 1.5, hora: int = 12):
     return lons, lats, u, v
 
 
-def clip_viento(img: Image.Image, dia: date, salida: Path, segundos: float = 6.0, titulo: str = "ASÍ SE MUEVE EL TIEMPO"):
-    """Foto de satélite fija + partículas que fluyen con el viento previsto + flecha de avance (si hay viento
-    organizado sobre la Península)."""
-    import subprocess
-    from .mapa import fuente
-    lons, lats, u, v = viento(dia)
-    W, H, fps = 1080, 1920, 30
-    base = img.convert("RGB")
-    esc = W / base.width
-    base = base.resize((W, round(base.height * esc)), Image.LANCZOS)
-    bh = base.height
-    y0 = (H - bh) // 2 + 60
+def _get_reintentos(url, params, intentos=3, timeout=120):
+    import time
+    for k in range(intentos):
+        try:
+            r = requests.get(url, params=params, timeout=timeout)
+            r.raise_for_status()
+            return r
+        except Exception:  # noqa: BLE001
+            if k == intentos - 1:
+                raise
+            time.sleep(10 * (k + 1))
 
-    def uv(px, py):  # interpolación bilineal en píxeles de la imagen
-        lon = LON0 + px / W * (LON1 - LON0)
-        lat = LAT1 - py / bh * (LAT1 - LAT0)
+
+class AnimSatelite:
+    """Foto de satélite fija + estelas y flechas pequeñas que viajan con el viento previsto. frame(k) devuelve el
+    fotograma k (en orden) del tamaño de la zona del mapa."""
+
+    def __init__(self, img: Image.Image, dia_viento: date, ancho: int = 1080, fps: int = 30):
+        self.lons, self.lats, self.u, self.v = viento(dia_viento)
+        base = img.convert("RGB")
+        self.W = ancho
+        self.base = base.resize((ancho, round(base.height * ancho / base.width)), Image.LANCZOS)
+        self.bh = self.base.height
+        self.fondo = np.asarray(self.base).astype(np.float32) * 0.85
+        self.rnd = np.random.default_rng(7)
+        self.n = 2200
+        self.px = self.rnd.uniform(0, self.W, self.n)
+        self.py = self.rnd.uniform(0, self.bh, self.n)
+        self.edad = self.rnd.integers(0, 60, self.n)
+        self.estela = np.zeros((self.bh, self.W), np.float32)
+        self.k = 0.055 * 30 / fps
+        self.ultimo = -1
+        self.cuadro = None
+
+    def _uv(self, px, py):
+        lons, lats = self.lons, self.lats
+        lon = LON0 + px / self.W * (LON1 - LON0)
+        lat = LAT1 - py / self.bh * (LAT1 - LAT0)
         fi = np.clip((lat - lats[0]) / (lats[1] - lats[0]), 0, len(lats) - 1.001)
         fj = np.clip((lon - lons[0]) / (lons[1] - lons[0]), 0, len(lons) - 1.001)
         i0, j0 = fi.astype(int), fj.astype(int)
         di, dj = fi - i0, fj - j0
+
         def b(m):
             return (m[i0, j0] * (1 - di) * (1 - dj) + m[i0 + 1, j0] * di * (1 - dj) +
                     m[i0, j0 + 1] * (1 - di) * dj + m[i0 + 1, j0 + 1] * di * dj)
-        return b(u), b(v)
+        return b(self.u), b(self.v)
 
-    rnd = np.random.default_rng(7)
-    n = 2200
-    px, py = rnd.uniform(0, W, n), rnd.uniform(0, bh, n)
-    edad = rnd.integers(0, 60, n)
-    k = 0.055                       # km/h → píxeles por fotograma (60 km/h ≈ 3,3 px)
-    estela = np.zeros((bh, W), np.float32)
-    # Flecha de avance: viento medio sobre la Península
-    msk = (lambda LO, LA: (LO > -10) & (LO < 4) & (LA > 36) & (LA < 44))(*np.meshgrid(lons, lats))
-    um, vm = u[msk].mean(), v[msk].mean()
-    vmed = math.hypot(um, vm)
-    proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s",
-                             f"{W}x{H}", "-r", str(fps), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                             "-crf", "22", str(salida)], stdin=subprocess.PIPE)
-    fondo_sat = np.asarray(base).astype(np.float32) * 0.85
-    for f_ in range(int(segundos * fps)):
-        uu, vv = uv(px, py)
-        nx, ny = px + uu * k, py - vv * k
-        estela *= 0.92
-        # trazos: se marca el segmento recorrido
+    def _paso(self):
+        W, bh = self.W, self.bh
+        px, py = self.px, self.py
+        uu, vv = self._uv(px, py)
+        nx, ny = px + uu * self.k, py - vv * self.k
+        self.estela *= 0.92
         for t in (0.0, 0.33, 0.66, 1.0):
             xs = np.clip((px + (nx - px) * t).astype(int), 0, W - 1)
             ys = np.clip((py + (ny - py) * t).astype(int), 0, bh - 1)
             val = np.clip(np.hypot(uu, vv) / 60, 0.4, 1.0)
-            estela[ys, xs] = np.maximum(estela[ys, xs], val)
-            estela[np.clip(ys + 1, 0, bh - 1), xs] = np.maximum(estela[np.clip(ys + 1, 0, bh - 1), xs], val * 0.7)
-        px, py, edad = nx, ny, edad + 1
-        fuera = (px < 0) | (px >= W) | (py < 0) | (py >= bh) | (edad > 70) | (np.hypot(uu, vv) < 3)
+            self.estela[ys, xs] = np.maximum(self.estela[ys, xs], val)
+            y2 = np.clip(ys + 1, 0, bh - 1)
+            self.estela[y2, xs] = np.maximum(self.estela[y2, xs], val * 0.7)
+        self.px, self.py, self.edad = nx, ny, self.edad + 1
+        fuera = (nx < 0) | (nx >= W) | (ny < 0) | (ny >= bh) | (self.edad > 70) | (np.hypot(uu, vv) < 3)
         m = int(fuera.sum())
-        px[fuera], py[fuera], edad[fuera] = rnd.uniform(0, W, m), rnd.uniform(0, bh, m), 0
-        e = Image.fromarray((np.clip(estela * 0.75, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.9))
+        self.px[fuera], self.py[fuera] = self.rnd.uniform(0, W, m), self.rnd.uniform(0, bh, m)
+        self.edad[fuera] = 0
+        e = Image.fromarray((np.clip(self.estela * 0.75, 0, 1) * 255).astype(np.uint8)).filter(
+            ImageFilter.GaussianBlur(0.9))
         a = np.asarray(e).astype(np.float32)[..., None] / 255
-        sat = fondo_sat * (1 - a) + np.array([255, 255, 255], np.float32) * a
-        cuadro = Image.new("RGB", (W, H), (6, 16, 38))
-        cuadro.paste(Image.fromarray(sat.astype(np.uint8)), (0, y0))
-        d = ImageDraw.Draw(cuadro, "RGBA")
-        # Muchas flechas pequeñas que viajan con el viento (una de cada 12 partículas)
-        for i in range(0, n, 12):
-            if not (0 <= px[i] < W and 0 <= py[i] < bh) or edad[i] < 3:
+        im = Image.fromarray((self.fondo * (1 - a) + 255 * a).astype(np.uint8))
+        d = ImageDraw.Draw(im, "RGBA")
+        uu, vv = self._uv(self.px, self.py)
+        for i in range(0, self.n, 12):  # flechas pequeñas que viajan con el viento
+            if self.edad[i] < 3:
                 continue
             sp = math.hypot(uu[i], vv[i])
             if sp < 8:
                 continue
             ang = math.atan2(-vv[i], uu[i])
             tam = 9 + min(sp, 90) / 9
-            x, y = px[i], py[i] + y0
+            x, y = self.px[i], self.py[i]
             pts = [(x + math.cos(ang) * tam, y + math.sin(ang) * tam),
                    (x + math.cos(ang + 2.5) * tam * 0.8, y + math.sin(ang + 2.5) * tam * 0.8),
                    (x + math.cos(ang - 2.5) * tam * 0.8, y + math.sin(ang - 2.5) * tam * 0.8)]
-            vida = min(1.0, edad[i] / 10, (70 - edad[i]) / 10)
+            vida = max(0.0, min(1.0, self.edad[i] / 10, (70 - self.edad[i]) / 10))
             d.polygon(pts, fill=(255, 255, 255, int(230 * vida)), outline=(0, 0, 0, int(140 * vida)))
+        return im
+
+    def frame(self, k: int) -> Image.Image:
+        while self.ultimo < k:
+            self.cuadro = self._paso()
+            self.ultimo += 1
+        return self.cuadro
+
+
+def merece_satelite(dia: date, fen: dict | None = None) -> tuple[bool, str]:
+    """¿Toca satélite? Avisos naranja/rojo, borrasca profunda o DANA cerca, o anticiclón muy potente."""
+    import os
+    if os.environ.get("FORZAR_SATELITE"):
+        return True, "forzado"
+    if fen and fen.get("nivel") in ("naranja", "rojo"):
+        return True, f"aviso {fen['nivel']}"
+    try:
+        lons, lats, p, z = presion(dia)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Sin presión para decidir el satélite: %s", e)
+        return False, ""
+    for tipo, lo, la, v in centros(lons, lats, p, z):
+        cerca = -16 <= lo <= 6 and 33 <= la <= 47
+        if tipo == "B" and v <= 1005 and cerca:
+            return True, f"borrasca de {round(v)} hPa"
+        if tipo == "DANA" and cerca:
+            return True, "DANA"
+        if tipo == "A" and v >= 1036:
+            return True, f"anticiclón de {round(v)} hPa"
+    return False, ""
+
+
+def preparar(dia_viento: date) -> tuple["AnimSatelite", dict]:
+    """Foto más reciente (hoy o ayer) con isobaras y A/B + animación del viento del día que se predice."""
+    hoy = date.today()
+    img, info = componer(hoy)
+    return AnimSatelite(img, dia_viento), info
+
+
+def clip_viento(img: Image.Image, dia: date, salida: Path, segundos: float = 6.0, titulo: str = "ASÍ SE MUEVE EL TIEMPO"):
+    """Clip vertical de muestra con la animación."""
+    import subprocess
+    from .mapa import fuente
+    an = AnimSatelite(img, dia)
+    W, H, fps = 1080, 1920, 30
+    y0 = (H - an.bh) // 2 + 60
+    proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s",
+                             f"{W}x{H}", "-r", str(fps), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                             "-crf", "22", str(salida)], stdin=subprocess.PIPE)
+    for k in range(int(segundos * fps)):
+        cuadro = Image.new("RGB", (W, H), (6, 16, 38))
+        cuadro.paste(an.frame(k), (0, y0))
+        d = ImageDraw.Draw(cuadro)
         d.text((W // 2, y0 - 120), titulo, font=fuente("Black", 74), fill=(255, 196, 45), anchor="mm")
         d.text((W // 2, y0 - 50), "Satélite + viento previsto a 3.000 m", font=fuente("Bold", 40),
                fill=(220, 230, 255), anchor="mm")

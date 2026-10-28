@@ -176,17 +176,18 @@ class Particulas:
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
-                 gancho=None, dias_portada=None):
+                 gancho=None, dias_portada=None, satelite=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
         portada_txt: (marca, texto grande, texto pequeño). capas: {bloque: función(img, proyección, dt)} que dibuja
         encima del mapa. sin_marcadores: bloques sin marcadores de ciudades."""
         self.dias_portada = dias_portada  # [(día, icono, máx)]: portada del vídeo semanal
+        self.satelite = satelite          # tiempo.satelite.AnimSatelite: 6 s tras el gancho en días señalados
         self.gancho = gancho  # fenómeno del día (tiempo.gancho): icono grande, insignia de urgencia y efecto
         self.datos_seg = datos_seg or {}
         self.vistas = vistas or {}
-        self.pills = {**PILLS, **(pills or {})}
+        self.pills = {**PILLS, "satelite": "ASÍ SE MUEVE EL TIEMPO", **(pills or {})}
         self.portada_txt = portada_txt
         self.capas = capas or {}
         self.sin_marcadores = set(sin_marcadores)
@@ -212,6 +213,7 @@ class Compositor:
             self.ventanas.append((ini, fin, p["seg"]))
         self.cabecera = self._cabecera()
         self.fin_intro = next((b for a, b, sg in self.ventanas if sg == "intro"), 0.0)
+        self.sat_ini, self.sat_dur = self.fin_intro, 6.0
 
     # ------------------------------------------------ capas estáticas
     def _cabecera(self):
@@ -265,7 +267,27 @@ class Compositor:
                 return i, a, seg
         return 0, 0, self.ventanas[0][2]
 
+    def _fotograma_satelite(self, t) -> Image.Image:
+        """La foto de satélite con el viento animado ocupa la zona del mapa; cabecera y subtítulos siguen."""
+        loc = t - self.sat_ini
+        cuadro = self.satelite.frame(int(loc * FPS))
+        img = _fondo().convert("RGBA")
+        y = MAPA_Y0 + max(0, (MAPA_H - cuadro.height) // 2)
+        img.paste(cuadro.crop((0, 0, ANCHO, min(cuadro.height, MAPA_H))), (0, y))
+        for borde in (0.0, self.sat_dur - 0.35):  # fundido corto al entrar y al salir
+            if 0 <= loc - borde < 0.35:
+                k = (loc - borde) / 0.35
+                img = Image.blend(img, Image.new("RGBA", img.size, (6, 16, 38, 255)),
+                                  (1 - k) if borde == 0 else k)
+        img.alpha_composite(self.cabecera)
+        d = ImageDraw.Draw(img)
+        self._pill(img, d, "satelite", loc)
+        self._subtitulo(img, d, t)
+        return img.convert("RGB")
+
     def fotograma(self, t) -> Image.Image:
+        if self.satelite is not None and self.sat_ini <= t < self.sat_ini + self.sat_dur:
+            return self._fotograma_satelite(t)
         i, ini, seg_real = self.ventana(t)
         prev_real = self.ventanas[i - 1][2] if i > 0 else seg_real
         seg, prev_seg = self.alias.get(seg_real, seg_real), self.alias.get(prev_real, prev_real)
