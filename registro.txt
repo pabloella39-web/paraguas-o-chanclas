@@ -1,0 +1,12 @@
+INFO:matplotlib.font_manager:Failed to extract font properties from /usr/share/fonts/truetype/noto/NotoColorEmoji.ttf: Non-scalable fonts are not supported
+INFO:matplotlib.font_manager:generated new fontManager
+INFO:__main__:GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor 2026-10-28: 100 % sin datos
+INFO:__main__:GIBS VIIRS_NOAA21_CorrectedReflectance_TrueColor 2026-10-28: 100 % sin datos
+INFO:__main__:GIBS VIIRS_SNPP_CorrectedReflectance_TrueColor 2026-10-28: 100 % sin datos
+INFO:__main__:GIBS MODIS_Terra_CorrectedReflectance_TrueColor 2026-10-28: 100 % sin datos
+INFO:__main__:GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor 2026-10-27: 38 % sin datos
+INFO:__main__:GIBS VIIRS_NOAA21_CorrectedReflectance_TrueColor 2026-10-27: 25 % sin datos
+INFO:__main__:GIBS VIIRS_SNPP_CorrectedReflectance_TrueColor 2026-10-27: 0 % sin datos
+INFO:__main__:GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor 2026-10-26: 1 % sin datos
+INFO:__main__:Satélite 2026-10-27: 0.1 % sin cubrir
+{"dia_satelite": "2026-10-27", "centros": [["A", -22.5, 41.0, 1027], ["A", -6.0, 32.0, 1026], ["A", 6.0, 35.0, 1020]]}
