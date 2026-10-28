@@ -151,8 +151,11 @@ PROMPT_DETECTAR = """Estos son comentarios nuevos de TikTok en "Paraguas o Chanc
 humor ligero y cercano. Clasifica CADA comentario en uno de estos tipos:
 - "pregunta": pide el tiempo de un lugar concreto ("¿y en Cuenca?", "haz Jaca", "qué tiempo hará en Zahara") → se le
   contestará con un VÍDEO.
-- "ciudad": solo dice un sitio, normalmente contestando a "¿desde qué ciudad nos ves?" o "dime tu pueblo" ("Málaga",
-  "desde Vigo", "Tomelloso, Ciudad Real") → se le contestará con la previsión de ese sitio por escrito.
+- "ciudad": el comentario es SOLO un sitio (como mucho con "desde", "soy de", "aquí en" o la provincia), contestando a
+  "¿desde qué ciudad nos ves?" o "dime tu pueblo" ("Málaga", "desde Vigo", "Tomelloso, Ciudad Real", "soy de Jaén")
+  → se le contestará con la previsión de ese sitio por escrito. Si además cuenta algo, opina o comenta el tiempo
+  ("en Murcia hace mucho calor", "en Sevilla pocos paraguas", "un pueblo de León 6 grados", "en Elche dan sol"),
+  NO es "ciudad": es "otro".
 - "otro": cualquier otro comentario al que merezca la pena contestar (opiniones, bromas, "¿acertaste?", quejas del
   tiempo, emojis de apoyo...). Escribe tú la "respuesta": máximo 120 caracteres, de tú, simpática, con 1 emoji, sin
   inventar datos del tiempo. Varía las respuestas (no empieces todas igual) y solo en UNA de cada tres invita a decir su
@@ -189,7 +192,22 @@ def clasificar(coms: list[dict]) -> list[dict]:
                 res.append({"id": c["id"], "tipo": "ciudad", "lugar": re.sub(r"(?i)^desde\s+", "", lugar).strip(),
                             "provincia": prov.strip(), "pais": "ES"})
     por_id = {c["id"]: c for c in coms}
-    return [{**por_id[p["id"]], **p} for p in res if p.get("id") in por_id]
+    out = [{**por_id[p["id"]], **p} for p in res if p.get("id") in por_id]
+    for q in out:
+        if q.get("tipo") == "ciudad" and not solo_lugar(q["texto"], q.get("lugar", ""), q.get("provincia", "")):
+            log.info("«%s» habla de algo más que el sitio: no se contesta automáticamente", q["texto"][:60])
+            q["tipo"] = "otro"
+    return out
+
+
+RELLENO = {"desde", "de", "soy", "aqui", "en", "el", "la", "los", "las", "y", "provincia", "pueblo", "ciudad", "un",
+           "una", "mi", "vivo", "saludos", "hola", "nos", "veo", "te", "os", "vemos"}
+
+
+def solo_lugar(texto: str, lugar: str, provincia: str = "") -> bool:
+    """True si el comentario es básicamente el nombre del sitio (sin opiniones ni frases)."""
+    resto = set(_norm(texto).split()) - set(_norm(lugar).split()) - set(_norm(provincia).split()) - RELLENO
+    return len(resto) <= 1
 
 
 def detectar(coms: list[dict]) -> list[dict]:
