@@ -14,7 +14,7 @@ jobs:
       - run: bash scripts/instalar_ffmpeg.sh && pip install -r requirements.txt matplotlib scipy
       - run: |
           mkdir -p muestras_satelite
-          for d in "$(date +%F):hoy" "2026-10-19:dana_19oct" "2026-10-27:ayer"; do
+          for d in "$(date +%F):hoy"; do
             python -m tiempo.satelite "${d%%:*}" "muestras_satelite/${d##*:}.jpg" >> muestras_satelite/registro.txt 2>&1 || echo "FALLO ${d}" >> muestras_satelite/registro.txt
           done
       - if: always()

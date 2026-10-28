@@ -280,29 +280,34 @@ def clip_viento(img: Image.Image, dia: date, salida: Path, segundos: float = 6.0
         for t in (0.0, 0.33, 0.66, 1.0):
             xs = np.clip((px + (nx - px) * t).astype(int), 0, W - 1)
             ys = np.clip((py + (ny - py) * t).astype(int), 0, bh - 1)
-            estela[ys, xs] = np.maximum(estela[ys, xs], np.clip(np.hypot(uu, vv) / 60, 0.35, 1.0))
+            val = np.clip(np.hypot(uu, vv) / 60, 0.4, 1.0)
+            estela[ys, xs] = np.maximum(estela[ys, xs], val)
+            estela[np.clip(ys + 1, 0, bh - 1), xs] = np.maximum(estela[np.clip(ys + 1, 0, bh - 1), xs], val * 0.7)
         px, py, edad = nx, ny, edad + 1
         fuera = (px < 0) | (px >= W) | (py < 0) | (py >= bh) | (edad > 70) | (np.hypot(uu, vv) < 3)
         m = int(fuera.sum())
         px[fuera], py[fuera], edad[fuera] = rnd.uniform(0, W, m), rnd.uniform(0, bh, m), 0
-        e = Image.fromarray((np.clip(estela, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8))
+        e = Image.fromarray((np.clip(estela * 0.75, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.9))
         a = np.asarray(e).astype(np.float32)[..., None] / 255
         sat = fondo_sat * (1 - a) + np.array([255, 255, 255], np.float32) * a
         cuadro = Image.new("RGB", (W, H), (6, 16, 38))
         cuadro.paste(Image.fromarray(sat.astype(np.uint8)), (0, y0))
         d = ImageDraw.Draw(cuadro, "RGBA")
-        if vmed >= 20:  # flecha grande con el sentido del avance, que palpita
-            cx, cy = W * 0.47, y0 + bh * 0.47
-            ang = math.atan2(-vm, um)
-            pul = 1 + 0.08 * math.sin(f_ / fps * 6)
-            L = 260 * pul
-            x1, y1 = cx - math.cos(ang) * L / 2, cy - math.sin(ang) * L / 2
-            x2, y2 = cx + math.cos(ang) * L / 2, cy + math.sin(ang) * L / 2
-            d.line([(x1, y1), (x2, y2)], fill=(255, 196, 45, 235), width=26)
-            pa = [(x2 + math.cos(ang) * 40, y2 + math.sin(ang) * 40),
-                  (x2 + math.cos(ang + 2.4) * 70, y2 + math.sin(ang + 2.4) * 70),
-                  (x2 + math.cos(ang - 2.4) * 70, y2 + math.sin(ang - 2.4) * 70)]
-            d.polygon(pa, fill=(255, 196, 45, 235))
+        # Muchas flechas pequeñas que viajan con el viento (una de cada 12 partículas)
+        for i in range(0, n, 12):
+            if not (0 <= px[i] < W and 0 <= py[i] < bh) or edad[i] < 3:
+                continue
+            sp = math.hypot(uu[i], vv[i])
+            if sp < 8:
+                continue
+            ang = math.atan2(-vv[i], uu[i])
+            tam = 9 + min(sp, 90) / 9
+            x, y = px[i], py[i] + y0
+            pts = [(x + math.cos(ang) * tam, y + math.sin(ang) * tam),
+                   (x + math.cos(ang + 2.5) * tam * 0.8, y + math.sin(ang + 2.5) * tam * 0.8),
+                   (x + math.cos(ang - 2.5) * tam * 0.8, y + math.sin(ang - 2.5) * tam * 0.8)]
+            vida = min(1.0, edad[i] / 10, (70 - edad[i]) / 10)
+            d.polygon(pts, fill=(255, 255, 255, int(230 * vida)), outline=(0, 0, 0, int(140 * vida)))
         d.text((W // 2, y0 - 120), titulo, font=fuente("Black", 74), fill=(255, 196, 45), anchor="mm")
         d.text((W // 2, y0 - 50), "Satélite + viento previsto a 3.000 m", font=fuente("Bold", 40),
                fill=(220, 230, 255), anchor="mm")
