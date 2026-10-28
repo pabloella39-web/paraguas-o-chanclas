@@ -275,9 +275,31 @@ def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
     return res
 
 
+EXTRA: list[dict] = []   # previsión de CIUDADES_EXTRA del último obtener_previsiones (para el guion)
+
+
+def obtener_extra(hoy: date) -> list[dict]:
+    from .config import CIUDADES_EXTRA
+    cs = [{"id": f"x{k}", "nombre": n, "lat": la, "lon": lo, "region": r} for k, (n, la, lo, r) in enumerate(CIUDADES_EXTRA)]
+    try:
+        om = openmeteo_todas(cs, hoy)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Ciudades extra sin datos: %s", e)
+        return []
+    out = []
+    for c in cs:
+        d = om.get(c["id"])
+        if d and d.get("tmax") is not None:
+            out.append({"nombre": c["nombre"], "region": c["region"], "tmax": round(d["tmax"]), "tmin": round(d["tmin"]),
+                        "lluvia": round(d.get("lluvia") or 0), "lluvia_mm": round(d.get("lluvia_mm") or 0, 1),
+                        "racha": round(d.get("racha") or 0), "icono": d.get("icono")})
+    return out
+
+
 def obtener_previsiones(hoy: date) -> tuple[list[dict], str]:
     clave_aemet = os.environ.get("AEMET_API_KEY", "")
     clave_google = os.environ.get("GOOGLE_WEATHER_API_KEY", "")
+    EXTRA[:] = obtener_extra(hoy)
     try:
         om = openmeteo_todas(CIUDADES, hoy)
     except Exception as e:  # noqa: BLE001

@@ -56,6 +56,34 @@ CIUDADES = [
     {"id": "38038", "nombre": "S.C. Tenerife", "lat": 28.464, "lon": -16.251, "region": "islas"},
 ]
 
+# Más ciudades por región (solo Open-Meteo, una única petición): el guion las nombra cuando tienen algo reseñable,
+# para no repetir siempre las mismas capitales. No salen como marcadores en el mapa.
+CIUDADES_EXTRA = [
+    # Norte
+    ("Vigo", 42.240, -8.721, "norte"), ("Ourense", 42.336, -7.864, "norte"), ("Pontevedra", 42.431, -8.644, "norte"),
+    ("Lugo", 43.010, -7.556, "norte"), ("Santiago de Compostela", 42.878, -8.545, "norte"),
+    ("Gijón", 43.532, -5.661, "norte"), ("San Sebastián", 43.318, -1.981, "norte"),
+    ("Vitoria", 42.847, -2.672, "norte"), ("Logroño", 42.463, -2.445, "norte"),
+    # Interior
+    ("Burgos", 42.344, -3.697, "interior"), ("León", 42.599, -5.567, "interior"), ("Segovia", 40.948, -4.118, "interior"),
+    ("Ávila", 40.656, -4.700, "interior"), ("Soria", 41.764, -2.468, "interior"), ("Cuenca", 40.070, -2.137, "interior"),
+    ("Guadalajara", 40.633, -3.167, "interior"), ("Ciudad Real", 38.985, -3.927, "interior"),
+    ("Albacete", 38.994, -1.858, "interior"), ("Teruel", 40.344, -1.106, "interior"), ("Huesca", 42.136, -0.409, "interior"),
+    ("Zamora", 41.503, -5.745, "interior"), ("Palencia", 42.010, -4.528, "interior"),
+    # Mediterráneo
+    ("Girona", 41.979, 2.821, "mediterraneo"), ("Tarragona", 41.119, 1.245, "mediterraneo"),
+    ("Lleida", 41.618, 0.620, "mediterraneo"), ("Castellón", 39.986, -0.051, "mediterraneo"),
+    ("Elche", 38.267, -0.698, "mediterraneo"), ("Cartagena", 37.626, -0.996, "mediterraneo"),
+    ("Benidorm", 38.541, -0.123, "mediterraneo"),
+    # Sur
+    ("Córdoba", 37.888, -4.779, "sur"), ("Jaén", 37.780, -3.785, "sur"), ("Huelva", 37.261, -6.945, "sur"),
+    ("Cádiz", 36.527, -6.289, "sur"), ("Jerez de la Frontera", 36.685, -6.126, "sur"), ("Cáceres", 39.475, -6.372, "sur"),
+    ("Marbella", 36.510, -4.883, "sur"), ("Algeciras", 36.141, -5.456, "sur"),
+    # Islas
+    ("Ibiza", 38.907, 1.432, "islas"), ("Mahón", 39.889, 4.262, "islas"), ("Arrecife", 28.963, -13.548, "islas"),
+    ("Puerto del Rosario", 28.500, -13.862, "islas"), ("Santa Cruz de La Palma", 28.684, -17.765, "islas"),
+]
+
 REGIONES = {
     "norte": {
         "titulo": "NORTE",

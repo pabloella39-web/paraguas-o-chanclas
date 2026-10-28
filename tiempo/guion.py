@@ -59,6 +59,15 @@ Hoy es {fecha}. Datos por región (temperaturas en grados, lluvia = probabilidad
 icono: sol, sol_nubes, nubes, lluvia, chubascos, tormenta, nieve, niebla). Fuentes: AEMET (oficial) y Open-Meteo (consenso de varios modelos: europeo, alemán, francés y americano).
 {datos}
 
+Otras ciudades de cada región (solo para nombrarlas si tienen algo reseñable: más lluvia, más calor o frío, más
+viento, o simplemente para variar):
+{extra}
+
+VARIEDAD DE CIUDADES: no nombres siempre las mismas capitales. En cada región, si una ciudad de la lista de "otras
+ciudades" tiene algo más llamativo que las de siempre, nómbrala a ella (por ejemplo Vigo, Ourense o Pontevedra en vez de
+A Coruña; Gijón en vez de Oviedo; Córdoba o Jaén en vez de Sevilla; Burgos o León en el interior). Ciudades más
+repetidas en los últimos partes (úsalas solo si son la noticia): {repetidas}. Ceuta y Melilla se nombran siempre.
+
 Texto de AEMET para hoy (contexto, puede venir vacío):
 {texto_aemet}
 
@@ -185,6 +194,30 @@ def continuidad(hoy: date) -> str | None:
     return None
 
 
+def ciudades_repetidas(hoy: date, prev: list[dict], dias: int = 4) -> list[str]:
+    """Ciudades nombradas en la mayoría de los últimos partes (para pedir variedad)."""
+    import json as _json
+    from datetime import timedelta as _td
+    from .config import RAIZ
+    cuenta = {}
+    n = 0
+    for k in range(1, dias + 1):
+        ruta = RAIZ / "historial" / f"{(hoy - _td(days=k)).isoformat()}.json"
+        if not ruta.exists():
+            continue
+        try:
+            texto = " ".join((_json.loads(ruta.read_text(encoding="utf-8")).get("guion") or {}).values())
+        except Exception:  # noqa: BLE001
+            continue
+        n += 1
+        for c in prev:
+            nombre = c["nombre"].replace("S.C. Tenerife", "Santa Cruz de Tenerife")
+            if nombre in texto:
+                cuenta[nombre] = cuenta.get(nombre, 0) + 1
+    return [c for c, v in sorted(cuenta.items(), key=lambda x: -x[1]) if n and v >= max(2, n - 1)
+            and c not in ("Ceuta", "Melilla")][:6]
+
+
 def cta_del_dia(hoy: date) -> str:
     # "Dime tu pueblo" es lo que más conversación genera (y se contesta a todos): 4 de cada 7 días
     return ("ciudad", "mencion", "ciudad", "pregunta", "ciudad", "ciudad", "mencion")[hoy.toordinal() % 7]
@@ -212,7 +245,13 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
     log.info("Orden de regiones hoy: %s", ", ".join(f"{r} ({info[r]['puntos']})" for r in orden))
     clave = os.environ.get("ANTHROPIC_API_KEY", "")
     if clave:
+        from .fuentes import EXTRA
+        extra = {}
+        for c in EXTRA:
+            extra.setdefault(c["region"], []).append({k: v for k, v in c.items() if k != "region"})
         prompt = PROMPT.format(fecha=fecha_larga(hoy), datos=json.dumps(_resumen_datos(prev), ensure_ascii=False),
+                               extra=json.dumps(extra, ensure_ascii=False) if extra else "(no disponibles)",
+                               repetidas=", ".join(ciudades_repetidas(hoy, prev)) or "(ninguna)",
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
                                orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],
