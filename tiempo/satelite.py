@@ -27,7 +27,7 @@ COS = math.cos(math.radians((LAT0 + LAT1) / 2))
 ATRIBUCION = "Imagen: NASA (VIIRS) · Presión: Open-Meteo"
 
 
-def _gibs(capa: str, dia: date, ancho: int, alto: int) -> Image.Image | None:
+def _gibs(capa: str, dia: date, ancho: int, alto: int, max_negro: float = 0.25) -> Image.Image | None:
     try:
         r = requests.get(GIBS, timeout=90, params={
             "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.1.1", "LAYERS": capa, "SRS": "EPSG:4326",
@@ -40,21 +40,40 @@ def _gibs(capa: str, dia: date, ancho: int, alto: int) -> Image.Image | None:
         a = np.asarray(im)
         negro = (a.sum(axis=2) < 25).mean()
         log.info("GIBS %s %s: %.0f %% sin datos", capa, dia, 100 * negro)
-        return im if negro < 0.25 else None
+        return im if negro < max_negro else None
     except Exception as e:  # noqa: BLE001
         log.warning("GIBS %s: %s", capa, e)
         return None
 
 
 def imagen_satelite(dia: date, ancho: int = 1360) -> tuple[Image.Image, date]:
-    """La imagen más reciente con buena cobertura (hoy si ya está; si no, ayer)."""
+    """Mosaico del día: el primer satélite y, en sus huecos entre pasadas (negro), los demás; si hoy aún no hay
+    imagen (la NASA la publica unas horas después del paso), la de ayer."""
     alto = round(ancho * (LAT1 - LAT0) / (LON1 - LON0))
     for d in (dia, dia - timedelta(days=1)):
+        base, hueco = None, None
         for capa in CAPAS:
-            im = _gibs(capa, d, ancho, alto)
-            if im is not None:
-                # De equirrectangular a proporciones reales (los grados de longitud son más cortos)
-                return im.resize((round(ancho * COS), alto), Image.LANCZOS), d
+            im = _gibs(capa, d, ancho, alto, max_negro=0.9)
+            if im is None:
+                continue
+            a = np.asarray(im).astype(np.int16)
+            vacio = a.sum(axis=2) < 25
+            if base is None:
+                base, hueco = a.copy(), vacio
+            else:
+                base[hueco] = a[hueco]
+                hueco = hueco & vacio
+            if hueco.mean() < 0.01:
+                break
+        if base is not None and hueco.mean() < 0.12:
+            if hueco.any():  # restos de hueco: se rellenan con la imagen de la víspera
+                prev = _gibs(CAPAS[0], d - timedelta(days=1), ancho, alto, max_negro=0.9)
+                if prev is not None:
+                    base[hueco] = np.asarray(prev).astype(np.int16)[hueco]
+            im = Image.fromarray(np.clip(base, 0, 255).astype(np.uint8))
+            log.info("Satélite %s: %.1f %% sin cubrir", d, 100 * hueco.mean())
+            # De equirrectangular a proporciones reales (los grados de longitud son más cortos)
+            return im.resize((round(ancho * COS), alto), Image.LANCZOS), d
     raise RuntimeError("Sin imagen de satélite")
 
 
@@ -64,26 +83,42 @@ def presion(dia: date, paso: float = 1.5):
     LO, LA = np.meshgrid(lons, lats)
     r = requests.get("https://api.open-meteo.com/v1/forecast", timeout=120, params={
         "latitude": ",".join(f"{x:.2f}" for x in LA.ravel()), "longitude": ",".join(f"{x:.2f}" for x in LO.ravel()),
-        "hourly": "pressure_msl", "timezone": "UTC", "start_date": dia.isoformat(), "end_date": dia.isoformat()})
+        "hourly": "pressure_msl,geopotential_height_500hPa", "timezone": "UTC", "start_date": dia.isoformat(), "end_date": dia.isoformat()})
     r.raise_for_status()
     d = r.json()
     d = d if isinstance(d, list) else [d]
     p = np.array([x["hourly"]["pressure_msl"][12] for x in d], dtype=float).reshape(LA.shape)  # 12 UTC
-    return lons, lats, p
+    z = np.array([x["hourly"]["geopotential_height_500hPa"][12] for x in d], dtype=float).reshape(LA.shape)
+    return lons, lats, p, z
 
 
-def centros(lons, lats, p, radio: int = 3):
+def _sin_repetir(lista, dist=4.0):
     out = []
-    for i in range(p.shape[0]):
-        for j in range(p.shape[1]):
+    for c in sorted(lista, key=lambda c: c[3] if c[0] != "A" else -c[3]):
+        if all(math.hypot(c[1] - o[1], c[2] - o[2]) > dist for o in out if o[0] == c[0]):
+            out.append(c)
+    return out
+
+
+def centros(lons, lats, p, z=None, radio: int = 3):
+    """A y B en superficie; DANA = mínimo aislado del geopotencial en 500 hPa sin borrasca debajo."""
+    out = []
+    for i in range(1, p.shape[0] - 1):
+        for j in range(1, p.shape[1] - 1):
             v = p[i, j]
             ven = p[max(0, i - radio):i + radio + 1, max(0, j - radio):j + radio + 1]
-            borde = i in (0, p.shape[0] - 1) or j in (0, p.shape[1] - 1)
-            if v == ven.min() and v <= 1010 and not borde:
+            if v == ven.min() and v <= 1010:
                 out.append(("B", lons[j], lats[i], v))
-            elif v == ven.max() and v >= 1020 and not borde:
+            elif v == ven.max() and v >= 1020:
                 out.append(("A", lons[j], lats[i], v))
-    return out
+            if z is not None:
+                vz = z[i, j]
+                vz_ven = z[max(0, i - radio):i + radio + 1, max(0, j - radio):j + radio + 1]
+                # cerrada: más baja que todo su entorno y al menos 40 m por debajo del borde de la ventana
+                borde = np.concatenate([vz_ven[0], vz_ven[-1], vz_ven[:, 0], vz_ven[:, -1]])
+                if vz == vz_ven.min() and borde.min() - vz >= 40 and vz < 5700:
+                    out.append(("DANA", lons[j], lats[i], vz))
+    return _sin_repetir(out)
 
 
 def componer(dia: date, salida: Path | None = None) -> tuple[Image.Image, dict]:
@@ -92,7 +127,7 @@ def componer(dia: date, salida: Path | None = None) -> tuple[Image.Image, dict]:
     import matplotlib.pyplot as plt
     sat, dia_sat = imagen_satelite(dia)
     W, H = sat.size
-    lons, lats, p = presion(dia)
+    lons, lats, p, z = presion(dia)
     # Isobaras cada 4 hPa con matplotlib sobre un lienzo transparente del mismo tamaño
     fig = plt.figure(figsize=(W / 100, H / 100), dpi=100)
     ax = fig.add_axes([0, 0, 1, 1])
@@ -126,9 +161,15 @@ def componer(dia: date, salida: Path | None = None) -> tuple[Image.Image, dict]:
     # A y B
     from .mapa import fuente
     f = fuente("Black", 92)
-    cs_ = centros(lons, lats, p)
+    cs_ = centros(lons, lats, p, z)
     for tipo, lo, la, v in cs_:
         x, y = xy(lo, la)
+        if tipo == "DANA":
+            w = fuente("Black", 54).getlength("DANA") + 50
+            d.rounded_rectangle([x - w / 2, y - 44, x + w / 2, y + 44], radius=44, fill=(150, 40, 200, 235),
+                                outline=(255, 255, 255, 255), width=5)
+            d.text((x, y - 2), "DANA", font=fuente("Black", 54), fill=(255, 255, 255), anchor="mm")
+            continue
         col = (40, 120, 255) if tipo == "A" else (230, 40, 50)
         d.ellipse([x - 62, y - 62, x + 62, y + 62], fill=col + (230,), outline=(255, 255, 255, 255), width=5)
         d.text((x, y - 4), tipo, font=f, fill=(255, 255, 255), anchor="mm")
