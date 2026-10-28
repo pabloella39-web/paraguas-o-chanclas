@@ -84,7 +84,9 @@
   "7701748732682158870",
   "7701774590674584342",
   "7701797461002175235",
-  "7701815691813749537"
+  "7701815691813749537",
+  "7701831019234018081",
+  "7701825415757038358"
  ],
  "hechas": [
   {
@@ -118,6 +120,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Los Alcázares: 24°/15°, 28 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-10-28",
+   "clave": "valencia|2026-10-29",
+   "lugar": "Valencia",
+   "usuarios": [
+    "joseantoniogarrid036"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Valencia: 25°/13°, 0 % de lluvia → chanclas.",
    "publicado": true
   }
  ],
