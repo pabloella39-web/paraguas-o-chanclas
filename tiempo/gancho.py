@@ -71,7 +71,11 @@ def _ordenar_publico(nombres: list[str]) -> list[str]:
 
 def fenomeno_del_dia(prev: list[dict], avisos: list[dict] | None = None) -> dict:
     """{icono, efecto, insignia, color, dato, ciudades, motivo}: lo que abre el vídeo."""
-    avisos = avisos or []
+    # Solo los avisos NARANJA y ROJO abren el vídeo: los amarillos son frecuentes y locales, y cuando no se cumplen
+    # (Murcia, 28/10/2026: aviso amarillo por lluvia y sol todo el día) el que queda mal es el canal.
+    amarillos = [a for a in (avisos or []) if a.get("nivel") == "amarillo"]
+    AMARILLOS[:] = amarillos
+    avisos = [a for a in (avisos or []) if a.get("nivel") in ("naranja", "rojo")]
     if avisos:
         a = avisos[0]
         fen = a["fenomeno"].lower()
@@ -104,7 +108,7 @@ def fenomeno_del_dia(prev: list[dict], avisos: list[dict] | None = None) -> dict
         ("viento", top("racha", lambda c: (c.get("racha") or 0) >= 60),
          lambda c: ("RACHAS FUERTES", f"RACHAS DE {round(c['racha'])} KM/H EN {c['nombre'].upper()}")),
         ("lluvia", top("lluvia", lambda c: c["lluvia"] >= 70 or (c.get("lluvia_mm") or 0) >= 10),
-         lambda c: ("LLUVIA SEGURA", f"LLUVIA {c['lluvia']} % EN {c['nombre'].upper()}")),
+         lambda c: ("OJO A LA LLUVIA", f"LLUVIA {c['lluvia']} % EN {c['nombre'].upper()}")),
         ("sol", top("tmax", lambda c: c["tmax"] >= 32),
          lambda c: ("CALOR FUERTE", f"{c['tmax']}° EN {c['nombre'].upper()}")),
         ("nieve", top("tmin", lambda c: c["tmin"] <= 1, rev=False),
@@ -128,9 +132,18 @@ def fenomeno_del_dia(prev: list[dict], avisos: list[dict] | None = None) -> dict
             "motivo": "día tranquilo y soleado", "nivel": None}
 
 
+AMARILLOS = []   # avisos amarillos del día (para mencionarlos con prudencia, nunca como titular)
+
+
 def para_guion(f: dict) -> str:
     """Texto para el prompt del guion."""
-    return (f"Fenómeno que abre el vídeo: {f['motivo']}. Ciudades afectadas (las primeras son las que más nos ven): "
+    extra = ""
+    if AMARILLOS:
+        zonas = "; ".join(f"{a['fenomeno']} en {', '.join(a['zonas'][:3])}" for a in AMARILLOS[:3])
+        extra = (f" Avisos AMARILLOS de AEMET (NO son titular ni gancho): {zonas}. Si los mencionas, en su bloque, de pasada "
+                 "y atribuidos ('AEMET mantiene aviso amarillo por...'), con la franja horaria, y sin prometer que "
+                 "lloverá en toda la provincia.")
+    return extra + (f"Fenómeno que abre el vídeo: {f['motivo']}. Ciudades afectadas (las primeras son las que más nos ven): "
             f"{', '.join(f['ciudades']) or 'ninguna concreta'}. "
             + ("Hay AVISO oficial de AEMET: puedes decir 'aviso " + f["nivel"] + "'." if f.get("nivel") else
                "NO hay avisos oficiales: no digas 'aviso' ni 'alerta oficial'; crea urgencia con el dato real "
