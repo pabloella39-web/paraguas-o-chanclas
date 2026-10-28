@@ -184,15 +184,6 @@ def componer(dia: date, salida: Path | None = None) -> tuple[Image.Image, dict]:
     return img, info
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    dia = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
-    sal = Path(sys.argv[2] if len(sys.argv) > 2 else "satelite.jpg")
-    im, info = componer(dia, sal)
-    print(json.dumps(info))
-    clip_muestra(im, sal.with_suffix(".mp4"))
-
-
 def clip_muestra(img: Image.Image, salida: Path, segundos: float = 5.0):
     """Clip vertical de muestra: título arriba, la imagen con un acercamiento lento y la atribución."""
     import subprocess
@@ -221,3 +212,12 @@ def clip_muestra(img: Image.Image, salida: Path, segundos: float = 5.0):
         proc.stdin.write(f.tobytes())
     proc.stdin.close()
     proc.wait()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    dia = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
+    sal = Path(sys.argv[2] if len(sys.argv) > 2 else "satelite.jpg")
+    im, info = componer(dia, sal)
+    print(json.dumps(info))
+    clip_muestra(im, sal.with_suffix(".mp4"))
