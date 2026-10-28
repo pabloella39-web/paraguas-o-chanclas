@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-28",
+ "titulo": "POV: DESEMBARCAS EN OMAHA",
+ "tipo": "guerra_mundial",
+ "pregunta": "¿Tú habrías saltado de la barcaza?",
+ "resumen": "Seis de junio de mil novecientos cuarenta y cuatro. Tienes diecinueve años y llevas tres horas vomitando en una barcaza. El mar de Normandía está gris y helado.",
+ "voz": "y4o1CguECnmbT8YSuREN",
+ "partes": [
+  {
+   "parte": 1,
+   "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_historias/historia_2026-10-28_parte1.mp4",
+   "duracion": 67.466667,
+   "caption": "Tienes 19 años y la rampa está a punto de caer 🌊\n\n📍 Normandía · 6 De Junio De 1944\nHechos reales; protagonista recreado. Voz IA.\nCada día, un momento de la historia: sígueme para vivir el próximo.\n\n#historia #pov #historiareal #segundaguerramundial #diad #normandia",
+   "publicacion": {
+    "via": "upload-post",
+    "programado": "2026-10-28T21:00:00+01:00",
+    "job_id": "2c037e9cd2d24778a3565269d7d914a4",
+    "respuesta": {
+     "success": true,
+     "job_id": "2c037e9cd2d24778a3565269d7d914a4",
+     "scheduled_date": "2026-10-28T21:00:00+01:00",
+     "request_id": "fa769bbeb62a44fd808a9a41cef626ee"
+    }
+   },
+   "youtube": {
+    "id": "6IbZLKufXjc",
+    "url": "https://youtube.com/shorts/6IbZLKufXjc",
+    "canal": "Lo que callan las paredes"
+   }
+  }
+ ]
+}
