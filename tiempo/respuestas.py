@@ -156,10 +156,12 @@ humor ligero y cercano. Clasifica CADA comentario en uno de estos tipos:
   → se le contestará con la previsión de ese sitio por escrito. Si además cuenta algo, opina o comenta el tiempo
   ("en Murcia hace mucho calor", "en Sevilla pocos paraguas", "un pueblo de León 6 grados", "en Elche dan sol"),
   NO es "ciudad": es "otro".
-- "otro": cualquier otro comentario al que merezca la pena contestar (opiniones, bromas, "¿acertaste?", quejas del
-  tiempo, emojis de apoyo...). Escribe tú la "respuesta": máximo 120 caracteres, de tú, simpática, con 1 emoji, sin
-  inventar datos del tiempo. Varía las respuestas (no empieces todas igual) y solo en UNA de cada tres invita a decir su
-  pueblo para darle su previsión.
+- "otro": cualquier otro comentario (opiniones, bromas, preguntas, quejas, emojis de apoyo...). Marca "merece": true
+  si merece una respuesta personal del dueño del canal (una pregunta, una queja o corrección del pronóstico, alguien que
+  cuenta cómo está el tiempo en su pueblo, un comentario con conversación); false para emojis sueltos o frases sin
+  más. Si merece, escribe una "respuesta" SUGERIDA (el dueño la revisa antes de publicarla): máximo 140 caracteres,
+  de tú, cercana y con humor ligero, 1 emoji, sin inventar datos del tiempo; ante una queja, reconoce y explica sin
+  discutir.
 - "ignorar": insultos, spam, enlaces o cosas sin sentido.
 Para "pregunta" y "ciudad" devuelve también: lugar (nombre limpio y bien escrito), provincia o región si se deduce (o
 ""), pais (ISO de 2 letras; "ES" si no se dice otra cosa) y dia: "hoy", "mañana" o "".
@@ -168,7 +170,7 @@ Comentarios:
 {comentarios}
 
 Responde SOLO con JSON: {{"comentarios": [{{"id": "...", "tipo": "ciudad", "lugar": "...", "provincia": "",
-"pais": "ES", "dia": "", "respuesta": ""}}]}}"""
+"pais": "ES", "dia": "", "merece": false, "respuesta": ""}}]}}"""
 
 
 def clasificar(coms: list[dict]) -> list[dict]:
@@ -198,6 +200,30 @@ def clasificar(coms: list[dict]) -> list[dict]:
             log.info("«%s» habla de algo más que el sitio: no se contesta automáticamente", q["texto"][:60])
             q["tipo"] = "otro"
     return out
+
+
+BANDEJA = RAIZ / "docs" / "comentarios.json"
+
+
+def guardar_bandeja(nuevos: list[dict]):
+    """Comentarios que merecen una respuesta personal: van a docs/comentarios.html (página para el móvil)."""
+    try:
+        d = json.loads(BANDEJA.read_text(encoding="utf-8")) if BANDEJA.exists() else {"comentarios": []}
+    except Exception:  # noqa: BLE001
+        d = {"comentarios": []}
+    ya = {c["id"] for c in d["comentarios"]}
+    limite = (ahora() - timedelta(days=4)).isoformat()
+    lista = [c for c in d["comentarios"] if c.get("cuando", "") >= limite]
+    for q in nuevos:
+        if q["id"] in ya:
+            continue
+        lista.append({"id": q["id"], "video": q["video"], "usuario": q.get("usuario", ""), "texto": q["texto"],
+                      "sugerencia": (q.get("respuesta") or "").strip(), "cuando": ahora().isoformat(timespec="minutes"),
+                      "enlace": f"https://www.tiktok.com/@{MIA}/video/{q['video']}"})
+    d = {"actualizado": ahora().isoformat(timespec="minutes"), "comentarios": lista[-60:]}
+    BANDEJA.write_text(json.dumps(d, ensure_ascii=False, indent=1), encoding="utf-8")
+    if nuevos:
+        log.info("Bandeja de comentarios: %d nuevos", len(nuevos))
 
 
 RELLENO = {"desde", "de", "soy", "aqui", "en", "el", "la", "los", "las", "y", "provincia", "pueblo", "ciudad", "un",
@@ -695,6 +721,7 @@ def main():
     contestables = {q["id"] for q in clasif if q.get("tipo") == "ciudad" and q["video"] in piden}
     hechas_txt = set(estado.setdefault("escritas", []))
     coms = [c for c in coms if c["id"] not in contestables or c["id"] in hechas_txt]
+    guardar_bandeja([q for q in clasif if q.get("tipo") == "otro" and q.get("merece")])
     estado["vistos"] += [c["id"] for c in coms if c["id"] not in {q["id"] for q in preguntas}]
     _guardar(estado)
 

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Comentarios · Paraguas o Chanclas</title>
+<link rel="icon" href="icono-200.png">
+<link rel="apple-touch-icon" href="icono-200.png">
+<style>
+  :root { --fondo:#0a1c3d; --tarjeta:#12346a; --texto:#fff; --suave:#b9c6e0; --acento:#ffc42d; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--fondo); color:var(--texto);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; padding:20px 16px 40px; }
+  main { max-width:560px; margin:0 auto; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  header img { width:48px; height:48px; border-radius:50%; }
+  h1 { font-size:20px; margin:0; }
+  .sub { color:var(--suave); font-size:14px; margin-top:2px; }
+  .filtros { display:flex; gap:8px; margin:14px 0 18px; }
+  .filtros button { flex:1; padding:10px; border-radius:12px; border:1px solid #2c4d86; background:transparent;
+                    color:var(--suave); font-weight:700; font-size:14px; }
+  .filtros button.on { background:var(--acento); color:#0f1932; border-color:var(--acento); }
+  .c { background:var(--tarjeta); border-radius:16px; padding:14px; margin-bottom:14px; }
+  .c.hecho { opacity:.45; }
+  .quien { display:flex; justify-content:space-between; gap:8px; font-size:14px; color:var(--suave); }
+  .quien b { color:var(--texto); }
+  .txt { font-size:17px; line-height:1.45; margin:8px 0 12px; word-break:break-word; }
+  label { font-size:13px; color:var(--suave); }
+  textarea { width:100%; min-height:70px; margin-top:4px; padding:10px; border-radius:12px; border:0;
+             font:inherit; font-size:16px; background:#0b2650; color:var(--texto); resize:vertical; }
+  .cuenta { font-size:12px; color:var(--suave); text-align:right; }
+  .acciones { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px; }
+  .acciones a, .acciones button { display:block; text-align:center; padding:12px 6px; border-radius:12px; border:0;
+                                  font-weight:800; font-size:15px; text-decoration:none; cursor:pointer; }
+  .copiar { background:var(--acento); color:#0f1932; }
+  .ver { background:#2c4d86; color:#fff; }
+  .hecho-b { background:transparent; color:var(--suave); border:1px solid #2c4d86 !important; }
+  .vacio { color:var(--suave); text-align:center; padding:40px 10px; }
+  .aviso { color:var(--suave); font-size:13px; margin-top:16px; line-height:1.5; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icono-200.png" alt="">
+    <div>
+      <h1>Comentarios para ti</h1>
+      <div class="sub" id="sub">Cargando…</div>
+    </div>
+  </header>
+  <div class="filtros">
+    <button id="f-pend" class="on" type="button">Pendientes</button>
+    <button id="f-todos" type="button">Todos</button>
+  </div>
+  <div id="lista"></div>
+  <p class="aviso">Aquí salen las preguntas, quejas y conversaciones que merecen una respuesta tuya (los pueblos se
+    contestan solos). Copia la sugerencia, cámbiala si quieres, abre el vídeo y pégala respondiendo al comentario.
+    Marca «Hecho» para quitarlo de pendientes (se guarda en este móvil).</p>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  let hechos = {};
+  try { hechos = JSON.parse(localStorage.getItem('hechos') || '{}'); } catch (e) {}
+  const guardar = () => { try { localStorage.setItem('hechos', JSON.stringify(hechos)); } catch (e) {} };
+  let todos = false, datos = [];
+  const hace = (iso) => {
+    const m = Math.round((Date.now() - new Date(iso)) / 60000);
+    return m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} d`;
+  };
+  function pintar() {
+    const lista = $('lista'); lista.innerHTML = '';
+    const ver = datos.filter(c => todos || !hechos[c.id]);
+    $('sub').textContent = `${datos.filter(c => !hechos[c.id]).length} pendientes`;
+    if (!ver.length) { lista.innerHTML = '<p class="vacio">No hay comentarios pendientes 🎉</p>'; return; }
+    ver.forEach(c => {
+      const d = document.createElement('div'); d.className = 'c' + (hechos[c.id] ? ' hecho' : '');
+      d.innerHTML = `<div class="quien"><span><b></b></span><span></span></div><div class="txt"></div>
+        <label>Respuesta sugerida</label><textarea maxlength="150"></textarea><div class="cuenta"></div>
+        <div class="acciones"><button class="copiar" type="button">Copiar</button>
+        <a class="ver" target="_blank" rel="noopener">Ver vídeo</a>
+        <button class="hecho-b" type="button"></button></div>`;
+      d.querySelector('b').textContent = '@' + c.usuario;
+      d.querySelector('.quien span:last-child').textContent = hace(c.cuando);
+      d.querySelector('.txt').textContent = c.texto;
+      const ta = d.querySelector('textarea'); ta.value = c.sugerencia || '';
+      const cuenta = () => d.querySelector('.cuenta').textContent = `${ta.value.length}/150`; cuenta();
+      ta.addEventListener('input', cuenta);
+      d.querySelector('.ver').href = c.enlace;
+      const bc = d.querySelector('.copiar');
+      bc.onclick = async () => {
+        try { await navigator.clipboard.writeText(ta.value); } catch (e) { ta.select(); document.execCommand('copy'); }
+        bc.textContent = '¡Copiado! ✅'; setTimeout(() => bc.textContent = 'Copiar', 2000);
+      };
+      const bh = d.querySelector('.hecho-b'); bh.textContent = hechos[c.id] ? 'Deshacer' : 'Hecho';
+      bh.onclick = () => { if (hechos[c.id]) delete hechos[c.id]; else hechos[c.id] = 1; guardar(); pintar(); };
+      lista.appendChild(d);
+    });
+  }
+  $('f-pend').onclick = () => { todos = false; $('f-pend').className = 'on'; $('f-todos').className = ''; pintar(); };
+  $('f-todos').onclick = () => { todos = true; $('f-todos').className = 'on'; $('f-pend').className = ''; pintar(); };
+  fetch('comentarios.json?t=' + Date.now(), {cache: 'no-store'})
+    .then(r => r.json())
+    .then(d => { datos = (d.comentarios || []).slice().reverse(); pintar(); })
+    .catch(() => { $('sub').textContent = 'Todavía no hay comentarios.'; });
+</script>
+</body>
+</html>
