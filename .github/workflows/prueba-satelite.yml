@@ -1,0 +1,24 @@
+name: Prueba de imagen de satélite
+on:
+  push:
+    branches: [main]
+    paths: ["tiempo/satelite.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  satelite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt matplotlib scipy
+      - run: |
+          mkdir -p muestras_satelite
+          python -m tiempo.satelite "$(date +%F)" muestras_satelite/hoy.jpg 2>&1 | tee muestras_satelite/registro.txt
+          python -m tiempo.satelite 2026-10-19 muestras_satelite/dana_19oct.jpg 2>&1 | tee -a muestras_satelite/registro.txt || true
+      - if: always()
+        run: |
+          cd muestras_satelite && git init -q -b muestras-satelite
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Muestras de satélite"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" muestras-satelite
