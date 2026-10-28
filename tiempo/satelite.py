@@ -214,6 +214,103 @@ def clip_muestra(img: Image.Image, salida: Path, segundos: float = 5.0):
     proc.wait()
 
 
+def viento(dia: date, nivel: str = "700hPa", paso: float = 1.5, hora: int = 12):
+    """Viento previsto en altura (por defecto 700 hPa, unos 3.000 m: el que arrastra nubes y frentes)."""
+    lons = np.arange(LON0, LON1 + 0.01, paso)
+    lats = np.arange(LAT0, LAT1 + 0.01, paso)
+    LO, LA = np.meshgrid(lons, lats)
+    r = requests.get("https://api.open-meteo.com/v1/forecast", timeout=120, params={
+        "latitude": ",".join(f"{x:.2f}" for x in LA.ravel()), "longitude": ",".join(f"{x:.2f}" for x in LO.ravel()),
+        "hourly": f"wind_speed_{nivel},wind_direction_{nivel}", "timezone": "UTC", "wind_speed_unit": "kmh",
+        "start_date": dia.isoformat(), "end_date": dia.isoformat()})
+    r.raise_for_status()
+    d = r.json()
+    d = d if isinstance(d, list) else [d]
+    vel = np.array([x["hourly"][f"wind_speed_{nivel}"][hora] for x in d], dtype=float).reshape(LA.shape)
+    dirc = np.array([x["hourly"][f"wind_direction_{nivel}"][hora] for x in d], dtype=float).reshape(LA.shape)
+    rad = np.radians(dirc)
+    u, v = -vel * np.sin(rad), -vel * np.cos(rad)   # hacia dónde sopla (este, norte)
+    return lons, lats, u, v
+
+
+def clip_viento(img: Image.Image, dia: date, salida: Path, segundos: float = 6.0, titulo: str = "ASÍ SE MUEVE EL TIEMPO"):
+    """Foto de satélite fija + partículas que fluyen con el viento previsto + flecha de avance (si hay viento
+    organizado sobre la Península)."""
+    import subprocess
+    from .mapa import fuente
+    lons, lats, u, v = viento(dia)
+    W, H, fps = 1080, 1920, 30
+    base = img.convert("RGB")
+    esc = W / base.width
+    base = base.resize((W, round(base.height * esc)), Image.LANCZOS)
+    bh = base.height
+    y0 = (H - bh) // 2 + 60
+
+    def uv(px, py):  # interpolación bilineal en píxeles de la imagen
+        lon = LON0 + px / W * (LON1 - LON0)
+        lat = LAT1 - py / bh * (LAT1 - LAT0)
+        fi = np.clip((lat - lats[0]) / (lats[1] - lats[0]), 0, len(lats) - 1.001)
+        fj = np.clip((lon - lons[0]) / (lons[1] - lons[0]), 0, len(lons) - 1.001)
+        i0, j0 = fi.astype(int), fj.astype(int)
+        di, dj = fi - i0, fj - j0
+        def b(m):
+            return (m[i0, j0] * (1 - di) * (1 - dj) + m[i0 + 1, j0] * di * (1 - dj) +
+                    m[i0, j0 + 1] * (1 - di) * dj + m[i0 + 1, j0 + 1] * di * dj)
+        return b(u), b(v)
+
+    rnd = np.random.default_rng(7)
+    n = 2200
+    px, py = rnd.uniform(0, W, n), rnd.uniform(0, bh, n)
+    edad = rnd.integers(0, 60, n)
+    k = 0.055                       # km/h → píxeles por fotograma (60 km/h ≈ 3,3 px)
+    estela = np.zeros((bh, W), np.float32)
+    # Flecha de avance: viento medio sobre la Península
+    msk = (lambda LO, LA: (LO > -10) & (LO < 4) & (LA > 36) & (LA < 44))(*np.meshgrid(lons, lats))
+    um, vm = u[msk].mean(), v[msk].mean()
+    vmed = math.hypot(um, vm)
+    proc = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s",
+                             f"{W}x{H}", "-r", str(fps), "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                             "-crf", "22", str(salida)], stdin=subprocess.PIPE)
+    fondo_sat = np.asarray(base).astype(np.float32) * 0.85
+    for f_ in range(int(segundos * fps)):
+        uu, vv = uv(px, py)
+        nx, ny = px + uu * k, py - vv * k
+        estela *= 0.92
+        # trazos: se marca el segmento recorrido
+        for t in (0.0, 0.33, 0.66, 1.0):
+            xs = np.clip((px + (nx - px) * t).astype(int), 0, W - 1)
+            ys = np.clip((py + (ny - py) * t).astype(int), 0, bh - 1)
+            estela[ys, xs] = np.maximum(estela[ys, xs], np.clip(np.hypot(uu, vv) / 60, 0.35, 1.0))
+        px, py, edad = nx, ny, edad + 1
+        fuera = (px < 0) | (px >= W) | (py < 0) | (py >= bh) | (edad > 70) | (np.hypot(uu, vv) < 3)
+        m = int(fuera.sum())
+        px[fuera], py[fuera], edad[fuera] = rnd.uniform(0, W, m), rnd.uniform(0, bh, m), 0
+        e = Image.fromarray((np.clip(estela, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8))
+        a = np.asarray(e).astype(np.float32)[..., None] / 255
+        sat = fondo_sat * (1 - a) + np.array([255, 255, 255], np.float32) * a
+        cuadro = Image.new("RGB", (W, H), (6, 16, 38))
+        cuadro.paste(Image.fromarray(sat.astype(np.uint8)), (0, y0))
+        d = ImageDraw.Draw(cuadro, "RGBA")
+        if vmed >= 20:  # flecha grande con el sentido del avance, que palpita
+            cx, cy = W * 0.47, y0 + bh * 0.47
+            ang = math.atan2(-vm, um)
+            pul = 1 + 0.08 * math.sin(f_ / fps * 6)
+            L = 260 * pul
+            x1, y1 = cx - math.cos(ang) * L / 2, cy - math.sin(ang) * L / 2
+            x2, y2 = cx + math.cos(ang) * L / 2, cy + math.sin(ang) * L / 2
+            d.line([(x1, y1), (x2, y2)], fill=(255, 196, 45, 235), width=26)
+            pa = [(x2 + math.cos(ang) * 40, y2 + math.sin(ang) * 40),
+                  (x2 + math.cos(ang + 2.4) * 70, y2 + math.sin(ang + 2.4) * 70),
+                  (x2 + math.cos(ang - 2.4) * 70, y2 + math.sin(ang - 2.4) * 70)]
+            d.polygon(pa, fill=(255, 196, 45, 235))
+        d.text((W // 2, y0 - 120), titulo, font=fuente("Black", 74), fill=(255, 196, 45), anchor="mm")
+        d.text((W // 2, y0 - 50), "Satélite + viento previsto a 3.000 m", font=fuente("Bold", 40),
+               fill=(220, 230, 255), anchor="mm")
+        proc.stdin.write(cuadro.tobytes())
+    proc.stdin.close()
+    proc.wait()
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     dia = date.fromisoformat(sys.argv[1]) if len(sys.argv) > 1 else date.today()
@@ -221,3 +318,4 @@ if __name__ == "__main__":
     im, info = componer(dia, sal)
     print(json.dumps(info))
     clip_muestra(im, sal.with_suffix(".mp4"))
+    clip_viento(im, date.fromisoformat(info["dia_satelite"]), sal.with_name(sal.stem + "_viento.mp4"))
