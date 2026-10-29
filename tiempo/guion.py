@@ -80,7 +80,8 @@ Texto de AEMET para hoy (contexto, puede venir vacío):
 {texto_aemet}
 
 CONTEXTO DEL DÍA (menciónalo de pasada, con gracia, en la intro, en "general" o en el cierre; si está vacío, nada).
-Lo marcado [OBLIGATORIO] (festivos nacionales, autonómicos y grandes fiestas locales) se nombra SIEMPRE, en la intro o
+Lo marcado [OBLIGATORIO] (festivos nacionales y autonómicos) se nombra SIEMPRE; las fiestas locales y los eventos
+(Halloween, San Juan…), solo si el día es tranquilo, en la intro o
 en el bloque de su región, ligándolo al tiempo ("Mañana, Día de Andalucía: sol para salir a la calle en Sevilla y
 Málaga"):
 {contexto}

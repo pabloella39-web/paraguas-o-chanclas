@@ -180,7 +180,8 @@ de playa?, ¿frío de verdad?) y promete que al final dirás dónde está el mej
 Habla de tú, frases que fluyan, nada de listas ni dos puntos, números en cifras con "grados" o "por ciento".
 Interpela a la gente de alguna ciudad. Ciudades por su nombre (S.C. Tenerife = Santa Cruz de Tenerife).
 
-Festivos y fiestas este finde: nómbralos SIEMPRE, en el bloque de su día y ligados al tiempo: {fiestas}
+Festivos y fiestas este finde (los marcados [SIEMPRE] se nombran siempre, en el bloque de su día y ligados al
+tiempo; el resto, solo si no hay nada más relevante): {fiestas}
 
 Bloques (palabras aproximadas por bloque: {palabras}; total ≈ {total}):
 - intro: gancho + promesa del final.
@@ -354,8 +355,8 @@ IMPORTANTE: hoy NO sale el parte diario: este vídeo es TAMBIÉN el parte de MA�
 más largo y detallado: recorre España por zonas (norte, interior, Mediterráneo, sur, islas) con las ciudades
 destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla aunque sea en media frase. Los demás días, más breves:
 solo lo destacado. Si mañana pasa algo llamativo (lluvia fuerte, rachas, calor, frío), la intro puede abrir con ello.
-Festivos y fiestas en estos días: nómbralos SIEMPRE, cada uno en el bloque de su día y ligado al tiempo (si
-acompaña o si estropea el plan): {fiestas}
+Festivos y fiestas en estos días (los marcados [SIEMPRE] se nombran siempre, cada uno en el bloque de su día y
+ligado al tiempo; el resto, solo si no hay nada más relevante): {fiestas}
 Para el bloque de mañana tienes además otras ciudades de cada región: {extra}
 VARIEDAD: no nombres siempre las mismas capitales; si una de estas otras ciudades tiene algo más llamativo (más
 lluvia, más calor o frío, más viento), nómbrala a ella (Vigo, Ourense o Pontevedra en vez de A Coruña; Gijón en vez de

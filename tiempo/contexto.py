@@ -82,16 +82,16 @@ def _festivos_anio(anio: int) -> list[dict]:
         return []
 
 
-def festivos_del_dia(d: date) -> list[str]:
-    """Festivos autonómicos y fiestas locales de ese día (los nacionales ya van en FESTIVOS)."""
-    out = []
+def festivos_del_dia(d: date) -> tuple[list[str], list[str]]:
+    """(festivos autonómicos, fiestas locales) de ese día (los nacionales ya van en FESTIVOS)."""
+    reg, loc = [], []
     for f in _festivos_anio(d.year):
         if f["fecha"] == d.isoformat() and not f["nacional"]:
             sitios = [COMUNIDADES.get(c.split("-")[-1], c) for c in f["comunidades"]]
-            out.append(f"{f['nombre']} (festivo en {', '.join(sitios)})")
+            reg.append(f"{f['nombre']} (festivo en {', '.join(sitios)})")
     if (d.month, d.day) in FIESTAS_LOCALES:
-        out.append(f"fiestas de {FIESTAS_LOCALES[(d.month, d.day)]}")
-    return out
+        loc.append(f"fiestas de {FIESTAS_LOCALES[(d.month, d.day)]}")
+    return reg, loc
 
 
 def notas_rango(d0: date, d1: date) -> list[str]:
@@ -100,10 +100,12 @@ def notas_rango(d0: date, d1: date) -> list[str]:
     d = d0
     while d <= d1:
         nombre = DIAS_SEMANA[d.weekday()]
-        for f in festivos_del_dia(d) + ([FESTIVOS[(d.month, d.day)] + " (festivo nacional)"]
-                                        if (d.month, d.day) in FESTIVOS else []) + \
-                ([EVENTOS[(d.month, d.day)]] if (d.month, d.day) in EVENTOS else []):
-            out.append(f"El {nombre} {d.day}: {f}.")
+        reg, loc = festivos_del_dia(d)
+        nac = [FESTIVOS[(d.month, d.day)] + " (festivo nacional)"] if (d.month, d.day) in FESTIVOS else []
+        for f in nac + reg:
+            out.append(f"El {nombre} {d.day}: {f} [SIEMPRE].")
+        for f in loc + ([EVENTOS[(d.month, d.day)]] if (d.month, d.day) in EVENTOS else []):
+            out.append(f"El {nombre} {d.day}: {f} [solo si no hay nada más relevante].")
         d += timedelta(days=1)
     return out
 
@@ -137,9 +139,12 @@ def notas(d: date) -> list[str]:
     if manana.weekday() == 5:
         out.append("Mañana empieza el fin de semana: planes, terrazas, excursiones, ropa tendida…")
     for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
-        for f in festivos_del_dia(dd):
+        reg, loc = festivos_del_dia(dd)
+        for f in reg:
             out.append(f"[OBLIGATORIO] {cuando} es {f}: nómbralo siempre, relacionando el tiempo con el plan "
                        "(si acompaña o si lo estropea).")
+        for f in loc:
+            out.append(f"{cuando} son las {f}: nómbralo SOLO si el día es tranquilo y no hay nada más relevante.")
     if (manana.month, manana.day) in FESTIVOS:
         out.append(f"[OBLIGATORIO] Mañana es {FESTIVOS[(manana.month, manana.day)]} (festivo nacional): nómbralo "
                    "siempre y di qué tiempo hará para los planes.")

@@ -43,6 +43,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   Halloween, festivos autonómicos y fiestas locales del contexto, ropa, terraza o manta), nunca "cuatro gotas en una
   ciudad"; cierre con UNA pregunta de respuesta rápida
   que genere debate ("¿Chaqueta o manga corta mañana? Te leo."). Los comentarios son lo que reparte el vídeo.
-- Festivos nacionales, autonómicos y grandes fiestas locales (marcados [OBLIGATORIO] o en "Festivos y fiestas"):
-  se nombran SIEMPRE, ligados al tiempo del día.
+- Festivos nacionales y autonómicos (marcados [OBLIGATORIO] o [SIEMPRE]): se nombran SIEMPRE, ligados al tiempo.
+  Fiestas locales y eventos (Halloween, San Juan…): solo si el día es tranquilo y no hay nada más relevante.
 - Revisa antes de entregar: ¿la primera frase engancharía a alguien que va deslizando?
