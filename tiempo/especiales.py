@@ -176,7 +176,7 @@ puente, cambio de hora), qué ropa ponerse, tender la ropa, terraza o manta ("Es
 España, menos en un sitio."). Y el cierre termina con UNA pregunta que se conteste en una o dos palabras y genere
 debate ("¿Chaqueta o manga corta mañana? Te leo.", "¿Terraza o sofá este finde?", "¿Castañas o disfraz?"): los
 comentarios son lo que hace que TikTok reparta el vídeo.
-No empieces con "Ojo" (está muy repetido): varía la fórmula del arranque.
+Varía la fórmula del arranque ("Ojo" vale de vez en cuando, pero no siempre).
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo del finde (¿se estropea el domingo?, ¿último finde
 de playa?, ¿frío de verdad?) y promete que al final dirás dónde está el mejor plan del fin de semana.
 Habla de tú, frases que fluyan, nada de listas ni dos puntos, números en cifras con "grados" o "por ciento".
@@ -347,7 +347,7 @@ con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca diga
 mejor 'posibles chubascos' que afirmaciones rotundas; con 5 litros o más di cuántos litros por metro cuadrado):
 {datos}
 
-No empieces con "Ojo" (está muy repetido): varía la fórmula del arranque.
+Varía la fórmula del arranque ("Ojo" vale de vez en cuando, pero no siempre).
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón
 de temperaturas?, ¿semana de sol?) y promete que al final dirás cuál es el mejor día de la semana y cuál el peor.
 Un bloque por día, {rango_txt}: lo destacado de ese día en España, agrupando zonas, con alguna ciudad concreta
@@ -948,6 +948,7 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
         if VOZ_USADA:
             from .config import registrar_voz
             registrar_voz(VOZ_USADA, hoy)
+    meta.setdefault("voz", VOZ_USADA)
     hist.write_text(json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1),
                     encoding="utf-8")
 

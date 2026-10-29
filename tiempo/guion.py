@@ -94,7 +94,8 @@ INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
   lee la fecha (ya sale en pantalla). La PRIMERA FRASE (máximo 10 palabras) es el gancho: urgencia + fenómeno +
   ciudad concreta, como un titular de última hora ("Málaga, prepárate: rachas de 80 kilómetros por hora.",
   "Madrid, mañana te mojas.", "Barcelona, aviso naranja por lluvias.", "¿Manga corta en noviembre? Sevilla dice sí.").
-  VARÍA SIEMPRE el arranque: NO empieces con "Ojo" ni con las mismas palabras que los últimos partes ({aperturas}).
+  VARÍA el arranque: no repitas la fórmula de los últimos partes ({aperturas}); "Ojo" vale de vez en cuando, pero
+  no siempre.
   Usa el GANCHO DE HOY de abajo y nombra
   primero las ciudades que más nos ven (Madrid, Barcelona, Málaga, Sevilla, Valencia) si están afectadas. La segunda
   frase amplía en una línea y promete que al final dirás dónde hará más calor y más frío ("quédate, que al final...").

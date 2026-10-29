@@ -153,8 +153,14 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
         if not g.get("caption"):
             errores.append("falta caption")
         intro = str((seg or {}).get("intro", "")).strip().lower()
-        if intro.startswith("ojo"):
-            errores.append('la intro empieza con "Ojo": varía el arranque')
+        try:  # "Ojo" vale de vez en cuando, pero no dos veces seguidas
+            from datetime import date as _d
+            from .guion import aperturas_recientes
+            ultima = (aperturas_recientes(_d.today(), 1) or [""])[-1].lower()
+        except Exception:  # noqa: BLE001
+            ultima = ""
+        if intro.split()[:1] and ultima.split()[:1] and intro.split()[0].strip(",:¡!¿?") == ultima.split()[0].strip(",:¡!¿?"):
+            errores.append(f'la intro empieza igual que el último vídeo («{ultima}»): varía el arranque')
     return errores
 
 
