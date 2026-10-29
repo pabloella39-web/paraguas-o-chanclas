@@ -1,0 +1,259 @@
+[
+ {
+  "fecha": "2027-01-01",
+  "nombre": "Año Nuevo",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-01-06",
+  "nombre": "Día de Reyes / Epifanía del Señor",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-02-28",
+  "nombre": "Día de Andalucía",
+  "nacional": false,
+  "comunidades": [
+   "ES-AN"
+  ]
+ },
+ {
+  "fecha": "2027-03-01",
+  "nombre": "Dia de les Illes Balears",
+  "nacional": false,
+  "comunidades": [
+   "ES-IB"
+  ]
+ },
+ {
+  "fecha": "2027-03-25",
+  "nombre": "Jueves Santo",
+  "nacional": false,
+  "comunidades": [
+   "ES-AN",
+   "ES-AR",
+   "ES-CL",
+   "ES-CM",
+   "ES-CN",
+   "ES-EX",
+   "ES-GA",
+   "ES-IB",
+   "ES-RI",
+   "ES-MD",
+   "ES-MC",
+   "ES-NC",
+   "ES-AS",
+   "ES-PV",
+   "ES-CB"
+  ]
+ },
+ {
+  "fecha": "2027-03-26",
+  "nombre": "Viernes Santo",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-03-29",
+  "nombre": "Lunes de Pascua",
+  "nacional": false,
+  "comunidades": [
+   "ES-CT",
+   "ES-IB",
+   "ES-RI",
+   "ES-NC",
+   "ES-PV",
+   "ES-VC"
+  ]
+ },
+ {
+  "fecha": "2027-04-23",
+  "nombre": "Día de Castilla y León",
+  "nacional": false,
+  "comunidades": [
+   "ES-CL"
+  ]
+ },
+ {
+  "fecha": "2027-04-23",
+  "nombre": "San Jorge (Día de Aragón)",
+  "nacional": false,
+  "comunidades": [
+   "ES-AR"
+  ]
+ },
+ {
+  "fecha": "2027-05-01",
+  "nombre": "Fiesta del trabajo",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-05-02",
+  "nombre": "Fiesta de la Comunidad de Madrid",
+  "nacional": false,
+  "comunidades": [
+   "ES-MD"
+  ]
+ },
+ {
+  "fecha": "2027-05-17",
+  "nombre": "Día das Letras Galegas",
+  "nacional": false,
+  "comunidades": [
+   "ES-GA"
+  ]
+ },
+ {
+  "fecha": "2027-05-27",
+  "nombre": "Corpus Christi",
+  "nacional": false,
+  "comunidades": [
+   "ES-CM"
+  ]
+ },
+ {
+  "fecha": "2027-05-30",
+  "nombre": "Día de Canarias",
+  "nacional": false,
+  "comunidades": [
+   "ES-CN"
+  ]
+ },
+ {
+  "fecha": "2027-05-31",
+  "nombre": "Día de la Región Castilla-La Mancha",
+  "nacional": false,
+  "comunidades": [
+   "ES-CM"
+  ]
+ },
+ {
+  "fecha": "2027-06-09",
+  "nombre": "Día de La Rioja",
+  "nacional": false,
+  "comunidades": [
+   "ES-RI"
+  ]
+ },
+ {
+  "fecha": "2027-06-09",
+  "nombre": "Día de la Región de Murcia",
+  "nacional": false,
+  "comunidades": [
+   "ES-MC"
+  ]
+ },
+ {
+  "fecha": "2027-06-24",
+  "nombre": "Sant Joan",
+  "nacional": false,
+  "comunidades": [
+   "ES-CT",
+   "ES-VC"
+  ]
+ },
+ {
+  "fecha": "2027-07-25",
+  "nombre": "Santiago Apóstol",
+  "nacional": false,
+  "comunidades": [
+   "ES-GA",
+   "ES-PV"
+  ]
+ },
+ {
+  "fecha": "2027-07-28",
+  "nombre": "Día de las Instituciones de Cantabria",
+  "nacional": false,
+  "comunidades": [
+   "ES-CB"
+  ]
+ },
+ {
+  "fecha": "2027-08-15",
+  "nombre": "Asunción",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-09-08",
+  "nombre": "Día de Asturias",
+  "nacional": false,
+  "comunidades": [
+   "ES-AS"
+  ]
+ },
+ {
+  "fecha": "2027-09-08",
+  "nombre": "Día de Extremadura",
+  "nacional": false,
+  "comunidades": [
+   "ES-EX"
+  ]
+ },
+ {
+  "fecha": "2027-09-11",
+  "nombre": "Diada Nacional de Catalunya",
+  "nacional": false,
+  "comunidades": [
+   "ES-CT"
+  ]
+ },
+ {
+  "fecha": "2027-09-15",
+  "nombre": "Festividad de la Bien Aparecida",
+  "nacional": false,
+  "comunidades": [
+   "ES-CB"
+  ]
+ },
+ {
+  "fecha": "2027-10-09",
+  "nombre": "Dia de la Comunitat Valenciana",
+  "nacional": false,
+  "comunidades": [
+   "ES-VC"
+  ]
+ },
+ {
+  "fecha": "2027-10-12",
+  "nombre": "Fiesta Nacional de España",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-11-01",
+  "nombre": "Día de todos los Santos",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-12-06",
+  "nombre": "Día de la Constitución",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-12-08",
+  "nombre": "Inmaculada Concepción",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-12-25",
+  "nombre": "Navidad",
+  "nacional": true,
+  "comunidades": []
+ },
+ {
+  "fecha": "2027-12-26",
+  "nombre": "Feast of Saint Stephen",
+  "nacional": false,
+  "comunidades": [
+   "ES-CT"
+  ]
+ }
+]
