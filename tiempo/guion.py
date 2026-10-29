@@ -63,6 +63,14 @@ Otras ciudades de cada región (solo para nombrarlas si tienen algo reseñable: 
 viento, o simplemente para variar):
 {extra}
 
+DÍAS TRANQUILOS (sin avisos naranja/rojo, sin lluvia importante ni temperaturas extremas): el gancho NO puede ser
+"cuatro gotas en una ciudad" ni un dato local flojo, porque a quien no es de allí no le importa y desliza. Abre con un
+gancho HUMANO para toda España: el plan del día o del finde, un evento del CONTEXTO DEL DÍA (Halloween, festivo,
+puente, cambio de hora), qué ropa ponerse, tender la ropa, terraza o manta ("Mañana es día de terraza en casi toda
+España, menos en un sitio."). Y el cierre termina con UNA pregunta que se conteste en una o dos palabras y genere
+debate ("¿Chaqueta o manga corta mañana? Te leo.", "¿Terraza o sofá este finde?", "¿Castañas o disfraz?"): los
+comentarios son lo que hace que TikTok reparta el vídeo.
+
 VARIEDAD DE CIUDADES: no nombres siempre las mismas capitales. En cada región, si una ciudad de la lista de "otras
 ciudades" tiene algo más llamativo que las de siempre, nómbrala a ella (por ejemplo Vigo, Ourense o Pontevedra en vez de
 A Coruña; Gijón en vez de Oviedo; Córdoba o Jaén en vez de Sevilla; Burgos o León en el interior). Ciudades más

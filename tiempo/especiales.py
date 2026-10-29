@@ -167,6 +167,13 @@ con 5 litros o más di cuántos litros por metro cuadrado caerán):
 SÁBADO: {datos_sab}
 DOMINGO: {datos_dom}
 
+DÍAS TRANQUILOS (sin avisos naranja/rojo, sin lluvia importante ni temperaturas extremas): el gancho NO puede ser
+"cuatro gotas en una ciudad" ni un dato local flojo, porque a quien no es de allí no le importa y desliza. Abre con un
+gancho HUMANO para toda España: el plan del día o del finde, un evento del CONTEXTO DEL DÍA (Halloween, festivo,
+puente, cambio de hora), qué ropa ponerse, tender la ropa, terraza o manta ("Este finde es día de terraza en casi toda
+España, menos en un sitio."). Y el cierre termina con UNA pregunta que se conteste en una o dos palabras y genere
+debate ("¿Chaqueta o manga corta mañana? Te leo.", "¿Terraza o sofá este finde?", "¿Castañas o disfraz?"): los
+comentarios son lo que hace que TikTok reparta el vídeo.
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo del finde (¿se estropea el domingo?, ¿último finde
 de playa?, ¿frío de verdad?) y promete que al final dirás dónde está el mejor plan del fin de semana.
 Habla de tú, frases que fluyan, nada de listas ni dos puntos, números en cifras con "grados" o "por ciento".
@@ -348,6 +355,13 @@ VARIEDAD: no nombres siempre las mismas capitales; si una de estas otras ciudade
 lluvia, más calor o frío, más viento), nómbrala a ella (Vigo, Ourense o Pontevedra en vez de A Coruña; Gijón en vez de
 Oviedo; Córdoba o Jaén en vez de Sevilla; Burgos o León en el interior...). Más repetidas en los últimos vídeos (solo
 si son la noticia): {repetidas}.
+DÍAS TRANQUILOS (sin avisos naranja/rojo, sin lluvia importante ni temperaturas extremas): el gancho NO puede ser
+"cuatro gotas en una ciudad" ni un dato local flojo, porque a quien no es de allí no le importa y desliza. Abre con un
+gancho HUMANO para toda España: el plan del día o del finde, un evento del CONTEXTO DEL DÍA (Halloween, festivo,
+puente, cambio de hora), qué ropa ponerse, tender la ropa, terraza o manta ("Este finde es día de terraza en casi toda
+España, menos en un sitio."). Y el cierre termina con UNA pregunta que se conteste en una o dos palabras y genere
+debate ("¿Chaqueta o manga corta mañana? Te leo.", "¿Terraza o sofá este finde?", "¿Castañas o disfraz?"): los
+comentarios son lo que hace que TikTok reparta el vídeo.
 Palabras aproximadas por bloque: {palabras}; total ≈ {total}. Es crucial respetarlo.
 
 "titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, sin emojis (ej. "SEMANA PASADA POR AGUA").

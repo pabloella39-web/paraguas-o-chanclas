@@ -45,6 +45,10 @@ def atardecer(d: date, lat=40.4168, lon=-3.7038) -> str:
 FESTIVOS = {(1, 1): "Año Nuevo", (1, 6): "Reyes", (5, 1): "el Día del Trabajo", (8, 15): "la Asunción",
             (10, 12): "la Fiesta Nacional", (11, 1): "Todos los Santos", (12, 6): "el Día de la Constitución",
             (12, 8): "la Inmaculada", (12, 24): "Nochebuena", (12, 25): "Navidad", (12, 31): "Nochevieja"}
+# Fechas con plan (no festivas) que dan gancho humano los días de tiempo tranquilo
+EVENTOS = {(10, 31): "Halloween", (11, 1): "Todos los Santos (castañas, visitas al cementerio)", (2, 14): "San Valentín",
+           (6, 23): "la Noche de San Juan", (12, 22): "el sorteo de la Lotería de Navidad", (1, 7): "el inicio de las rebajas",
+           (12, 5): "el puente de diciembre", (3, 19): "San José y las Fallas", (11, 11): "San Martín"}
 INICIO_ESTACION = {(3, 20): "la primavera", (6, 21): "el verano", (9, 23): "el otoño", (12, 21): "el invierno"}
 
 
@@ -68,6 +72,11 @@ def notas(d: date) -> list[str]:
     if (d.month, d.day) in FESTIVOS:
         out.append(f"Hoy es {FESTIVOS[(d.month, d.day)]} (festivo).")
     manana = d + timedelta(days=1)
+    for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
+        if (dd.month, dd.day) in EVENTOS:
+            out.append(f"{cuando} es {EVENTOS[(dd.month, dd.day)]}: buen gancho humano si el tiempo está tranquilo.")
+    if manana.weekday() == 5:
+        out.append("Mañana empieza el fin de semana: planes, terrazas, excursiones, ropa tendida…")
     if (manana.month, manana.day) in FESTIVOS:
         out.append(f"Mañana es {FESTIVOS[(manana.month, manana.day)]}: si hay planes, el tiempo importa.")
     p = _pascua(d.year)
