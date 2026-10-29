@@ -136,8 +136,22 @@ VOCES = {
 
 
 def voz_del_dia(fecha) -> str:
-    """Días pares (contando desde el año 1) voz masculina, impares femenina."""
-    return "masculina" if fecha.toordinal() % 2 == 0 else "femenina"
+    """La contraria a la del último vídeo publicado (parte, semanal o finde), para que se alternen siempre;
+    sin registro, días pares masculina e impares femenina."""
+    import json
+    try:
+        ultima = json.loads((RAIZ / "estado" / "ultima_voz.json").read_text(encoding="utf-8"))["voz"]
+        return "femenina" if ultima == "masculina" else "masculina"
+    except Exception:  # noqa: BLE001
+        return "masculina" if fecha.toordinal() % 2 == 0 else "femenina"
+
+
+def registrar_voz(tipo: str, fecha=None):
+    """Se llama al publicar: la siguiente publicación usará la otra voz."""
+    import json
+    (RAIZ / "estado").mkdir(exist_ok=True)
+    (RAIZ / "estado" / "ultima_voz.json").write_text(json.dumps({"voz": tipo, "fecha": str(fecha or "")}),
+                                                      encoding="utf-8")
 VELOCIDAD_EDGE = "+15%"  # punto de partida; se ajusta solo para cuadrar la duración
 
 MODELO_CLAUDE = "claude-sonnet-5-5"

@@ -152,6 +152,9 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
                     errores.append(f"faltan segmentos: {sorted(faltan)}")
         if not g.get("caption"):
             errores.append("falta caption")
+        intro = str((seg or {}).get("intro", "")).strip().lower()
+        if intro.startswith("ojo"):
+            errores.append('la intro empieza con "Ojo": varía el arranque')
     return errores
 
 

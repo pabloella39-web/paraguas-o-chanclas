@@ -63,6 +63,7 @@ def duracion(dmin: float, dmax: float, dobj: float):
 
 
 DURACION_SEMANA = (85.0, 95.0, 90.0)
+VOZ_USADA = ""   # voz del especial que se está haciendo (para alternar con el siguiente vídeo)
 
 
 # ================================================================ voz (común)
@@ -175,6 +176,7 @@ puente, cambio de hora), qué ropa ponerse, tender la ropa, terraza o manta ("Es
 España, menos en un sitio."). Y el cierre termina con UNA pregunta que se conteste en una o dos palabras y genere
 debate ("¿Chaqueta o manga corta mañana? Te leo.", "¿Terraza o sofá este finde?", "¿Castañas o disfraz?"): los
 comentarios son lo que hace que TikTok reparta el vídeo.
+No empieces con "Ojo" (está muy repetido): varía la fórmula del arranque.
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo del finde (¿se estropea el domingo?, ¿último finde
 de playa?, ¿frío de verdad?) y promete que al final dirás dónde está el mejor plan del fin de semana.
 Habla de tú, frases que fluyan, nada de listas ni dos puntos, números en cifras con "grados" o "por ciento".
@@ -286,6 +288,8 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
             if clave_google:
                 os.environ["GOOGLE_WEATHER_API_KEY"] = clave_google
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(viernes)
+    global VOZ_USADA
+    VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
     guion, plan, total, trozos, motor = locutar(
         lambda f, pl: guion_finde(prev_s, prev_d, sab, dom, f, VOCES[tipo_voz]["presenta"], pl),
@@ -343,6 +347,7 @@ con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca diga
 mejor 'posibles chubascos' que afirmaciones rotundas; con 5 litros o más di cuántos litros por metro cuadrado):
 {datos}
 
+No empieces con "Ojo" (está muy repetido): varía la fórmula del arranque.
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón
 de temperaturas?, ¿semana de sol?) y promete que al final dirás cuál es el mejor día de la semana y cuál el peor.
 Un bloque por día, {rango_txt}: lo destacado de ese día en España, agrupando zonas, con alguna ciudad concreta
@@ -485,6 +490,8 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
                 if v:
                     os.environ[k] = v
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(domingo)
+    global VOZ_USADA
+    VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
     guion, plan, total, trozos, motor = locutar(
         lambda f, pl: guion_semana(prevs, fechas, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
@@ -782,6 +789,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     trabajo = salida / "trabajo"
     trabajo.mkdir(exist_ok=True)
     tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
+    global VOZ_USADA
+    VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
     with duracion(*DURACION_AVISO):  # vídeo flash de 20-30 s
         guion, plan, total, trozos, motor = locutar(
@@ -936,6 +945,9 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
                 log.info("Esperando %.0f min hasta la hora de publicación", falta / 60)
                 _t.sleep(falta)
         _publicar(meta, hoy)
+        if VOZ_USADA:
+            from .config import registrar_voz
+            registrar_voz(VOZ_USADA, hoy)
     hist.write_text(json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1),
                     encoding="utf-8")
 

@@ -147,5 +147,5 @@ def para_guion(f: dict) -> str:
             f"{', '.join(f['ciudades']) or 'ninguna concreta'}. "
             + ("Hay AVISO oficial de AEMET: puedes decir 'aviso " + f["nivel"] + "'." if f.get("nivel") else
                "NO hay avisos oficiales: no digas 'aviso' ni 'alerta oficial'; crea urgencia con el dato real "
-               "('ojo', 'atención', 'hoy sí').")
+               "(variando la fórmula: 'prepárate', 'atención', 'mañana sí', una pregunta…; nunca 'Ojo').")
             )

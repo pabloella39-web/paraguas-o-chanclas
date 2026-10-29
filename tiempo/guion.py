@@ -92,8 +92,10 @@ INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
 - Habla de tú al espectador todo el rato ("si hoy sales a correr...", "tú que estás en Málaga...").
 - RETENCIÓN (lo más importante): casi la mitad de la gente se va en los 3 primeros segundos. La intro NO saluda ni
   lee la fecha (ya sale en pantalla). La PRIMERA FRASE (máximo 10 palabras) es el gancho: urgencia + fenómeno +
-  ciudad concreta, como un titular de última hora ("Ojo, Málaga: rachas de 80 kilómetros por hora hoy.",
-  "Madrid, hoy te mojas sí o sí.", "Barcelona, aviso naranja por lluvias."). Usa el GANCHO DE HOY de abajo y nombra
+  ciudad concreta, como un titular de última hora ("Málaga, prepárate: rachas de 80 kilómetros por hora.",
+  "Madrid, mañana te mojas.", "Barcelona, aviso naranja por lluvias.", "¿Manga corta en noviembre? Sevilla dice sí.").
+  VARÍA SIEMPRE el arranque: NO empieces con "Ojo" ni con las mismas palabras que los últimos partes ({aperturas}).
+  Usa el GANCHO DE HOY de abajo y nombra
   primero las ciudades que más nos ven (Madrid, Barcelona, Málaga, Sevilla, Valencia) si están afectadas. La segunda
   frase amplía en una línea y promete que al final dirás dónde hará más calor y más frío ("quédate, que al final...").
   Urgencia sí, mentiras no: solo habla de avisos si los hay de verdad.
@@ -206,6 +208,23 @@ def continuidad(hoy: date) -> str | None:
     return None
 
 
+def aperturas_recientes(hoy: date, n: int = 4) -> list[str]:
+    """Primeras palabras de los últimos partes y vídeos semanales (para no repetir arranque)."""
+    from .config import RAIZ
+    rutas = sorted(list((RAIZ / "historial").glob("*.json")) + list((RAIZ / "historial_especiales").glob("*.json")),
+                   key=lambda r: r.stat().st_mtime)[-n:]
+    out = []
+    for r in rutas:
+        try:
+            gu = json.loads(r.read_text(encoding="utf-8")).get("guion")
+            intro = (gu or {}).get("intro", "") if isinstance(gu, dict) else ""
+        except Exception:  # noqa: BLE001
+            continue
+        if intro:
+            out.append(" ".join(intro.split()[:4]))
+    return out
+
+
 def ciudades_repetidas(hoy: date, prev: list[dict], dias: int = 4) -> list[str]:
     """Ciudades nombradas en la mayoría de los últimos partes (para pedir variedad)."""
     import json as _json
@@ -264,6 +283,7 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
         prompt = PROMPT.format(fecha=fecha_larga(hoy), datos=json.dumps(_resumen_datos(prev), ensure_ascii=False),
                                extra=json.dumps(extra, ensure_ascii=False) if extra else "(no disponibles)",
                                repetidas=", ".join(ciudades_repetidas(hoy, prev)) or "(ninguna)",
+                               aperturas=" / ".join(f"«{a}»" for a in aperturas_recientes(hoy)) or "ninguno",
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
                                orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],

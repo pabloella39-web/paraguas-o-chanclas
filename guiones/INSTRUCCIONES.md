@@ -45,4 +45,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   que genere debate ("¿Chaqueta o manga corta mañana? Te leo."). Los comentarios son lo que reparte el vídeo.
 - Festivos nacionales y autonómicos (marcados [OBLIGATORIO] o [SIEMPRE]): se nombran SIEMPRE, ligados al tiempo.
   Fiestas locales y eventos (Halloween, San Juan…): solo si el día es tranquilo y no hay nada más relevante.
+- Arranque: NUNCA empieces con "Ojo" ni con la misma fórmula que los últimos partes (el prompt las lista); el modelo
+  de parte empieza con "Ojo" pero eso ya no vale.
 - Revisa antes de entregar: ¿la primera frase engancharía a alguien que va deslizando?

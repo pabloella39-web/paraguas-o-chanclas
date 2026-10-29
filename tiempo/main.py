@@ -310,6 +310,8 @@ def main():
             meta["primer_comentario"] = uploadpost.comentario_pueblo(hoy)
             meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo",
                                                         primer_comentario=meta["primer_comentario"])
+            from .config import registrar_voz
+            registrar_voz(meta.get("voz", ""), hoy)
         except Exception as e:  # noqa: BLE001
             log.error("Upload-Post falló (%s): se envía como borrador", e)
             from .tiktok import publicar_con_reintentos
