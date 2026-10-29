@@ -129,7 +129,7 @@ def notas(d: date) -> list[str]:
     if (d.month, d.day) in INICIO_ESTACION:
         out.append(f"Hoy empieza oficialmente {INICIO_ESTACION[(d.month, d.day)]}.")
     if (d.month, d.day) in FESTIVOS:
-        out.append(f"Hoy es {FESTIVOS[(d.month, d.day)]} (festivo).")
+        out.append(f"[OBLIGATORIO] Hoy es {FESTIVOS[(d.month, d.day)]} (festivo nacional): nómbralo siempre.")
     manana = d + timedelta(days=1)
     for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
         if (dd.month, dd.day) in EVENTOS:
@@ -138,10 +138,11 @@ def notas(d: date) -> list[str]:
         out.append("Mañana empieza el fin de semana: planes, terrazas, excursiones, ropa tendida…")
     for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
         for f in festivos_del_dia(dd):
-            out.append(f"{cuando} es {f}: gancho cercano para la gente de allí (nómbralo si el tiempo acompaña o "
-                       "si estropea el plan).")
+            out.append(f"[OBLIGATORIO] {cuando} es {f}: nómbralo siempre, relacionando el tiempo con el plan "
+                       "(si acompaña o si lo estropea).")
     if (manana.month, manana.day) in FESTIVOS:
-        out.append(f"Mañana es {FESTIVOS[(manana.month, manana.day)]}: si hay planes, el tiempo importa.")
+        out.append(f"[OBLIGATORIO] Mañana es {FESTIVOS[(manana.month, manana.day)]} (festivo nacional): nómbralo "
+                   "siempre y di qué tiempo hará para los planes.")
     p = _pascua(d.year)
     if d == p - timedelta(days=2):
         out.append("Hoy es Viernes Santo (festivo).")

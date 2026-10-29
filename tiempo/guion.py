@@ -79,7 +79,10 @@ repetidas en los últimos partes (úsalas solo si son la noticia): {repetidas}. 
 Texto de AEMET para hoy (contexto, puede venir vacío):
 {texto_aemet}
 
-CONTEXTO DEL DÍA (menciónalo de pasada, con gracia, en la intro, en "general" o en el cierre; si está vacío, nada):
+CONTEXTO DEL DÍA (menciónalo de pasada, con gracia, en la intro, en "general" o en el cierre; si está vacío, nada).
+Lo marcado [OBLIGATORIO] (festivos nacionales, autonómicos y grandes fiestas locales) se nombra SIEMPRE, en la intro o
+en el bloque de su región, ligándolo al tiempo ("Mañana, Día de Andalucía: sol para salir a la calle en Sevilla y
+Málaga"):
 {contexto}
 
 Hoy la locución la lee {presenta}: usa la concordancia de género correcta si hablas de ti.
