@@ -8,8 +8,12 @@ import requests
 
 RAIZ = Path(__file__).resolve().parent.parent
 for anio in sys.argv[1:]:
-    r = requests.get(f"https://date.nager.at/api/v3/PublicHolidays/{anio}/ES", timeout=60)
-    r.raise_for_status()
+    try:
+        r = requests.get(f"https://date.nager.at/api/v3/PublicHolidays/{anio}/ES", timeout=60)
+        r.raise_for_status()
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::Festivos {anio}: {e}")
+        continue
     datos = [{"fecha": x["date"], "nombre": x["localName"], "nacional": x.get("global", False),
               "comunidades": x.get("counties") or []} for x in r.json()]
     destino = RAIZ / "assets" / "festivos" / f"{anio}.json"
