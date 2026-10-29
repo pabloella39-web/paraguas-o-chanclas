@@ -17,5 +17,6 @@ for anio in sys.argv[1:]:
     datos = [{"fecha": x["date"], "nombre": x["localName"], "nacional": x.get("global", False),
               "comunidades": x.get("counties") or []} for x in r.json()]
     destino = RAIZ / "assets" / "festivos" / f"{anio}.json"
+    destino.parent.mkdir(parents=True, exist_ok=True)
     destino.write_text(json.dumps(datos, ensure_ascii=False, indent=1), encoding="utf-8")
     print(anio, len(datos), "festivos")
