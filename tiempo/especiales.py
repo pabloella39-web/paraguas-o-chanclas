@@ -287,7 +287,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         finally:
             if clave_google:
                 os.environ["GOOGLE_WEATHER_API_KEY"] = clave_google
-    tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(viernes)
+    tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
@@ -489,7 +489,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
             for k, v in guardadas.items():
                 if v:
                     os.environ[k] = v
-    tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(domingo)
+    tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
@@ -788,7 +788,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     salida.mkdir(parents=True, exist_ok=True)
     trabajo = salida / "trabajo"
     trabajo.mkdir(exist_ok=True)
-    tipo_voz = os.environ.get("VOZ_TIPO") or voz_del_dia(hoy)
+    tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])

@@ -146,6 +146,14 @@ def voz_del_dia(fecha) -> str:
         return "masculina" if fecha.toordinal() % 2 == 0 else "femenina"
 
 
+def voz_para(tipo: str, fecha, importante: bool = False) -> str:
+    """Reparto fijo (de momento): voz FEMENINA en los partes de diario (de lunes a viernes) y MASCULINA en los vídeos
+    importantes (semanal, finde, avisos, partes con aviso naranja o rojo) y en los partes del fin de semana."""
+    if tipo != "parte" or importante or fecha.weekday() >= 5:
+        return "masculina"
+    return "femenina"
+
+
 def registrar_voz(tipo: str, fecha=None):
     """Se llama al publicar: la siguiente publicación usará la otra voz."""
     import json
