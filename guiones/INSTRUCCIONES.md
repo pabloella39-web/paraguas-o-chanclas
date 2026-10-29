@@ -40,6 +40,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   Tramos de 12-25 palabras; cada "imagen" es una búsqueda en inglés de una foto HISTÓRICA real de Wikimedia
   ("Berlin 1945 ruins", "Omaha Beach landing 1944"): lugar + año, sin cadáveres. No repitas temas ya contados.
 - Días de tiempo tranquilo (parte y vídeos semanales): gancho HUMANO para toda España (plan, finde, festivo,
-  Halloween, ropa, terraza o manta), nunca "cuatro gotas en una ciudad"; cierre con UNA pregunta de respuesta rápida
+  Halloween, festivos autonómicos y fiestas locales del contexto, ropa, terraza o manta), nunca "cuatro gotas en una
+  ciudad"; cierre con UNA pregunta de respuesta rápida
   que genere debate ("¿Chaqueta o manga corta mañana? Te leo."). Los comentarios son lo que reparte el vídeo.
 - Revisa antes de entregar: ¿la primera frase engancharía a alguien que va deslizando?

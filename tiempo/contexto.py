@@ -52,6 +52,65 @@ EVENTOS = {(10, 31): "Halloween", (11, 1): "Todos los Santos (castañas, visitas
 INICIO_ESTACION = {(3, 20): "la primavera", (6, 21): "el verano", (9, 23): "el otoño", (12, 21): "el invierno"}
 
 
+COMUNIDADES = {"AN": "Andalucía", "AR": "Aragón", "AS": "Asturias", "IB": "Baleares", "CN": "Canarias",
+               "CB": "Cantabria", "CL": "Castilla y León", "CM": "Castilla-La Mancha", "CT": "Cataluña",
+               "VC": "Comunidad Valenciana", "EX": "Extremadura", "GA": "Galicia", "MD": "Madrid", "MC": "Murcia",
+               "NC": "Navarra", "PV": "País Vasco", "RI": "La Rioja", "CE": "Ceuta", "ML": "Melilla"}
+
+# Fiestas locales grandes (fecha fija) de las ciudades que más nos ven o que salen en el parte
+FIESTAS_LOCALES = {
+    (1, 20): "San Sebastián (la Tamborrada en Donostia) y Sant Sebastià en Palma",
+    (1, 29): "San Valero en Zaragoza", (3, 19): "San José, último día de Fallas en Valencia",
+    (4, 23): "Sant Jordi en Cataluña (libros y rosas en la calle)", (5, 13): "San Pedro Regalado en Valladolid",
+    (5, 15): "San Isidro en Madrid", (6, 23): "la Noche de San Juan (hogueras en A Coruña, Alicante y media España)",
+    (6, 24): "San Juan (Hogueras de Alicante y fiesta en León y Burgos)", (6, 29): "San Pedro en Burgos",
+    (7, 6): "el chupinazo de San Fermín en Pamplona", (7, 7): "San Fermín en Pamplona",
+    (7, 25): "Santiago Apóstol (Galicia y Santiago de Compostela)", (8, 5): "la Virgen Blanca en Vitoria",
+    (8, 15): "la Asunción y fiestas de agosto en muchos pueblos", (9, 8): "la Virgen de la Victoria en Málaga",
+    (9, 21): "San Mateo en Oviedo y Logroño (la vendimia riojana)", (9, 24): "La Mercè en Barcelona",
+    (10, 12): "el Pilar en Zaragoza", (11, 9): "la Almudena en Madrid",
+}
+
+
+def _festivos_anio(anio: int) -> list[dict]:
+    import json
+    from pathlib import Path
+    ruta = Path(__file__).resolve().parent.parent / "assets" / "festivos" / f"{anio}.json"
+    try:
+        return json.loads(ruta.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def festivos_del_dia(d: date) -> list[str]:
+    """Festivos autonómicos y fiestas locales de ese día (los nacionales ya van en FESTIVOS)."""
+    out = []
+    for f in _festivos_anio(d.year):
+        if f["fecha"] == d.isoformat() and not f["nacional"]:
+            sitios = [COMUNIDADES.get(c.split("-")[-1], c) for c in f["comunidades"]]
+            out.append(f"{f['nombre']} (festivo en {', '.join(sitios)})")
+    if (d.month, d.day) in FIESTAS_LOCALES:
+        out.append(f"fiestas de {FIESTAS_LOCALES[(d.month, d.day)]}")
+    return out
+
+
+def notas_rango(d0: date, d1: date) -> list[str]:
+    """Festivos y fiestas entre dos fechas (para los vídeos semanales y del finde)."""
+    out = []
+    d = d0
+    while d <= d1:
+        nombre = DIAS_SEMANA[d.weekday()]
+        for f in festivos_del_dia(d) + ([FESTIVOS[(d.month, d.day)] + " (festivo nacional)"]
+                                        if (d.month, d.day) in FESTIVOS else []) + \
+                ([EVENTOS[(d.month, d.day)]] if (d.month, d.day) in EVENTOS else []):
+            out.append(f"El {nombre} {d.day}: {f}.")
+        d += timedelta(days=1)
+    return out
+
+
+DIAS_SEMANA = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+
+
 def notas(d: date) -> list[str]:
     out = []
     oct_, mar = _ultimo_domingo(d.year, 10), _ultimo_domingo(d.year, 3)
@@ -77,6 +136,10 @@ def notas(d: date) -> list[str]:
             out.append(f"{cuando} es {EVENTOS[(dd.month, dd.day)]}: buen gancho humano si el tiempo está tranquilo.")
     if manana.weekday() == 5:
         out.append("Mañana empieza el fin de semana: planes, terrazas, excursiones, ropa tendida…")
+    for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
+        for f in festivos_del_dia(dd):
+            out.append(f"{cuando} es {f}: gancho cercano para la gente de allí (nómbralo si el tiempo acompaña o "
+                       "si estropea el plan).")
     if (manana.month, manana.day) in FESTIVOS:
         out.append(f"Mañana es {FESTIVOS[(manana.month, manana.day)]}: si hay planes, el tiempo importa.")
     p = _pascua(d.year)

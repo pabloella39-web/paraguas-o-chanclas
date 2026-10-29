@@ -31,6 +31,7 @@ from . import eleven, musica, voz
 from . import guion as g
 from .config import (ANCHO, DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, MODELO_CLAUDE, RAIZ, VISTA_GENERAL,
                      VOCES, voz_del_dia)
+from .contexto import notas_rango
 from .horario import ahora
 from .mapa import fuente
 from .video import MAPA_Y0, Compositor, renderizar
@@ -179,6 +180,8 @@ de playa?, ¿frío de verdad?) y promete que al final dirás dónde está el mej
 Habla de tú, frases que fluyan, nada de listas ni dos puntos, números en cifras con "grados" o "por ciento".
 Interpela a la gente de alguna ciudad. Ciudades por su nombre (S.C. Tenerife = Santa Cruz de Tenerife).
 
+Festivos y fiestas este finde (úsalos como gancho humano si encajan): {fiestas}
+
 Bloques (palabras aproximadas por bloque: {palabras}; total ≈ {total}):
 - intro: gancho + promesa del final.
 - sabado: cómo será el sábado en España (lo destacado, agrupando zonas).
@@ -218,7 +221,8 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
             gg = _claude_json(f"finde-{ahora().date().isoformat()}", "16:50", PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
-                                                  palabras=json.dumps(palabras), total=sum(palabras.values())))
+                                                  palabras=json.dumps(palabras), total=sum(palabras.values()),
+                                                  fiestas=" ".join(notas_rango(sab, dom)) or "(ninguno)"))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 return gg
@@ -350,6 +354,7 @@ IMPORTANTE: hoy NO sale el parte diario: este vídeo es TAMBIÉN el parte de MA�
 más largo y detallado: recorre España por zonas (norte, interior, Mediterráneo, sur, islas) con las ciudades
 destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla aunque sea en media frase. Los demás días, más breves:
 solo lo destacado. Si mañana pasa algo llamativo (lluvia fuerte, rachas, calor, frío), la intro puede abrir con ello.
+Festivos y fiestas en estos días (úsalos como gancho humano si encajan): {fiestas}
 Para el bloque de mañana tienes además otras ciudades de cada región: {extra}
 VARIEDAD: no nombres siempre las mismas capitales; si una de estas otras ciudades tiene algo más llamativo (más
 lluvia, más calor o frío, más viento), nómbrala a ella (Vigo, Ourense o Pontevedra en vez de A Coruña; Gijón en vez de
@@ -403,6 +408,8 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
                                                    claves_dias=", ".join(f'"{d}": "..."' for d in _dias()),
                                                    primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}",
                                                    extra=json.dumps(_extra_por_region(), ensure_ascii=False),
+                                                   fiestas=" ".join(notas_rango(fechas[_dias()[0]],
+                                                                                fechas[_dias()[-1]])) or "(ninguno)",
                                                    repetidas=", ".join(g.ciudades_repetidas(fechas[_dias()[0]],
                                                                                             prevs[_dias()[0]]))
                                                    or "(ninguna)"))
