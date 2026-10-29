@@ -1,0 +1,83 @@
+{
+ "fecha": "2026-10-30",
+ "duracion": 69.4,
+ "caption": "Valencia con cuatro gotas y el sur en chanclas… ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, viernes 30 de octubre 🇪🇸\n🌧️ Lluvia en Valencia y Las Palmas\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 7° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valencia",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "VALENCIA, CUATRO GOTAS",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Ojo, Valencia: mañana por la tarde caen gotas. Te lo dije el miércoles. Quédate, que al final te digo dónde hará más calor.",
+  "mediterraneo": "Gente de Valencia, por la tarde lloverá casi seguro, pero menos de un litro: cuatro gotas, no diluvio. Murcia, seca y a 26 grados.",
+  "islas": "En Ibiza y Formentera, aviso amarillo de AEMET por lluvias. En Canarias, 25 grados y alguna gota por la tarde en Las Palmas.",
+  "norte": "Subimos al norte, que mañana se libra: ni una gota. Gente de Ourense y Pontevedra, 21 grados, y Pamplona, 20. Jersey fino y listo.",
+  "sur": "Al sur, chanclas: Córdoba sube a 27 grados y Cádiz y Huelva a 26. Ceuta y Melilla, cielo cubierto, con 22 y 24 grados.",
+  "interior": "Interior, sol y calma: Toledo llega a 24 grados y Madrid a 22, mientras Burgos y León se quedan en 19. Terraceo asegurado.",
+  "general": "Lo prometido: el horno de mañana es Sevilla, con 28 grados. Y la nevera, la madrugada de Soria, con 6 grados.",
+  "cierre": "Dime en comentarios tu pueblo y te digo si toca paraguas o chanclas. Sigue a Paraguas o Chanclas: mañana, chanclas casi en todas partes."
+ },
+ "primer_comentario": "¿Paraguas o chanclas mañana en tu ciudad? Escríbela y salimos de dudas 👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-10-29T19:28:28.572Z"
+     },
+     "success": true,
+     "platform_post_id": "7702173494158576928",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7702173494158576928",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13785907,
+     "post_title": "Valencia con cuatro gotas y el sur en chanclas… ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, viernes 30 de octubre 🇪🇸\n🌧️ Lluvia en Valencia y Las Palmas\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 7° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valencia",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7702173210988742688",
+     "first_comment_posted": true,
+     "request_id": "2df8cf45b63742b0b338176a4f4c0208",
+     "request_id_logs": "2df8cf45b63742b0b338176a4f4c0208",
+     "job_id": "3c29f84c910e48df83316e60429448c3",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-10-29T19:28:28.572Z"
+   },
+   "request_id": "2df8cf45b63742b0b338176a4f4c0208"
+  }
+ },
+ "youtube": {
+  "id": "4PlHtLyDcYw",
+  "url": "https://youtube.com/shorts/4PlHtLyDcYw",
+  "canal": "Paraguas o Chanclas"
+ }
+}
