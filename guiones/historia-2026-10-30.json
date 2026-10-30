@@ -1,0 +1,71 @@
+{
+ "titulo": "POV: VIVES EN POMPEYA",
+ "gancho": "TIENES 15 AÑOS Y VIVES EN POMPEYA",
+ "etiqueta": "POMPEYA · AÑO 79",
+ "narrador": "hombre",
+ "caption": "Hueles a pan recién hecho y la montaña de enfrente está a punto de despertar 🌋",
+ "pregunta": "¿Tú habrías corrido o te habrías quedado en casa?",
+ "hashtags": [
+  "#pompeya",
+  "#vesubio",
+  "#historiaantigua",
+  "#roma"
+ ],
+ "partes": [
+  {
+   "ambiente": "ciudad_antigua",
+   "tramos": [
+    {
+     "texto": "Pompeya, año setenta y nueve. Tienes quince años y trabajas en un horno de pan junto al foro.",
+     "imagen": "Pompeii bakery oven",
+     "susto": false
+    },
+    {
+     "texto": "Huele a harina y a leña. Hace días que tiembla la tierra, pero aquí siempre tiembla.",
+     "imagen": "Pompeii street ruins",
+     "susto": false
+    },
+    {
+     "texto": "Sobre la ciudad, el Vesubio está verde de viñas. Nadie sabe que es un volcán. Tú tampoco.",
+     "imagen": "Pompeii forum Vesuvius",
+     "susto": false
+    },
+    {
+     "texto": "A primera hora de la tarde, un estruendo sacude el suelo. Sales a la calle y miras arriba.",
+     "imagen": "Pompeii street excavation",
+     "susto": false
+    },
+    {
+     "texto": "Una columna gigantesca sube de la montaña, con forma de pino. Y en minutos, el sol desaparece.",
+     "imagen": "Vesuvius eruption engraving",
+     "susto": true
+    },
+    {
+     "texto": "Empieza a caer piedra pómez, ligera y caliente, como granizo. Repiquetea en las tejas y en tu cabeza.",
+     "imagen": "Pompeii house atrium",
+     "susto": false
+    },
+    {
+     "texto": "Cae durante horas. Los tejados se hunden por el peso. Tienes que elegir: quedarte o correr.",
+     "imagen": "Pompeii collapsed house",
+     "susto": false
+    },
+    {
+     "texto": "Lo que nadie imagina es que, al amanecer, una nube ardiente bajará por la ladera.",
+     "imagen": "Vesuvius from Pompeii",
+     "susto": true
+    },
+    {
+     "texto": "Pompeya quedó enterrada bajo metros de ceniza. Allí se han hallado los restos de más de mil cien personas.",
+     "imagen": "Pompeii excavation 19th century",
+     "susto": false
+    },
+    {
+     "texto": "La mayoría de los vecinos huyó a tiempo. ¿Tú habrías corrido o te habrías quedado?",
+     "imagen": "Pompeii ruins Vesuvius",
+     "susto": false
+    }
+   ]
+  }
+ ]
+}
