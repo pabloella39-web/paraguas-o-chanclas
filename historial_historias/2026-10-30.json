@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-30",
+ "titulo": "POV: VIVES EN POMPEYA",
+ "tipo": "antigua",
+ "pregunta": "¿Tú habrías corrido o te habrías quedado en casa?",
+ "resumen": "Pompeya, año setenta y nueve. Tienes quince años y trabajas en un horno de pan junto al foro. Huele a harina y a leña. Hace días que tiembla la tierra, pero aqu",
+ "voz": "y4o1CguECnmbT8YSuREN",
+ "partes": [
+  {
+   "parte": 1,
+   "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_historias/historia_2026-10-30_parte1.mp4",
+   "duracion": 73.7,
+   "caption": "Hueles a pan recién hecho y la montaña de enfrente está a punto de despertar 🌋\n\n📍 Pompeya · Año 79\nHechos reales; protagonista recreado. Voz IA.\nCada día, un momento de la historia: sígueme para vivir el próximo.\n\n#historia #pov #historiareal #pompeya #vesubio #historiaantigua",
+   "publicacion": {
+    "via": "upload-post",
+    "programado": "2026-10-30T21:00:00+01:00",
+    "job_id": "fea25977c7d84ec58e6273cacaceba93",
+    "respuesta": {
+     "success": true,
+     "job_id": "fea25977c7d84ec58e6273cacaceba93",
+     "scheduled_date": "2026-10-30T21:00:00+01:00",
+     "request_id": "833c9ec2b320473dbe144c429498a7aa"
+    }
+   },
+   "youtube": {
+    "id": "N4YooKm05I0",
+    "url": "https://youtube.com/shorts/N4YooKm05I0",
+    "canal": "Lo que callan las paredes"
+   }
+  }
+ ]
+}
