@@ -160,7 +160,9 @@ def _producir(nombre: str, guion, plan, total, trozos, comp_kwargs: dict, prev, 
 
 # ================================================================ fin de semana
 PROMPT_FINDE = """Eres el guionista de "Paraguas o Chanclas", un canal de TikTok sobre el tiempo en España con humor
-ligero (sin palabrotas, sin política). Es viernes por la tarde: toca el vídeo del FIN DE SEMANA. Usa SOLO estos datos
+ligero (sin palabrotas, sin política). Es viernes por la noche: toca el vídeo del FIN DE SEMANA. IMPORTANTE: hoy NO
+sale el parte diario: este vídeo es TAMBIÉN el parte de MAÑANA SÁBADO, así que el bloque del sábado es el más largo y
+detallado (recorre España por zonas con las ciudades destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla). Usa SOLO estos datos
 (no inventes temperaturas, lluvias ni avisos). Lo lee {presenta} con voz sintética.
 
 Sábado {sab} y domingo {dom}. Datos por ciudad (grados, lluvia = probabilidad máxima del día en %, lluvia_mm = litros previstos;
@@ -199,7 +201,7 @@ Bloques (palabras aproximadas por bloque: {palabras}; total ≈ {total}):
 
 Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "sabado": "...", "domingo": "...", "general": "...",
 "cierre": "..."}}, "titular": "...", "caption": "..."}}"""
-PALABRAS_FINDE = {"intro": 22, "sabado": 42, "domingo": 42, "general": 36, "cierre": 22}
+PALABRAS_FINDE = {"intro": 22, "sabado": 56, "domingo": 36, "general": 30, "cierre": 20}
 
 
 def _resumen(prev):
@@ -221,7 +223,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
     palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_FINDE.items()}
     if not plantilla:
         try:
-            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "16:50", PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
+            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "19:50", PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
@@ -938,7 +940,7 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
         if a.esperar and a.tipo in ("finde", "semana", "resto"):
             from .horario import TZ
             import time as _t
-            h, m = (17, 26) if a.tipo == "finde" else (20, 26)   # domingo y miércoles no hay parte: este lo sustituye
+            h, m = 20, 26   # viernes, domingo y miércoles no hay parte: el especial lo sustituye
             objetivo = ahora().replace(hour=h, minute=m, second=0, microsecond=0)
             falta = (objetivo - ahora()).total_seconds()
             if 0 < falta < 4 * 3600:

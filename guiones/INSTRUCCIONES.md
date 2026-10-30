@@ -8,9 +8,9 @@ Si no respondes a tiempo usan la API de pago (respaldo), así que **responde rá
 | clave | qué es | aparece | límite |
 |---|---|---|---|
 | `historia-AAAA-MM-DD` | canal de historias: UN vídeo POV de historia (L, X, V, S, D), sale a las 21:00 | ~17:05-18:00 | 19:30 |
-| `parte-AAAA-MM-DD` | parte de MAÑANA (fecha = mañana), sale a las 20:30; NO hay los domingos ni los miércoles | ~17:20-18:50 | 19:50 |
+| `parte-AAAA-MM-DD` | parte de MAÑANA (fecha = mañana), sale a las 20:30; NO hay los domingos, miércoles ni viernes | ~17:20-18:50 | 19:50 |
 | `semana-AAAA-MM-DD` / `resto-AAAA-MM-DD` | domingo / miércoles, sale a las 20:30 y hace también de parte de mañana (bloque del primer día largo y por zonas) | ~18:45-19:15 | 19:50 |
-| `finde-AAAA-MM-DD` | viernes, sale a las 17:30 | ~15:15-16:10 | 16:50 |
+| `finde-AAAA-MM-DD` | viernes, sale a las 20:30 y hace también de parte del sábado (bloque del sábado largo y por zonas) | ~18:45-19:15 | 19:50 |
 
 ## Cómo trabajar
 ```bash

@@ -4,11 +4,11 @@ on:
   schedule:
     # Avisos de AEMET: se comprueban cada 2 horas (si hay naranjas o rojos nuevos, vídeo especial)
     - cron: "23 6-20/2 * * *"
-    # Fin de semana: viernes por la tarde (varios intentos; el primero que llega lo hace y espera a las 17:30)
-    - cron: "11 14 * * 5"
-    - cron: "41 14 * * 5"
-    - cron: "11 15 * * 5"
-    - cron: "41 15 * * 5"
+    # Fin de semana: viernes por la noche, a las 20:30 de Madrid (hace también de parte del sábado)
+    - cron: "41 17 * * 5"
+    - cron: "11 18 * * 5"
+    - cron: "41 18 * * 5"
+    - cron: "11 19 * * 5"
     # La semana que viene: domingo por la noche (sale a las 20:30 de Madrid y hace también de parte del lunes)
     - cron: "41 17 * * 0"
     - cron: "11 18 * * 0"
@@ -51,7 +51,7 @@ jobs:
             grep -qi esperar lanzar_especial.txt && P="$P --esperar"
           else
             # Viernes entre las 15:00 y las 18:30 (Madrid) → fin de semana; si no, revisión de avisos
-            T=$(python3 -c "from datetime import datetime;from zoneinfo import ZoneInfo as Z;t=datetime.now(Z('Europe/Madrid'));c='${{ github.event.schedule }}'!='23 6-20/2 * * *';hm=(t.hour,t.minute);print('finde' if c and t.weekday()==4 and (15,0)<=hm<=(18,30) else 'semana' if c and t.weekday()==6 and (17,30)<=hm<=(20,10) else 'resto' if c and t.weekday()==2 and (17,30)<=hm<=(20,10) else 'avisos')")
+            T=$(python3 -c "from datetime import datetime;from zoneinfo import ZoneInfo as Z;t=datetime.now(Z('Europe/Madrid'));c='${{ github.event.schedule }}'!='23 6-20/2 * * *';hm=(t.hour,t.minute);print('finde' if c and t.weekday()==4 and (17,30)<=hm<=(20,10) else 'semana' if c and t.weekday()==6 and (17,30)<=hm<=(20,10) else 'resto' if c and t.weekday()==2 and (17,30)<=hm<=(20,10) else 'avisos')")
             P="--publicar --esperar"
           fi
           echo "tipo=$T" >> $GITHUB_OUTPUT
