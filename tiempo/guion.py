@@ -91,7 +91,7 @@ Hoy la locución la lee {presenta}: usa la concordancia de género correcta si h
 INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
 - Habla de tú al espectador todo el rato ("si hoy sales a correr...", "tú que estás en Málaga...").
 - RETENCIÓN (lo más importante): casi la mitad de la gente se va en los 3 primeros segundos. La intro NO saluda ni
-  lee la fecha (ya sale en pantalla). La PRIMERA FRASE (máximo 10 palabras) es el gancho: urgencia + fenómeno +
+  lee la fecha (ya sale en pantalla). La PRIMERA FRASE (MÁXIMO 8 PALABRAS, corta y seca) es el gancho: urgencia + fenómeno +
   ciudad concreta, como un titular de última hora ("Málaga, prepárate: rachas de 80 kilómetros por hora.",
   "Madrid, mañana te mojas.", "Barcelona, aviso naranja por lluvias.", "¿Manga corta en noviembre? Sevilla dice sí.").
   VARÍA el arranque: no repitas la fórmula de los últimos partes ({aperturas}); "Ojo" vale de vez en cuando, pero

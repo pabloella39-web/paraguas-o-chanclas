@@ -153,6 +153,10 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
         if not g.get("caption"):
             errores.append("falta caption")
         intro = str((seg or {}).get("intro", "")).strip().lower()
+        import re as _re
+        primera = _re.split(r"(?<=[.!?…])\s", intro, maxsplit=1)[0] if intro else ""
+        if len(primera.split()) > 8:
+            errores.append(f"la primera frase tiene {len(primera.split())} palabras (máximo 8): «{primera}»")
         try:  # "Ojo" vale de vez en cuando, pero no dos veces seguidas
             from datetime import date as _d
             from .guion import aperturas_recientes

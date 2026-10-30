@@ -28,7 +28,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 ## Calidad (es lo que hace crecer los canales)
 - Sigue el prompt al pie de la letra: datos reales, longitudes, formato JSON, reglas de estilo.
 - Parte del tiempo: mira `guiones/parte-2026-10-27.json` como modelo (el dueño lo calificó de perfecto): primera
-  frase gancho de ≤10 palabras con ciudad y fenómeno, continuidad con lo que se dijo en el vídeo semanal si el
+  frase gancho de ≤8 palabras (corta y seca) con ciudad y fenómeno, continuidad con lo que se dijo en el vídeo semanal si el
   prompt la trae ("Te lo dije el domingo"), promesa de "al final te digo dónde hará más calor", interpelar a la gente
   de dos ciudades, cierre con pregunta y "paraguas en ... y chanclas en ...". En víspera se dice "mañana", nunca "hoy".
   Números en cifras + "grados"/"por ciento". Nada de inventar datos ni avisos.

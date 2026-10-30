@@ -179,6 +179,7 @@ España, menos en un sitio."). Y el cierre termina con UNA pregunta que se conte
 debate ("¿Chaqueta o manga corta mañana? Te leo.", "¿Terraza o sofá este finde?", "¿Castañas o disfraz?"): los
 comentarios son lo que hace que TikTok reparta el vídeo.
 Varía la fórmula del arranque ("Ojo" vale de vez en cuando, pero no siempre).
+PRIMERA FRASE de la intro: MÁXIMO 8 PALABRAS, corta y seca (ej. "Finde de sol, salvo en dos sitios."); luego ya amplías.
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo del finde (¿se estropea el domingo?, ¿último finde
 de playa?, ¿frío de verdad?) y promete que al final dirás dónde está el mejor plan del fin de semana.
 Habla de tú, frases que fluyan, nada de listas ni dos puntos, números en cifras con "grados" o "por ciento".
@@ -350,6 +351,7 @@ mejor 'posibles chubascos' que afirmaciones rotundas; con 5 litros o más di cu�
 {datos}
 
 Varía la fórmula del arranque ("Ojo" vale de vez en cuando, pero no siempre).
+PRIMERA FRASE de la intro: MÁXIMO 8 PALABRAS, corta y seca (ej. "Finde de sol, salvo en dos sitios."); luego ya amplías.
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón
 de temperaturas?, ¿semana de sol?) y promete que al final dirás cuál es el mejor día de la semana y cuál el peor.
 Un bloque por día, {rango_txt}: lo destacado de ese día en España, agrupando zonas, con alguna ciudad concreta
@@ -698,7 +700,7 @@ Hoy es {fecha}. Avisos vigentes o para las próximas horas:
 {avisos}
 
 Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasarse):
-- intro: la PRIMERA FRASE (máx. 10 palabras) es el titular de última hora: CIUDAD (de las grandes ciudades afectadas,
+- intro: la PRIMERA FRASE (máx. 8 palabras) es el titular de última hora: CIUDAD (de las grandes ciudades afectadas,
   la más conocida) + nivel + fenómeno ("Atención Valencia: aviso rojo por lluvias torrenciales."). Luego, en una frase, lo más grave que se espera.
 - zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras).
 - consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
