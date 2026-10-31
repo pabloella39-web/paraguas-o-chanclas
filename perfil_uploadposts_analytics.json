@@ -1,0 +1,8 @@
+{
+ "status": 404,
+ "data": {
+  "error": "Not Found",
+  "message": "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.",
+  "request_id": "8ae24ac438b543d6aaf886d98be3116a"
+ }
+}

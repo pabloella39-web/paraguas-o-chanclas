@@ -1,0 +1,5620 @@
+{
+ "7702498063545421089": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7702498063545421089",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "13613e6ac3d146b799f00d7e06aeaf25",
+   "post_title": "Halloween y Todos los Santos con sol… menos en dos rincones de España 🎃☀️\n\nEl tiempo del fin de semana en España, 31-1 de noviembre 🇪🇸\n☀️ Mejor plan: Sevilla (28° / 28°)\n🔥 Máxima del finde: 28° en Sevilla\n🌧️ Lluvia en Alicante, Almería, Ceuta\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-30 16:29:00.939000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7702498063545421089",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7702498063545421089",
+    "post_metrics": {
+     "views": 379,
+     "likes": 12,
+     "comments": 5,
+     "shares": 0,
+     "reach": 0,
+     "favorites": 0,
+     "new_followers": 2,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0307,
+     "average_time_watched": 11.84,
+     "total_time_watched": 4630,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.83,
+       "second": "1"
+      },
+      {
+       "percentage": 0.64,
+       "second": "2"
+      },
+      {
+       "percentage": 0.53,
+       "second": "3"
+      },
+      {
+       "percentage": 0.4,
+       "second": "4"
+      },
+      {
+       "percentage": 0.37,
+       "second": "5"
+      },
+      {
+       "percentage": 0.34,
+       "second": "6"
+      },
+      {
+       "percentage": 0.32,
+       "second": "7"
+      },
+      {
+       "percentage": 0.29,
+       "second": "8"
+      },
+      {
+       "percentage": 0.27,
+       "second": "9"
+      },
+      {
+       "percentage": 0.25,
+       "second": "10"
+      },
+      {
+       "percentage": 0.24,
+       "second": "11"
+      },
+      {
+       "percentage": 0.23,
+       "second": "12"
+      },
+      {
+       "percentage": 0.21,
+       "second": "13"
+      },
+      {
+       "percentage": 0.2,
+       "second": "14"
+      },
+      {
+       "percentage": 0.19,
+       "second": "15"
+      },
+      {
+       "percentage": 0.19,
+       "second": "16"
+      },
+      {
+       "percentage": 0.18,
+       "second": "17"
+      },
+      {
+       "percentage": 0.18,
+       "second": "18"
+      },
+      {
+       "percentage": 0.17,
+       "second": "19"
+      },
+      {
+       "percentage": 0.17,
+       "second": "20"
+      },
+      {
+       "percentage": 0.17,
+       "second": "21"
+      },
+      {
+       "percentage": 0.16,
+       "second": "22"
+      },
+      {
+       "percentage": 0.16,
+       "second": "23"
+      },
+      {
+       "percentage": 0.15,
+       "second": "24"
+      },
+      {
+       "percentage": 0.15,
+       "second": "25"
+      },
+      {
+       "percentage": 0.14,
+       "second": "26"
+      },
+      {
+       "percentage": 0.14,
+       "second": "27"
+      },
+      {
+       "percentage": 0.13,
+       "second": "28"
+      },
+      {
+       "percentage": 0.13,
+       "second": "29"
+      },
+      {
+       "percentage": 0.13,
+       "second": "30"
+      },
+      {
+       "percentage": 0.13,
+       "second": "31"
+      },
+      {
+       "percentage": 0.13,
+       "second": "32"
+      },
+      {
+       "percentage": 0.13,
+       "second": "33"
+      },
+      {
+       "percentage": 0.13,
+       "second": "34"
+      },
+      {
+       "percentage": 0.12,
+       "second": "35"
+      },
+      {
+       "percentage": 0.12,
+       "second": "36"
+      },
+      {
+       "percentage": 0.12,
+       "second": "37"
+      },
+      {
+       "percentage": 0.11,
+       "second": "38"
+      },
+      {
+       "percentage": 0.11,
+       "second": "39"
+      },
+      {
+       "percentage": 0.11,
+       "second": "40"
+      },
+      {
+       "percentage": 0.1,
+       "second": "41"
+      },
+      {
+       "percentage": 0.1,
+       "second": "42"
+      },
+      {
+       "percentage": 0.1,
+       "second": "43"
+      },
+      {
+       "percentage": 0.09,
+       "second": "44"
+      },
+      {
+       "percentage": 0.09,
+       "second": "45"
+      },
+      {
+       "percentage": 0.09,
+       "second": "46"
+      },
+      {
+       "percentage": 0.09,
+       "second": "47"
+      },
+      {
+       "percentage": 0.09,
+       "second": "48"
+      },
+      {
+       "percentage": 0.08,
+       "second": "49"
+      },
+      {
+       "percentage": 0.08,
+       "second": "50"
+      },
+      {
+       "percentage": 0.08,
+       "second": "51"
+      },
+      {
+       "percentage": 0.08,
+       "second": "52"
+      },
+      {
+       "percentage": 0.08,
+       "second": "53"
+      },
+      {
+       "percentage": 0.08,
+       "second": "54"
+      },
+      {
+       "percentage": 0.08,
+       "second": "55"
+      },
+      {
+       "percentage": 0.08,
+       "second": "56"
+      },
+      {
+       "percentage": 0.08,
+       "second": "57"
+      },
+      {
+       "percentage": 0.07,
+       "second": "58"
+      },
+      {
+       "percentage": 0.06,
+       "second": "59"
+      },
+      {
+       "percentage": 0.04,
+       "second": "60"
+      },
+      {
+       "percentage": 0.03,
+       "second": "61"
+      },
+      {
+       "percentage": 0.03,
+       "second": "62"
+      },
+      {
+       "percentage": 0.03,
+       "second": "63"
+      },
+      {
+       "percentage": 0.03,
+       "second": "64"
+      },
+      {
+       "percentage": 0.03,
+       "second": "65"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Search",
+       "percentage": 0.143
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0.005
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0.005
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.814
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.033
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.2,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.8,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0,
+       "type": "RETURN_VIEWER"
+      }
+     ]
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7702173494158576928": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7702173494158576928",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "2df8cf45b63742b0b338176a4f4c0208",
+   "post_title": "Valencia con cuatro gotas y el sur en chanclas… ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, viernes 30 de octubre 🇪🇸\n🌧️ Lluvia en Valencia y Las Palmas\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 7° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valencia",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-29 19:28:28.572000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7702173494158576928",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7702173494158576928",
+    "post_metrics": {
+     "views": 4644,
+     "likes": 128,
+     "comments": 13,
+     "shares": 11,
+     "reach": 536,
+     "favorites": 13,
+     "new_followers": 56,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0283,
+     "average_time_watched": 15.11,
+     "total_time_watched": 71128,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.87,
+       "second": "1"
+      },
+      {
+       "percentage": 0.74,
+       "second": "2"
+      },
+      {
+       "percentage": 0.67,
+       "second": "3"
+      },
+      {
+       "percentage": 0.61,
+       "second": "4"
+      },
+      {
+       "percentage": 0.56,
+       "second": "5"
+      },
+      {
+       "percentage": 0.52,
+       "second": "6"
+      },
+      {
+       "percentage": 0.47,
+       "second": "7"
+      },
+      {
+       "percentage": 0.43,
+       "second": "8"
+      },
+      {
+       "percentage": 0.4,
+       "second": "9"
+      },
+      {
+       "percentage": 0.37,
+       "second": "10"
+      },
+      {
+       "percentage": 0.36,
+       "second": "11"
+      },
+      {
+       "percentage": 0.35,
+       "second": "12"
+      },
+      {
+       "percentage": 0.33,
+       "second": "13"
+      },
+      {
+       "percentage": 0.32,
+       "second": "14"
+      },
+      {
+       "percentage": 0.31,
+       "second": "15"
+      },
+      {
+       "percentage": 0.29,
+       "second": "16"
+      },
+      {
+       "percentage": 0.27,
+       "second": "17"
+      },
+      {
+       "percentage": 0.26,
+       "second": "18"
+      },
+      {
+       "percentage": 0.22,
+       "second": "19"
+      },
+      {
+       "percentage": 0.21,
+       "second": "20"
+      },
+      {
+       "percentage": 0.2,
+       "second": "21"
+      },
+      {
+       "percentage": 0.19,
+       "second": "22"
+      },
+      {
+       "percentage": 0.18,
+       "second": "23"
+      },
+      {
+       "percentage": 0.18,
+       "second": "24"
+      },
+      {
+       "percentage": 0.17,
+       "second": "25"
+      },
+      {
+       "percentage": 0.16,
+       "second": "26"
+      },
+      {
+       "percentage": 0.14,
+       "second": "27"
+      },
+      {
+       "percentage": 0.13,
+       "second": "28"
+      },
+      {
+       "percentage": 0.13,
+       "second": "29"
+      },
+      {
+       "percentage": 0.12,
+       "second": "30"
+      },
+      {
+       "percentage": 0.12,
+       "second": "31"
+      },
+      {
+       "percentage": 0.11,
+       "second": "32"
+      },
+      {
+       "percentage": 0.11,
+       "second": "33"
+      },
+      {
+       "percentage": 0.1,
+       "second": "34"
+      },
+      {
+       "percentage": 0.1,
+       "second": "35"
+      },
+      {
+       "percentage": 0.1,
+       "second": "36"
+      },
+      {
+       "percentage": 0.1,
+       "second": "37"
+      },
+      {
+       "percentage": 0.09,
+       "second": "38"
+      },
+      {
+       "percentage": 0.09,
+       "second": "39"
+      },
+      {
+       "percentage": 0.09,
+       "second": "40"
+      },
+      {
+       "percentage": 0.09,
+       "second": "41"
+      },
+      {
+       "percentage": 0.09,
+       "second": "42"
+      },
+      {
+       "percentage": 0.09,
+       "second": "43"
+      },
+      {
+       "percentage": 0.08,
+       "second": "44"
+      },
+      {
+       "percentage": 0.08,
+       "second": "45"
+      },
+      {
+       "percentage": 0.08,
+       "second": "46"
+      },
+      {
+       "percentage": 0.08,
+       "second": "47"
+      },
+      {
+       "percentage": 0.08,
+       "second": "48"
+      },
+      {
+       "percentage": 0.08,
+       "second": "49"
+      },
+      {
+       "percentage": 0.08,
+       "second": "50"
+      },
+      {
+       "percentage": 0.07,
+       "second": "51"
+      },
+      {
+       "percentage": 0.07,
+       "second": "52"
+      },
+      {
+       "percentage": 0.07,
+       "second": "53"
+      },
+      {
+       "percentage": 0.07,
+       "second": "54"
+      },
+      {
+       "percentage": 0.07,
+       "second": "55"
+      },
+      {
+       "percentage": 0.07,
+       "second": "56"
+      },
+      {
+       "percentage": 0.06,
+       "second": "57"
+      },
+      {
+       "percentage": 0.06,
+       "second": "58"
+      },
+      {
+       "percentage": 0.06,
+       "second": "59"
+      },
+      {
+       "percentage": 0.06,
+       "second": "60"
+      },
+      {
+       "percentage": 0.06,
+       "second": "61"
+      },
+      {
+       "percentage": 0.05,
+       "second": "62"
+      },
+      {
+       "percentage": 0.04,
+       "second": "63"
+      },
+      {
+       "percentage": 0.04,
+       "second": "64"
+      },
+      {
+       "percentage": 0.03,
+       "second": "65"
+      },
+      {
+       "percentage": 0.03,
+       "second": "66"
+      },
+      {
+       "percentage": 0.03,
+       "second": "67"
+      },
+      {
+       "percentage": 0.03,
+       "second": "68"
+      },
+      {
+       "percentage": 0.02,
+       "second": "69"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.007
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.048
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0.003
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.94
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.001
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.03,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.48,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.97,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.52,
+       "type": "RETURN_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "VE",
+        "percentage": 0.002
+       },
+       {
+        "country": "FR",
+        "percentage": 0.002
+       },
+       {
+        "country": "CO",
+        "percentage": 0.004
+       },
+       {
+        "country": "EC",
+        "percentage": 0.002
+       },
+       {
+        "country": "ES",
+        "percentage": 0.961
+       },
+       {
+        "country": "Others",
+        "percentage": 0.012
+       },
+       {
+        "country": "RO",
+        "percentage": 0.004
+       },
+       {
+        "country": "IT",
+        "percentage": 0.002
+       },
+       {
+        "country": "MX",
+        "percentage": 0.003
+       },
+       {
+        "country": "US",
+        "percentage": 0.001
+       },
+       {
+        "country": "AR",
+        "percentage": 0.007
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Murcia",
+        "percentage": 0.05
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.3979
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.2806
+       },
+       {
+        "city_name": "ES Alicante",
+        "percentage": 0.0875
+       },
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.0682
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.0769
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.67
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.3
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.03
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7701802289224256801": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7701802289224256801",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "f950e1b69a3d4ed59dc3a28b6ea306f1",
+   "post_title": "Halloween casi sin lluvia… salvo si eres de Valencia 🎃☔\n\nLo que queda de semana y el finde en España 🇪🇸\n☁️ Jueves 29: máx. 28°\n☁️ Viernes 30: máx. 27°\n☁️ Sábado 31: máx. 27° · lluvia en Valencia\n☀️ Domingo 1: máx. 26° · lluvia en S.C. Tenerife\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-28 19:27:30.100000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7701802289224256801",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7701802289224256801",
+    "post_metrics": {
+     "views": 14149,
+     "likes": 243,
+     "comments": 5,
+     "shares": 20,
+     "reach": 11999,
+     "favorites": 28,
+     "new_followers": 60,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0197,
+     "average_time_watched": 17.02,
+     "total_time_watched": 244792,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.86,
+       "second": "1"
+      },
+      {
+       "percentage": 0.73,
+       "second": "2"
+      },
+      {
+       "percentage": 0.68,
+       "second": "3"
+      },
+      {
+       "percentage": 0.61,
+       "second": "4"
+      },
+      {
+       "percentage": 0.53,
+       "second": "5"
+      },
+      {
+       "percentage": 0.48,
+       "second": "6"
+      },
+      {
+       "percentage": 0.43,
+       "second": "7"
+      },
+      {
+       "percentage": 0.37,
+       "second": "8"
+      },
+      {
+       "percentage": 0.32,
+       "second": "9"
+      },
+      {
+       "percentage": 0.28,
+       "second": "10"
+      },
+      {
+       "percentage": 0.27,
+       "second": "11"
+      },
+      {
+       "percentage": 0.26,
+       "second": "12"
+      },
+      {
+       "percentage": 0.25,
+       "second": "13"
+      },
+      {
+       "percentage": 0.24,
+       "second": "14"
+      },
+      {
+       "percentage": 0.23,
+       "second": "15"
+      },
+      {
+       "percentage": 0.23,
+       "second": "16"
+      },
+      {
+       "percentage": 0.22,
+       "second": "17"
+      },
+      {
+       "percentage": 0.21,
+       "second": "18"
+      },
+      {
+       "percentage": 0.21,
+       "second": "19"
+      },
+      {
+       "percentage": 0.2,
+       "second": "20"
+      },
+      {
+       "percentage": 0.2,
+       "second": "21"
+      },
+      {
+       "percentage": 0.19,
+       "second": "22"
+      },
+      {
+       "percentage": 0.19,
+       "second": "23"
+      },
+      {
+       "percentage": 0.19,
+       "second": "24"
+      },
+      {
+       "percentage": 0.18,
+       "second": "25"
+      },
+      {
+       "percentage": 0.18,
+       "second": "26"
+      },
+      {
+       "percentage": 0.17,
+       "second": "27"
+      },
+      {
+       "percentage": 0.17,
+       "second": "28"
+      },
+      {
+       "percentage": 0.16,
+       "second": "29"
+      },
+      {
+       "percentage": 0.16,
+       "second": "30"
+      },
+      {
+       "percentage": 0.16,
+       "second": "31"
+      },
+      {
+       "percentage": 0.15,
+       "second": "32"
+      },
+      {
+       "percentage": 0.15,
+       "second": "33"
+      },
+      {
+       "percentage": 0.15,
+       "second": "34"
+      },
+      {
+       "percentage": 0.14,
+       "second": "35"
+      },
+      {
+       "percentage": 0.14,
+       "second": "36"
+      },
+      {
+       "percentage": 0.14,
+       "second": "37"
+      },
+      {
+       "percentage": 0.14,
+       "second": "38"
+      },
+      {
+       "percentage": 0.14,
+       "second": "39"
+      },
+      {
+       "percentage": 0.14,
+       "second": "40"
+      },
+      {
+       "percentage": 0.13,
+       "second": "41"
+      },
+      {
+       "percentage": 0.13,
+       "second": "42"
+      },
+      {
+       "percentage": 0.13,
+       "second": "43"
+      },
+      {
+       "percentage": 0.13,
+       "second": "44"
+      },
+      {
+       "percentage": 0.12,
+       "second": "45"
+      },
+      {
+       "percentage": 0.12,
+       "second": "46"
+      },
+      {
+       "percentage": 0.12,
+       "second": "47"
+      },
+      {
+       "percentage": 0.12,
+       "second": "48"
+      },
+      {
+       "percentage": 0.12,
+       "second": "49"
+      },
+      {
+       "percentage": 0.12,
+       "second": "50"
+      },
+      {
+       "percentage": 0.11,
+       "second": "51"
+      },
+      {
+       "percentage": 0.11,
+       "second": "52"
+      },
+      {
+       "percentage": 0.11,
+       "second": "53"
+      },
+      {
+       "percentage": 0.11,
+       "second": "54"
+      },
+      {
+       "percentage": 0.11,
+       "second": "55"
+      },
+      {
+       "percentage": 0.1,
+       "second": "56"
+      },
+      {
+       "percentage": 0.1,
+       "second": "57"
+      },
+      {
+       "percentage": 0.1,
+       "second": "58"
+      },
+      {
+       "percentage": 0.1,
+       "second": "59"
+      },
+      {
+       "percentage": 0.1,
+       "second": "60"
+      },
+      {
+       "percentage": 0.1,
+       "second": "61"
+      },
+      {
+       "percentage": 0.09,
+       "second": "62"
+      },
+      {
+       "percentage": 0.09,
+       "second": "63"
+      },
+      {
+       "percentage": 0.09,
+       "second": "64"
+      },
+      {
+       "percentage": 0.08,
+       "second": "65"
+      },
+      {
+       "percentage": 0.08,
+       "second": "66"
+      },
+      {
+       "percentage": 0.08,
+       "second": "67"
+      },
+      {
+       "percentage": 0.08,
+       "second": "68"
+      },
+      {
+       "percentage": 0.08,
+       "second": "69"
+      },
+      {
+       "percentage": 0.08,
+       "second": "70"
+      },
+      {
+       "percentage": 0.07,
+       "second": "71"
+      },
+      {
+       "percentage": 0.07,
+       "second": "72"
+      },
+      {
+       "percentage": 0.07,
+       "second": "73"
+      },
+      {
+       "percentage": 0.07,
+       "second": "74"
+      },
+      {
+       "percentage": 0.06,
+       "second": "75"
+      },
+      {
+       "percentage": 0.06,
+       "second": "76"
+      },
+      {
+       "percentage": 0.05,
+       "second": "77"
+      },
+      {
+       "percentage": 0.05,
+       "second": "78"
+      },
+      {
+       "percentage": 0.05,
+       "second": "79"
+      },
+      {
+       "percentage": 0.05,
+       "second": "80"
+      },
+      {
+       "percentage": 0.05,
+       "second": "81"
+      },
+      {
+       "percentage": 0.04,
+       "second": "82"
+      },
+      {
+       "percentage": 0.04,
+       "second": "83"
+      },
+      {
+       "percentage": 0.03,
+       "second": "84"
+      },
+      {
+       "percentage": 0.03,
+       "second": "85"
+      },
+      {
+       "percentage": 0.02,
+       "second": "86"
+      },
+      {
+       "percentage": 0.02,
+       "second": "87"
+      },
+      {
+       "percentage": 0.02,
+       "second": "88"
+      },
+      {
+       "percentage": 0.02,
+       "second": "89"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.989
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.003
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.007
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.02,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.53,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.98,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.47,
+       "type": "RETURN_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "ES",
+        "percentage": 0.982
+       },
+       {
+        "country": "Others",
+        "percentage": 0.006
+       },
+       {
+        "country": "MX",
+        "percentage": 0.001
+       },
+       {
+        "country": "FR",
+        "percentage": 0.002
+       },
+       {
+        "country": "RO",
+        "percentage": 0.004
+       },
+       {
+        "country": "US",
+        "percentage": 0.001
+       },
+       {
+        "country": "IT",
+        "percentage": 0.002
+       },
+       {
+        "country": "PE",
+        "percentage": 0.001
+       },
+       {
+        "country": "CO",
+        "percentage": 0.001
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.057
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.0845
+       },
+       {
+        "city_name": "ES Murcia",
+        "percentage": 0.0511
+       },
+       {
+        "city_name": "PE Cajamarca",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "US Riverside",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.3005
+       },
+       {
+        "city_name": "PE Lima",
+        "percentage": 0.0008
+       },
+       {
+        "city_name": "PE Chiclayo",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "US Cook",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Alicante",
+        "percentage": 0.0854
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.4036
+       },
+       {
+        "city_name": "US Other",
+        "percentage": 0.0009
+       }
+      ],
+      "genders": [
+       {
+        "gender": "other_vv",
+        "percentage": 0.02
+       },
+       {
+        "gender": "female_vv",
+        "percentage": 0.67
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.31
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7701431200539364640": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7701431200539364640",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "f55012353a7d4fa4be2d736c4d7d1eb8",
+   "post_title": "Bilbao con paraguas y Sevilla en chanclas… ¿en qué bando te toca mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 28 de octubre 🇪🇸\n🌧️ Lluvia en Bilbao y S.C. Tenerife\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 6° en Pamplona\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Bilbao",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-27 19:27:32.106000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7701431200539364640",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7701431200539364640",
+    "post_metrics": {
+     "views": 34969,
+     "likes": 637,
+     "comments": 29,
+     "shares": 64,
+     "reach": 31113,
+     "favorites": 60,
+     "new_followers": 220,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0382,
+     "average_time_watched": 17.05,
+     "total_time_watched": 605009,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.85,
+       "second": "1"
+      },
+      {
+       "percentage": 0.71,
+       "second": "2"
+      },
+      {
+       "percentage": 0.64,
+       "second": "3"
+      },
+      {
+       "percentage": 0.58,
+       "second": "4"
+      },
+      {
+       "percentage": 0.53,
+       "second": "5"
+      },
+      {
+       "percentage": 0.5,
+       "second": "6"
+      },
+      {
+       "percentage": 0.45,
+       "second": "7"
+      },
+      {
+       "percentage": 0.39,
+       "second": "8"
+      },
+      {
+       "percentage": 0.36,
+       "second": "9"
+      },
+      {
+       "percentage": 0.33,
+       "second": "10"
+      },
+      {
+       "percentage": 0.3,
+       "second": "11"
+      },
+      {
+       "percentage": 0.28,
+       "second": "12"
+      },
+      {
+       "percentage": 0.27,
+       "second": "13"
+      },
+      {
+       "percentage": 0.26,
+       "second": "14"
+      },
+      {
+       "percentage": 0.25,
+       "second": "15"
+      },
+      {
+       "percentage": 0.24,
+       "second": "16"
+      },
+      {
+       "percentage": 0.23,
+       "second": "17"
+      },
+      {
+       "percentage": 0.23,
+       "second": "18"
+      },
+      {
+       "percentage": 0.22,
+       "second": "19"
+      },
+      {
+       "percentage": 0.22,
+       "second": "20"
+      },
+      {
+       "percentage": 0.21,
+       "second": "21"
+      },
+      {
+       "percentage": 0.21,
+       "second": "22"
+      },
+      {
+       "percentage": 0.2,
+       "second": "23"
+      },
+      {
+       "percentage": 0.2,
+       "second": "24"
+      },
+      {
+       "percentage": 0.19,
+       "second": "25"
+      },
+      {
+       "percentage": 0.19,
+       "second": "26"
+      },
+      {
+       "percentage": 0.19,
+       "second": "27"
+      },
+      {
+       "percentage": 0.19,
+       "second": "28"
+      },
+      {
+       "percentage": 0.18,
+       "second": "29"
+      },
+      {
+       "percentage": 0.18,
+       "second": "30"
+      },
+      {
+       "percentage": 0.18,
+       "second": "31"
+      },
+      {
+       "percentage": 0.17,
+       "second": "32"
+      },
+      {
+       "percentage": 0.17,
+       "second": "33"
+      },
+      {
+       "percentage": 0.17,
+       "second": "34"
+      },
+      {
+       "percentage": 0.17,
+       "second": "35"
+      },
+      {
+       "percentage": 0.17,
+       "second": "36"
+      },
+      {
+       "percentage": 0.16,
+       "second": "37"
+      },
+      {
+       "percentage": 0.16,
+       "second": "38"
+      },
+      {
+       "percentage": 0.16,
+       "second": "39"
+      },
+      {
+       "percentage": 0.16,
+       "second": "40"
+      },
+      {
+       "percentage": 0.15,
+       "second": "41"
+      },
+      {
+       "percentage": 0.15,
+       "second": "42"
+      },
+      {
+       "percentage": 0.15,
+       "second": "43"
+      },
+      {
+       "percentage": 0.15,
+       "second": "44"
+      },
+      {
+       "percentage": 0.15,
+       "second": "45"
+      },
+      {
+       "percentage": 0.14,
+       "second": "46"
+      },
+      {
+       "percentage": 0.14,
+       "second": "47"
+      },
+      {
+       "percentage": 0.14,
+       "second": "48"
+      },
+      {
+       "percentage": 0.14,
+       "second": "49"
+      },
+      {
+       "percentage": 0.14,
+       "second": "50"
+      },
+      {
+       "percentage": 0.14,
+       "second": "51"
+      },
+      {
+       "percentage": 0.13,
+       "second": "52"
+      },
+      {
+       "percentage": 0.13,
+       "second": "53"
+      },
+      {
+       "percentage": 0.12,
+       "second": "54"
+      },
+      {
+       "percentage": 0.12,
+       "second": "55"
+      },
+      {
+       "percentage": 0.11,
+       "second": "56"
+      },
+      {
+       "percentage": 0.11,
+       "second": "57"
+      },
+      {
+       "percentage": 0.1,
+       "second": "58"
+      },
+      {
+       "percentage": 0.1,
+       "second": "59"
+      },
+      {
+       "percentage": 0.09,
+       "second": "60"
+      },
+      {
+       "percentage": 0.09,
+       "second": "61"
+      },
+      {
+       "percentage": 0.08,
+       "second": "62"
+      },
+      {
+       "percentage": 0.08,
+       "second": "63"
+      },
+      {
+       "percentage": 0.07,
+       "second": "64"
+      },
+      {
+       "percentage": 0.05,
+       "second": "65"
+      },
+      {
+       "percentage": 0.05,
+       "second": "66"
+      },
+      {
+       "percentage": 0.04,
+       "second": "67"
+      },
+      {
+       "percentage": 0.04,
+       "second": "68"
+      },
+      {
+       "percentage": 0.04,
+       "second": "69"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.002
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.004
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.992
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.001
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.01,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.64,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.99,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.36,
+       "type": "RETURN_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "ES",
+        "percentage": 0.982
+       },
+       {
+        "country": "FR",
+        "percentage": 0.003
+       },
+       {
+        "country": "MA",
+        "percentage": 0.001
+       },
+       {
+        "country": "VE",
+        "percentage": 0.001
+       },
+       {
+        "country": "CO",
+        "percentage": 0.001
+       },
+       {
+        "country": "Others",
+        "percentage": 0.006
+       },
+       {
+        "country": "US",
+        "percentage": 0.001
+       },
+       {
+        "country": "DE",
+        "percentage": 0.001
+       },
+       {
+        "country": "IT",
+        "percentage": 0.001
+       },
+       {
+        "country": "PE",
+        "percentage": 0.001
+       },
+       {
+        "country": "RO",
+        "percentage": 0.002
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "PE Chiclayo",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Alicante",
+        "percentage": 0.0923
+       },
+       {
+        "city_name": "US New York",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Murcia",
+        "percentage": 0.2023
+       },
+       {
+        "city_name": "US Hillsborough",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "US Other",
+        "percentage": 0.0006
+       },
+       {
+        "city_name": "US Riverside",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.0874
+       },
+       {
+        "city_name": "PE Lima",
+        "percentage": 0.0008
+       },
+       {
+        "city_name": "US Jefferson",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Malaga",
+        "percentage": 0.0658
+       },
+       {
+        "city_name": "PE Other",
+        "percentage": 0
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0579
+       },
+       {
+        "city_name": "US Cuyahoga",
+        "percentage": 0.0002
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.4763
+       }
+      ],
+      "genders": [
+       {
+        "gender": "other_vv",
+        "percentage": 0.03
+       },
+       {
+        "gender": "female_vv",
+        "percentage": 0.65
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.32
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7701060123736722720": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7701060123736722720",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "5860af22d9cb415dbad14184fcb7a3f9",
+   "post_title": "¿Acerté ayer? Dímelo en comentarios 👇\n\nEl tiempo en España mañana, martes 27 de octubre 🇪🇸\n🌧️ Lluvia en A Coruña y Bilbao\n🔥 Máxima: 29° en Murcia\n🥶 Mínima: 8° en Valladolid\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #ACoruna #Murcia",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-26 19:27:31.549000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7701060123736722720",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7701060123736722720",
+    "post_metrics": {
+     "views": 16005,
+     "likes": 338,
+     "comments": 39,
+     "shares": 11,
+     "reach": 14623,
+     "favorites": 19,
+     "new_followers": 110,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0298,
+     "average_time_watched": 13.67,
+     "total_time_watched": 222524,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.84,
+       "second": "1"
+      },
+      {
+       "percentage": 0.65,
+       "second": "2"
+      },
+      {
+       "percentage": 0.54,
+       "second": "3"
+      },
+      {
+       "percentage": 0.46,
+       "second": "4"
+      },
+      {
+       "percentage": 0.41,
+       "second": "5"
+      },
+      {
+       "percentage": 0.36,
+       "second": "6"
+      },
+      {
+       "percentage": 0.32,
+       "second": "7"
+      },
+      {
+       "percentage": 0.29,
+       "second": "8"
+      },
+      {
+       "percentage": 0.28,
+       "second": "9"
+      },
+      {
+       "percentage": 0.26,
+       "second": "10"
+      },
+      {
+       "percentage": 0.25,
+       "second": "11"
+      },
+      {
+       "percentage": 0.24,
+       "second": "12"
+      },
+      {
+       "percentage": 0.23,
+       "second": "13"
+      },
+      {
+       "percentage": 0.22,
+       "second": "14"
+      },
+      {
+       "percentage": 0.21,
+       "second": "15"
+      },
+      {
+       "percentage": 0.2,
+       "second": "16"
+      },
+      {
+       "percentage": 0.19,
+       "second": "17"
+      },
+      {
+       "percentage": 0.19,
+       "second": "18"
+      },
+      {
+       "percentage": 0.18,
+       "second": "19"
+      },
+      {
+       "percentage": 0.18,
+       "second": "20"
+      },
+      {
+       "percentage": 0.17,
+       "second": "21"
+      },
+      {
+       "percentage": 0.17,
+       "second": "22"
+      },
+      {
+       "percentage": 0.16,
+       "second": "23"
+      },
+      {
+       "percentage": 0.16,
+       "second": "24"
+      },
+      {
+       "percentage": 0.15,
+       "second": "25"
+      },
+      {
+       "percentage": 0.15,
+       "second": "26"
+      },
+      {
+       "percentage": 0.14,
+       "second": "27"
+      },
+      {
+       "percentage": 0.14,
+       "second": "28"
+      },
+      {
+       "percentage": 0.13,
+       "second": "29"
+      },
+      {
+       "percentage": 0.13,
+       "second": "30"
+      },
+      {
+       "percentage": 0.13,
+       "second": "31"
+      },
+      {
+       "percentage": 0.13,
+       "second": "32"
+      },
+      {
+       "percentage": 0.12,
+       "second": "33"
+      },
+      {
+       "percentage": 0.12,
+       "second": "34"
+      },
+      {
+       "percentage": 0.12,
+       "second": "35"
+      },
+      {
+       "percentage": 0.12,
+       "second": "36"
+      },
+      {
+       "percentage": 0.11,
+       "second": "37"
+      },
+      {
+       "percentage": 0.11,
+       "second": "38"
+      },
+      {
+       "percentage": 0.11,
+       "second": "39"
+      },
+      {
+       "percentage": 0.11,
+       "second": "40"
+      },
+      {
+       "percentage": 0.1,
+       "second": "41"
+      },
+      {
+       "percentage": 0.1,
+       "second": "42"
+      },
+      {
+       "percentage": 0.1,
+       "second": "43"
+      },
+      {
+       "percentage": 0.1,
+       "second": "44"
+      },
+      {
+       "percentage": 0.1,
+       "second": "45"
+      },
+      {
+       "percentage": 0.09,
+       "second": "46"
+      },
+      {
+       "percentage": 0.09,
+       "second": "47"
+      },
+      {
+       "percentage": 0.09,
+       "second": "48"
+      },
+      {
+       "percentage": 0.09,
+       "second": "49"
+      },
+      {
+       "percentage": 0.08,
+       "second": "50"
+      },
+      {
+       "percentage": 0.08,
+       "second": "51"
+      },
+      {
+       "percentage": 0.08,
+       "second": "52"
+      },
+      {
+       "percentage": 0.08,
+       "second": "53"
+      },
+      {
+       "percentage": 0.08,
+       "second": "54"
+      },
+      {
+       "percentage": 0.07,
+       "second": "55"
+      },
+      {
+       "percentage": 0.07,
+       "second": "56"
+      },
+      {
+       "percentage": 0.07,
+       "second": "57"
+      },
+      {
+       "percentage": 0.07,
+       "second": "58"
+      },
+      {
+       "percentage": 0.07,
+       "second": "59"
+      },
+      {
+       "percentage": 0.07,
+       "second": "60"
+      },
+      {
+       "percentage": 0.07,
+       "second": "61"
+      },
+      {
+       "percentage": 0.06,
+       "second": "62"
+      },
+      {
+       "percentage": 0.05,
+       "second": "63"
+      },
+      {
+       "percentage": 0.04,
+       "second": "64"
+      },
+      {
+       "percentage": 0.04,
+       "second": "65"
+      },
+      {
+       "percentage": 0.03,
+       "second": "66"
+      },
+      {
+       "percentage": 0.03,
+       "second": "67"
+      },
+      {
+       "percentage": 0.03,
+       "second": "68"
+      },
+      {
+       "percentage": 0.03,
+       "second": "69"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.984
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.005
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.009
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.02,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.42,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.98,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.58,
+       "type": "RETURN_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "IT",
+        "percentage": 0.003
+       },
+       {
+        "country": "MA",
+        "percentage": 0.002
+       },
+       {
+        "country": "PE",
+        "percentage": 0.001
+       },
+       {
+        "country": "PT",
+        "percentage": 0.002
+       },
+       {
+        "country": "BG",
+        "percentage": 0.001
+       },
+       {
+        "country": "CO",
+        "percentage": 0.001
+       },
+       {
+        "country": "ES",
+        "percentage": 0.976
+       },
+       {
+        "country": "VE",
+        "percentage": 0.001
+       },
+       {
+        "country": "RO",
+        "percentage": 0.002
+       },
+       {
+        "country": "FR",
+        "percentage": 0.002
+       },
+       {
+        "country": "Others",
+        "percentage": 0.009
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "PE Arequipa",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "PE Barranca",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.04
+       },
+       {
+        "city_name": "PE Lima",
+        "percentage": 0.0006
+       },
+       {
+        "city_name": "ES A Coruna",
+        "percentage": 0.0371
+       },
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.0654
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.6354
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.1542
+       },
+       {
+        "city_name": "ES Malaga",
+        "percentage": 0.0439
+       },
+       {
+        "city_name": "PE Huancayo",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "PE Other",
+        "percentage": 0.0001
+       },
+       {
+        "city_name": "PE Trujillo",
+        "percentage": 0.0001
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.66
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.3
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.04
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7700859104197283104": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7700859104197283104",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "a643899b70a4462795afa3fe6dcad714",
+   "post_title": "¿Paraguas o chanclas en tu pueblo? Escríbelo y te respondo con un vídeo ☔🩴\n\nEl tiempo en España hoy, lunes 26 de octubre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife\n🔥 Máxima: 30° en Sevilla\n🥶 Mínima: 5° en Salamanca\n📍 ¿Y en tu pueblo? Pregúntame en comentarios y te respondo con un vídeo\n\n#eltiempo #tiempo #prevision #españa #AEMET #parati #paraguasochanclas #lluvia #calor #otoño #Tenerife #Sevilla",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-26 06:27:28.386000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7700859104197283104",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7700859104197283104",
+    "post_metrics": {
+     "views": 547,
+     "likes": 17,
+     "comments": 2,
+     "shares": 0,
+     "reach": 476,
+     "favorites": 1,
+     "new_followers": 2,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.024,
+     "average_time_watched": 11.02,
+     "total_time_watched": 6435,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.82,
+       "second": "1"
+      },
+      {
+       "percentage": 0.58,
+       "second": "2"
+      },
+      {
+       "percentage": 0.46,
+       "second": "3"
+      },
+      {
+       "percentage": 0.34,
+       "second": "4"
+      },
+      {
+       "percentage": 0.28,
+       "second": "5"
+      },
+      {
+       "percentage": 0.24,
+       "second": "6"
+      },
+      {
+       "percentage": 0.21,
+       "second": "7"
+      },
+      {
+       "percentage": 0.19,
+       "second": "8"
+      },
+      {
+       "percentage": 0.18,
+       "second": "9"
+      },
+      {
+       "percentage": 0.16,
+       "second": "10"
+      },
+      {
+       "percentage": 0.16,
+       "second": "11"
+      },
+      {
+       "percentage": 0.15,
+       "second": "12"
+      },
+      {
+       "percentage": 0.14,
+       "second": "13"
+      },
+      {
+       "percentage": 0.13,
+       "second": "14"
+      },
+      {
+       "percentage": 0.13,
+       "second": "15"
+      },
+      {
+       "percentage": 0.12,
+       "second": "16"
+      },
+      {
+       "percentage": 0.12,
+       "second": "17"
+      },
+      {
+       "percentage": 0.11,
+       "second": "18"
+      },
+      {
+       "percentage": 0.11,
+       "second": "19"
+      },
+      {
+       "percentage": 0.11,
+       "second": "20"
+      },
+      {
+       "percentage": 0.11,
+       "second": "21"
+      },
+      {
+       "percentage": 0.1,
+       "second": "22"
+      },
+      {
+       "percentage": 0.1,
+       "second": "23"
+      },
+      {
+       "percentage": 0.1,
+       "second": "24"
+      },
+      {
+       "percentage": 0.09,
+       "second": "25"
+      },
+      {
+       "percentage": 0.09,
+       "second": "26"
+      },
+      {
+       "percentage": 0.08,
+       "second": "27"
+      },
+      {
+       "percentage": 0.08,
+       "second": "28"
+      },
+      {
+       "percentage": 0.08,
+       "second": "29"
+      },
+      {
+       "percentage": 0.08,
+       "second": "30"
+      },
+      {
+       "percentage": 0.08,
+       "second": "31"
+      },
+      {
+       "percentage": 0.08,
+       "second": "32"
+      },
+      {
+       "percentage": 0.08,
+       "second": "33"
+      },
+      {
+       "percentage": 0.08,
+       "second": "34"
+      },
+      {
+       "percentage": 0.08,
+       "second": "35"
+      },
+      {
+       "percentage": 0.08,
+       "second": "36"
+      },
+      {
+       "percentage": 0.08,
+       "second": "37"
+      },
+      {
+       "percentage": 0.07,
+       "second": "38"
+      },
+      {
+       "percentage": 0.07,
+       "second": "39"
+      },
+      {
+       "percentage": 0.07,
+       "second": "40"
+      },
+      {
+       "percentage": 0.07,
+       "second": "41"
+      },
+      {
+       "percentage": 0.06,
+       "second": "42"
+      },
+      {
+       "percentage": 0.06,
+       "second": "43"
+      },
+      {
+       "percentage": 0.06,
+       "second": "44"
+      },
+      {
+       "percentage": 0.06,
+       "second": "45"
+      },
+      {
+       "percentage": 0.05,
+       "second": "46"
+      },
+      {
+       "percentage": 0.05,
+       "second": "47"
+      },
+      {
+       "percentage": 0.05,
+       "second": "48"
+      },
+      {
+       "percentage": 0.05,
+       "second": "49"
+      },
+      {
+       "percentage": 0.05,
+       "second": "50"
+      },
+      {
+       "percentage": 0.05,
+       "second": "51"
+      },
+      {
+       "percentage": 0.05,
+       "second": "52"
+      },
+      {
+       "percentage": 0.05,
+       "second": "53"
+      },
+      {
+       "percentage": 0.05,
+       "second": "54"
+      },
+      {
+       "percentage": 0.05,
+       "second": "55"
+      },
+      {
+       "percentage": 0.04,
+       "second": "56"
+      },
+      {
+       "percentage": 0.04,
+       "second": "57"
+      },
+      {
+       "percentage": 0.03,
+       "second": "58"
+      },
+      {
+       "percentage": 0.03,
+       "second": "59"
+      },
+      {
+       "percentage": 0.03,
+       "second": "60"
+      },
+      {
+       "percentage": 0.03,
+       "second": "61"
+      },
+      {
+       "percentage": 0.02,
+       "second": "62"
+      },
+      {
+       "percentage": 0.02,
+       "second": "63"
+      },
+      {
+       "percentage": 0.02,
+       "second": "64"
+      },
+      {
+       "percentage": 0.02,
+       "second": "65"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.139
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.144
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0.005
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.71
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.002
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.63,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.86,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.37,
+       "type": "RETURN_VIEWER"
+      },
+      {
+       "percentage": 0.14,
+       "type": "FOLLOWER_PERCENT"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "CO",
+        "percentage": 0.005
+       },
+       {
+        "country": "FR",
+        "percentage": 0.007
+       },
+       {
+        "country": "VE",
+        "percentage": 0.005
+       },
+       {
+        "country": "CL",
+        "percentage": 0.007
+       },
+       {
+        "country": "IT",
+        "percentage": 0.017
+       },
+       {
+        "country": "PE",
+        "percentage": 0.005
+       },
+       {
+        "country": "BY",
+        "percentage": 0.027
+       },
+       {
+        "country": "Others",
+        "percentage": 0.017
+       },
+       {
+        "country": "PT",
+        "percentage": 0.003
+       },
+       {
+        "country": "EC",
+        "percentage": 0.017
+       },
+       {
+        "country": "ES",
+        "percentage": 0.89
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.1575
+       },
+       {
+        "city_name": "PE Lima",
+        "percentage": 0.005
+       },
+       {
+        "city_name": "ES Malaga",
+        "percentage": 0.0534
+       },
+       {
+        "city_name": "ES Seville",
+        "percentage": 0.0427
+       },
+       {
+        "city_name": "CL Santiago",
+        "percentage": 0.0053
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0614
+       },
+       {
+        "city_name": "CL Valparaiso",
+        "percentage": 0.0018
+       },
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.081
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.494
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.69
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.26
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.05
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7700689035001335073": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7700689035001335073",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "request_id": "357a80eb6efe4c3788459e6263af52c6",
+   "post_title": "Semana casi seca, pero el martes el norte se moja ☔ ¿Ya tienes plan? 😎\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 26: máx. 30°\n☁️ Martes 27: máx. 27° · lluvia en A Coruña, Santander\n☁️ Miércoles 28: máx. 28° · lluvia en Bilbao\n☁️ Jueves 29: máx. 28°\n☁️ Viernes 30: máx. 28°\n\n#eltiempo #tiempo #semana #prevision #españa #AEMET #parati #paraguasochanclas #otoño",
+   "post_caption": "",
+   "media_type": "video",
+   "upload_timestamp": "2026-10-25 19:27:30.982000",
+   "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7700689035001335073",
+   "source": "api_uploaded"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7700689035001335073",
+    "post_metrics": {
+     "views": 77024,
+     "likes": 956,
+     "comments": 13,
+     "shares": 46,
+     "reach": 69159,
+     "favorites": 77,
+     "new_followers": 406,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0189,
+     "average_time_watched": 17.48,
+     "total_time_watched": 1365742,
+     "is_ai_generated": true,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.84,
+       "second": "1"
+      },
+      {
+       "percentage": 0.67,
+       "second": "2"
+      },
+      {
+       "percentage": 0.57,
+       "second": "3"
+      },
+      {
+       "percentage": 0.49,
+       "second": "4"
+      },
+      {
+       "percentage": 0.44,
+       "second": "5"
+      },
+      {
+       "percentage": 0.41,
+       "second": "6"
+      },
+      {
+       "percentage": 0.4,
+       "second": "7"
+      },
+      {
+       "percentage": 0.38,
+       "second": "8"
+      },
+      {
+       "percentage": 0.37,
+       "second": "9"
+      },
+      {
+       "percentage": 0.36,
+       "second": "10"
+      },
+      {
+       "percentage": 0.35,
+       "second": "11"
+      },
+      {
+       "percentage": 0.33,
+       "second": "12"
+      },
+      {
+       "percentage": 0.32,
+       "second": "13"
+      },
+      {
+       "percentage": 0.31,
+       "second": "14"
+      },
+      {
+       "percentage": 0.3,
+       "second": "15"
+      },
+      {
+       "percentage": 0.3,
+       "second": "16"
+      },
+      {
+       "percentage": 0.3,
+       "second": "17"
+      },
+      {
+       "percentage": 0.29,
+       "second": "18"
+      },
+      {
+       "percentage": 0.28,
+       "second": "19"
+      },
+      {
+       "percentage": 0.28,
+       "second": "20"
+      },
+      {
+       "percentage": 0.27,
+       "second": "21"
+      },
+      {
+       "percentage": 0.27,
+       "second": "22"
+      },
+      {
+       "percentage": 0.26,
+       "second": "23"
+      },
+      {
+       "percentage": 0.26,
+       "second": "24"
+      },
+      {
+       "percentage": 0.25,
+       "second": "25"
+      },
+      {
+       "percentage": 0.25,
+       "second": "26"
+      },
+      {
+       "percentage": 0.24,
+       "second": "27"
+      },
+      {
+       "percentage": 0.24,
+       "second": "28"
+      },
+      {
+       "percentage": 0.23,
+       "second": "29"
+      },
+      {
+       "percentage": 0.23,
+       "second": "30"
+      },
+      {
+       "percentage": 0.23,
+       "second": "31"
+      },
+      {
+       "percentage": 0.23,
+       "second": "32"
+      },
+      {
+       "percentage": 0.22,
+       "second": "33"
+      },
+      {
+       "percentage": 0.22,
+       "second": "34"
+      },
+      {
+       "percentage": 0.21,
+       "second": "35"
+      },
+      {
+       "percentage": 0.21,
+       "second": "36"
+      },
+      {
+       "percentage": 0.21,
+       "second": "37"
+      },
+      {
+       "percentage": 0.2,
+       "second": "38"
+      },
+      {
+       "percentage": 0.2,
+       "second": "39"
+      },
+      {
+       "percentage": 0.2,
+       "second": "40"
+      },
+      {
+       "percentage": 0.2,
+       "second": "41"
+      },
+      {
+       "percentage": 0.19,
+       "second": "42"
+      },
+      {
+       "percentage": 0.19,
+       "second": "43"
+      },
+      {
+       "percentage": 0.19,
+       "second": "44"
+      },
+      {
+       "percentage": 0.18,
+       "second": "45"
+      },
+      {
+       "percentage": 0.18,
+       "second": "46"
+      },
+      {
+       "percentage": 0.18,
+       "second": "47"
+      },
+      {
+       "percentage": 0.18,
+       "second": "48"
+      },
+      {
+       "percentage": 0.17,
+       "second": "49"
+      },
+      {
+       "percentage": 0.16,
+       "second": "50"
+      },
+      {
+       "percentage": 0.14,
+       "second": "51"
+      },
+      {
+       "percentage": 0.13,
+       "second": "52"
+      },
+      {
+       "percentage": 0.12,
+       "second": "53"
+      },
+      {
+       "percentage": 0.11,
+       "second": "54"
+      },
+      {
+       "percentage": 0.1,
+       "second": "55"
+      },
+      {
+       "percentage": 0.1,
+       "second": "56"
+      },
+      {
+       "percentage": 0.09,
+       "second": "57"
+      },
+      {
+       "percentage": 0.08,
+       "second": "58"
+      },
+      {
+       "percentage": 0.06,
+       "second": "59"
+      },
+      {
+       "percentage": 0.04,
+       "second": "60"
+      },
+      {
+       "percentage": 0.03,
+       "second": "61"
+      },
+      {
+       "percentage": 0.03,
+       "second": "62"
+      },
+      {
+       "percentage": 0.02,
+       "second": "63"
+      },
+      {
+       "percentage": 0.02,
+       "second": "64"
+      },
+      {
+       "percentage": 0.02,
+       "second": "65"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.997
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.002
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.15,
+       "type": "RETURN_VIEWER"
+      },
+      {
+       "percentage": 0,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.85,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 1,
+       "type": "NON_FOLLOWER_PERCENT"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "RO",
+        "percentage": 0.002
+       },
+       {
+        "country": "FR",
+        "percentage": 0.001
+       },
+       {
+        "country": "IT",
+        "percentage": 0.001
+       },
+       {
+        "country": "MA",
+        "percentage": 0.001
+       },
+       {
+        "country": "PT",
+        "percentage": 0.001
+       },
+       {
+        "country": "US",
+        "percentage": 0.001
+       },
+       {
+        "country": "ES",
+        "percentage": 0.99
+       },
+       {
+        "country": "Others",
+        "percentage": 0.003
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Other",
+        "percentage": 0.5782
+       },
+       {
+        "city_name": "ES Seville",
+        "percentage": 0.0574
+       },
+       {
+        "city_name": "US City And Of San Francisco",
+        "percentage": 0
+       },
+       {
+        "city_name": "US District Of Columbia",
+        "percentage": 0
+       },
+       {
+        "city_name": "US Miami-Dade",
+        "percentage": 0
+       },
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.0743
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.1663
+       },
+       {
+        "city_name": "US Los Angeles",
+        "percentage": 0
+       },
+       {
+        "city_name": "ES Malaga",
+        "percentage": 0.0683
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0455
+       },
+       {
+        "city_name": "US Other",
+        "percentage": 0.0009
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.65
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.32
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.03
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7700580616630258966": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7700580616630258966",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "source": "organic"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7700580616630258966",
+    "post_metrics": {
+     "views": 1047,
+     "likes": 17,
+     "comments": 6,
+     "shares": 0,
+     "reach": 933,
+     "favorites": 2,
+     "new_followers": 1,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0272,
+     "average_time_watched": 8.13,
+     "total_time_watched": 8662,
+     "is_ai_generated": false,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.81,
+       "second": "1"
+      },
+      {
+       "percentage": 0.56,
+       "second": "2"
+      },
+      {
+       "percentage": 0.41,
+       "second": "3"
+      },
+      {
+       "percentage": 0.32,
+       "second": "4"
+      },
+      {
+       "percentage": 0.26,
+       "second": "5"
+      },
+      {
+       "percentage": 0.22,
+       "second": "6"
+      },
+      {
+       "percentage": 0.19,
+       "second": "7"
+      },
+      {
+       "percentage": 0.16,
+       "second": "8"
+      },
+      {
+       "percentage": 0.15,
+       "second": "9"
+      },
+      {
+       "percentage": 0.14,
+       "second": "10"
+      },
+      {
+       "percentage": 0.13,
+       "second": "11"
+      },
+      {
+       "percentage": 0.13,
+       "second": "12"
+      },
+      {
+       "percentage": 0.12,
+       "second": "13"
+      },
+      {
+       "percentage": 0.12,
+       "second": "14"
+      },
+      {
+       "percentage": 0.11,
+       "second": "15"
+      },
+      {
+       "percentage": 0.1,
+       "second": "16"
+      },
+      {
+       "percentage": 0.1,
+       "second": "17"
+      },
+      {
+       "percentage": 0.09,
+       "second": "18"
+      },
+      {
+       "percentage": 0.09,
+       "second": "19"
+      },
+      {
+       "percentage": 0.09,
+       "second": "20"
+      },
+      {
+       "percentage": 0.09,
+       "second": "21"
+      },
+      {
+       "percentage": 0.09,
+       "second": "22"
+      },
+      {
+       "percentage": 0.08,
+       "second": "23"
+      },
+      {
+       "percentage": 0.08,
+       "second": "24"
+      },
+      {
+       "percentage": 0.08,
+       "second": "25"
+      },
+      {
+       "percentage": 0.08,
+       "second": "26"
+      },
+      {
+       "percentage": 0.07,
+       "second": "27"
+      },
+      {
+       "percentage": 0.07,
+       "second": "28"
+      },
+      {
+       "percentage": 0.07,
+       "second": "29"
+      },
+      {
+       "percentage": 0.07,
+       "second": "30"
+      },
+      {
+       "percentage": 0.07,
+       "second": "31"
+      },
+      {
+       "percentage": 0.07,
+       "second": "32"
+      },
+      {
+       "percentage": 0.07,
+       "second": "33"
+      },
+      {
+       "percentage": 0.07,
+       "second": "34"
+      },
+      {
+       "percentage": 0.06,
+       "second": "35"
+      },
+      {
+       "percentage": 0.06,
+       "second": "36"
+      },
+      {
+       "percentage": 0.06,
+       "second": "37"
+      },
+      {
+       "percentage": 0.06,
+       "second": "38"
+      },
+      {
+       "percentage": 0.06,
+       "second": "39"
+      },
+      {
+       "percentage": 0.06,
+       "second": "40"
+      },
+      {
+       "percentage": 0.05,
+       "second": "41"
+      },
+      {
+       "percentage": 0.05,
+       "second": "42"
+      },
+      {
+       "percentage": 0.05,
+       "second": "43"
+      },
+      {
+       "percentage": 0.05,
+       "second": "44"
+      },
+      {
+       "percentage": 0.05,
+       "second": "45"
+      },
+      {
+       "percentage": 0.05,
+       "second": "46"
+      },
+      {
+       "percentage": 0.05,
+       "second": "47"
+      },
+      {
+       "percentage": 0.05,
+       "second": "48"
+      },
+      {
+       "percentage": 0.04,
+       "second": "49"
+      },
+      {
+       "percentage": 0.04,
+       "second": "50"
+      },
+      {
+       "percentage": 0.04,
+       "second": "51"
+      },
+      {
+       "percentage": 0.04,
+       "second": "52"
+      },
+      {
+       "percentage": 0.04,
+       "second": "53"
+      },
+      {
+       "percentage": 0.04,
+       "second": "54"
+      },
+      {
+       "percentage": 0.03,
+       "second": "55"
+      },
+      {
+       "percentage": 0.03,
+       "second": "56"
+      },
+      {
+       "percentage": 0.03,
+       "second": "57"
+      },
+      {
+       "percentage": 0.03,
+       "second": "58"
+      },
+      {
+       "percentage": 0.03,
+       "second": "59"
+      },
+      {
+       "percentage": 0.03,
+       "second": "60"
+      },
+      {
+       "percentage": 0.03,
+       "second": "61"
+      },
+      {
+       "percentage": 0.03,
+       "second": "62"
+      },
+      {
+       "percentage": 0.03,
+       "second": "63"
+      },
+      {
+       "percentage": 0.03,
+       "second": "64"
+      },
+      {
+       "percentage": 0.02,
+       "second": "65"
+      },
+      {
+       "percentage": 0.02,
+       "second": "66"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Search",
+       "percentage": 0.021
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0.002
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.919
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.002
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.055
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.38,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.89,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.62,
+       "type": "RETURN_VIEWER"
+      },
+      {
+       "percentage": 0.11,
+       "type": "FOLLOWER_PERCENT"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "IT",
+        "percentage": 0.003
+       },
+       {
+        "country": "LU",
+        "percentage": 0.001
+       },
+       {
+        "country": "DE",
+        "percentage": 0.001
+       },
+       {
+        "country": "ES",
+        "percentage": 0.972
+       },
+       {
+        "country": "MA",
+        "percentage": 0.002
+       },
+       {
+        "country": "VE",
+        "percentage": 0.002
+       },
+       {
+        "country": "PT",
+        "percentage": 0.005
+       },
+       {
+        "country": "CH",
+        "percentage": 0.003
+       },
+       {
+        "country": "IS",
+        "percentage": 0.001
+       },
+       {
+        "country": "FR",
+        "percentage": 0.002
+       },
+       {
+        "country": "Others",
+        "percentage": 0.008
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.0836
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.1351
+       },
+       {
+        "city_name": "ES Murcia",
+        "percentage": 0.0447
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.5851
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.071
+       },
+       {
+        "city_name": "ES Alicante",
+        "percentage": 0.0525
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.74
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.21
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.05
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7700101548159896854": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7700101548159896854",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "source": "organic"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7700101548159896854",
+    "post_metrics": {
+     "views": 2917,
+     "likes": 71,
+     "comments": 4,
+     "shares": 6,
+     "reach": 2462,
+     "favorites": 5,
+     "new_followers": 16,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0285,
+     "average_time_watched": 11.53,
+     "total_time_watched": 33563,
+     "is_ai_generated": false,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.8,
+       "second": "1"
+      },
+      {
+       "percentage": 0.61,
+       "second": "2"
+      },
+      {
+       "percentage": 0.54,
+       "second": "3"
+      },
+      {
+       "percentage": 0.49,
+       "second": "4"
+      },
+      {
+       "percentage": 0.42,
+       "second": "5"
+      },
+      {
+       "percentage": 0.37,
+       "second": "6"
+      },
+      {
+       "percentage": 0.35,
+       "second": "7"
+      },
+      {
+       "percentage": 0.33,
+       "second": "8"
+      },
+      {
+       "percentage": 0.3,
+       "second": "9"
+      },
+      {
+       "percentage": 0.28,
+       "second": "10"
+      },
+      {
+       "percentage": 0.27,
+       "second": "11"
+      },
+      {
+       "percentage": 0.25,
+       "second": "12"
+      },
+      {
+       "percentage": 0.24,
+       "second": "13"
+      },
+      {
+       "percentage": 0.22,
+       "second": "14"
+      },
+      {
+       "percentage": 0.2,
+       "second": "15"
+      },
+      {
+       "percentage": 0.18,
+       "second": "16"
+      },
+      {
+       "percentage": 0.17,
+       "second": "17"
+      },
+      {
+       "percentage": 0.16,
+       "second": "18"
+      },
+      {
+       "percentage": 0.15,
+       "second": "19"
+      },
+      {
+       "percentage": 0.14,
+       "second": "20"
+      },
+      {
+       "percentage": 0.14,
+       "second": "21"
+      },
+      {
+       "percentage": 0.13,
+       "second": "22"
+      },
+      {
+       "percentage": 0.13,
+       "second": "23"
+      },
+      {
+       "percentage": 0.12,
+       "second": "24"
+      },
+      {
+       "percentage": 0.12,
+       "second": "25"
+      },
+      {
+       "percentage": 0.11,
+       "second": "26"
+      },
+      {
+       "percentage": 0.11,
+       "second": "27"
+      },
+      {
+       "percentage": 0.11,
+       "second": "28"
+      },
+      {
+       "percentage": 0.11,
+       "second": "29"
+      },
+      {
+       "percentage": 0.1,
+       "second": "30"
+      },
+      {
+       "percentage": 0.1,
+       "second": "31"
+      },
+      {
+       "percentage": 0.1,
+       "second": "32"
+      },
+      {
+       "percentage": 0.1,
+       "second": "33"
+      },
+      {
+       "percentage": 0.1,
+       "second": "34"
+      },
+      {
+       "percentage": 0.09,
+       "second": "35"
+      },
+      {
+       "percentage": 0.09,
+       "second": "36"
+      },
+      {
+       "percentage": 0.09,
+       "second": "37"
+      },
+      {
+       "percentage": 0.09,
+       "second": "38"
+      },
+      {
+       "percentage": 0.09,
+       "second": "39"
+      },
+      {
+       "percentage": 0.08,
+       "second": "40"
+      },
+      {
+       "percentage": 0.08,
+       "second": "41"
+      },
+      {
+       "percentage": 0.08,
+       "second": "42"
+      },
+      {
+       "percentage": 0.08,
+       "second": "43"
+      },
+      {
+       "percentage": 0.07,
+       "second": "44"
+      },
+      {
+       "percentage": 0.07,
+       "second": "45"
+      },
+      {
+       "percentage": 0.07,
+       "second": "46"
+      },
+      {
+       "percentage": 0.07,
+       "second": "47"
+      },
+      {
+       "percentage": 0.07,
+       "second": "48"
+      },
+      {
+       "percentage": 0.07,
+       "second": "49"
+      },
+      {
+       "percentage": 0.07,
+       "second": "50"
+      },
+      {
+       "percentage": 0.06,
+       "second": "51"
+      },
+      {
+       "percentage": 0.06,
+       "second": "52"
+      },
+      {
+       "percentage": 0.06,
+       "second": "53"
+      },
+      {
+       "percentage": 0.06,
+       "second": "54"
+      },
+      {
+       "percentage": 0.06,
+       "second": "55"
+      },
+      {
+       "percentage": 0.06,
+       "second": "56"
+      },
+      {
+       "percentage": 0.06,
+       "second": "57"
+      },
+      {
+       "percentage": 0.06,
+       "second": "58"
+      },
+      {
+       "percentage": 0.06,
+       "second": "59"
+      },
+      {
+       "percentage": 0.06,
+       "second": "60"
+      },
+      {
+       "percentage": 0.06,
+       "second": "61"
+      },
+      {
+       "percentage": 0.05,
+       "second": "62"
+      },
+      {
+       "percentage": 0.05,
+       "second": "63"
+      },
+      {
+       "percentage": 0.04,
+       "second": "64"
+      },
+      {
+       "percentage": 0.03,
+       "second": "65"
+      },
+      {
+       "percentage": 0.03,
+       "second": "66"
+      },
+      {
+       "percentage": 0.03,
+       "second": "67"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.016
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.063
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Direct Message",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.918
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.001
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.01,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.81,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.99,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.19,
+       "type": "RETURN_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "AR",
+        "percentage": 0.002
+       },
+       {
+        "country": "BO",
+        "percentage": 0.002
+       },
+       {
+        "country": "RO",
+        "percentage": 0.003
+       },
+       {
+        "country": "FR",
+        "percentage": 0.004
+       },
+       {
+        "country": "ES",
+        "percentage": 0.95
+       },
+       {
+        "country": "IT",
+        "percentage": 0.007
+       },
+       {
+        "country": "NL",
+        "percentage": 0.002
+       },
+       {
+        "country": "CO",
+        "percentage": 0.004
+       },
+       {
+        "country": "VE",
+        "percentage": 0.003
+       },
+       {
+        "country": "Others",
+        "percentage": 0.02
+       },
+       {
+        "country": "PE",
+        "percentage": 0.003
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.1321
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.1453
+       },
+       {
+        "city_name": "PE Lima",
+        "percentage": 0.0023
+       },
+       {
+        "city_name": "ES Alicante",
+        "percentage": 0.0371
+       },
+       {
+        "city_name": "PE Other",
+        "percentage": 0.0003
+       },
+       {
+        "city_name": "ES Malaga",
+        "percentage": 0.058
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.5178
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0599
+       },
+       {
+        "city_name": "PE Chiclayo",
+        "percentage": 0.0003
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.7
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.25
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.05
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7699730814522920194": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7699730814522920194",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "source": "organic"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7699730814522920194",
+    "post_metrics": {
+     "views": 13764,
+     "likes": 162,
+     "comments": 10,
+     "shares": 13,
+     "reach": 12251,
+     "favorites": 14,
+     "new_followers": 60,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0182,
+     "average_time_watched": 9.58,
+     "total_time_watched": 133497,
+     "is_ai_generated": false,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.75,
+       "second": "1"
+      },
+      {
+       "percentage": 0.56,
+       "second": "2"
+      },
+      {
+       "percentage": 0.48,
+       "second": "3"
+      },
+      {
+       "percentage": 0.43,
+       "second": "4"
+      },
+      {
+       "percentage": 0.37,
+       "second": "5"
+      },
+      {
+       "percentage": 0.32,
+       "second": "6"
+      },
+      {
+       "percentage": 0.27,
+       "second": "7"
+      },
+      {
+       "percentage": 0.25,
+       "second": "8"
+      },
+      {
+       "percentage": 0.24,
+       "second": "9"
+      },
+      {
+       "percentage": 0.21,
+       "second": "10"
+      },
+      {
+       "percentage": 0.19,
+       "second": "11"
+      },
+      {
+       "percentage": 0.18,
+       "second": "12"
+      },
+      {
+       "percentage": 0.17,
+       "second": "13"
+      },
+      {
+       "percentage": 0.15,
+       "second": "14"
+      },
+      {
+       "percentage": 0.14,
+       "second": "15"
+      },
+      {
+       "percentage": 0.13,
+       "second": "16"
+      },
+      {
+       "percentage": 0.12,
+       "second": "17"
+      },
+      {
+       "percentage": 0.11,
+       "second": "18"
+      },
+      {
+       "percentage": 0.11,
+       "second": "19"
+      },
+      {
+       "percentage": 0.1,
+       "second": "20"
+      },
+      {
+       "percentage": 0.1,
+       "second": "21"
+      },
+      {
+       "percentage": 0.1,
+       "second": "22"
+      },
+      {
+       "percentage": 0.09,
+       "second": "23"
+      },
+      {
+       "percentage": 0.09,
+       "second": "24"
+      },
+      {
+       "percentage": 0.09,
+       "second": "25"
+      },
+      {
+       "percentage": 0.09,
+       "second": "26"
+      },
+      {
+       "percentage": 0.08,
+       "second": "27"
+      },
+      {
+       "percentage": 0.08,
+       "second": "28"
+      },
+      {
+       "percentage": 0.08,
+       "second": "29"
+      },
+      {
+       "percentage": 0.08,
+       "second": "30"
+      },
+      {
+       "percentage": 0.08,
+       "second": "31"
+      },
+      {
+       "percentage": 0.08,
+       "second": "32"
+      },
+      {
+       "percentage": 0.07,
+       "second": "33"
+      },
+      {
+       "percentage": 0.07,
+       "second": "34"
+      },
+      {
+       "percentage": 0.07,
+       "second": "35"
+      },
+      {
+       "percentage": 0.07,
+       "second": "36"
+      },
+      {
+       "percentage": 0.07,
+       "second": "37"
+      },
+      {
+       "percentage": 0.07,
+       "second": "38"
+      },
+      {
+       "percentage": 0.06,
+       "second": "39"
+      },
+      {
+       "percentage": 0.06,
+       "second": "40"
+      },
+      {
+       "percentage": 0.06,
+       "second": "41"
+      },
+      {
+       "percentage": 0.06,
+       "second": "42"
+      },
+      {
+       "percentage": 0.06,
+       "second": "43"
+      },
+      {
+       "percentage": 0.06,
+       "second": "44"
+      },
+      {
+       "percentage": 0.06,
+       "second": "45"
+      },
+      {
+       "percentage": 0.06,
+       "second": "46"
+      },
+      {
+       "percentage": 0.06,
+       "second": "47"
+      },
+      {
+       "percentage": 0.05,
+       "second": "48"
+      },
+      {
+       "percentage": 0.05,
+       "second": "49"
+      },
+      {
+       "percentage": 0.05,
+       "second": "50"
+      },
+      {
+       "percentage": 0.05,
+       "second": "51"
+      },
+      {
+       "percentage": 0.05,
+       "second": "52"
+      },
+      {
+       "percentage": 0.05,
+       "second": "53"
+      },
+      {
+       "percentage": 0.05,
+       "second": "54"
+      },
+      {
+       "percentage": 0.04,
+       "second": "55"
+      },
+      {
+       "percentage": 0.04,
+       "second": "56"
+      },
+      {
+       "percentage": 0.04,
+       "second": "57"
+      },
+      {
+       "percentage": 0.04,
+       "second": "58"
+      },
+      {
+       "percentage": 0.04,
+       "second": "59"
+      },
+      {
+       "percentage": 0.04,
+       "second": "60"
+      },
+      {
+       "percentage": 0.03,
+       "second": "61"
+      },
+      {
+       "percentage": 0.03,
+       "second": "62"
+      },
+      {
+       "percentage": 0.02,
+       "second": "63"
+      },
+      {
+       "percentage": 0.02,
+       "second": "64"
+      },
+      {
+       "percentage": 0.02,
+       "second": "65"
+      },
+      {
+       "percentage": 0.02,
+       "second": "66"
+      },
+      {
+       "percentage": 0.02,
+       "second": "67"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.982
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.002
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.003
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.013
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.01,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.7,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 0.99,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.3,
+       "type": "RETURN_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "ES",
+        "percentage": 0.812
+       },
+       {
+        "country": "RO",
+        "percentage": 0.152
+       },
+       {
+        "country": "DE",
+        "percentage": 0.003
+       },
+       {
+        "country": "FR",
+        "percentage": 0.002
+       },
+       {
+        "country": "Others",
+        "percentage": 0.014
+       },
+       {
+        "country": "GB",
+        "percentage": 0.001
+       },
+       {
+        "country": "IT",
+        "percentage": 0.004
+       },
+       {
+        "country": "PT",
+        "percentage": 0.003
+       },
+       {
+        "country": "BE",
+        "percentage": 0.001
+       },
+       {
+        "country": "US",
+        "percentage": 0.007
+       },
+       {
+        "country": "AR",
+        "percentage": 0.001
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.043
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.0804
+       },
+       {
+        "city_name": "ES Málaga",
+        "percentage": 0.0114
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.6325
+       },
+       {
+        "city_name": "ES Seville",
+        "percentage": 0.0195
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0252
+       }
+      ],
+      "genders": [
+       {
+        "gender": "male_vv",
+        "percentage": 0.2
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.06
+       },
+       {
+        "gender": "female_vv",
+        "percentage": 0.74
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7699361150282059011": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7699361150282059011",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "source": "organic"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7699361150282059011",
+    "post_metrics": {
+     "views": 11334,
+     "likes": 146,
+     "comments": 14,
+     "shares": 2,
+     "reach": 9972,
+     "favorites": 13,
+     "new_followers": 82,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0178,
+     "average_time_watched": 9.54,
+     "total_time_watched": 109163,
+     "is_ai_generated": false,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.76,
+       "second": "1"
+      },
+      {
+       "percentage": 0.58,
+       "second": "2"
+      },
+      {
+       "percentage": 0.5,
+       "second": "3"
+      },
+      {
+       "percentage": 0.43,
+       "second": "4"
+      },
+      {
+       "percentage": 0.37,
+       "second": "5"
+      },
+      {
+       "percentage": 0.33,
+       "second": "6"
+      },
+      {
+       "percentage": 0.31,
+       "second": "7"
+      },
+      {
+       "percentage": 0.27,
+       "second": "8"
+      },
+      {
+       "percentage": 0.25,
+       "second": "9"
+      },
+      {
+       "percentage": 0.23,
+       "second": "10"
+      },
+      {
+       "percentage": 0.21,
+       "second": "11"
+      },
+      {
+       "percentage": 0.19,
+       "second": "12"
+      },
+      {
+       "percentage": 0.18,
+       "second": "13"
+      },
+      {
+       "percentage": 0.17,
+       "second": "14"
+      },
+      {
+       "percentage": 0.15,
+       "second": "15"
+      },
+      {
+       "percentage": 0.15,
+       "second": "16"
+      },
+      {
+       "percentage": 0.14,
+       "second": "17"
+      },
+      {
+       "percentage": 0.13,
+       "second": "18"
+      },
+      {
+       "percentage": 0.13,
+       "second": "19"
+      },
+      {
+       "percentage": 0.12,
+       "second": "20"
+      },
+      {
+       "percentage": 0.12,
+       "second": "21"
+      },
+      {
+       "percentage": 0.11,
+       "second": "22"
+      },
+      {
+       "percentage": 0.11,
+       "second": "23"
+      },
+      {
+       "percentage": 0.1,
+       "second": "24"
+      },
+      {
+       "percentage": 0.1,
+       "second": "25"
+      },
+      {
+       "percentage": 0.1,
+       "second": "26"
+      },
+      {
+       "percentage": 0.09,
+       "second": "27"
+      },
+      {
+       "percentage": 0.09,
+       "second": "28"
+      },
+      {
+       "percentage": 0.09,
+       "second": "29"
+      },
+      {
+       "percentage": 0.09,
+       "second": "30"
+      },
+      {
+       "percentage": 0.08,
+       "second": "31"
+      },
+      {
+       "percentage": 0.08,
+       "second": "32"
+      },
+      {
+       "percentage": 0.08,
+       "second": "33"
+      },
+      {
+       "percentage": 0.08,
+       "second": "34"
+      },
+      {
+       "percentage": 0.08,
+       "second": "35"
+      },
+      {
+       "percentage": 0.07,
+       "second": "36"
+      },
+      {
+       "percentage": 0.07,
+       "second": "37"
+      },
+      {
+       "percentage": 0.07,
+       "second": "38"
+      },
+      {
+       "percentage": 0.07,
+       "second": "39"
+      },
+      {
+       "percentage": 0.07,
+       "second": "40"
+      },
+      {
+       "percentage": 0.07,
+       "second": "41"
+      },
+      {
+       "percentage": 0.06,
+       "second": "42"
+      },
+      {
+       "percentage": 0.06,
+       "second": "43"
+      },
+      {
+       "percentage": 0.06,
+       "second": "44"
+      },
+      {
+       "percentage": 0.06,
+       "second": "45"
+      },
+      {
+       "percentage": 0.06,
+       "second": "46"
+      },
+      {
+       "percentage": 0.06,
+       "second": "47"
+      },
+      {
+       "percentage": 0.06,
+       "second": "48"
+      },
+      {
+       "percentage": 0.05,
+       "second": "49"
+      },
+      {
+       "percentage": 0.05,
+       "second": "50"
+      },
+      {
+       "percentage": 0.05,
+       "second": "51"
+      },
+      {
+       "percentage": 0.05,
+       "second": "52"
+      },
+      {
+       "percentage": 0.05,
+       "second": "53"
+      },
+      {
+       "percentage": 0.05,
+       "second": "54"
+      },
+      {
+       "percentage": 0.05,
+       "second": "55"
+      },
+      {
+       "percentage": 0.05,
+       "second": "56"
+      },
+      {
+       "percentage": 0.04,
+       "second": "57"
+      },
+      {
+       "percentage": 0.04,
+       "second": "58"
+      },
+      {
+       "percentage": 0.04,
+       "second": "59"
+      },
+      {
+       "percentage": 0.04,
+       "second": "60"
+      },
+      {
+       "percentage": 0.04,
+       "second": "61"
+      },
+      {
+       "percentage": 0.03,
+       "second": "62"
+      },
+      {
+       "percentage": 0.03,
+       "second": "63"
+      },
+      {
+       "percentage": 0.02,
+       "second": "64"
+      },
+      {
+       "percentage": 0.02,
+       "second": "65"
+      },
+      {
+       "percentage": 0.02,
+       "second": "66"
+      },
+      {
+       "percentage": 0.02,
+       "second": "67"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Others",
+       "percentage": 0.001
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.005
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.009
+      },
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.985
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.88,
+       "type": "NEW_VIEWER"
+      },
+      {
+       "percentage": 1,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.12,
+       "type": "RETURN_VIEWER"
+      },
+      {
+       "percentage": 0,
+       "type": "FOLLOWER_PERCENT"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "US",
+        "percentage": 0.007
+       },
+       {
+        "country": "EC",
+        "percentage": 0.001
+       },
+       {
+        "country": "GB",
+        "percentage": 0.001
+       },
+       {
+        "country": "IT",
+        "percentage": 0.003
+       },
+       {
+        "country": "AR",
+        "percentage": 0.001
+       },
+       {
+        "country": "Others",
+        "percentage": 0.01
+       },
+       {
+        "country": "PT",
+        "percentage": 0.004
+       },
+       {
+        "country": "RO",
+        "percentage": 0.156
+       },
+       {
+        "country": "DE",
+        "percentage": 0.002
+       },
+       {
+        "country": "ES",
+        "percentage": 0.813
+       },
+       {
+        "country": "FR",
+        "percentage": 0.002
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "ES Málaga",
+        "percentage": 0.0146
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.6276
+       },
+       {
+        "city_name": "ES Seville",
+        "percentage": 0.0203
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0252
+       },
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.0447
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.0805
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.73
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.2
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.07
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ },
+ "7698989459584421142": {
+  "success": true,
+  "post": {
+   "platform_post_id": "7698989459584421142",
+   "platform": "tiktok",
+   "profile_username": "paraguasochanclas",
+   "source": "organic"
+  },
+  "platforms": {
+   "tiktok": {
+    "success": true,
+    "platform_post_id": "7698989459584421142",
+    "post_metrics": {
+     "views": 2524,
+     "likes": 42,
+     "comments": 4,
+     "shares": 1,
+     "reach": 2173,
+     "favorites": 2,
+     "new_followers": 6,
+     "profile_views": 0,
+     "full_video_watched_rate": 0.0198,
+     "average_time_watched": 9.34,
+     "total_time_watched": 24116,
+     "is_ai_generated": false,
+     "retention": [
+      {
+       "percentage": 1,
+       "second": "0"
+      },
+      {
+       "percentage": 0.77,
+       "second": "1"
+      },
+      {
+       "percentage": 0.55,
+       "second": "2"
+      },
+      {
+       "percentage": 0.47,
+       "second": "3"
+      },
+      {
+       "percentage": 0.41,
+       "second": "4"
+      },
+      {
+       "percentage": 0.35,
+       "second": "5"
+      },
+      {
+       "percentage": 0.3,
+       "second": "6"
+      },
+      {
+       "percentage": 0.27,
+       "second": "7"
+      },
+      {
+       "percentage": 0.25,
+       "second": "8"
+      },
+      {
+       "percentage": 0.23,
+       "second": "9"
+      },
+      {
+       "percentage": 0.21,
+       "second": "10"
+      },
+      {
+       "percentage": 0.19,
+       "second": "11"
+      },
+      {
+       "percentage": 0.18,
+       "second": "12"
+      },
+      {
+       "percentage": 0.17,
+       "second": "13"
+      },
+      {
+       "percentage": 0.16,
+       "second": "14"
+      },
+      {
+       "percentage": 0.15,
+       "second": "15"
+      },
+      {
+       "percentage": 0.15,
+       "second": "16"
+      },
+      {
+       "percentage": 0.14,
+       "second": "17"
+      },
+      {
+       "percentage": 0.13,
+       "second": "18"
+      },
+      {
+       "percentage": 0.13,
+       "second": "19"
+      },
+      {
+       "percentage": 0.13,
+       "second": "20"
+      },
+      {
+       "percentage": 0.12,
+       "second": "21"
+      },
+      {
+       "percentage": 0.11,
+       "second": "22"
+      },
+      {
+       "percentage": 0.11,
+       "second": "23"
+      },
+      {
+       "percentage": 0.11,
+       "second": "24"
+      },
+      {
+       "percentage": 0.1,
+       "second": "25"
+      },
+      {
+       "percentage": 0.1,
+       "second": "26"
+      },
+      {
+       "percentage": 0.1,
+       "second": "27"
+      },
+      {
+       "percentage": 0.1,
+       "second": "28"
+      },
+      {
+       "percentage": 0.09,
+       "second": "29"
+      },
+      {
+       "percentage": 0.09,
+       "second": "30"
+      },
+      {
+       "percentage": 0.09,
+       "second": "31"
+      },
+      {
+       "percentage": 0.09,
+       "second": "32"
+      },
+      {
+       "percentage": 0.09,
+       "second": "33"
+      },
+      {
+       "percentage": 0.09,
+       "second": "34"
+      },
+      {
+       "percentage": 0.09,
+       "second": "35"
+      },
+      {
+       "percentage": 0.08,
+       "second": "36"
+      },
+      {
+       "percentage": 0.08,
+       "second": "37"
+      },
+      {
+       "percentage": 0.08,
+       "second": "38"
+      },
+      {
+       "percentage": 0.08,
+       "second": "39"
+      },
+      {
+       "percentage": 0.08,
+       "second": "40"
+      },
+      {
+       "percentage": 0.08,
+       "second": "41"
+      },
+      {
+       "percentage": 0.07,
+       "second": "42"
+      },
+      {
+       "percentage": 0.07,
+       "second": "43"
+      },
+      {
+       "percentage": 0.07,
+       "second": "44"
+      },
+      {
+       "percentage": 0.06,
+       "second": "45"
+      },
+      {
+       "percentage": 0.06,
+       "second": "46"
+      },
+      {
+       "percentage": 0.06,
+       "second": "47"
+      },
+      {
+       "percentage": 0.06,
+       "second": "48"
+      },
+      {
+       "percentage": 0.06,
+       "second": "49"
+      },
+      {
+       "percentage": 0.06,
+       "second": "50"
+      },
+      {
+       "percentage": 0.06,
+       "second": "51"
+      },
+      {
+       "percentage": 0.05,
+       "second": "52"
+      },
+      {
+       "percentage": 0.05,
+       "second": "53"
+      },
+      {
+       "percentage": 0.05,
+       "second": "54"
+      },
+      {
+       "percentage": 0.05,
+       "second": "55"
+      },
+      {
+       "percentage": 0.05,
+       "second": "56"
+      },
+      {
+       "percentage": 0.05,
+       "second": "57"
+      },
+      {
+       "percentage": 0.05,
+       "second": "58"
+      },
+      {
+       "percentage": 0.05,
+       "second": "59"
+      },
+      {
+       "percentage": 0.05,
+       "second": "60"
+      },
+      {
+       "percentage": 0.04,
+       "second": "61"
+      },
+      {
+       "percentage": 0.04,
+       "second": "62"
+      },
+      {
+       "percentage": 0.03,
+       "second": "63"
+      },
+      {
+       "percentage": 0.03,
+       "second": "64"
+      },
+      {
+       "percentage": 0.02,
+       "second": "65"
+      },
+      {
+       "percentage": 0.02,
+       "second": "66"
+      },
+      {
+       "percentage": 0.02,
+       "second": "67"
+      }
+     ],
+     "impression_sources": [
+      {
+       "impression_source": "Sound",
+       "percentage": 0
+      },
+      {
+       "impression_source": "Follow",
+       "percentage": 0
+      },
+      {
+       "impression_source": "For You",
+       "percentage": 0.91
+      },
+      {
+       "impression_source": "Others",
+       "percentage": 0.002
+      },
+      {
+       "impression_source": "Personal Profile",
+       "percentage": 0.016
+      },
+      {
+       "impression_source": "Search",
+       "percentage": 0.072
+      }
+     ],
+     "audience_types": [
+      {
+       "percentage": 0.97,
+       "type": "NON_FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.26,
+       "type": "RETURN_VIEWER"
+      },
+      {
+       "percentage": 0.03,
+       "type": "FOLLOWER_PERCENT"
+      },
+      {
+       "percentage": 0.74,
+       "type": "NEW_VIEWER"
+      }
+     ],
+     "audience": {
+      "countries": [
+       {
+        "country": "IT",
+        "percentage": 0.005
+       },
+       {
+        "country": "RO",
+        "percentage": 0.129
+       },
+       {
+        "country": "US",
+        "percentage": 0.017
+       },
+       {
+        "country": "ES",
+        "percentage": 0.781
+       },
+       {
+        "country": "MX",
+        "percentage": 0.004
+       },
+       {
+        "country": "VE",
+        "percentage": 0.004
+       },
+       {
+        "country": "Others",
+        "percentage": 0.033
+       },
+       {
+        "country": "PE",
+        "percentage": 0.009
+       },
+       {
+        "country": "AR",
+        "percentage": 0.008
+       },
+       {
+        "country": "CO",
+        "percentage": 0.006
+       },
+       {
+        "country": "EC",
+        "percentage": 0.004
+       }
+      ],
+      "cities": [
+       {
+        "city_name": "PE Other",
+        "percentage": 0.0047
+       },
+       {
+        "city_name": "US Miami",
+        "percentage": 0.0023
+       },
+       {
+        "city_name": "US Other",
+        "percentage": 0.014
+       },
+       {
+        "city_name": "ES Madrid",
+        "percentage": 0.0719
+       },
+       {
+        "city_name": "ES Valencia",
+        "percentage": 0.0219
+       },
+       {
+        "city_name": "PE Chiclayo",
+        "percentage": 0.0008
+       },
+       {
+        "city_name": "ES Barcelona",
+        "percentage": 0.0484
+       },
+       {
+        "city_name": "ES Other",
+        "percentage": 0.6061
+       },
+       {
+        "city_name": "ES Málaga",
+        "percentage": 0.0148
+       },
+       {
+        "city_name": "US New York",
+        "percentage": 0.0007
+       },
+       {
+        "city_name": "PE Lima",
+        "percentage": 0.0035
+       },
+       {
+        "city_name": "ES Bilbao",
+        "percentage": 0.018
+       }
+      ],
+      "genders": [
+       {
+        "gender": "female_vv",
+        "percentage": 0.72
+       },
+       {
+        "gender": "male_vv",
+        "percentage": 0.21
+       },
+       {
+        "gender": "other_vv",
+        "percentage": 0.07
+       }
+      ]
+     }
+    },
+    "post_metrics_source": "platform_api",
+    "available_metrics": [
+     "followers",
+     "impressions",
+     "likes",
+     "comments",
+     "shares",
+     "video_count",
+     "following",
+     "profileViews"
+    ],
+    "metric_labels": {
+     "impressions": "Video Views",
+     "profileViews": "Profile Views (30d)"
+    },
+    "primary_impressions_field": "impressions"
+   }
+  }
+ }
+}
