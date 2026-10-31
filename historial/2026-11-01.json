@@ -1,0 +1,30 @@
+{
+ "fecha": "2026-11-01",
+ "duracion": 69.4,
+ "caption": "¿Paraguas en Tenerife y chanclas en el resto? Dime tu pueblo y te contesto ☔😎\n\nEl tiempo en España mañana, domingo 1 de noviembre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife y Las Palmas\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 2° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Tenerife",
+ "portada_ms": 0,
+ "origen_guion": "claude",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "TENERIFE: AVISO NARANJA",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Tenerife, mañana aviso naranja por lluvia. Te lo dije el miércoles. Quédate, que al final hay frío.",
+  "islas": "Mira el satélite: así entra la lluvia en Canarias. Santa Cruz de Tenerife, 91 por ciento y hasta 6 litros por metro cuadrado, y La Palma hasta 14. Si eres de Tenerife, paraguas.",
+  "sur": "Gente de Málaga, por la mañana puede caer algo. Ceuta, posibles chubascos flojos por la mañana; Melilla, casi nada. Sevilla, 28 grados.",
+  "mediterraneo": "Barcelona rondará los 23 grados y Valencia, 24, con cielo casi despejado. Castañas en camiseta. Mahón, rachas de 51.",
+  "interior": "Si eres de Zaragoza, agárrate el flequillo: rachas de 54. Salamanca amanece a 2 grados, aún más frío de lo que dije.",
+  "norte": "Gente de Vigo, mañana 23 grados y sol en Todos los Santos. Pamplona, eso sí, con rachas de 43.",
+  "general": "Más calor, Sevilla con 28 grados. Más frío, Salamanca y Soria con 2 grados al amanecer.",
+  "cierre": "Mañana, chanclas en casi toda España y paraguas en Canarias. Dime en comentarios tu pueblo y te digo qué te toca. ¡Sigue Paraguas o Chanclas!"
+ },
+ "primer_comentario": "¿Desde qué pueblo nos ves? Te contesto con tu previsión de mañana 🌦️👇",
+ "tiktok": {
+  "publish_id": "v_inbox_file~v2.7702915750100781059",
+  "status": "SEND_TO_USER_INBOX"
+ },
+ "youtube": {
+  "id": "-7vSSO0QBlU",
+  "url": "https://youtube.com/shorts/-7vSSO0QBlU",
+  "canal": "Paraguas o Chanclas"
+ }
+}
