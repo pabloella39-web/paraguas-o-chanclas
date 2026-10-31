@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-10-31",
+ "titulo": "POV: BAJAS AL REFUGIO",
+ "tipo": "guerra_mundial",
+ "pregunta": "¿Habías oído hablar del desastre de Bethnal Green?",
+ "resumen": "Londres, marzo de mil novecientos cuarenta y tres. Tienes doce años. Suena la sirena. Tu madre agarra una manta, tu hermano pequeño llora y tú coges la bolsa co",
+ "voz": "BXtvkfRgOYGPQKVRgufE",
+ "partes": [
+  {
+   "parte": 1,
+   "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_historias/historia_2026-10-31_parte1.mp4",
+   "duracion": 65.77,
+   "caption": "Nunca cayó una bomba, y aun así murieron ciento setenta y tres personas. 😔\n\n📍 Londres · Marzo De 1943\nHechos reales; protagonista recreado. Voz IA.\nCada día, un momento de la historia: sígueme para vivir el próximo.\n\n#historia #pov #historiareal #segundaguerramundial #londres #bethnalgreen",
+   "publicacion": {
+    "via": "upload-post",
+    "programado": "2026-10-31T21:00:00+01:00",
+    "job_id": "ff4a920efb7f46939b95ae11918a71a9",
+    "respuesta": {
+     "success": true,
+     "job_id": "ff4a920efb7f46939b95ae11918a71a9",
+     "scheduled_date": "2026-10-31T21:00:00+01:00",
+     "request_id": "964b0dd424d04f5fb686d4a20b5983e8"
+    }
+   },
+   "youtube": {
+    "id": "2g1FSmJ8RS4",
+    "url": "https://youtube.com/shorts/2g1FSmJ8RS4",
+    "canal": "Lo que callan las paredes"
+   }
+  }
+ ]
+}
