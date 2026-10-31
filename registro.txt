@@ -1,0 +1,29 @@
+2026-10-31 16:37:30,772 INFO Prompt publicado en la rama pendiente/historia-2026-10-31
+2026-10-31 18:30:08,229 WARNING El guion historia-2026-10-31 no llegó antes de las 19:30: respaldo con la API
+2026-10-31 18:30:41,898 INFO Historia: POV: BAJAS AL REFUGIO (guerra_mundial), 1 partes de [168] palabras
+2026-10-31 18:30:41,898 INFO Narrador: mujer → voz BXtvkfRgOYGPQKVRgufE
+2026-10-31 18:30:56,783 INFO Narración: 168 palabras, 61.9 s (2.71 pal/s)
+2026-10-31 18:30:59,344 INFO Imagen 'London 1943 air raid siren': File:2014 9-18 Mukden Incident Museum, Shenyang, A (cc0)
+2026-10-31 18:31:02,419 INFO Imagen 'London East End 1940s family': File:Photograph of Members of the Mochida Family A (public domain)
+2026-10-31 18:31:04,973 INFO Imagen 'Bethnal Green tube station': File:Description of the Bethnal Green Tube Disaste (public domain)
+2026-10-31 18:31:06,138 INFO Imagen 'London Underground shelter 1940': File:Woman kneeling next to bed of child, in an un (public domain)
+2026-10-31 18:31:09,965 INFO Sin imagen para 'anti-aircraft rocket battery London'
+2026-10-31 18:31:13,198 INFO Imagen 'London tube shelterers 1940': File:Shelter Photographs Taken in London by Bill B (public domain)
+2026-10-31 18:31:18,699 INFO Imagen 'Bethnal Green 1940s street': File:Street Plan of Grantham, Lincolnshire c. 1940 (public domain)
+2026-10-31 18:31:22,990 INFO Imagen 'East End London 1943': File:St. Louis Post-Dispatch of St. Louis, Missour (public domain)
+2026-10-31 18:31:23,117 WARNING Wikimedia 'Bethnal Green Underground station 1940s': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+Bethnal+Green+Underground+station+1940s&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-10-31 18:31:23,246 WARNING Wikimedia 'station 1940s': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+station+1940s&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-10-31 18:31:23,380 WARNING Wikimedia '1940s': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+1940s&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-10-31 18:31:23,381 INFO Sin imagen para 'Bethnal Green Underground station 1940s'
+2026-10-31 18:31:23,507 WARNING Wikimedia 'Bethnal Green stairs memorial': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+Bethnal+Green+stairs+memorial&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-10-31 18:31:23,635 WARNING Wikimedia 'stairs memorial': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+stairs+memorial&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-10-31 18:31:23,767 WARNING Wikimedia 'memorial': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+memorial&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-10-31 18:31:23,768 INFO Sin imagen para 'Bethnal Green stairs memorial'
+2026-10-31 18:31:23,771 INFO Parte 1: 7 de 10 tramos con foto propia
+2026-10-31 18:31:45,757 INFO Sonido nuevo con ElevenLabs: ciudad_noche.mp3
+2026-10-31 18:31:47,388 INFO Parte 1/1: 61.9 s de voz, 65.8 s de vídeo, 7 imágenes
+2026-10-31 18:35:05,825 INFO Upload-Post: programado para 2026-10-31 21:00:00+01:00: {'success': True, 'job_id': 'ff4a920efb7f46939b95ae11918a71a9', 'scheduled_date': '2026-10-31T21:00:00+01:00', 'request_id': '964b0dd424d04f5fb686d4a20b5983e8'}
+2026-10-31 18:35:09,544 INFO Subido a YouTube Shorts (Lo que callan las paredes): https://youtube.com/shorts/2g1FSmJ8RS4
+::notice::YouTube parte 1: https://youtube.com/shorts/2g1FSmJ8RS4
+::notice::Parte 1/1 programada para las 21:00
+::notice::Historia: POV: BAJAS AL REFUGIO (guerra_mundial), 1 partes: 65.8 s
