@@ -74,7 +74,7 @@ comentarios son lo que hace que TikTok reparta el vídeo.
 VARIEDAD DE CIUDADES: no nombres siempre las mismas capitales. En cada región, si una ciudad de la lista de "otras
 ciudades" tiene algo más llamativo que las de siempre, nómbrala a ella (por ejemplo Vigo, Ourense o Pontevedra en vez de
 A Coruña; Gijón en vez de Oviedo; Córdoba o Jaén en vez de Sevilla; Burgos o León en el interior). Ciudades más
-repetidas en los últimos partes (úsalas solo si son la noticia): {repetidas}. Ceuta y Melilla se nombran siempre.
+repetidas en los últimos partes (úsalas solo si son la noticia): {repetidas}.
 
 Texto de AEMET para hoy (contexto, puede venir vacío):
 {texto_aemet}
@@ -126,8 +126,8 @@ Bloques (en este orden: intro, las regiones en el orden de hoy, general y cierre
 - intro: el gancho (ver RETENCIÓN), sobre la región que va primera.
 - general: va AL FINAL, justo antes del cierre: es la recompensa prometida. Dónde hará más calor y dónde más
   frío de España (con las cifras) y, si acaso, un remate de una frase.
-- norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias). En "sur" \
-nombra SIEMPRE Ceuta y Melilla (aunque sea en una frase corta): la gente de allí lo pide.
+- norte, interior, mediterraneo, sur, islas: el tiempo de esas ciudades (islas = Baleares y Canarias). Ceuta y \
+Melilla salen en el mapa: nómbralas solo si tienen algo relevante (lluvia, levante fuerte, calor…).
 - cierre: despedida graciosa + pide que sigan "Paraguas o Chanclas" para tener el tiempo de cada día. NUNCA digas \
 horas de publicación ni "mañana a las...".
   Si encaja, termina diciendo si hoy toca paraguas o chanclas.
@@ -247,7 +247,7 @@ def ciudades_repetidas(hoy: date, prev: list[dict], dias: int = 4) -> list[str]:
             if nombre in texto:
                 cuenta[nombre] = cuenta.get(nombre, 0) + 1
     return [c for c, v in sorted(cuenta.items(), key=lambda x: -x[1]) if n and v >= max(2, n - 1)
-            and c not in ("Ceuta", "Melilla")][:6]
+            ][:6]
 
 
 def cta_del_dia(hoy: date) -> str:
@@ -520,4 +520,10 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
         out[i] = {**out[i], **{k: e[k] for k in ("nombre", "lat", "lon", "tmax", "tmin", "lluvia", "icono")
                                 if e.get(k) is not None}, "racha": e.get("racha"), "extra": True}
         usados.add(i)
+    # Ceuta y Melilla: basta con la tarjeta de una (se alternan por días), salvo que el guion nombre a las dos
+    if not (nombrada("Ceuta") and nombrada("Melilla")):
+        from datetime import date as _d
+        quitar = "Melilla" if nombrada("Ceuta") else "Ceuta" if nombrada("Melilla") else \
+            ("Ceuta", "Melilla")[_d.today().toordinal() % 2]
+        out = [c for c in out if c["nombre"] != quitar]
     return out

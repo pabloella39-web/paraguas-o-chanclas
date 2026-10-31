@@ -162,7 +162,7 @@ def _producir(nombre: str, guion, plan, total, trozos, comp_kwargs: dict, prev, 
 PROMPT_FINDE = """Eres el guionista de "Paraguas o Chanclas", un canal de TikTok sobre el tiempo en España con humor
 ligero (sin palabrotas, sin política). Es viernes por la noche: toca el vídeo del FIN DE SEMANA. IMPORTANTE: hoy NO
 sale el parte diario: este vídeo es TAMBIÉN el parte de MAÑANA SÁBADO, así que el bloque del sábado es el más largo y
-detallado (recorre España por zonas con las ciudades destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla). Usa SOLO estos datos
+detallado (recorre España por zonas con las ciudades destacadas, sus cifras y un consejo; Ceuta y Melilla solo si tienen algo relevante). Usa SOLO estos datos
 (no inventes temperaturas, lluvias ni avisos). Lo lee {presenta} con voz sintética.
 
 Sábado {sab} y domingo {dom}. Datos por ciudad (grados, lluvia = probabilidad máxima del día en %, lluvia_mm = litros previstos;
@@ -170,6 +170,8 @@ con menos de 1 litro son lloviznas y con menos del 70 % o de 2 litros nunca diga
 con 5 litros o más di cuántos litros por metro cuadrado caerán):
 SÁBADO: {datos_sab}
 DOMINGO: {datos_dom}
+Otras ciudades para el bloque largo del sábado (nómbralas si tienen algo más llamativo que las de siempre, para variar:
+Vigo u Ourense en vez de A Coruña, Gijón en vez de Oviedo, Córdoba en vez de Sevilla, Burgos o León…): {extra}
 
 DÍAS TRANQUILOS (sin avisos naranja/rojo, sin lluvia importante ni temperaturas extremas): el gancho NO puede ser
 "cuatro gotas en una ciudad" ni un dato local flojo, porque a quien no es de allí no le importa y desliza. Abre con un
@@ -228,7 +230,8 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
-                                                  fiestas=" ".join(notas_rango(sab, dom)) or "(ninguno)"))
+                                                  fiestas=" ".join(notas_rango(sab, dom)) or "(ninguno)",
+                                                  extra=json.dumps(_extra_por_region(), ensure_ascii=False)))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 return gg
@@ -286,6 +289,8 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         clave_google = os.environ.pop("GOOGLE_WEATHER_API_KEY", None)  # Google solo da el día de hoy
         try:
             prev_s, _ = obtener_previsiones(sab)
+            from .fuentes import EXTRA
+            EXTRA_SEMANA[:] = list(EXTRA)   # otras ciudades para el bloque largo del sábado
             prev_d, _ = obtener_previsiones(dom)
         finally:
             if clave_google:
@@ -302,7 +307,8 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     rango = f"{sab.day} {MESES_CORTOS[sab.month - 1]} · {dom.day} {MESES_CORTOS[dom.month - 1]}"
     (ms, _), _ = _mejor_plan(prev_s, prev_d)
     kwargs = {
-        "datos_seg": {"sabado": prev_s, "domingo": prev_d, "intro": []},
+        "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
+                      "domingo": prev_d, "intro": []},
         "pills": {"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR PLAN DEL FINDE"},
         "portada_txt": ("EL TIEMPO DEL FINDE", "FIN DE SEMANA", rango,
@@ -362,7 +368,7 @@ listas ni dos puntos, números en cifras con "grados" o "por ciento". Ciudades p
   cuenta para tener el tiempo de cada día. NUNCA digas horas de publicación.
 IMPORTANTE: hoy NO sale el parte diario: este vídeo es TAMBIÉN el parte de MAÑANA ({primero}). Su bloque es el
 más largo y detallado: recorre España por zonas (norte, interior, Mediterráneo, sur, islas) con las ciudades
-destacadas, sus cifras y un consejo, y nombra Ceuta y Melilla aunque sea en media frase. Los demás días, más breves:
+destacadas, sus cifras y un consejo (Ceuta y Melilla solo si tienen algo relevante). Los demás días, más breves:
 solo lo destacado. Si mañana pasa algo llamativo (lluvia fuerte, rachas, calor, frío), la intro puede abrir con ello.
 Festivos y fiestas en estos días (los marcados [SIEMPRE] se nombran siempre, cada uno en el bloque de su día y
 ligado al tiempo; el resto, solo si no hay nada más relevante): {fiestas}
