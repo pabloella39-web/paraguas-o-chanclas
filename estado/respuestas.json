@@ -98,7 +98,8 @@
   "7702544456125989664",
   "7702540172735267617",
   "7702553615215919894",
-  "7702763162528940822"
+  "7702763162528940822",
+  "7702847193934463766"
  ],
  "hechas": [
   {
@@ -154,6 +155,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Valencia: 22°/16°, 15 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-10-31",
+   "clave": "barcelona|2026-10-31",
+   "lugar": "Barcelona",
+   "usuarios": [
+    "alexander_26028"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Barcelona: 20°/12°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
