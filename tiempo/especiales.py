@@ -515,9 +515,12 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
                 log.info("Satélite en el vídeo semanal (%s): %s", motivo, info_sat)
         except Exception as e:  # noqa: BLE001
             log.warning("Sin satélite: %s", e)
+    primero = _dias()[0]
+    mapa_dias = {d: prevs[d] for d in _dias()}
+    mapa_dias[primero] = g.prev_para_mapa(prevs[primero], [guion["segmentos"].get(primero, "")], EXTRA_SEMANA)
     kwargs = {
         "satelite": sat,
-        "datos_seg": {**{d: prevs[d] for d in _dias()}, "intro": []},
+        "datos_seg": {**mapa_dias, "intro": []},
         "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR Y EL PEOR DÍA"},

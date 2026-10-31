@@ -302,7 +302,8 @@ def obtener_extra(hoy: date) -> list[dict]:
     for c in cs:
         d = om.get(c["id"])
         if d and d.get("tmax") is not None:
-            out.append({"nombre": c["nombre"], "region": c["region"], "tmax": round(d["tmax"]), "tmin": round(d["tmin"]),
+            out.append({"nombre": c["nombre"], "region": c["region"], "lat": c["lat"], "lon": c["lon"],
+                        "tmax": round(d["tmax"]), "tmin": round(d["tmin"]),
                         "lluvia": round(d.get("lluvia") or 0), "lluvia_mm": round(d.get("lluvia_mm") or 0, 1),
                         "racha": round(d.get("racha") or 0), "icono": d.get("icono")})
     return out

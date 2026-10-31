@@ -280,7 +280,7 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
         from .fuentes import EXTRA
         extra = {}
         for c in EXTRA:
-            extra.setdefault(c["region"], []).append({k: v for k, v in c.items() if k != "region"})
+            extra.setdefault(c["region"], []).append({k: v for k, v in c.items() if k not in ("region", "lat", "lon")})
         prompt = PROMPT.format(fecha=fecha_larga(hoy), datos=json.dumps(_resumen_datos(prev), ensure_ascii=False),
                                extra=json.dumps(extra, ensure_ascii=False) if extra else "(no disponibles)",
                                repetidas=", ".join(ciudades_repetidas(hoy, prev)) or "(ninguna)",
@@ -491,3 +491,33 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     if extra:
         seg["cierre"] = extra[0] + " " + seg["cierre"]
     return {"segmentos": seg, "caption": caption, "orden": orden, "titular": titular[:30]}
+
+
+def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) -> list[dict]:
+    """Si el guion nombra una ciudad 'extra' (Vigo en vez de A Coruña), su tarjeta sustituye en el mapa a la ciudad
+    habitual más cercana de su región que el guion NO nombra; así lo que se oye y lo que se ve coinciden."""
+    import math
+    import re as _re
+    from .fuentes import EXTRA
+    extra = EXTRA if extra is None else extra
+    texto = " ".join(textos.values()) if isinstance(textos, dict) else " ".join(textos)
+
+    def nombrada(n):
+        n = n.replace("S.C. Tenerife", "Santa Cruz de Tenerife")
+        return _re.search(r"(?<![\wáéíóúñ])" + _re.escape(n) + r"(?![\wáéíóúñ])", texto) is not None
+
+    out = [dict(c) for c in prev]
+    usados = set()
+    for e in extra:
+        if not e.get("lat") or not nombrada(e["nombre"]):
+            continue
+        candidatos = [i for i, c in enumerate(out) if c["region"] == e["region"] and i not in usados
+                      and c["nombre"] not in ("Ceuta", "Melilla") and not nombrada(c["nombre"])]
+        if not candidatos:
+            continue
+        i = min(candidatos, key=lambda i: math.hypot(out[i]["lat"] - e["lat"], out[i]["lon"] - e["lon"]))
+        log.info("Mapa: %s sustituye a %s (la nombra el guion)", e["nombre"], out[i]["nombre"])
+        out[i] = {**out[i], **{k: e[k] for k in ("nombre", "lat", "lon", "tmax", "tmin", "lluvia", "icono")
+                                if e.get(k) is not None}, "racha": e.get("racha"), "extra": True}
+        usados.add(i)
+    return out
