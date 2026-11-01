@@ -214,7 +214,7 @@ def continuidad(hoy: date) -> str | None:
                     k = hoy.toordinal()
                     cumple = [FORMULAS_CUMPLE[(k + i) % len(FORMULAS_CUMPLE)] for i in range(3)]
                     cambio = [FORMULAS_CAMBIO[(k + i) % len(FORMULAS_CAMBIO)] for i in range(2)]
-                    fmt = lambda x: x.format(quien=quien, Quien=quien[:1].upper() + quien[1:])  # noqa: E731
+                    fmt = lambda x: x.format(quien=quien, Quien=quien[:1].upper() + quien[1:]).replace(" a el ", " al ").replace(" de el ", " del ")  # noqa: E731
                     return (f"CONTINUIDAD: {quien} adelantamos sobre hoy: «{texto}». Compáralo con los datos de hoy: si "
                             f"se cumple, dilo en la intro justo después del gancho, con orgullo y en una frase; si ha "
                             f"cambiado, avísalo. VARÍA LA FÓRMULA: «Te lo dije el domingo» se ha repetido mucho; usa por "
