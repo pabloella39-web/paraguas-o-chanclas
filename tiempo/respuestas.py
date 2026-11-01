@@ -100,6 +100,9 @@ def videos_recientes(n: int = 8) -> list[str]:
         j = _get("uploadposts/media", platform="tiktok", user=perfil, limit=n)
         items = j.get("media") or j.get("data") or j.get("items") or j
         ids = _ids_en(items)
+        for it in items if isinstance(items, list) else []:   # la descripción también puede pedir el pueblo
+            if isinstance(it, dict) and it.get("id") and PIDE_LUGAR.search(str(it.get("caption") or "")):
+                PIDEN_POR_COMENTARIO.add(str(it["id"]))
     except Exception as e:  # noqa: BLE001
         log.warning("No se pudo listar los vídeos (media): %s", e)
     if not ids:
