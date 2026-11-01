@@ -47,4 +47,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   Fiestas locales y eventos (Halloween, San Juan…): solo si el día es tranquilo y no hay nada más relevante.
 - Arranque: varía la fórmula y no repitas la de los últimos partes (el prompt las lista); "Ojo" vale de vez en cuando,
   pero no siempre (el modelo de parte empieza con "Ojo": no lo copies cada día).
+- Continuidad con el vídeo semanal: varía la fórmula («Como te adelanté el domingo», «Lo avisamos el miércoles y se
+  cumple», «Si viste el vídeo del viernes, ya lo sabías»…); no repitas siempre «Te lo dije el domingo».
 - Revisa antes de entregar: ¿la primera frase engancharía a alguien que va deslizando?

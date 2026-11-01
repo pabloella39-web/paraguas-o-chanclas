@@ -186,15 +186,24 @@ GANCHO = None       # dict de tiempo.gancho.fenomeno_del_dia (también para la p
 DIAS_CLAVE = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"]
 
 
+FORMULAS_CUMPLE = ["Lo avisamos {quien} y se cumple", "Como te adelanté {quien}", "{Quien} ya lo veíamos venir",
+                   "Tal y como te conté {quien}", "Lo que te anticipé {quien}, confirmado",
+                   "Sin sorpresas respecto a {quien}", "Si viste el vídeo de {quien}, ya lo sabías"]
+FORMULAS_CAMBIO = ["Cambio de planes respecto a {quien}", "Esto ha cambiado desde {quien}",
+                   "Rectificamos lo de {quien}", "Novedad respecto a lo que te conté {quien}",
+                   "Al final no será como te dije {quien}"]
+
+
 def continuidad(hoy: date) -> str | None:
-    """Lo que adelantó sobre hoy el último vídeo semanal (domingo) o de mitad de semana (miércoles)."""
+    """Lo que adelantó sobre hoy el último vídeo semanal (domingo), de mitad de semana (miércoles) o del finde
+    (viernes), con fórmulas que van rotando para no repetir siempre «Te lo dije el domingo»."""
     import json as _json
     from datetime import timedelta as _td
     from .config import RAIZ
     dia = DIAS_CLAVE[hoy.weekday()]
     for atras in range(1, 7):
         f = hoy - _td(days=atras)
-        for tipo, quien in (("resto", "el miércoles"), ("semana", "el domingo")):
+        for tipo, quien in (("finde", "el viernes"), ("resto", "el miércoles"), ("semana", "el domingo")):
             ruta = RAIZ / "historial_especiales" / f"{tipo}-{f.isoformat()}.json"
             if ruta.exists():
                 try:
@@ -202,10 +211,15 @@ def continuidad(hoy: date) -> str | None:
                 except Exception:  # noqa: BLE001
                     texto = None
                 if texto:
-                    return (f"CONTINUIDAD: {quien} adelantamos sobre hoy: «{texto}». Compáralo con los datos de hoy: si se "
-                            f"cumple, dilo en la intro justo después del gancho, con orgullo y en una frase ('Te lo dije "
-                            f"{quien}: hoy el norte se moja'); si ha cambiado, avísalo ('Cambio de planes respecto a lo "
-                            f"que te dije {quien}: ...'). Nunca inventes lo que se dijo.")
+                    k = hoy.toordinal()
+                    cumple = [FORMULAS_CUMPLE[(k + i) % len(FORMULAS_CUMPLE)] for i in range(3)]
+                    cambio = [FORMULAS_CAMBIO[(k + i) % len(FORMULAS_CAMBIO)] for i in range(2)]
+                    fmt = lambda x: x.format(quien=quien, Quien=quien[:1].upper() + quien[1:])  # noqa: E731
+                    return (f"CONTINUIDAD: {quien} adelantamos sobre hoy: «{texto}». Compáralo con los datos de hoy: si "
+                            f"se cumple, dilo en la intro justo después del gancho, con orgullo y en una frase; si ha "
+                            f"cambiado, avísalo. VARÍA LA FÓRMULA: «Te lo dije el domingo» se ha repetido mucho; usa por "
+                            f"ejemplo «{fmt(cumple[0])}», «{fmt(cumple[1])}» o «{fmt(cumple[2])}» (o una tuya), y si "
+                            f"cambia, «{fmt(cambio[0])}» o «{fmt(cambio[1])}». Nunca inventes lo que se dijo.")
     return None
 
 
