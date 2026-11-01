@@ -1,0 +1,81 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-01",
+ "caption": "⚠️ Aviso naranja por lluvias hoy en Santa Cruz de Tenerife y La Laguna.\n\n🟠 Aviso naranja por lluvia: Santa Cruz de Tenerife, San Cristóbal de La Laguna\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
+ "titular": "SANTA CRUZ: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 23.9,
+ "firma": "naranja:lluvias:1",
+ "guion": {
+  "intro": "Santa Cruz de Tenerife: aviso naranja por lluvias. Pueden caer 30 litros por metro cuadrado en una hora.",
+  "zonas": "Aviso en el área metropolitana de Tenerife, con Santa Cruz y La Laguna. Desde las doce de hoy hasta el final del día.",
+  "consejos": "Toma precauciones y mantente informado de la predicción. Si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva allí."
+ },
+ "nivel_max": 2,
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-01T07:30:08.012Z"
+     },
+     "success": true,
+     "platform_post_id": "7703101740903566624",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7703101740903566624",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 5485362,
+     "post_title": "⚠️ Aviso naranja por lluvias hoy en Santa Cruz de Tenerife y La Laguna.\n\n🟠 Aviso naranja por lluvia: Santa Cruz de Tenerife, San Cristóbal de La Laguna\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 23.9,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7703100836855154720",
+     "request_id": "27c24ae067c74cf3b34da1cb27a9dbb5",
+     "request_id_logs": "27c24ae067c74cf3b34da1cb27a9dbb5",
+     "job_id": "6c86a97711704a8c8a8e3e3cad3054c2",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-01T07:30:08.012Z"
+   },
+   "request_id": "27c24ae067c74cf3b34da1cb27a9dbb5"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "JgEtUDAfRpk",
+  "url": "https://youtube.com/shorts/JgEtUDAfRpk",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
