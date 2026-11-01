@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-11-01",
+ "titulo": "POV: ESTÁS EN EL 23-F",
+ "tipo": "espana",
+ "pregunta": "¿Te habrías tirado al suelo o te habrías quedado sentado?",
+ "resumen": "Madrid, veintitrés de febrero de mil novecientos ochenta y uno. Eres taquígrafa en el Congreso. Apuntas la votación. Los diputados dicen sí o no, uno a uno. Una",
+ "voz": "gratuita",
+ "partes": [
+  {
+   "parte": 1,
+   "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_historias/historia_2026-11-01_parte1.mp4",
+   "duracion": 83.966667,
+   "caption": "Estás tomando notas en el Congreso y, de repente, disparos al techo 😶\n\n📍 Congreso, Madrid · 23 De Febrero De 1981\nHechos reales; protagonista recreado. Voz IA.\nCada día, un momento de la historia: sígueme para vivir el próximo.\n\n#historia #pov #historiareal #23F #historiadeespaña #transicion",
+   "publicacion": {
+    "via": "upload-post",
+    "programado": "2026-11-01T21:00:00+01:00",
+    "job_id": "6f56763db73a47d5959b22ac4bb5b845",
+    "respuesta": {
+     "success": true,
+     "job_id": "6f56763db73a47d5959b22ac4bb5b845",
+     "scheduled_date": "2026-11-01T21:00:00+01:00",
+     "request_id": "94c0735d9618477fa5b155843b96e964"
+    }
+   },
+   "youtube": {
+    "id": "c5mpR0CJ7BU",
+    "url": "https://youtube.com/shorts/c5mpR0CJ7BU",
+    "canal": "Lo que callan las paredes"
+   }
+  }
+ ]
+}
