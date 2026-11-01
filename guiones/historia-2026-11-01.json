@@ -1,0 +1,71 @@
+{
+ "titulo": "POV: ESTÁS EN EL 23-F",
+ "gancho": "ERES TAQUÍGRAFA Y ENTRA TEJERO",
+ "etiqueta": "CONGRESO, MADRID · 23 DE FEBRERO DE 1981",
+ "narrador": "mujer",
+ "caption": "Estás tomando notas en el Congreso y, de repente, disparos al techo 😶",
+ "pregunta": "¿Te habrías tirado al suelo o te habrías quedado sentado?",
+ "hashtags": [
+  "#23F",
+  "#historiadeespaña",
+  "#transicion",
+  "#congreso"
+ ],
+ "partes": [
+  {
+   "ambiente": "multitud",
+   "tramos": [
+    {
+     "texto": "Madrid, veintitrés de febrero de mil novecientos ochenta y uno. Eres taquígrafa en el Congreso.",
+     "imagen": "Congreso de los Diputados Madrid",
+     "susto": false
+    },
+    {
+     "texto": "Apuntas la votación. Los diputados dicen sí o no, uno a uno. Una tarde aburrida.",
+     "imagen": "Spanish Congress chamber 1981",
+     "susto": false
+    },
+    {
+     "texto": "Son casi las seis y media. Te duele la muñeca y piensas en la cena.",
+     "imagen": "Madrid 1981 street",
+     "susto": false
+    },
+    {
+     "texto": "Lo que no sabes es que por el pasillo avanzan guardias civiles armados.",
+     "imagen": "Guardia Civil 1981",
+     "susto": false
+    },
+    {
+     "texto": "Las puertas se abren de golpe. Un teniente coronel con tricornio sube a la tribuna, pistola en mano.",
+     "imagen": "Tejero 23F 1981",
+     "susto": false
+    },
+    {
+     "texto": "Grita que nadie se mueva. Y entonces, ráfagas contra el techo. Cae yeso sobre tu cuaderno.",
+     "imagen": "23F golpe de estado 1981",
+     "susto": true
+    },
+    {
+     "texto": "Te tiras al suelo. Huele a pólvora. Todos se esconden bajo los escaños. Solo tres hombres siguen sentados.",
+     "imagen": "Congreso Diputados hemiciclo",
+     "susto": false
+    },
+    {
+     "texto": "Pasan las horas. Alguien susurra que hay tanques en Valencia. Aprietas el lápiz para que no te tiemble la mano.",
+     "imagen": "Valencia 1981 tanks",
+     "susto": false
+    },
+    {
+     "texto": "Pasada la una de la madrugada, el rey sale en televisión contra el golpe. Tú aún no lo sabes.",
+     "imagen": "Juan Carlos I 1981",
+     "susto": false
+    },
+    {
+     "texto": "Saldrás por la mañana, tras más de dieciséis horas secuestrada. Nadie murió, pero la democracia pendió de un hilo. ¿Tú qué habrías hecho?",
+     "imagen": "Madrid February 1981",
+     "susto": false
+    }
+   ]
+  }
+ ]
+}
