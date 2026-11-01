@@ -100,7 +100,10 @@
   "7702553615215919894",
   "7702763162528940822",
   "7702847193934463766",
-  "7702941070996816662"
+  "7702941070996816662",
+  "7703076562267276055",
+  "7702968866746368801",
+  "7702991402284909345"
  ],
  "hechas": [
   {
@@ -167,6 +170,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Barcelona: 20°/12°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-01",
+   "clave": "madrid|2026-11-01",
+   "lugar": "Madrid",
+   "usuarios": [
+    "carmenbarrul516"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Madrid: 21°/8°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
