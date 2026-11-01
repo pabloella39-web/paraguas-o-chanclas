@@ -125,6 +125,8 @@ def comentarios_nuevos(estado: dict) -> list[dict]:
             u = c.get("user") or {}
             nombre = (u.get("username") or u.get("display_name") or c.get("username") or "").lstrip("@")
             texto = (c.get("text") or c.get("message") or "").strip()
+            if nombre.lower() == MIA and PIDE_LUGAR.search(texto):
+                PIDEN_POR_COMENTARIO.add(vid)   # nuestro primer comentario pide el pueblo: en este vídeo se contesta
             if not cid or cid in vistos or not texto or nombre.lower() == MIA:
                 continue
             nuevos.append({"id": cid, "video": vid, "usuario": nombre, "texto": texto[:300]})
@@ -256,9 +258,13 @@ PIDE_LUGAR = re.compile(r"desde (?:qu[eé]|d[oó]nde)|(?:tu|vuestro) (?:pueblo|c
                         r"de d[oó]nde (?:nos ves|eres|sois)|qu[eé] (?:ciudad|pueblo)|dime el pueblo", re.I)
 
 
+PIDEN_POR_COMENTARIO: set = set()
+
+
 def videos_que_piden_lugar() -> set[str]:
-    """Ids de TikTok de los vídeos cuyo guion (locución o descripción) pedía el pueblo o la ciudad."""
-    ids = set()
+    """Ids de TikTok de los vídeos cuyo guion (locución o descripción) o cuyo primer comentario del canal pedía el
+    pueblo o la ciudad (lo segundo vale aunque el historial no tenga el id del vídeo)."""
+    ids = set(PIDEN_POR_COMENTARIO)
     for f in list((RAIZ / "historial").glob("*.json")) + list((RAIZ / "historial_especiales").glob("*.json")):
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
