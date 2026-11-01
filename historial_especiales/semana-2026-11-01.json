@@ -1,0 +1,84 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-11-01",
+ "caption": "Disfruta el lunes, que el martes llega el frío y Barcelona se empapa 🧥☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 2: máx. 26°\n🌧️ Martes 3: máx. 25° · lluvia en Barcelona, Las Palmas\n☁️ Miércoles 4: máx. 25° · lluvia en Ceuta, Málaga\n🌧️ Jueves 5: máx. 25°\n☁️ Viernes 6: máx. 26°\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "LLEGA EL BAJÓN",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 94.4,
+ "guion": {
+  "intro": "Disfruta el lunes, que el martes cambia todo. Llega el bajón de temperaturas. Quédate, que al final te digo el mejor día de la semana y el peor.",
+  "lunes": "Mañana lunes, día seco en casi toda España. En el norte, Vigo y Pontevedra suben a 23 grados, y en Burgos, rachas de 45 kilómetros por hora. Madrid y Zaragoza, sol y 19 grados, pero Ávila amanece a 2, así que chaqueta temprano. En Barcelona, alguna llovizna. El sur, de manga corta, con Sevilla y Córdoba a 26 grados. Y en Santa Cruz de La Palma, chubascos de casi 6 litros.",
+  "martes": "El martes se tuerce. Barcelona, con un 90 por ciento y 22 litros por metro cuadrado, paraguas sí o sí. Posibles chubascos en Canarias y en Palma, de hasta 8 litros, y bajón en el interior, con Pamplona a 10 grados.",
+  "miercoles": "El miércoles, madrugada de bufanda, con Salamanca a 0 grados y Valladolid a 1. Y en el sur, posibles chubascos en Málaga y Almería, así que paraguas en el bolso.",
+  "jueves": "El jueves, sol en el Cantábrico, con Bilbao a 16 grados, buen día para tender la ropa. En Valencia y Zaragoza, algún chubasco suelto, nada serio.",
+  "viernes": "El viernes, la semana termina en calma, sin lluvia en casi toda España. Canarias a 26 grados y Salamanca, otra vez a 0 de madrugada. Ve pensando en el plan del finde.",
+  "general": "Lo prometido. El mejor día, el lunes, con sol casi en todas partes y 26 grados en Sevilla y Córdoba. Y el peor, el martes, con 22 litros en Barcelona y el termómetro cayendo en el interior.",
+  "cierre": "¿Abrigo ya o aguantas en manga corta? Te leo en comentarios. Y sigue a Paraguas o Chanclas para tener el tiempo de cada día."
+ },
+ "primer_comentario": "¿Desde qué pueblo nos ves? Te contesto con tu previsión de mañana 🌦️👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-01T19:28:01.714Z"
+     },
+     "success": true,
+     "platform_post_id": "7703286615204007201",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7703286615204007201",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13613185,
+     "post_title": "Disfruta el lunes, que el martes llega el frío y Barcelona se empapa 🧥☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 2: máx. 26°\n🌧️ Martes 3: máx. 25° · lluvia en Barcelona, Las Palmas\n☁️ Miércoles 4: máx. 25° · lluvia en Ceuta, Málaga\n🌧️ Jueves 5: máx. 25°\n☁️ Viernes 6: máx. 26°\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 94.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7703286146788509729",
+     "first_comment_posted": true,
+     "request_id": "94662d6df08341e3aab7c9cf1ae4dc73",
+     "request_id_logs": "94662d6df08341e3aab7c9cf1ae4dc73",
+     "job_id": "2284957f1cd74bb68e8398ece483ef9c",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-01T19:28:01.714Z"
+   },
+   "request_id": "94662d6df08341e3aab7c9cf1ae4dc73"
+  }
+ },
+ "tipo_youtube": "semana",
+ "youtube": {
+  "id": "lvkSRNzNefA",
+  "url": "https://youtube.com/shorts/lvkSRNzNefA",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
