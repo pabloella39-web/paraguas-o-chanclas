@@ -648,6 +648,10 @@ def main():
     if manual:
         vid, cid, texto = manual.split("|", 2)
         responder_texto({"video": vid.strip(), "id": cid.strip(), "usuario": "manual"}, texto.strip())
+        est = _cargar()   # contestado a mano: que la respuesta automática no lo repita
+        est.setdefault("escritas", []).append(cid.strip())
+        est["vistos"].append(cid.strip())
+        _guardar(est)
         return
     if a.comprobar:
         perfil = uploadpost.perfil("tiempo")
