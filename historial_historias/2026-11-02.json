@@ -1,0 +1,32 @@
+{
+ "fecha": "2026-11-02",
+ "titulo": "POV: TOKIO VA A TEMBLAR",
+ "tipo": "asia",
+ "pregunta": "¿Tú habrías seguido andando o te habrías quedado en la explanada?",
+ "resumen": "Tokio, uno de septiembre de mil novecientos veintitrés. Tienes doce años y ya casi es mediodía. En tu casa de madera, en el barrio de Honjo, tu madre enciende e",
+ "voz": "gratuita",
+ "partes": [
+  {
+   "parte": 1,
+   "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_historias/historia_2026-11-02_parte1.mp4",
+   "duracion": 77.1,
+   "caption": "Es casi mediodía en Tokio y tu madre acaba de encender el brasero 🔥\n\n📍 Tokio · 1 De Septiembre De 1923\nHechos reales; protagonista recreado. Voz IA.\nCada día, un momento de la historia: sígueme para vivir el próximo.\n\n#historia #pov #historiareal #japon #terremoto #tokio",
+   "publicacion": {
+    "via": "upload-post",
+    "programado": "2026-11-02T21:00:00+01:00",
+    "job_id": "eecdf37f737241299cf9157d56d0d38b",
+    "respuesta": {
+     "success": true,
+     "job_id": "eecdf37f737241299cf9157d56d0d38b",
+     "scheduled_date": "2026-11-02T21:00:00+01:00",
+     "request_id": "1ca944fa52d944caab645eadae5a18f5"
+    }
+   },
+   "youtube": {
+    "id": "Lm8VSSbKw5A",
+    "url": "https://youtube.com/shorts/Lm8VSSbKw5A",
+    "canal": "Lo que callan las paredes"
+   }
+  }
+ ]
+}
