@@ -29,8 +29,9 @@ def _iso(s: str) -> datetime:
     return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
 
 
-def avisos_terminados(ahora: datetime) -> list[dict]:
-    """Avisos que publicamos y que terminaron en las últimas ~30 h (solo se comentan una vez)."""
+def avisos_terminados(ahora: datetime, activos: bool = False) -> list[dict]:
+    """Avisos que publicamos y que terminaron en las últimas ~30 h (solo se comentan una vez).
+    Con activos=True, también los que están en curso (para ir guardando observaciones)."""
     out = []
     for d in (ahora.date() - timedelta(days=1), ahora.date()):
         for f in sorted(HISTORIAL.glob(f"aviso-{d.isoformat()}-*.json")):
@@ -43,14 +44,52 @@ def avisos_terminados(ahora: datetime) -> list[dict]:
                     fin = _iso(a["fin"])
                 except Exception:  # noqa: BLE001
                     continue
-                if fin <= ahora and ahora - fin <= timedelta(hours=30):
+                if (fin <= ahora or (activos and _iso(a["inicio"]) - timedelta(hours=2) <= ahora)) \
+                        and ahora - fin <= timedelta(hours=30):
                     out.append(a)
     return out
 
 
+GUARDADAS = RAIZ / "estado" / "observaciones_aviso.json"
+
+
 def observaciones(clave: str) -> list[dict]:
+    """Observaciones horarias de AEMET (solo cubren ~12 h) + las guardadas durante el aviso."""
     from .fuentes import _aemet_get
-    return json.loads(_aemet_get("/observacion/convencional/todas", clave))
+    nuevas = json.loads(_aemet_get("/observacion/convencional/todas", clave))
+    try:
+        viejas = json.loads(GUARDADAS.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        viejas = []
+    vistas = {(o["idema"], o["fint"]) for o in nuevas}
+    return nuevas + [o for o in viejas if (o["idema"], o["fint"]) not in vistas]
+
+
+def guardar(ahora: datetime | None = None):
+    """Mientras hay un aviso en curso o reciente, guarda las observaciones de las estaciones de la zona (la API solo
+    da las últimas ~12 h y el parte se escribe por la tarde). Lo llama el workflow de respuestas cada hora."""
+    from .poblaciones import GRANDES
+    ahora = ahora or datetime.now(timezone.utc)
+    avisos = avisos_terminados(ahora, activos=True)
+    try:
+        viejas = json.loads(GUARDADAS.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        viejas = []
+    viejas = [o for o in viejas if ahora - _iso(o["fint"]) <= timedelta(days=3)]
+    if avisos:
+        sitios = [(la, lo) for a in avisos for n, la, lo in GRANDES if n in (a.get("ciudades") or [])]
+        nuevas = observaciones(os.environ.get("AEMET_API_KEY", ""))
+        vistas = {(o["idema"], o["fint"]) for o in viejas}
+        for o in nuevas:
+            try:
+                la, lo = float(o["lat"]), float(o["lon"])
+            except Exception:  # noqa: BLE001
+                continue
+            if (o["idema"], o["fint"]) not in vistas and any(_km(la, lo, a, b) <= RADIO_KM for a, b in sitios):
+                viejas.append({k: o.get(k) for k in ("idema", "ubi", "lat", "lon", "fint", "prec", "vmax")})
+        log.info("Aviso en curso o reciente: %d observaciones guardadas", len(viejas))
+    GUARDADAS.parent.mkdir(exist_ok=True)
+    GUARDADAS.write_text(json.dumps(viejas, ensure_ascii=False), encoding="utf-8")
 
 
 def medir(aviso: dict, obs: list[dict]) -> dict | None:
@@ -134,6 +173,9 @@ def resumen_aviso(gr: dict) -> dict:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     import sys
+    if sys.argv[1:] == ["guardar"]:
+        guardar()
+        sys.exit(0)
     ahora = _iso(sys.argv[1]) if len(sys.argv) > 1 else None
     if ahora is None:
         print(nota() or "(nada)")

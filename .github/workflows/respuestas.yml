@@ -77,6 +77,12 @@ jobs:
           else
             python -m tiempo.respuestas --publicar
           fi
+      - name: Guardar observaciones si hay un aviso naranja/rojo en curso (para el dato real del día siguiente)
+        if: always() && steps.up.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: python -m tiempo.cumplido guardar
       - name: Guardar estado
         if: always() && steps.up.outputs.ok == 'true'
         run: |
