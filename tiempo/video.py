@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -92,9 +93,30 @@ class Particulas:
     """Adornos de la estación que caen o flotan por el fondo: hojas (otoño), nieve (invierno), pétalos (primavera)
     y destellos de sol (verano). Sutiles: no tapan datos ni subtítulos."""
 
-    def __init__(self, est: str, semilla: int = 7):
+    # Cómo se mueven (varía cada día para que el fondo no sea siempre igual):
+    #   caida: caen balanceándose · brisa: cruzan de lado a lado como empujadas por una brisa
+    #   rafagas: flotan casi quietas y cada pocos segundos una ráfaga las barre (con estelas de viento)
+    #   remolino: bajan girando en círculos amplios
+    MODOS = {"otono": ["caida", "brisa", "rafagas", "remolino"], "primavera": ["caida", "brisa", "remolino", "rafagas"],
+             "invierno": ["caida", "brisa", "rafagas"], "verano": ["caida", "brisa"]}
+
+    @classmethod
+    def modo_del_dia(cls, est: str, fecha=None, gancho=None) -> str:
+        forzado = os.environ.get("PARTICULAS_MODO")
+        if forzado in cls.MODOS[est]:
+            return forzado
+        if gancho and gancho.get("efecto") == "viento" and "rafagas" in cls.MODOS[est]:
+            return "rafagas"   # día de viento: que se note también en el fondo
+        import datetime as _dt
+        d = fecha or _dt.date.today()
+        return cls.MODOS[est][d.toordinal() % len(cls.MODOS[est])]
+
+    def __init__(self, est: str, semilla: int = 7, modo: str | None = None, fecha=None):
         rnd = np.random.default_rng(semilla)
         self.est = est
+        self.modo = modo or self.modo_del_dia(est, fecha)
+        self.rafaga = {"P": 5.5, "D": 1.7, "A": 650.0}   # periodo, duración y fuerza de las ráfagas
+        self._estela = None
         n = {"otono": 16, "invierno": 46, "primavera": 18, "verano": 22}[est]
         self.p = [{"x": rnd.uniform(0, ANCHO), "y": rnd.uniform(0, ALTO), "v": rnd.uniform(40, 110),
                    "amp": rnd.uniform(15, 60), "w": rnd.uniform(0.4, 1.2), "fase": rnd.uniform(0, 6.3),
@@ -163,12 +185,70 @@ class Particulas:
             self._fondo = capa
         img.alpha_composite(self._fondo)
 
+    def _rafaga(self, t: float, off: float):
+        """(intensidad 0-1 ahora, desplazamiento acumulado) de las ráfagas periódicas."""
+        P, D = self.rafaga["P"], self.rafaga["D"]
+        n, fase = divmod(t + off, P)
+        if fase < D:
+            g = math.sin(math.pi * fase / D) ** 2
+            parcial = fase / 2 - D / (4 * math.pi) * math.sin(2 * math.pi * fase / D)
+        else:
+            g, parcial = 0.0, D / 2
+        return g, n * D / 2 + parcial
+
+    def _dibujar_estelas(self, img: Image.Image, t: float):
+        """Líneas de viento suaves que cruzan la pantalla durante la ráfaga."""
+        g, _ = self._rafaga(t, 0.0)
+        if g < 0.05:
+            return
+        if self._estela is None:
+            W, H = 340, 5
+            alfa = (np.sin(np.linspace(0, math.pi, W)) ** 1.5 * 120).astype(np.uint8)
+            im = Image.new("RGBA", (W, H), (255, 255, 255, 0))
+            m = np.repeat(alfa[None, :], H, axis=0)
+            m[0, :] //= 3
+            m[-1, :] //= 3
+            im.putalpha(Image.fromarray(m))
+            self._estela = im
+        P, D = self.rafaga["P"], self.rafaga["D"]
+        fase = (t % P) / D   # 0→1 durante la ráfaga
+        rnd = np.random.default_rng(int(t // P) + 11)
+        e = self._estela.copy()
+        e.putalpha(Image.fromarray((np.asarray(e.getchannel("A"), dtype=np.float32) * g).astype(np.uint8)))
+        for _ in range(5):
+            y0 = rnd.uniform(380, ALTO - 300)
+            x = -400 + fase * (ANCHO + 800) * rnd.uniform(0.8, 1.2)
+            img.alpha_composite(e, (int(x) % (ANCHO + 400) - 340, int(y0 - fase * 60)))
+
     def dibujar(self, img: Image.Image, t: float):
+        if self.modo == "rafagas" and self.est != "verano":
+            self._dibujar_estelas(img, t)
         sube = self.est == "verano"
+        lento = 0.45 if self.est == "invierno" else 1
         for p in self.p:
-            y = (p["y"] + (-1 if sube else 1) * p["v"] * t * (0.45 if self.est == "invierno" else 1)) % (ALTO + 80) - 40
-            x = (p["x"] + p["amp"] * math.sin(p["w"] * t + p["fase"])) % ANCHO
-            ang = int(((p["giro"] * t) % 360) // 30)
+            if self.modo == "brisa":
+                vx = p["v"] * 1.1 + 30
+                x = (p["x"] + vx * t) % (ANCHO + 100) - 50
+                y = (p["y"] + (-0.15 if sube else 0.25) * p["v"] * t + p["amp"] * 0.6 * math.sin(p["w"] * 1.6 * t + p["fase"])) \
+                    % (ALTO + 80) - 40
+                giro = p["giro"] * 1.8
+            elif self.modo == "rafagas":
+                g, G = self._rafaga(t, p["fase"] * 0.04)
+                x = (p["x"] + 12 * t + self.rafaga["A"] * G * p["tam"]) % (ANCHO + 100) - 50
+                y = (p["y"] + (-1 if sube else 1) * 0.35 * p["v"] * t * lento - 0.18 * self.rafaga["A"] * G
+                     + p["amp"] * 0.5 * math.sin(p["w"] * t + p["fase"])) % (ALTO + 80) - 40
+                giro = p["giro"] * (1 + 6 * g)
+            elif self.modo == "remolino":
+                R = 50 + p["amp"] * 1.6
+                a = p["w"] * 1.3 * t + p["fase"]
+                x = (p["x"] + R * math.cos(a)) % ANCHO
+                y = (p["y"] + (-1 if sube else 1) * 0.6 * p["v"] * t * lento + R * 0.45 * math.sin(a)) % (ALTO + 80) - 40
+                giro = p["giro"] * 1.4
+            else:
+                y = (p["y"] + (-1 if sube else 1) * p["v"] * t * lento) % (ALTO + 80) - 40
+                x = (p["x"] + p["amp"] * math.sin(p["w"] * t + p["fase"])) % ANCHO
+                giro = p["giro"]
+            ang = int(((giro * t) % 360) // 30)
             sp = self._sprite(p["tipo"], int((p["tam"] - 0.6) / 0.65 * 5), ang)
             img.paste(sp, (int(x), int(y)), sp)
 
@@ -192,7 +272,10 @@ class Compositor:
         self.capas = capas or {}
         self.sin_marcadores = set(sin_marcadores)
         from .estacion import estacion
-        self.particulas = Particulas(estacion_override or estacion(fecha or __import__("datetime").date.today()))
+        self.particulas = Particulas(estacion_override or estacion(fecha or __import__("datetime").date.today()),
+                                     fecha=fecha, modo=Particulas.modo_del_dia(
+                                         estacion_override or estacion(fecha or __import__("datetime").date.today()),
+                                         fecha, gancho))
         self.prev = prev
         self.titular = (titular or "¿PARAGUAS O CHANCLAS?").upper()
         # La intro se dibuja ya sobre la región más relevante (la que va justo después)
