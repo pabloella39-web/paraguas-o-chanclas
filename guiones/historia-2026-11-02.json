@@ -1,0 +1,71 @@
+{
+ "titulo": "POV: TOKIO VA A TEMBLAR",
+ "gancho": "TIENES 12 AÑOS Y TOKIO ARDERÁ",
+ "etiqueta": "TOKIO · 1 DE SEPTIEMBRE DE 1923",
+ "narrador": "hombre",
+ "caption": "Es casi mediodía en Tokio y tu madre acaba de encender el brasero 🔥",
+ "pregunta": "¿Tú habrías seguido andando o te habrías quedado en la explanada?",
+ "hashtags": [
+  "#historia",
+  "#japon",
+  "#terremoto",
+  "#tokio"
+ ],
+ "partes": [
+  {
+   "ambiente": "multitud",
+   "tramos": [
+    {
+     "texto": "Tokio, uno de septiembre de mil novecientos veintitrés. Tienes doce años y ya casi es mediodía.",
+     "imagen": "Tokyo 1923 street",
+     "susto": false
+    },
+    {
+     "texto": "En tu casa de madera, en el barrio de Honjo, tu madre enciende el brasero para el arroz.",
+     "imagen": "Tokyo wooden houses Taisho",
+     "susto": false
+    },
+    {
+     "texto": "Sopla un viento caliente de tifón. En miles de cocinas de la ciudad arde ahora mismo el mismo fuego.",
+     "imagen": "Tokyo 1920s Asakusa",
+     "susto": false
+    },
+    {
+     "texto": "Tú no lo sabes, pero en un minuto esos braseros van a incendiar Tokio.",
+     "imagen": "Great Kanto earthquake fire",
+     "susto": false
+    },
+    {
+     "texto": "Las once y cincuenta y ocho. El suelo ruge. La casa se dobla y el techo cae sobre la mesa.",
+     "imagen": "Great Kanto earthquake 1923",
+     "susto": true
+    },
+    {
+     "texto": "Sales a rastras con tu hermano. Sobre los tejados ya suben columnas de humo negro, empujadas por el viento.",
+     "imagen": "Tokyo 1923 fire smoke",
+     "susto": false
+    },
+    {
+     "texto": "Los vecinos arrastran carros con colchones hacia una gran explanada, un antiguo almacén del ejército. Allí caben miles.",
+     "imagen": "Tokyo 1923 refugees",
+     "susto": false
+    },
+    {
+     "texto": "Tu padre mira el viento y dice que no. Que sigáis andando, lejos de allí.",
+     "imagen": "Kanto earthquake refugees 1923",
+     "susto": false
+    },
+    {
+     "texto": "A media tarde, a tu espalda, el fuego se levanta en un remolino gigante sobre la explanada.",
+     "imagen": "Tokyo 1923 burning city",
+     "susto": true
+    },
+    {
+     "texto": "Allí murieron unas treinta y ocho mil personas. En total, más de cien mil. ¿Tú habrías seguido andando?",
+     "imagen": "Tokyo 1923 ruins",
+     "susto": false
+    }
+   ]
+  }
+ ]
+}
