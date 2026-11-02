@@ -254,61 +254,147 @@ class Particulas:
 
 
 COLOR_ALERTA = {"naranja": (255, 128, 0), "rojo": (215, 22, 32)}
+OSCURO_ALERTA = (14, 18, 30)
+VARIANTES_AVISO = 4
 
 
-def portada_aviso(a: dict) -> Image.Image:
-    """Portada de alerta naranja/roja: fondo del color del nivel, franjas de peligro y triángulo. Se distingue al
-    instante en el feed y en la cuadrícula del perfil (que recorta a 3:4: todo en la franja central)."""
-    col = COLOR_ALERTA.get(a["nivel"], COLOR_ALERTA["naranja"])
-    oscuro = (14, 18, 30)
+def _degradado(col, fuerza=0.35):
     im = Image.new("RGBA", (ANCHO, ALTO), col + (255,))
-    # degradado suave para dar volumen
     arr = np.asarray(im).astype(np.float32)
     yy = np.linspace(-1, 1, ALTO)[:, None]
     xx = np.linspace(-1, 1, ANCHO)[None, :]
-    luz = np.clip(1.12 - 0.35 * (xx ** 2 + yy ** 2), 0.6, 1.12)
+    luz = np.clip(1.12 - fuerza * (xx ** 2 + yy ** 2), 0.55, 1.12)
     arr[..., :3] = np.clip(arr[..., :3] * luz[..., None], 0, 255)
-    im = Image.fromarray(arr.astype(np.uint8), "RGBA")
-    d = ImageDraw.Draw(im)
-    cy = ALTO / 2
-    # franjas de peligro arriba y abajo de la zona visible en la cuadrícula
-    for y0 in (cy - 700, cy + 610):
-        banda = Image.new("RGBA", (ANCHO, 90), oscuro + (255,))
-        db = ImageDraw.Draw(banda)
-        for x in range(-120, ANCHO + 120, 120):
-            db.polygon([(x, 90), (x + 60, 90), (x + 150, 0), (x + 90, 0)], fill=col + (255,))
-        im.alpha_composite(banda, (0, int(y0)))
-    # triángulo de aviso
-    tx, ty, L = ANCHO / 2, cy - 430, 300
+    return Image.fromarray(arr.astype(np.uint8), "RGBA")
+
+
+def _franjas(im, y0, col, alto=90, oscuro=OSCURO_ALERTA):
+    banda = Image.new("RGBA", (ANCHO, alto), oscuro + (255,))
+    db = ImageDraw.Draw(banda)
+    for x in range(-160, ANCHO + 160, 120):
+        db.polygon([(x, alto), (x + 60, alto), (x + 60 + alto, 0), (x + alto, 0)], fill=col + (255,))
+    im.alpha_composite(banda, (0, int(y0)))
+
+
+def _triangulo(d, tx, ty, L, fondo, simbolo, sombra=True):
     tri = [(tx, ty - L * 0.62), (tx + L * 0.62, ty + L * 0.45), (tx - L * 0.62, ty + L * 0.45)]
-    d.polygon([(x + 8, y + 10) for x, y in tri], fill=(0, 0, 0, 90))
-    d.polygon(tri, fill=oscuro)
-    d.polygon([(tx, ty - L * 0.40), (tx + L * 0.43, ty + L * 0.33), (tx - L * 0.43, ty + L * 0.33)], fill=col)
-    d.text((tx, ty + 15), "!", font=fuente("Black", 200), fill=oscuro, anchor="mm")
-    # AVISO NARANJA
-    claro = (255, 255, 255)
+    if sombra:
+        d.polygon([(x + 8, y + 10) for x, y in tri], fill=(0, 0, 0, 90))
+    d.polygon(tri, fill=fondo)
+    d.polygon([(tx, ty - L * 0.40), (tx + L * 0.43, ty + L * 0.33), (tx - L * 0.43, ty + L * 0.33)], fill=simbolo)
+    d.text((tx, ty + L * 0.05), "!", font=fuente("Black", int(L * 0.66)), fill=fondo, anchor="mm")
+
+
+def _texto(d, xy, txt, peso, tam, ancho, fill, anchor="mm", sombra=False, **kw):
+    f = _ajustar(txt, peso, tam, ancho)
+    if sombra:
+        d.text((xy[0] + 6, xy[1] + 8), txt, font=f, fill=(0, 0, 0, 110), anchor=anchor)
+    d.text(xy, txt, font=f, fill=fill, anchor=anchor, **kw)
+
+
+def portada_aviso(a: dict) -> Image.Image:
+    """Portada de alerta naranja/roja, con el dato clave (litros, km/h…). Cuatro diseños que se van alternando
+    (a["variante"]); todo cabe en la franja central que muestra la cuadrícula del perfil (3:4)."""
+    col = COLOR_ALERTA.get(a["nivel"], COLOR_ALERTA["naranja"])
+    osc, claro = OSCURO_ALERTA, (255, 255, 255)
+    sobre_col = osc if a["nivel"] == "naranja" else claro   # texto legible sobre el color del nivel
+    cy = ALTO / 2
     t1 = f"AVISO {a['nivel'].upper()}"
-    f1 = _ajustar(t1, "Black", 150, 1000)
-    d.text((ANCHO / 2 + 6, cy - 150 + 8), t1, font=f1, fill=(0, 0, 0, 110), anchor="mm")
-    d.text((ANCHO / 2, cy - 150), t1, font=f1, fill=oscuro if a["nivel"] == "naranja" else claro, anchor="mm")
-    t2 = a["fenomeno"].upper()
-    f2 = _ajustar(t2, "Black", 120, 960)
-    d.text((ANCHO / 2, cy - 15), t2, font=f2, fill=claro, anchor="mm", stroke_width=6, stroke_fill=oscuro)
-    # panel oscuro con ciudades y hora
-    d.rounded_rectangle([60, cy + 80, ANCHO - 60, cy + 470], radius=40, fill=oscuro + (240,))
-    ic = mapa.icono(a.get("icono") or "lluvia", 150, 0)
-    im.alpha_composite(ic, (90, int(cy + 105)))
+    fen = a["fenomeno"].upper()
     ciudades = [c.upper() for c in (a.get("ciudades") or [])][:2]
-    for k, c in enumerate(ciudades):
-        f = _ajustar(c, "Black", 84 if k == 0 else 58, 720)
-        d.text((270, cy + 150 + k * 92), c, font=f, fill=claro, anchor="lm")
-    if a.get("cuando"):
-        ft = _ajustar(a["cuando"].upper(), "Black", 62, 900)
-        d.text((ANCHO / 2, cy + 400), a["cuando"].upper(), font=ft, fill=col, anchor="mm")
-    # pie
+    dato = (a.get("dato") or "").upper()
+    cuando = (a.get("cuando") or "").upper()
     pie = "AVISO OFICIAL DE AEMET · COMPÁRTELO"
-    fp = _ajustar(pie, "ExtraBold", 44, 920)
-    d.text((ANCHO / 2, cy + 545), pie, font=fp, fill=oscuro if a["nivel"] == "naranja" else claro, anchor="mm")
+    v = int(a.get("variante") or 0) % VARIANTES_AVISO
+
+    if v == 0:  # franjas de peligro + triángulo (fondo de color)
+        im = _degradado(col)
+        d = ImageDraw.Draw(im)
+        for y0 in (cy - 700, cy + 610):
+            _franjas(im, y0, col)
+        _triangulo(d, ANCHO / 2, cy - 450, 260, osc, col)
+        _texto(d, (ANCHO / 2, cy - 215), t1, "Black", 150, 1000, sobre_col, sombra=True)
+        _texto(d, (ANCHO / 2, cy - 85), fen, "Black", 112, 960, claro, stroke_width=6, stroke_fill=osc)
+        d.rounded_rectangle([60, cy + 0, ANCHO - 60, cy + 500], radius=40, fill=osc + (240,))
+        im.alpha_composite(mapa.icono(a.get("icono") or "lluvia", 140, 0), (90, int(cy + 25)))
+        for k, c in enumerate(ciudades):
+            _texto(d, (260, cy + 70 + k * 84), c, "Black", 80 if k == 0 else 54, 730, claro, anchor="lm")
+        if dato:
+            _texto(d, (ANCHO / 2, cy + 300), dato, "Black", 96, 900, col)
+        if cuando:
+            _texto(d, (ANCHO / 2, cy + 420), cuando, "ExtraBold", 54, 900, claro)
+        _texto(d, (ANCHO / 2, cy + 560), pie, "ExtraBold", 42, 920, sobre_col)
+
+    elif v == 1:  # fondo oscuro con marco grueso del color del nivel
+        im = _degradado((24, 30, 48), 0.25)
+        d = ImageDraw.Draw(im)
+        d.rounded_rectangle([40, cy - 690, ANCHO - 40, cy + 690], radius=50, outline=col, width=22)
+        _triangulo(d, ANCHO / 2, cy - 470, 250, col, osc, sombra=False)
+        d.text((ANCHO / 2, cy - 470 + 12), "!", font=fuente("Black", 165), fill=col, anchor="mm")
+        _texto(d, (ANCHO / 2, cy - 245), t1, "Black", 140, 960, col)
+        _texto(d, (ANCHO / 2, cy - 120), fen, "Black", 104, 940, claro)
+        if dato:
+            f = _ajustar(dato, "Black", 92, 860)
+            w = f.getlength(dato) + 90
+            d.rounded_rectangle([ANCHO / 2 - w / 2, cy - 30, ANCHO / 2 + w / 2, cy + 110], radius=70, fill=col)
+            d.text((ANCHO / 2, cy + 40), dato, font=f, fill=sobre_col, anchor="mm")
+        for k, c in enumerate(ciudades):
+            _texto(d, (ANCHO / 2, cy + 225 + k * 95), c, "Black", 86 if k == 0 else 58, 940, claro)
+        if cuando:
+            _texto(d, (ANCHO / 2, cy + 440), cuando, "Black", 58, 940, col)
+        _texto(d, (ANCHO / 2, cy + 580), pie, "ExtraBold", 40, 900, (200, 205, 220))
+
+    elif v == 2:  # diagonal: color arriba, oscuro abajo, icono del fenómeno grande
+        im = _degradado(col)
+        d = ImageDraw.Draw(im)
+        d.polygon([(0, cy + 40), (ANCHO, cy - 120), (ANCHO, ALTO), (0, ALTO)], fill=osc)
+        d.line([(0, cy + 40), (ANCHO, cy - 120)], fill=claro, width=10)
+        im.alpha_composite(mapa.icono(a.get("icono") or "lluvia", 330, 0), (ANCHO - 400, int(cy - 640)))
+        _triangulo(d, 210, cy - 520, 190, osc, col, sombra=False)
+        _texto(d, (70, cy - 330), t1, "Black", 132, 960, sobre_col, anchor="lm")
+        _texto(d, (70, cy - 205), fen, "Black", 110, 960, claro, anchor="lm", stroke_width=6, stroke_fill=osc)
+        if dato:
+            _texto(d, (ANCHO / 2, cy + 130), dato, "Black", 104, 960, col)
+        for k, c in enumerate(ciudades):
+            _texto(d, (ANCHO / 2, cy + 265 + k * 92), c, "Black", 84 if k == 0 else 56, 960, claro)
+        if cuando:
+            f = _ajustar(cuando, "Black", 54, 860)
+            w = f.getlength(cuando) + 70
+            d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 435, ANCHO / 2 + w / 2, cy + 525], radius=45, fill=col)
+            d.text((ANCHO / 2, cy + 480), cuando, font=f, fill=sobre_col, anchor="mm")
+        _texto(d, (ANCHO / 2, cy + 600), pie, "ExtraBold", 40, 900, (200, 205, 220))
+
+    else:  # anillos de alerta + cinta de precaución cruzada, la ciudad en grande
+        im = _degradado(col, 0.45)
+        d = ImageDraw.Draw(im)
+        for k, r in enumerate((620, 500, 380, 260)):
+            d.ellipse([ANCHO / 2 - r, cy - 330 - r, ANCHO / 2 + r, cy - 330 + r],
+                      outline=(255, 255, 255, 40 + 25 * k), width=12)
+        _triangulo(d, ANCHO / 2, cy - 345, 270, osc, col)
+        cinta = Image.new("RGBA", (ANCHO + 400, 130), osc + (255,))
+        dc = ImageDraw.Draw(cinta)
+        txt_cinta = f"  {t1} · {fen}  "
+        fc = fuente("Black", 74)
+        x = 0
+        while x < cinta.width:
+            dc.text((x, 65), txt_cinta, font=fc, fill=col, anchor="lm")
+            x += fc.getlength(txt_cinta)
+        cinta = cinta.rotate(6, expand=True, resample=Image.BICUBIC)
+        im.alpha_composite(cinta, (-200, int(cy - 40 - cinta.height / 2)))
+        d = ImageDraw.Draw(im)
+        if ciudades:
+            _texto(d, (ANCHO / 2, cy + 150), ciudades[0], "Black", 132, 980, claro, sombra=True,
+                   stroke_width=6, stroke_fill=osc)
+        if len(ciudades) > 1:
+            _texto(d, (ANCHO / 2, cy + 280), ciudades[1], "Black", 56, 960, sobre_col)
+        if dato:
+            f = _ajustar(dato, "Black", 86, 900)
+            w = f.getlength(dato) + 90
+            d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 345, ANCHO / 2 + w / 2, cy + 475], radius=65, fill=osc)
+            d.text((ANCHO / 2, cy + 410), dato, font=f, fill=col, anchor="mm")
+        if cuando:
+            _texto(d, (ANCHO / 2, cy + 537), cuando, "Black", 56, 960, sobre_col)
+        _texto(d, (ANCHO / 2, cy + 615), pie, "ExtraBold", 38, 900, sobre_col)
     return im
 
 

@@ -638,7 +638,9 @@ def agrupar(avisos: list[dict]) -> list[dict]:
         k = (a["fenomeno"], a["nivel"])
         gr = grupos.setdefault(k, {"fenomeno": a["fenomeno"], "nivel": a["nivel"], "zonas": [], "inicio": a["inicio"],
                                    "fin": a["fin"], "descripcion": a["descripcion"], "instruccion": a["instruccion"],
-                                   "poligonos": [], "ciudades": []})
+                                   "poligonos": [], "ciudades": [], "descripciones": []})
+        if a.get("descripcion") and a["descripcion"] not in gr["descripciones"]:
+            gr["descripciones"].append(a["descripcion"])
         for c in a.get("ciudades", []):
             if c not in gr["ciudades"]:
                 gr["ciudades"].append(c)
@@ -741,6 +743,37 @@ CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAM
                  "costeros": ["LEJOS DE LA COSTA", "NO TE ACERQUES A DIQUES", "LLAMA AL 112"],
                  "temperaturas máximas": ["BEBE AGUA", "EVITA EL SOL", "CUIDA A LOS MAYORES"],
                  "nevadas": ["EVITA CARRETERA", "CADENAS Y DEPÓSITO", "LLAMA AL 112"]}
+
+
+def dato_aviso(gr) -> str:
+    """El número clave del aviso para la portada, sacado del texto oficial de AEMET (el máximo de todas las zonas):
+    '40 L/M² EN 1 HORA', 'RACHAS DE 100 KM/H', '20 CM DE NIEVE', 'HASTA 42 °C', 'OLAS DE 7 METROS'."""
+    t = " ".join(gr.get("descripciones") or [gr.get("descripcion") or ""]).lower()
+    fen = gr.get("fenomeno", "").lower()
+    nums = lambda pat: [int(x) for x in re.findall(pat, t)]
+    if "lluvia" in fen or "tormenta" in fen:
+        mm = nums(r"(\d+)\s*mm")
+        if mm:
+            h = re.search(r"en (una|\d+) horas?", t)
+            horas = 1 if not h or h.group(1) == "una" else int(h.group(1))
+            return f"{max(mm)} L/M² EN {horas} HORA{'S' if horas > 1 else ''}"
+    if "viento" in fen or "tormenta" in fen:
+        kmh = nums(r"(\d+)\s*km/h")
+        if kmh:
+            return f"RACHAS DE {max(kmh)} KM/H"
+    if "nev" in fen or "nieve" in fen:
+        cm = nums(r"(\d+)\s*cm")
+        if cm:
+            return f"{max(cm)} CM DE NIEVE"
+    if "temperatura" in fen:
+        g_ = [int(x) for x in re.findall(r"(-?\d+)\s*[º°]\s*c", t)]
+        if g_:
+            return f"HASTA {max(g_)} °C" if "máxima" in fen else f"MÍNIMAS DE {min(g_)} °C"
+    if "coster" in fen:
+        olas = nums(r"(\d+)\s*(?:m\b|metros)")
+        if olas:
+            return f"OLAS DE {max(olas)} METROS"
+    return ""
 
 
 def _cuando_portada(gr, hoy: date) -> str:
@@ -850,7 +883,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "aviso_portada": {"nivel": gr["nivel"], "fenomeno": "oleaje" if "costeros" in gr["fenomeno"] else gr["fenomeno"],
                           "icono": _gancho_aviso(grupos).get("icono"),
                           "ciudades": gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]],
-                          "cuando": _cuando_portada(gr, hoy)},
+                          "cuando": _cuando_portada(gr, hoy), "dato": dato_aviso(gr),
+                          "variante": len(list(HISTORIAL.glob("aviso-*.json")))},
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
                         tuple((z.upper()[:30], COLOR_NIVEL.get(gr["nivel"], (255, 205, 40)))
                               for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),
