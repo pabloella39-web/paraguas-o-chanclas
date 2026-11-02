@@ -159,9 +159,17 @@ def nota(ahora: datetime | None = None, obs: list[dict] | None = None) -> str:
         return ""
     return ("[DATO REAL] " + " | ".join(lineas) + ". Dedícale UNA sola frase corta, como dato y con naturalidad "
             "(por ejemplo «Barcelona amaneció con 47 litros caídos en la noche» o «Lo de anoche en Barcelona fue "
-            "serio: 47 litros por metro cuadrado»). Varía la forma. PROHIBIDO presumir o sonar a «te lo dije»: nada de "
-            "«lo dijimos», «te lo avisamos», «como ya te dijimos», «lo avisamos ayer». Si se quedó muy por debajo de "
+            "serio: 47 litros por metro cuadrado»). Varía la forma. " + _tono(ahora) + " Si se quedó muy por debajo de "
             "lo previsto, dilo con naturalidad en media frase («al final fue menos de lo esperado») o no lo menciones.")
+
+
+def _tono(ahora: datetime) -> str:
+    """El «te lo dije» vale de vez en cuando (más o menos una de cada tres veces), nunca siempre."""
+    if ahora.date().toordinal() % 3 == 0:
+        return ("Esta vez PUEDES (no es obligatorio), si de verdad se cumplió, recordar que lo avisamos, con una fórmula "
+                "fresca y sin presumir («Lo avisamos y así fue», «Ya lo veíamos venir»).")
+    return ("Esta vez NO recuerdes que lo avisamos: nada de «lo dijimos», «te lo avisamos», «como ya te dijimos»; "
+            "solo el dato.")
 
 
 def resumen_aviso(gr: dict) -> dict:
