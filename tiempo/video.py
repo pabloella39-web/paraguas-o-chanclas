@@ -349,7 +349,7 @@ def portada_aviso(a: dict) -> Image.Image:
         d = ImageDraw.Draw(im)
         d.polygon([(0, cy + 40), (ANCHO, cy - 120), (ANCHO, ALTO), (0, ALTO)], fill=osc)
         d.line([(0, cy + 40), (ANCHO, cy - 120)], fill=claro, width=10)
-        im.alpha_composite(mapa.icono(a.get("icono") or "lluvia", 330, 0), (ANCHO - 400, int(cy - 640)))
+        im.alpha_composite(mapa.icono(a.get("icono") or "lluvia", 250, 0), (ANCHO - 320, int(cy - 700)))
         _triangulo(d, 210, cy - 520, 190, osc, col, sombra=False)
         _texto(d, (70, cy - 330), t1, "Black", 132, 960, sobre_col, anchor="lm")
         _texto(d, (70, cy - 205), fen, "Black", 110, 960, claro, anchor="lm", stroke_width=6, stroke_fill=osc)
@@ -367,9 +367,15 @@ def portada_aviso(a: dict) -> Image.Image:
     else:  # anillos de alerta + cinta de precaución cruzada, la ciudad en grande
         im = _degradado(col, 0.45)
         d = ImageDraw.Draw(im)
+        anillos = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
+        da = ImageDraw.Draw(anillos)
         for k, r in enumerate((620, 500, 380, 260)):
-            d.ellipse([ANCHO / 2 - r, cy - 330 - r, ANCHO / 2 + r, cy - 330 + r],
-                      outline=(255, 255, 255, 40 + 25 * k), width=12)
+            da.ellipse([ANCHO / 2 - r, cy - 330 - r, ANCHO / 2 + r, cy - 330 + r],
+                       outline=(255, 255, 255, 40 + 25 * k), width=12)
+        corte = np.clip((cy + 60 - np.arange(ALTO)) / 120, 0, 1)   # se desvanecen antes de las ciudades
+        alfa = (np.asarray(anillos.getchannel("A"), dtype=np.float32) * corte[:, None]).astype(np.uint8)
+        anillos.putalpha(Image.fromarray(alfa))
+        im.alpha_composite(anillos)
         _triangulo(d, ANCHO / 2, cy - 345, 270, osc, col)
         cinta = Image.new("RGBA", (ANCHO + 400, 130), osc + (255,))
         dc = ImageDraw.Draw(cinta)
@@ -383,10 +389,10 @@ def portada_aviso(a: dict) -> Image.Image:
         im.alpha_composite(cinta, (-200, int(cy - 40 - cinta.height / 2)))
         d = ImageDraw.Draw(im)
         if ciudades:
-            _texto(d, (ANCHO / 2, cy + 150), ciudades[0], "Black", 132, 980, claro, sombra=True,
+            _texto(d, (ANCHO / 2, cy + 135), ciudades[0], "Black", 118, 980, claro, sombra=True,
                    stroke_width=6, stroke_fill=osc)
         if len(ciudades) > 1:
-            _texto(d, (ANCHO / 2, cy + 280), ciudades[1], "Black", 56, 960, sobre_col)
+            _texto(d, (ANCHO / 2, cy + 280), ciudades[1], "Black", 54, 960, sobre_col)
         if dato:
             f = _ajustar(dato, "Black", 86, 900)
             w = f.getlength(dato) + 90
