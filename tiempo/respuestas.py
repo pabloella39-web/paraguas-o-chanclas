@@ -18,6 +18,7 @@ import math
 import os
 import re
 import tempfile
+import time
 import unicodedata
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -654,12 +655,20 @@ def main():
                          if q.get("tipo") == "otro" and q.get("merece")])
         return
     manual = os.environ.get("RESPUESTA_MANUAL", "").strip()   # "id_video|id_comentario|texto" (a mano, una vez)
-    if manual:
-        vid, cid, texto = manual.split("|", 2)
-        responder_texto({"video": vid.strip(), "id": cid.strip(), "usuario": "manual"}, texto.strip())
+    if manual:   # una o varias líneas "id_video|id_comentario|texto"
         est = _cargar()   # contestado a mano: que la respuesta automática no lo repita
-        est.setdefault("escritas", []).append(cid.strip())
-        est["vistos"].append(cid.strip())
+        for linea in [l for l in manual.splitlines() if l.count("|") >= 2]:
+            vid, cid, texto = linea.split("|", 2)
+            if cid.strip() in est.get("escritas", []):
+                continue
+            try:
+                responder_texto({"video": vid.strip(), "id": cid.strip(), "usuario": "manual"}, texto.strip())
+            except Exception as e:  # noqa: BLE001
+                print(f"::warning::No se pudo responder a {cid.strip()}: {e}")
+                continue
+            est.setdefault("escritas", []).append(cid.strip())
+            est["vistos"].append(cid.strip())
+            time.sleep(4)
         _guardar(est)
         return
     if a.comprobar:
