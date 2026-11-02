@@ -1,18 +1,12 @@
 {
- "fecha": "2026-11-01",
+ "fecha": "2026-11-02",
  "caption": "¿Paraguas en Tenerife y chanclas en el resto? Dime tu pueblo y te contesto ☔😎\n\nEl tiempo en España mañana, domingo 1 de noviembre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife y Las Palmas\n🔥 Máxima: 28° en Sevilla\n🥶 Mínima: 2° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Tenerife",
- "voz": "masculina",
- "duracion": 69.4,
+ "anterior": true,
  "extras": [
   {
    "titulo": "Aviso naranja",
-   "caption": "⚠️ Aviso naranja por lluvias hoy en Santa Cruz de Tenerife y La Laguna.\n\n🟠 Aviso naranja por lluvia: Santa Cruz de Tenerife, San Cristóbal de La Laguna\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
-   "hora": "08:28"
-  },
-  {
-   "titulo": "La semana que viene",
-   "caption": "Disfruta el lunes, que el martes llega el frío y Barcelona se empapa 🧥☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 2: máx. 26°\n🌧️ Martes 3: máx. 25° · lluvia en Barcelona, Las Palmas\n☁️ Miércoles 4: máx. 25° · lluvia en Ceuta, Málaga\n🌧️ Jueves 5: máx. 25°\n☁️ Viernes 6: máx. 26°\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
-   "hora": "19:18"
+   "caption": "⚠️ Aviso naranja por lluvias y tormenta en el litoral de Barcelona y Tarragona\n\n🟠 Aviso naranja por lluvia: Barcelona, L'Hospitalet de Llobregat, Badalona, Mataró y más\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Barcelona",
+   "hora": "10:29"
   }
  ]
 }
