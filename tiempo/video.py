@@ -334,6 +334,65 @@ def _adorno(est: str, tam: int, color, ang: float, alfa: int = 235, tipo: int = 
     return im.rotate(ang, expand=True, resample=Image.BICUBIC)
 
 
+# Dibujos protagonistas de la portada (assets/estacion, Noto Color Emoji): parejas que rotan según el día
+DIBUJOS_ESTACION = {
+    "verano": [("sombrilla", "chancla"), ("chancla", "sandia"), ("playa", "helado"), ("sombrilla", "gafas"),
+               ("helado", "chancla")],
+    "invierno": [("muneco", "bufanda"), ("cafe", "guantes"), ("bufanda", "muneco"), ("guantes", "cafe")],
+    "navidad": [("arbol_navidad", "regalo"), ("papa_noel", "estrella"), ("regalo", "arbol_navidad"),
+                ("estrella", "papa_noel"), ("arbol_navidad", "papa_noel")],
+    "reyes": [("corona", "camello"), ("regalo", "corona"), ("camello", "estrella")],
+    "halloween": [("calabaza", "hoja"), ("calabaza", "seta")],
+    "otono": [("seta", "castana"), ("paraguas", "hoja"), ("castana", "seta"), ("hoja", "paraguas"), ("seta", "hoja")],
+    "primavera": [("mariposa", "tulipan"), ("flor", "abeja"), ("tulipan", "girasol"), ("abeja", "flor"),
+                  ("girasol", "mariposa")],
+}
+
+
+def tema_portada(est: str, d) -> str:
+    md = (d.month, d.day)
+    if md >= (12, 1) or md <= (1, 5):
+        return "reyes" if (1, 1) <= md <= (1, 5) else "navidad"
+    if (10, 20) <= md <= (10, 31):
+        return "halloween"
+    return est
+
+
+def _dibujo(nombre: str, tam: int, ang: float) -> Image.Image | None:
+    ruta = Path(__file__).resolve().parent.parent / "assets" / "estacion" / f"{nombre}.png"
+    if not ruta.exists():
+        return None
+    im = Image.open(ruta).convert("RGBA")
+    k = tam / max(im.size)
+    im = im.resize((max(1, int(im.width * k)), max(1, int(im.height * k))), Image.LANCZOS)
+    im = im.rotate(ang, expand=True, resample=Image.BICUBIC)
+    sombra = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    sombra.putalpha(im.getchannel("A").point(lambda a: int(a * 0.45)))
+    lienzo = Image.new("RGBA", (im.width + 14, im.height + 16), (0, 0, 0, 0))
+    lienzo.alpha_composite(sombra, (12, 14))
+    lienzo.alpha_composite(im, (0, 0))
+    return lienzo
+
+
+def dibujos_portada(im: Image.Image, est: str, variante: int, d):
+    """Uno o dos dibujos grandes de la temática (sombrilla y chanclas, árbol de Navidad…) en las esquinas libres de
+    texto, dentro del recorte 3:4 del perfil y lejos de los botones de TikTok (lado derecho, abajo)."""
+    tema = tema_portada(est, d)
+    pares = DIBUJOS_ESTACION.get(tema) or DIBUJOS_ESTACION[est]
+    a, b = pares[variante % len(pares)]
+    cy = ALTO / 2
+    # (x, y, tamaño, giro): grandes y medio asomando por las esquinas; los textos se dibujan encima
+    sitios = {0: [(170, cy - 560, 320, -12), (170, cy + 600, 300, 10)],
+              1: [(ANCHO - 170, cy - 560, 320, 12), (170, cy + 600, 300, -8)],
+              2: [(165, cy - 570, 300, -10), (ANCHO - 165, cy - 570, 300, 10)],
+              3: [(180, cy + 580, 360, 8), (ANCHO - 160, cy - 580, 260, 14)],
+              4: [(185, cy - 545, 370, -10)]}[variante % VARIANTES_ESTACION]
+    for (x, y, tam, ang), nombre in zip(sitios, (a, b)):
+        dib = _dibujo(nombre, tam, ang)
+        if dib is not None:
+            im.alpha_composite(dib, (int(x - dib.width / 2), int(y - dib.height / 2)))
+
+
 def fondo_estacion(est: str, variante: int) -> Image.Image:
     """Fondo de la portada del parte con la estación; 5 composiciones que se alternan. Los adornos van en los bordes y
     en la zona que recorta la cuadrícula del perfil (y 240-1680) sin tapar los textos del centro."""
@@ -737,7 +796,9 @@ class Compositor:
         else:   # partes y finde: fondo con la estación, 5 composiciones que se alternan por día
             import datetime as _dt
             dia = self.fecha or _dt.date.today()
-            im = fondo_estacion(self.particulas.est, int(os.environ.get("PORTADA_VARIANTE", dia.toordinal())))
+            var = int(os.environ.get("PORTADA_VARIANTE", dia.toordinal()))
+            im = fondo_estacion(self.particulas.est, var)
+            dibujos_portada(im, self.particulas.est, var, dia)
         d = ImageDraw.Draw(im)
         if self.dias_portada:  # marco dorado: se distingue a simple vista en la cuadrícula del perfil
             d.rounded_rectangle([40, ALTO / 2 - 640, ANCHO - 40, ALTO / 2 + 640], radius=48, outline=ACENTO, width=14)

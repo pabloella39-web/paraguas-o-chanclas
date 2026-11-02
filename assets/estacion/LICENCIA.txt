@@ -1,0 +1,2 @@
+Dibujos de assets/estacion/*.png: Noto Color Emoji (Google), licencia Apache 2.0 / SIL OFL 1.1.
+https://github.com/googlefonts/noto-emoji
