@@ -253,6 +253,141 @@ class Particulas:
             img.paste(sp, (int(x), int(y)), sp)
 
 
+# ------------------------------------------------ portada con la estación (partes diarios)
+VARIANTES_ESTACION = 5
+# Por estación y variante: (color arriba, color abajo, colores de los adornos)
+PALETAS_ESTACION = {
+    "otono": [((52, 22, 18), (12, 18, 40), [(214, 110, 35), (190, 60, 30), (232, 172, 60), (150, 80, 40)]),
+              ((10, 22, 46), (40, 20, 30), [(230, 120, 40), (200, 70, 35), (240, 185, 70)]),
+              ((48, 18, 52), (120, 50, 20), [(240, 150, 50), (210, 80, 40), (250, 200, 90)]),
+              ((16, 18, 26), (36, 26, 22), [(220, 120, 40), (180, 55, 30), (230, 170, 60)]),
+              ((22, 34, 26), (10, 20, 30), [(222, 130, 45), (196, 70, 35), (236, 180, 70)])],
+    "invierno": [((14, 30, 62), (6, 12, 30), [(235, 245, 255), (170, 210, 255)]),
+                 ((30, 40, 70), (10, 16, 36), [(255, 255, 255), (190, 220, 255)]),
+                 ((8, 20, 44), (30, 58, 96), [(240, 248, 255), (160, 200, 250)]),
+                 ((24, 22, 50), (8, 10, 26), [(230, 240, 255), (200, 180, 255)]),
+                 ((10, 34, 52), (6, 14, 28), [(250, 252, 255), (150, 220, 240)])],
+    "primavera": [((24, 44, 40), (10, 18, 40), [(255, 182, 206), (255, 225, 235), (250, 150, 190)]),
+                  ((40, 24, 54), (12, 18, 40), [(255, 190, 215), (255, 240, 245), (200, 170, 255)]),
+                  ((12, 30, 54), (34, 54, 40), [(255, 170, 200), (255, 230, 120), (255, 240, 245)]),
+                  ((30, 20, 40), (10, 26, 34), [(250, 160, 190), (255, 210, 225)]),
+                  ((14, 40, 34), (8, 16, 34), [(255, 200, 220), (255, 245, 250), (255, 220, 110)])],
+    "verano": [((10, 40, 80), (6, 16, 38), [(255, 196, 45), (255, 150, 40)]),
+               ((60, 24, 30), (10, 16, 40), [(255, 200, 60), (255, 130, 50)]),
+               ((6, 48, 70), (6, 20, 44), [(255, 210, 80), (120, 220, 230)]),
+               ((40, 18, 50), (120, 50, 30), [(255, 190, 60), (255, 120, 60)]),
+               ((8, 30, 60), (4, 12, 30), [(255, 205, 70), (255, 240, 170)])],
+}
+
+
+def _gradiente(c0, c1):
+    t = np.linspace(0, 1, ALTO)[:, None, None]
+    arr = (np.array(c0)[None, None, :] * (1 - t) + np.array(c1)[None, None, :] * t)
+    arr = np.repeat(arr, ANCHO, axis=1).astype(np.uint8)
+    return Image.fromarray(np.dstack([arr, np.full((ALTO, ANCHO), 255, np.uint8)]), "RGBA")
+
+
+def _adorno(est: str, tam: int, color, ang: float, alfa: int = 235, tipo: int = 0) -> Image.Image:
+    """Hoja de arce u ovalada (otoño), copo (invierno), flor (primavera) o sol (verano), con antialias."""
+    s = 3
+    T = tam * s
+    im = Image.new("RGBA", (T, T), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    c = T / 2
+    col = tuple(color) + (alfa,)
+    if est == "otono":
+        if tipo % 2 == 0:  # hoja de arce
+            pts = [(0, -1), (.16, -.58), (.42, -.78), (.36, -.36), (.86, -.5), (.62, -.12), (.78, .02), (.32, .14),
+                   (.36, .5), (.06, .3), (0, .55)]
+            pts = pts + [(-x, y) for x, y in reversed(pts[1:-1])]
+        else:              # hoja ovalada
+            pts = [(math.sin(a) * .42 * (1 - .25 * math.cos(a)), -math.cos(a) * .9)
+                   for a in np.linspace(0, 2 * math.pi, 40)]
+        d.polygon([(c + x * c * .9, c + y * c * .9) for x, y in pts], fill=col)
+        d.line([(c, c + .5 * c * .9), (c, c + .95 * c)], fill=col, width=2 * s)
+        d.line([(c, c - .7 * c), (c, c + .5 * c)], fill=(0, 0, 0, 60), width=s)
+    elif est == "invierno":
+        w = max(2, int(T * .045))
+        for k in range(6):
+            a = k * math.pi / 3
+            x1, y1 = c + math.cos(a) * c * .92, c + math.sin(a) * c * .92
+            d.line([(c, c), (x1, y1)], fill=col, width=w)
+            for f in (.45, .7):
+                bx, by = c + math.cos(a) * c * f, c + math.sin(a) * c * f
+                for da in (.6, -.6):
+                    d.line([(bx, by), (bx + math.cos(a + da) * c * .25, by + math.sin(a + da) * c * .25)], fill=col,
+                           width=w)
+        d.ellipse([c - w, c - w, c + w, c + w], fill=col)
+    elif est == "primavera":
+        for k in range(5):
+            a = k * 2 * math.pi / 5
+            px, py = c + math.cos(a) * c * .42, c + math.sin(a) * c * .42
+            d.ellipse([px - c * .38, py - c * .38, px + c * .38, py + c * .38], fill=col)
+        d.ellipse([c - c * .22, c - c * .22, c + c * .22, c + c * .22], fill=(255, 214, 90, alfa))
+    else:
+        for k in range(12):
+            a = k * math.pi / 6
+            d.line([(c + math.cos(a) * c * .55, c + math.sin(a) * c * .55),
+                    (c + math.cos(a) * c * .92, c + math.sin(a) * c * .92)], fill=col, width=int(T * .05))
+        d.ellipse([c - c * .42, c - c * .42, c + c * .42, c + c * .42], fill=col)
+    im = im.resize((tam, tam), Image.LANCZOS)
+    return im.rotate(ang, expand=True, resample=Image.BICUBIC)
+
+
+def fondo_estacion(est: str, variante: int) -> Image.Image:
+    """Fondo de la portada del parte con la estación; 5 composiciones que se alternan. Los adornos van en los bordes y
+    en la zona que recorta la cuadrícula del perfil (y 240-1680) sin tapar los textos del centro."""
+    v = variante % VARIANTES_ESTACION
+    c0, c1, cols = PALETAS_ESTACION[est][v]
+    im = _gradiente(c0, c1)
+    rnd = np.random.default_rng(100 + v)
+    cy = ALTO / 2
+
+    def poner(x, y, tam, alfa=230, ang=None, tipo=None):
+        a = _adorno(est, int(tam), cols[int(rnd.integers(len(cols)))], rnd.uniform(0, 360) if ang is None else ang,
+                    alfa, int(rnd.integers(2)) if tipo is None else tipo)
+        im.alpha_composite(a, (int(x - a.width / 2), int(y - a.height / 2)))
+
+    if v == 0:    # racimos en las cuatro esquinas
+        for ex, ey in ((60, cy - 640), (ANCHO - 60, cy - 640), (60, cy + 640), (ANCHO - 60, cy + 640)):
+            for _ in range(7):
+                poner(ex + rnd.normal(0, 70), ey + rnd.normal(0, 60), rnd.uniform(90, 170))
+    elif v == 1:  # guirnalda arriba y abajo
+        for y in (cy - 680, cy + 680):
+            for x in np.linspace(-20, ANCHO + 20, 13):
+                poner(x + rnd.normal(0, 15), y + rnd.normal(0, 25), rnd.uniform(80, 130))
+    elif v == 2:  # atardecer: resplandor abajo y adornos sueltos por los lados
+        brillo = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
+        db = ImageDraw.Draw(brillo)
+        for k in range(20, 0, -1):
+            r = 40 * k
+            db.ellipse([ANCHO / 2 - r * 1.6, ALTO - 260 - r, ANCHO / 2 + r * 1.6, ALTO - 260 + r],
+                       fill=tuple(cols[0]) + (6,))
+        im.alpha_composite(brillo)
+        for _ in range(24):
+            x = rnd.choice([rnd.uniform(0, 160), rnd.uniform(ANCHO - 160, ANCHO)])
+            poner(x, rnd.uniform(cy - 700, cy + 700), rnd.uniform(60, 130), alfa=215)
+    elif v == 3:  # diagonal de adornos cayendo de arriba a la izquierda, grandes y translúcidos al fondo
+        for k in range(9):
+            poner(-40 + k * 60, cy - 720 + k * 55, rnd.uniform(130, 220), alfa=175)
+        for k in range(7):
+            poner(ANCHO + 40 - k * 55, cy + 720 - k * 50, rnd.uniform(120, 210), alfa=175)
+    else:         # lluvia suave de adornos pequeños por todo el fondo (muy translúcidos) + marco fino
+        for _ in range(34):
+            poner(rnd.uniform(0, ANCHO), rnd.uniform(cy - 720, cy + 720), rnd.uniform(45, 90), alfa=120)
+        ImageDraw.Draw(im).rounded_rectangle([40, cy - 700, ANCHO - 40, cy + 700], radius=46,
+                                             outline=tuple(cols[0]) + (200,), width=6)
+    # velo oscuro en el centro para que los textos se lean siempre
+    velo = np.zeros((ALTO, ANCHO), np.float32)
+    yy = (np.arange(ALTO)[:, None] - cy) / 600
+    xx = (np.arange(ANCHO)[None, :] - ANCHO / 2) / 420
+    velo[:] = np.clip(1 - (xx ** 2 + yy ** 2), 0, 1) * 90
+    capa = Image.new("RGBA", (ANCHO, ALTO), (6, 12, 28, 0))
+    capa.putalpha(Image.fromarray(velo.astype(np.uint8)))
+    im.alpha_composite(capa)
+    return im
+
+
 COLOR_ALERTA = {"naranja": (255, 128, 0), "rojo": (215, 22, 32)}
 OSCURO_ALERTA = (14, 18, 30)
 VARIANTES_AVISO = 4
@@ -414,6 +549,7 @@ class Compositor:
         portada_txt: (marca, texto grande, texto pequeño). capas: {bloque: función(img, proyección, dt)} que dibuja
         encima del mapa. sin_marcadores: bloques sin marcadores de ciudades."""
         self.dias_portada = dias_portada  # [(día, icono, máx)]: portada del vídeo semanal
+        self.fecha = fecha
         self.aviso_portada = aviso_portada  # {nivel, fenomeno, icono, ciudades, cuando}: portada de alerta
         self.satelite = satelite          # tiempo.satelite.AnimSatelite: 6 s tras el gancho en días señalados
         self.gancho = gancho  # fenómeno del día (tiempo.gancho): icono grande, insignia de urgencia y efecto
@@ -596,7 +732,12 @@ class Compositor:
         if self.aviso_portada:
             self._portada = portada_aviso(self.aviso_portada)
             return self._portada
-        im = Image.new("RGBA", (ANCHO, ALTO), (70, 8, 30, 246) if self.dias_portada else (6, 16, 38, 238))
+        if self.dias_portada:
+            im = Image.new("RGBA", (ANCHO, ALTO), (70, 8, 30, 246))
+        else:   # partes y finde: fondo con la estación, 5 composiciones que se alternan por día
+            import datetime as _dt
+            dia = self.fecha or _dt.date.today()
+            im = fondo_estacion(self.particulas.est, int(os.environ.get("PORTADA_VARIANTE", dia.toordinal())))
         d = ImageDraw.Draw(im)
         if self.dias_portada:  # marco dorado: se distingue a simple vista en la cuadrícula del perfil
             d.rounded_rectangle([40, ALTO / 2 - 640, ANCHO - 40, ALTO / 2 + 640], radius=48, outline=ACENTO, width=14)
