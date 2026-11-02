@@ -374,7 +374,7 @@ def _dibujo(nombre: str, tam: int, ang: float) -> Image.Image | None:
     return lienzo
 
 
-ESQUINAS = ("tl", "tr", "bl")
+ESQUINAS = ("tl", "tr")   # arriba: la pastilla de abajo puede ser ancha (avisos) y no se debe tapar
 
 
 def _esquina(variante: int) -> str:
@@ -389,8 +389,8 @@ def dibujos_portada(im: Image.Image, est: str, variante: int, d):
     for par in DIBUJOS_ESTACION.get(tema) or DIBUJOS_ESTACION[est]:
         nombres += [n for n in par if n not in nombres]
     cy = ALTO / 2
-    x, y, tam, ang = {"tl": (175, cy - 555, 340, -12), "tr": (ANCHO - 175, cy - 555, 340, 12),
-                      "bl": (185, cy + 590, 350, 8)}[_esquina(variante)]
+    # hueco libre: por encima de "MARTES" (y < cy-440) y a los lados de la marca (x < 250 o x > 830)
+    x, y, tam, ang = {"tl": (135, cy - 610, 185, -10), "tr": (ANCHO - 135, cy - 610, 185, 10)}[_esquina(variante)]
     dib = _dibujo(nombres[variante % len(nombres)], tam, ang)
     if dib is not None:
         im.alpha_composite(dib, (int(x - dib.width / 2), int(y - dib.height / 2)))
@@ -416,11 +416,10 @@ def fondo_estacion(est: str, variante: int) -> Image.Image:
                                ((40, cy - 690), (ANCHO - 40, cy - 690), (40, cy + 690), (ANCHO - 40, cy + 690))):
             if k != libre:
                 for _ in range(5):
-                    poner(ex + rnd.normal(0, 50), ey + rnd.normal(0, 40), rnd.uniform(70, 130))
+                    poner(ex + rnd.normal(0, 35), ey + rnd.normal(0, 25), rnd.uniform(50, 85))
     elif v == 1:  # guirnalda en el borde contrario al dibujo
-        y = cy + 690 if libre in ("tl", "tr") else cy - 690
-        for x in np.linspace(-20, ANCHO + 20, 12):
-            poner(x + rnd.normal(0, 12), y + rnd.normal(0, 18), rnd.uniform(70, 110))
+        for x in np.linspace(-20, ANCHO + 20, 14):   # guirnalda abajo (el dibujo va arriba)
+            poner(x + rnd.normal(0, 10), cy + 690 + rnd.normal(0, 10), rnd.uniform(50, 80))
     else:         # marco fino del color de la estación
         ImageDraw.Draw(im).rounded_rectangle([40, cy - 700, ANCHO - 40, cy + 700], radius=46,
                                              outline=tuple(cols[0]) + (210,), width=6)
