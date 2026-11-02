@@ -146,7 +146,9 @@
   "7703333858816951062",
   "7703332361778643734",
   "7703346076363965206",
-  "7703450014647452438"
+  "7703450014647452438",
+  "7703488790187787030",
+  "7703496415394169622"
  ],
  "hechas": [
   {
@@ -246,6 +248,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Girona: 18°/9°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-02",
+   "clave": "islas baleares|2026-11-02",
+   "lugar": "Islas Baleares",
+   "usuarios": [
+    "merymutgoya"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Islas Baleares: 18°/12°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
