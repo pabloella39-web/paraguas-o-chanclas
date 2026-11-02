@@ -77,5 +77,26 @@
   "url": "https://youtube.com/shorts/3c0ylKhX2aM",
   "canal": "Paraguas o Chanclas"
  },
- "voz": "masculina"
+ "voz": "masculina",
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "naranja",
+   "zonas": [
+    "Litoral de Barcelona",
+    "Litoral norte de Tarragona"
+   ],
+   "ciudades": [
+    "Barcelona",
+    "L'Hospitalet de Llobregat",
+    "Badalona",
+    "Mataró",
+    "Sabadell",
+    "Terrassa"
+   ],
+   "inicio": "2026-11-02T22:00:00+01:00",
+   "fin": "2026-11-03T00:00:00+01:00",
+   "descripcion": "Precipitación acumulada en una hora: 40 mm. Acompañada de tormentas; afectará más a la mitad sur del litoral."
+  }
+ ]
 }

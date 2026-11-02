@@ -50,3 +50,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Continuidad con el vídeo semanal: varía la fórmula («Como te adelanté el domingo», «Lo avisamos el miércoles y se
   cumple», «Si viste el vídeo del viernes, ya lo sabías»…); no repitas siempre «Te lo dije el domingo».
 - Revisa antes de entregar: ¿la primera frase engancharía a alguien que va deslizando?
+- Si el contexto trae un [DATO REAL] (lo que midió AEMET tras un aviso naranja o rojo), dedícale UNA frase corta como
+  dato («Barcelona amaneció con 47 litros caídos en la noche»), variando la forma. Nunca en tono de «te lo dije»:
+  nada de «lo dijimos», «te lo avisamos», «como ya te dijimos».

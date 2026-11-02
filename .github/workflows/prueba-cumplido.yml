@@ -1,0 +1,26 @@
+name: Prueba del dato real tras un aviso
+on:
+  push:
+    branches: [main]
+    paths: ["tiempo/cumplido.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  cumplido:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt
+      - env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: |
+          mkdir -p reg
+          python -m tiempo.cumplido "$(date -u +%FT%T+00:00)" > reg/cumplido.txt 2>&1 || echo FALLO >> reg/cumplido.txt
+          cat reg/cumplido.txt
+      - if: always()
+        run: |
+          cd reg && git init -q -b registro-cumplido
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Prueba cumplido"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" registro-cumplido

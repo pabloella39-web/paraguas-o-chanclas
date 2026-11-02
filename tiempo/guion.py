@@ -240,6 +240,22 @@ def aperturas_recientes(hoy: date, n: int = 4) -> list[str]:
     return out
 
 
+_DATO_REAL = None
+
+
+def _dato_real() -> str:
+    """Lo medido tras el aviso naranja/rojo de anoche (tiempo.cumplido); vacío casi todos los días."""
+    global _DATO_REAL
+    if _DATO_REAL is None:
+        try:
+            from .cumplido import nota
+            _DATO_REAL = nota()
+        except Exception as e:  # noqa: BLE001
+            log.warning("Dato real del aviso: %s", e)
+            _DATO_REAL = ""
+    return _DATO_REAL
+
+
 def ciudades_repetidas(hoy: date, prev: list[dict], dias: int = 4) -> list[str]:
     """Ciudades nombradas en la mayoría de los últimos partes (para pedir variedad)."""
     import json as _json
@@ -304,7 +320,8 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],
                                gancho=GANCHO_TEXTO or "(sin datos: usa lo más llamativo de los datos)",
                                contexto="\n".join(f"- {n}" for n in notas_dia(hoy) + ([continuidad(hoy)]
-                                                                                       if continuidad(hoy) else []))
+                                                                                       if continuidad(hoy) else [])
+                                                 + ([_dato_real()] if _dato_real() else []))
                                or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))

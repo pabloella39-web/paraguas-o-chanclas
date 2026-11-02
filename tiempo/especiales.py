@@ -27,7 +27,7 @@ from pathlib import Path
 import requests
 from PIL import ImageDraw
 
-from . import eleven, musica, voz
+from . import cumplido, eleven, musica, voz
 from . import guion as g
 from .config import (ANCHO, DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, MODELO_CLAUDE, RAIZ, VISTA_GENERAL,
                      VOCES, voz_del_dia)
@@ -230,7 +230,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
-                                                  fiestas=" ".join(notas_rango(sab, dom)) or "(ninguno)",
+                                                  fiestas=(" ".join(notas_rango(sab, dom)) or "(ninguno)") + _dato_real(),
                                                   extra=json.dumps(_extra_por_region(), ensure_ascii=False)))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
@@ -396,6 +396,16 @@ Responde SOLO con JSON: {{"segmentos": {{"intro": "...", {claves_dias}, "general
 EXTRA_SEMANA: list = []
 
 
+def _dato_real() -> str:
+    """Lo medido tras el aviso naranja/rojo de anoche (si lo hubo), para una frase en la intro."""
+    try:
+        n = cumplido.nota()
+    except Exception as e:  # noqa: BLE001
+        log.warning("Dato real del aviso: %s", e)
+        n = ""
+    return f"\n\nADEMÁS, en la intro o en el bloque del primer día: {n}" if n else ""
+
+
 def _extra_por_region() -> dict:
     out = {}
     for c in EXTRA_SEMANA:
@@ -425,8 +435,8 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
                                                    claves_dias=", ".join(f'"{d}": "..."' for d in _dias()),
                                                    primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}",
                                                    extra=json.dumps(_extra_por_region(), ensure_ascii=False),
-                                                   fiestas=" ".join(notas_rango(fechas[_dias()[0]],
-                                                                                fechas[_dias()[-1]])) or "(ninguno)",
+                                                   fiestas=(" ".join(notas_rango(fechas[_dias()[0]], fechas[_dias()[-1]])) or "(ninguno)")
+                                                   + _dato_real(),
                                                    repetidas=", ".join(g.ciudades_repetidas(fechas[_dias()[0]],
                                                                                             prevs[_dias()[0]]))
                                                    or "(ninguna)"))
@@ -832,7 +842,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     return {"tipo": "aviso", "fecha": hoy.isoformat(), "video": str(video), "caption": caption,
             "titular": guion.get("titular"), "motor_voz": motor, "origen_guion": guion.get("origen"),
             "duracion": round(voz.duracion(video), 2), "firma": firma(grupos), "guion": guion["segmentos"],
-            "nivel_max": max(NIVELES[x["nivel"]] for x in grupos)}
+            "nivel_max": max(NIVELES[x["nivel"]] for x in grupos),
+            "avisos": [cumplido.resumen_aviso(x) for x in grupos]}
 
 
 def avisos_demo() -> list[dict]:
