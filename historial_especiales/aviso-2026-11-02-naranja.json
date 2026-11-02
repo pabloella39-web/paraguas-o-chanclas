@@ -1,0 +1,81 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-02",
+ "caption": "⚠️ Aviso naranja por lluvias y tormenta en el litoral de Barcelona y Tarragona\n\n🟠 Aviso naranja por lluvia: Barcelona, L'Hospitalet de Llobregat, Badalona, Mataró y más\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Barcelona",
+ "titular": "BARCELONA: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 24.93,
+ "firma": "naranja:lluvias:2",
+ "guion": {
+  "intro": "Atención Barcelona: aviso naranja por lluvias. Se esperan 40 litros por metro cuadrado en una hora, con tormenta y posibles daños graves.",
+  "zonas": "Litoral de Barcelona y norte de Tarragona, desde las diez de la noche de hoy hasta las tres de la madrugada.",
+  "consejos": "Toma precauciones y mantente informado de la predicción. Y si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva allí."
+ },
+ "nivel_max": 2,
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-02T09:30:50.451Z"
+     },
+     "success": true,
+     "platform_post_id": "7703504050800708897",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7703504050800708897",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 6084447,
+     "post_title": "⚠️ Aviso naranja por lluvias y tormenta en el litoral de Barcelona y Tarragona\n\n🟠 Aviso naranja por lluvia: Barcelona, L'Hospitalet de Llobregat, Badalona, Mataró y más\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Barcelona",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 24.934,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7703503511077849121",
+     "request_id": "be9548f38b5244e692e49b66ffe77705",
+     "request_id_logs": "be9548f38b5244e692e49b66ffe77705",
+     "job_id": "cb69c13cd10a47a193fa3fb0bd37f045",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-02T09:30:50.451Z"
+   },
+   "request_id": "be9548f38b5244e692e49b66ffe77705"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "3c0ylKhX2aM",
+  "url": "https://youtube.com/shorts/3c0ylKhX2aM",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
