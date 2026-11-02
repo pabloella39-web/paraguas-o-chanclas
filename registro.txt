@@ -1,0 +1,29 @@
+2026-11-02 17:01:27,129 WARNING Quedan 5958 créditos de ElevenLabs y el parte necesita reservarlos: voz gratuita hoy
+2026-11-02 17:01:29,432 INFO Prompt publicado en la rama pendiente/historia-2026-11-02
+2026-11-02 17:02:59,953 INFO Usando el guion escrito con el plan de Claude: guiones/historia-2026-11-02.json
+2026-11-02 17:03:00,914 INFO Historia: POV: TOKIO VA A TEMBLAR (asia), 1 partes de [174] palabras
+2026-11-02 17:03:00,914 INFO Narrador: hombre → voz y4o1CguECnmbT8YSuREN
+2026-11-02 17:03:21,065 INFO Imagen 'Tokyo 1923 street': File:Tokyo (4787569011).jpg (no restrictions)
+2026-11-02 17:03:24,294 INFO Imagen 'Tokyo wooden houses Taisho': File:Qingdao customs.jpg (public domain)
+2026-11-02 17:03:26,327 INFO Imagen 'Tokyo 1920s Asakusa': File:Asakusa Station 1927.jpg (public domain)
+2026-11-02 17:03:27,672 INFO Imagen 'Great Kanto earthquake fire': File:1923 Sumida River after the Great Kantō earth (public domain)
+2026-11-02 17:03:29,913 INFO Imagen 'Great Kanto earthquake 1923': File:Yokosuka Naval Arsenal after Great Kanto eart (public domain)
+2026-11-02 17:03:31,607 INFO Imagen 'Tokyo 1923 fire smoke': File:Airport Fire smoke plume 1.jpg (public domain)
+2026-11-02 17:03:32,475 INFO Sin imagen para 'Tokyo 1923 refugees'
+2026-11-02 17:03:33,954 INFO Imagen 'Kanto earthquake refugees 1923': File:Refugee camp in Shinjuku Gyoen after 1923 Gre (public domain)
+2026-11-02 17:03:34,071 WARNING Wikimedia 'Tokyo 1923 burning city': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+Tokyo+1923+burning+city&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-11-02 17:03:34,197 WARNING Wikimedia 'burning city': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+burning+city&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-11-02 17:03:34,323 WARNING Wikimedia 'city': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+city&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-11-02 17:03:34,324 INFO Sin imagen para 'Tokyo 1923 burning city'
+2026-11-02 17:03:34,444 WARNING Wikimedia 'Tokyo 1923 ruins': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+Tokyo+1923+ruins&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-11-02 17:03:34,563 WARNING Wikimedia '1923 ruins': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+1923+ruins&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-11-02 17:03:34,692 WARNING Wikimedia 'ruins': 429 Client Error: Too Many Requests for url: https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=filetype%3Abitmap+ruins&prop=imageinfo&iiprop=url%7Csize%7Cextmetadata%7Cmime&iiurlwidth=1400
+2026-11-02 17:03:34,693 INFO Sin imagen para 'Tokyo 1923 ruins'
+2026-11-02 17:03:34,693 INFO Parte 1: 7 de 10 tramos con foto propia
+2026-11-02 17:03:53,022 INFO Parte 1/1: 73.2 s de voz, 77.1 s de vídeo, 7 imágenes
+2026-11-02 17:07:33,412 INFO Upload-Post: programado para 2026-11-02 21:00:00+01:00: {'success': True, 'job_id': 'eecdf37f737241299cf9157d56d0d38b', 'scheduled_date': '2026-11-02T21:00:00+01:00', 'request_id': '1ca944fa52d944caab645eadae5a18f5'}
+2026-11-02 17:07:35,536 INFO Subido a YouTube Shorts (Lo que callan las paredes): https://youtube.com/shorts/Lm8VSSbKw5A
+::warning::Historias con voz gratuita: quedan 5958 créditos de ElevenLabs
+::notice::YouTube parte 1: https://youtube.com/shorts/Lm8VSSbKw5A
+::notice::Parte 1/1 programada para las 21:00
+::notice::Historia: POV: TOKIO VA A TEMBLAR (asia), 1 partes: 77.1 s
