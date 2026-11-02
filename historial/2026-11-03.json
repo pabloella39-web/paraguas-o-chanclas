@@ -1,0 +1,83 @@
+{
+ "fecha": "2026-11-03",
+ "duracion": 69.4,
+ "caption": "Barcelona y Palma sacan el paraguas, Sevilla la manga corta… ¿y tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, martes 3 de noviembre 🇪🇸\n🌧️ Lluvia en Barcelona y Palma\n🔥 Máxima: 26° en Sevilla\n🥶 Mínima: 1° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Barcelona",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "BARCELONA, MAÑANA TE MOJAS",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Barcelona, mañana paraguas sí o sí. Lo que te anticipé el domingo, confirmado. Al final te digo dónde hará más calor y más frío.",
+  "mediterraneo": "Mira el satélite: así entra el agua. Barcelona y Tarragona, unos 17 litros por metro cuadrado. En Alicante y Murcia, posibles chubascos por la tarde.",
+  "islas": "En Mallorca, peor de lo previsto: Palma, hasta 23 litros. En Canarias, aviso naranja por lluvia en La Palma y La Gomera, y 7 litros en Las Palmas.",
+  "norte": "Si eres de Santander, paraguas por la mañana con unos 2 litros, y en Oviedo y Gijón, lloviznas. Galicia, seca y con sol.",
+  "sur": "Gente de Sevilla, mañana manga corta: 26 grados en noviembre, y Málaga ronda los 24. Eso sí, Ceuta, aviso amarillo por tormentas por la tarde.",
+  "interior": "En el interior, sol y fresquito: Madrid se queda en 14 grados, y Burgos y Ávila ni llegan a 10. Saca la bufanda.",
+  "general": "Lo prometido: el calor, Sevilla y Canarias con 26 grados. Y el frío, Ávila, Segovia y Soria, a 0 grados de madrugada.",
+  "cierre": "¿Y tu pueblo? Dímelo en comentarios y te digo si allí toca paraguas o chanclas. Y sigue a Paraguas o Chanclas."
+ },
+ "primer_comentario": "¿Acerté en tu pueblo? Cuéntame cómo está el cielo por ahí y te doy la previsión de mañana 👀",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-02T19:28:10.228Z"
+     },
+     "success": true,
+     "platform_post_id": "7703657754677742881",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7703657754677742881",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 19699593,
+     "post_title": "Barcelona y Palma sacan el paraguas, Sevilla la manga corta… ¿y tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, martes 3 de noviembre 🇪🇸\n🌧️ Lluvia en Barcelona y Palma\n🔥 Máxima: 26° en Sevilla\n🥶 Mínima: 1° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Barcelona",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7703657422920976417",
+     "first_comment_posted": true,
+     "request_id": "84580e74bfd042ab8246b98010f1aa9f",
+     "request_id_logs": "84580e74bfd042ab8246b98010f1aa9f",
+     "job_id": "15aa655a016d445e828a53c197361613",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-02T19:28:10.228Z"
+   },
+   "request_id": "84580e74bfd042ab8246b98010f1aa9f"
+  }
+ },
+ "youtube": {
+  "id": "kHD4wOx4i7s",
+  "url": "https://youtube.com/shorts/kHD4wOx4i7s",
+  "canal": "Paraguas o Chanclas"
+ }
+}
