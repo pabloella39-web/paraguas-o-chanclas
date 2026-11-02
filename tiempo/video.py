@@ -374,73 +374,60 @@ def _dibujo(nombre: str, tam: int, ang: float) -> Image.Image | None:
     return lienzo
 
 
+ESQUINAS = ("tl", "tr", "bl")
+
+
+def _esquina(variante: int) -> str:
+    return ESQUINAS[(variante // 3) % len(ESQUINAS)]
+
+
 def dibujos_portada(im: Image.Image, est: str, variante: int, d):
-    """Uno o dos dibujos grandes de la temática (sombrilla y chanclas, árbol de Navidad…) en las esquinas libres de
-    texto, dentro del recorte 3:4 del perfil y lejos de los botones de TikTok (lado derecho, abajo)."""
+    """UN dibujo grande de la temática (sombrilla, chanclas, árbol de Navidad…) asomando por una esquina, dentro del
+    recorte 3:4 del perfil y lejos de los botones de TikTok (abajo a la derecha). Los textos se dibujan encima."""
     tema = tema_portada(est, d)
-    pares = DIBUJOS_ESTACION.get(tema) or DIBUJOS_ESTACION[est]
-    a, b = pares[variante % len(pares)]
+    nombres = []
+    for par in DIBUJOS_ESTACION.get(tema) or DIBUJOS_ESTACION[est]:
+        nombres += [n for n in par if n not in nombres]
     cy = ALTO / 2
-    # (x, y, tamaño, giro): grandes y medio asomando por las esquinas; los textos se dibujan encima
-    sitios = {0: [(170, cy - 560, 320, -12), (170, cy + 600, 300, 10)],
-              1: [(ANCHO - 170, cy - 560, 320, 12), (170, cy + 600, 300, -8)],
-              2: [(165, cy - 570, 300, -10), (ANCHO - 165, cy - 570, 300, 10)],
-              3: [(180, cy + 580, 360, 8), (ANCHO - 160, cy - 580, 260, 14)],
-              4: [(185, cy - 545, 370, -10)]}[variante % VARIANTES_ESTACION]
-    for (x, y, tam, ang), nombre in zip(sitios, (a, b)):
-        dib = _dibujo(nombre, tam, ang)
-        if dib is not None:
-            im.alpha_composite(dib, (int(x - dib.width / 2), int(y - dib.height / 2)))
+    x, y, tam, ang = {"tl": (175, cy - 555, 340, -12), "tr": (ANCHO - 175, cy - 555, 340, 12),
+                      "bl": (185, cy + 590, 350, 8)}[_esquina(variante)]
+    dib = _dibujo(nombres[variante % len(nombres)], tam, ang)
+    if dib is not None:
+        im.alpha_composite(dib, (int(x - dib.width / 2), int(y - dib.height / 2)))
 
 
 def fondo_estacion(est: str, variante: int) -> Image.Image:
-    """Fondo de la portada del parte con la estación; 5 composiciones que se alternan. Los adornos van en los bordes y
-    en la zona que recorta la cuadrícula del perfil (y 240-1680) sin tapar los textos del centro."""
-    v = variante % VARIANTES_ESTACION
-    c0, c1, cols = PALETAS_ESTACION[est][v]
+    """Fondo limpio de la portada del parte: degradado de la estación y adornos SOLO en los bordes (nunca detrás del
+    texto). Tres composiciones (esquinas, guirnalda, marco) × colores × esquina del dibujo, que rotan por día."""
+    v = variante % 3
+    c0, c1, cols = PALETAS_ESTACION[est][variante % VARIANTES_ESTACION]
     im = _gradiente(c0, c1)
-    rnd = np.random.default_rng(100 + v)
+    rnd = np.random.default_rng(100 + variante % 15)
     cy = ALTO / 2
+    libre = _esquina(variante)   # la esquina del dibujo grande queda sin adornos
 
-    def poner(x, y, tam, alfa=230, ang=None, tipo=None):
-        a = _adorno(est, int(tam), cols[int(rnd.integers(len(cols)))], rnd.uniform(0, 360) if ang is None else ang,
-                    alfa, int(rnd.integers(2)) if tipo is None else tipo)
+    def poner(x, y, tam, alfa=230):
+        a = _adorno(est, int(tam), cols[int(rnd.integers(len(cols)))], rnd.uniform(0, 360), alfa,
+                    int(rnd.integers(2)))
         im.alpha_composite(a, (int(x - a.width / 2), int(y - a.height / 2)))
 
-    if v == 0:    # racimos en las cuatro esquinas
-        for ex, ey in ((60, cy - 640), (ANCHO - 60, cy - 640), (60, cy + 640), (ANCHO - 60, cy + 640)):
-            for _ in range(7):
-                poner(ex + rnd.normal(0, 70), ey + rnd.normal(0, 60), rnd.uniform(90, 170))
-    elif v == 1:  # guirnalda arriba y abajo
-        for y in (cy - 680, cy + 680):
-            for x in np.linspace(-20, ANCHO + 20, 13):
-                poner(x + rnd.normal(0, 15), y + rnd.normal(0, 25), rnd.uniform(80, 130))
-    elif v == 2:  # atardecer: resplandor abajo y adornos sueltos por los lados
-        brillo = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
-        db = ImageDraw.Draw(brillo)
-        for k in range(20, 0, -1):
-            r = 40 * k
-            db.ellipse([ANCHO / 2 - r * 1.6, ALTO - 260 - r, ANCHO / 2 + r * 1.6, ALTO - 260 + r],
-                       fill=tuple(cols[0]) + (6,))
-        im.alpha_composite(brillo)
-        for _ in range(24):
-            x = rnd.choice([rnd.uniform(0, 160), rnd.uniform(ANCHO - 160, ANCHO)])
-            poner(x, rnd.uniform(cy - 700, cy + 700), rnd.uniform(60, 130), alfa=215)
-    elif v == 3:  # diagonal de adornos cayendo de arriba a la izquierda, grandes y translúcidos al fondo
-        for k in range(9):
-            poner(-40 + k * 60, cy - 720 + k * 55, rnd.uniform(130, 220), alfa=175)
-        for k in range(7):
-            poner(ANCHO + 40 - k * 55, cy + 720 - k * 50, rnd.uniform(120, 210), alfa=175)
-    else:         # lluvia suave de adornos pequeños por todo el fondo (muy translúcidos) + marco fino
-        for _ in range(34):
-            poner(rnd.uniform(0, ANCHO), rnd.uniform(cy - 720, cy + 720), rnd.uniform(45, 90), alfa=120)
+    if v == 0:    # racimos pequeños en las esquinas libres
+        for k, (ex, ey) in zip(("tl", "tr", "bl", "br"),
+                               ((40, cy - 690), (ANCHO - 40, cy - 690), (40, cy + 690), (ANCHO - 40, cy + 690))):
+            if k != libre:
+                for _ in range(5):
+                    poner(ex + rnd.normal(0, 50), ey + rnd.normal(0, 40), rnd.uniform(70, 130))
+    elif v == 1:  # guirnalda en el borde contrario al dibujo
+        y = cy + 690 if libre in ("tl", "tr") else cy - 690
+        for x in np.linspace(-20, ANCHO + 20, 12):
+            poner(x + rnd.normal(0, 12), y + rnd.normal(0, 18), rnd.uniform(70, 110))
+    else:         # marco fino del color de la estación
         ImageDraw.Draw(im).rounded_rectangle([40, cy - 700, ANCHO - 40, cy + 700], radius=46,
-                                             outline=tuple(cols[0]) + (200,), width=6)
+                                             outline=tuple(cols[0]) + (210,), width=6)
     # velo oscuro en el centro para que los textos se lean siempre
-    velo = np.zeros((ALTO, ANCHO), np.float32)
     yy = (np.arange(ALTO)[:, None] - cy) / 600
     xx = (np.arange(ANCHO)[None, :] - ANCHO / 2) / 420
-    velo[:] = np.clip(1 - (xx ** 2 + yy ** 2), 0, 1) * 90
+    velo = np.clip(1 - (xx ** 2 + yy ** 2), 0, 1) * 90
     capa = Image.new("RGBA", (ANCHO, ALTO), (6, 12, 28, 0))
     capa.putalpha(Image.fromarray(velo.astype(np.uint8)))
     im.alpha_composite(capa)
