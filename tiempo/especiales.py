@@ -743,6 +743,22 @@ CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAM
                  "nevadas": ["EVITA CARRETERA", "CADENAS Y DEPÓSITO", "LLAMA AL 112"]}
 
 
+def _cuando_portada(gr, hoy: date) -> str:
+    """'ESTA NOCHE DESDE LAS 22:00', 'HOY HASTA LAS 18:00', 'MAÑANA DESDE LAS 06:00'…"""
+    try:
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo("Europe/Madrid")
+        ini, fin = datetime.fromisoformat(gr["inicio"]).astimezone(tz), datetime.fromisoformat(gr["fin"]).astimezone(tz)
+    except Exception:  # noqa: BLE001
+        return ""
+    if ini <= datetime.now(tz):
+        return f"EN CURSO HASTA LAS {fin:%H:%M}" if fin.date() == hoy else f"EN CURSO HASTA EL {g.DIAS[fin.weekday()]}"
+    dia = "HOY" if ini.date() == hoy else "MAÑANA" if ini.date() == hoy + timedelta(days=1) else g.DIAS[ini.weekday()]
+    if dia == "HOY" and ini.hour >= 20:
+        dia = "ESTA NOCHE"
+    return f"{dia} DESDE LAS {ini:%H:%M}"
+
+
 def _hora_txt(iso: str) -> str:
     d = datetime.fromisoformat(iso)
     return f"{g.DIAS[d.weekday()]} {d.day} a las {d:%H:%M}"
@@ -831,6 +847,10 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "capas": {"intro": _capa_poligonos(grupos), "zonas": _capa_poligonos(grupos, con_lista=True),
                   "consejos": _capa_poligonos(grupos, consejos=consejos), "cierre": _capa_poligonos(grupos)},
         "gancho": _gancho_aviso(grupos),
+        "aviso_portada": {"nivel": gr["nivel"], "fenomeno": "oleaje" if "costeros" in gr["fenomeno"] else gr["fenomeno"],
+                          "icono": _gancho_aviso(grupos).get("icono"),
+                          "ciudades": gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]],
+                          "cuando": _cuando_portada(gr, hoy)},
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
                         tuple((z.upper()[:30], COLOR_NIVEL.get(gr["nivel"], (255, 205, 40)))
                               for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),

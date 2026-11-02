@@ -253,16 +253,76 @@ class Particulas:
             img.paste(sp, (int(x), int(y)), sp)
 
 
+COLOR_ALERTA = {"naranja": (255, 128, 0), "rojo": (215, 22, 32)}
+
+
+def portada_aviso(a: dict) -> Image.Image:
+    """Portada de alerta naranja/roja: fondo del color del nivel, franjas de peligro y triángulo. Se distingue al
+    instante en el feed y en la cuadrícula del perfil (que recorta a 3:4: todo en la franja central)."""
+    col = COLOR_ALERTA.get(a["nivel"], COLOR_ALERTA["naranja"])
+    oscuro = (14, 18, 30)
+    im = Image.new("RGBA", (ANCHO, ALTO), col + (255,))
+    # degradado suave para dar volumen
+    arr = np.asarray(im).astype(np.float32)
+    yy = np.linspace(-1, 1, ALTO)[:, None]
+    xx = np.linspace(-1, 1, ANCHO)[None, :]
+    luz = np.clip(1.12 - 0.35 * (xx ** 2 + yy ** 2), 0.6, 1.12)
+    arr[..., :3] = np.clip(arr[..., :3] * luz[..., None], 0, 255)
+    im = Image.fromarray(arr.astype(np.uint8), "RGBA")
+    d = ImageDraw.Draw(im)
+    cy = ALTO / 2
+    # franjas de peligro arriba y abajo de la zona visible en la cuadrícula
+    for y0 in (cy - 700, cy + 610):
+        banda = Image.new("RGBA", (ANCHO, 90), oscuro + (255,))
+        db = ImageDraw.Draw(banda)
+        for x in range(-120, ANCHO + 120, 120):
+            db.polygon([(x, 90), (x + 60, 90), (x + 150, 0), (x + 90, 0)], fill=col + (255,))
+        im.alpha_composite(banda, (0, int(y0)))
+    # triángulo de aviso
+    tx, ty, L = ANCHO / 2, cy - 430, 300
+    tri = [(tx, ty - L * 0.62), (tx + L * 0.62, ty + L * 0.45), (tx - L * 0.62, ty + L * 0.45)]
+    d.polygon([(x + 8, y + 10) for x, y in tri], fill=(0, 0, 0, 90))
+    d.polygon(tri, fill=oscuro)
+    d.polygon([(tx, ty - L * 0.40), (tx + L * 0.43, ty + L * 0.33), (tx - L * 0.43, ty + L * 0.33)], fill=col)
+    d.text((tx, ty + 15), "!", font=fuente("Black", 200), fill=oscuro, anchor="mm")
+    # AVISO NARANJA
+    claro = (255, 255, 255)
+    t1 = f"AVISO {a['nivel'].upper()}"
+    f1 = _ajustar(t1, "Black", 150, 1000)
+    d.text((ANCHO / 2 + 6, cy - 150 + 8), t1, font=f1, fill=(0, 0, 0, 110), anchor="mm")
+    d.text((ANCHO / 2, cy - 150), t1, font=f1, fill=oscuro if a["nivel"] == "naranja" else claro, anchor="mm")
+    t2 = a["fenomeno"].upper()
+    f2 = _ajustar(t2, "Black", 120, 960)
+    d.text((ANCHO / 2, cy - 15), t2, font=f2, fill=claro, anchor="mm", stroke_width=6, stroke_fill=oscuro)
+    # panel oscuro con ciudades y hora
+    d.rounded_rectangle([60, cy + 80, ANCHO - 60, cy + 470], radius=40, fill=oscuro + (240,))
+    ic = mapa.icono(a.get("icono") or "lluvia", 150, 0)
+    im.alpha_composite(ic, (90, int(cy + 105)))
+    ciudades = [c.upper() for c in (a.get("ciudades") or [])][:2]
+    for k, c in enumerate(ciudades):
+        f = _ajustar(c, "Black", 84 if k == 0 else 58, 720)
+        d.text((270, cy + 150 + k * 92), c, font=f, fill=claro, anchor="lm")
+    if a.get("cuando"):
+        ft = _ajustar(a["cuando"].upper(), "Black", 62, 900)
+        d.text((ANCHO / 2, cy + 400), a["cuando"].upper(), font=ft, fill=col, anchor="mm")
+    # pie
+    pie = "AVISO OFICIAL DE AEMET · COMPÁRTELO"
+    fp = _ajustar(pie, "ExtraBold", 44, 920)
+    d.text((ANCHO / 2, cy + 545), pie, font=fp, fill=oscuro if a["nivel"] == "naranja" else claro, anchor="mm")
+    return im
+
+
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
-                 gancho=None, dias_portada=None, satelite=None):
+                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
         portada_txt: (marca, texto grande, texto pequeño). capas: {bloque: función(img, proyección, dt)} que dibuja
         encima del mapa. sin_marcadores: bloques sin marcadores de ciudades."""
         self.dias_portada = dias_portada  # [(día, icono, máx)]: portada del vídeo semanal
+        self.aviso_portada = aviso_portada  # {nivel, fenomeno, icono, ciudades, cuando}: portada de alerta
         self.satelite = satelite          # tiempo.satelite.AnimSatelite: 6 s tras el gancho en días señalados
         self.gancho = gancho  # fenómeno del día (tiempo.gancho): icono grande, insignia de urgencia y efecto
         self.datos_seg = datos_seg or {}
@@ -440,6 +500,9 @@ class Compositor:
     def portada(self) -> Image.Image:
         """Miniatura legible en la cuadrícula del perfil (que recorta a 3:4: todo va en la franja central)."""
         if getattr(self, "_portada", None) is not None:
+            return self._portada
+        if self.aviso_portada:
+            self._portada = portada_aviso(self.aviso_portada)
             return self._portada
         im = Image.new("RGBA", (ANCHO, ALTO), (70, 8, 30, 246) if self.dias_portada else (6, 16, 38, 238))
         d = ImageDraw.Draw(im)
