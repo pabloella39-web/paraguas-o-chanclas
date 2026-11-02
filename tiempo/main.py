@@ -185,7 +185,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             sat = None
 
     from .config import voz_para
-    tipo_voz = os.environ.get("VOZ_TIPO") or voz_para("parte", hoy, importante=bool(fen.get("nivel")))
+    tipo_voz = os.environ.get("VOZ_TIPO") or voz_para("parte", hoy)   # diario: siempre femenina (aunque haya aviso)
     voz.elegir_voz(VOCES[tipo_voz])
     log.info("Voz del día: %s (%s)", tipo_voz, VOCES[tipo_voz]["edge"])
     plan, motor = None, "edge-tts"
