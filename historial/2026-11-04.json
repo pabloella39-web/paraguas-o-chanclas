@@ -1,0 +1,85 @@
+{
+ "fecha": "2026-11-04",
+ "duracion": 69.4,
+ "caption": "Aviso naranja en el sureste y heladas en Castilla… ¿abrigo o chubasquero mañana? ☔🧥\n\nEl tiempo en España mañana, miércoles 4 de noviembre 🇪🇸\n🌧️ Lluvia en Almería y Melilla\n🔥 Máxima: 26° en Las Palmas\n🥶 Mínima: -3° en Salamanca\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Almeria",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "AVISO NARANJA EN LORCA",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Lorca y Cartagena: mañana, aviso naranja por lluvia. Como te adelanté el domingo, paraguas en el sur. Quédate, que al final te digo dónde hará más calor.",
+  "islas": "Mira el satélite: así entran las nubes. Canarias, chubascos por la tarde y 26 grados, y Palma se moja de madrugada.",
+  "sur": "Gente de Almería, 95 por ciento de lluvia, y Málaga, paraguas por la tarde. Ceuta, tormentas y hasta 10 litros por metro cuadrado. Sevilla se libra.",
+  "mediterraneo": "Aviso naranja en el Campo de Cartagena y Mazarrón. Murcia y Alicante, lluvia casi todo el día, y Barcelona, chaparrón de madrugada.",
+  "interior": "Y más frío del que te conté el domingo: Ávila, Salamanca y León amanecen bajo cero. Madrid, nublado y 14 grados.",
+  "norte": "Si eres de Santander, lloviznas por la mañana, poca cosa. Gente de Vigo y Pontevedra, sol y 17 grados: lo mejor del norte.",
+  "general": "La recompensa: lo más caluroso, Las Palmas y Puerto del Rosario, con 26 grados. Lo más frío, Salamanca y Soria, a 3 bajo cero.",
+  "cierre": "¿Abrigo o chubasquero mañana? Te leo, y sigue a Paraguas o Chanclas. Mañana, paraguas en el sureste y chanclas en Sevilla."
+ },
+ "primer_comentario": "Reto: dime el pueblo más pequeño que conozcas y te digo qué tiempo hará mañana allí 😏📍",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-03T19:29:35.849Z"
+     },
+     "success": true,
+     "platform_post_id": null,
+     "post_url": null,
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 20721997,
+     "post_title": "Aviso naranja en el sureste y heladas en Castilla… ¿abrigo o chubasquero mañana? ☔🧥\n\nEl tiempo en España mañana, miércoles 4 de noviembre 🇪🇸\n🌧️ Lluvia en Almería y Melilla\n🔥 Máxima: 26° en Las Palmas\n🥶 Mínima: -3° en Salamanca\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Almeria",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7704028544867584033",
+     "warnings": [
+      "First comment skipped: TikTok has not returned the post id yet."
+     ],
+     "request_id": "be5a8d8a3e924759a4958e6fb347ce6f",
+     "request_id_logs": "be5a8d8a3e924759a4958e6fb347ce6f",
+     "job_id": "316e81dfcaaa4c20addaa53cbeec428b",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-03T19:29:35.849Z"
+   },
+   "request_id": "be5a8d8a3e924759a4958e6fb347ce6f"
+  }
+ },
+ "youtube": {
+  "id": "FVel-eHS9cI",
+  "url": "https://youtube.com/shorts/FVel-eHS9cI",
+  "canal": "Paraguas o Chanclas"
+ }
+}
