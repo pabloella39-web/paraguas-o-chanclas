@@ -1,0 +1,96 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-03",
+ "caption": "⚠️ Aviso naranja por lluvias en Cartagena esta noche desde las 21:00\n\n🟠 Aviso naranja por lluvia: Cartagena\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Cartagena",
+ "titular": "CARTAGENA: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 24.53,
+ "firma": "naranja:lluvias:1",
+ "guion": {
+  "intro": "Atención Cartagena: aviso naranja por lluvias. Pueden caer 30 litros por metro cuadrado en una hora, con daños graves posibles.",
+  "zonas": "Afecta al Campo de Cartagena y Mazarrón. Desde las nueve de la noche de hoy hasta casi medianoche.",
+  "consejos": "Toma precauciones y mantente informado de la predicción actualizada. Si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva allí."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "naranja",
+   "zonas": [
+    "Campo de Cartagena y Mazarrón"
+   ],
+   "ciudades": [
+    "Cartagena"
+   ],
+   "inicio": "2026-11-03T21:00:00+01:00",
+   "fin": "2026-11-03T23:59:59+01:00",
+   "descripcion": "Precipitación acumulada en una hora: 30 mm."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-03T09:15:27.999Z"
+     },
+     "success": true,
+     "platform_post_id": "7703871031307472160",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7703871031307472160",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 5761273,
+     "post_title": "⚠️ Aviso naranja por lluvias en Cartagena esta noche desde las 21:00\n\n🟠 Aviso naranja por lluvia: Cartagena\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Cartagena",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 24.534,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7703870579254331425",
+     "request_id": "799321c40599477989184cdb83a4574c",
+     "request_id_logs": "799321c40599477989184cdb83a4574c",
+     "job_id": "38f767e8728543ff8e7fec824beae7da",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-03T09:15:27.999Z"
+   },
+   "request_id": "799321c40599477989184cdb83a4574c"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "3VaxUF25pzs",
+  "url": "https://youtube.com/shorts/3VaxUF25pzs",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
