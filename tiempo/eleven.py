@@ -95,11 +95,16 @@ def _apocope(txt: str) -> str:
     return txt
 
 
+UNIDADES_112 = r"(litros?|l/|grados|km|kil[oó]|metros|cent[ií]metros|mm|por|personas|euros|años|d[ií]as|horas|minutos)"
+
+
 def hablar_token(token: str, siguiente: str = "") -> str:
     m = re.match(r"^([¿¡(\"«]*)(-?\d[\d.,]*\d|-?\d)([%º°]?)([.,;:!?)\"»]*)$", token)
     if not m:
         return token
     pre, num, simb, post = m.groups()
+    if num == "112" and not simb and not re.match(UNIDADES_112, (siguiente or "").lower()):
+        return pre + "uno, uno, dos" + post   # teléfono de emergencias: se dice cifra a cifra
     if re.fullmatch(r"-?\d{1,3}(\.\d{3})+", num):          # 1.200 → miles
         texto = numero(int(num.replace(".", "")))
     elif "," in num:                                      # 2,5 → dos coma cinco

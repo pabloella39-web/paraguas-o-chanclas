@@ -74,6 +74,9 @@ def sintetizar(texto: str, ruta_mp3: Path, demo: bool = False, velocidad: int | 
         _ffmpeg("-f", "lavfi", "-i", f"anullsrc=r={SR}:cl=mono", "-t", f"{seg:.2f}", str(wav))
         return wav
     velocidad = velocidad if velocidad is not None else velocidad_base()
+    import re as _re   # el 112 se dice cifra a cifra (también con las voces de respaldo)
+    from .eleven import UNIDADES_112
+    texto = _re.sub(r"\b112\b(?!\s*" + UNIDADES_112 + r")", "uno, uno, dos", texto, flags=_re.I)
     errores = []
     for motor in (_edge, _google_tts):
         try:
