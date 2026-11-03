@@ -364,7 +364,12 @@
   "7703874397216506642",
   "7703868015037580054",
   "7703858503082001174",
-  "7703657788102918944"
+  "7703657788102918944",
+  "7703896669150167830",
+  "7703896072992949014",
+  "7703886455575479063",
+  "7703890545057039127",
+  "7703882156884214561"
  ],
  "hechas": [
   {
@@ -541,6 +546,28 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Valencia: 18°/14°, 28 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-03",
+   "clave": "jerez de la frontera|2026-11-03",
+   "lugar": "Jerez de la Frontera",
+   "usuarios": [
+    "ussserrrr31837"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Jerez de la Frontera: 22°/14°, 18 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-03",
+   "clave": "menorca|2026-11-03",
+   "lugar": "Menorca",
+   "usuarios": [
+    "olgacantor3"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Menorca: 16°/11°, 45 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
