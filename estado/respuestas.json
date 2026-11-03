@@ -369,7 +369,14 @@
   "7703896072992949014",
   "7703886455575479063",
   "7703890545057039127",
-  "7703882156884214561"
+  "7703882156884214561",
+  "7703907819137385238",
+  "7703901621282079510",
+  "7703900201526756118",
+  "7703901338011157270",
+  "7703907506288263958",
+  "7703658551671948054",
+  "7703900032320340768"
  ],
  "hechas": [
   {
@@ -568,6 +575,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Menorca: 16°/11°, 45 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-03",
+   "clave": "alhama de murcia|2026-11-03",
+   "lugar": "Alhama de Murcia",
+   "usuarios": [
+    "pauli_aguayb"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Alhama de Murcia: 22°/13°, 93 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
