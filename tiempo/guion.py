@@ -100,6 +100,10 @@ INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
   primero las ciudades que más nos ven (Madrid, Barcelona, Málaga, Sevilla, Valencia) si están afectadas. La segunda
   frase amplía en una línea y promete que al final dirás dónde hará más calor y más frío ("quédate, que al final...").
   Urgencia sí, mentiras no: solo habla de avisos si los hay de verdad.
+  ALCANCE DEL GANCHO: la primera frase tiene que importarle a media España. Si lo más fuerte afecta solo a ciudades
+  pequeñas o a una zona concreta (Lorca, Cartagena, Mazarrón…), NO abras con ellas: abre con lo que afecta a más
+  gente (frío bajo cero en media España, lluvia en una gran ciudad, un contraste llamativo) y menciona esa zona en la
+  segunda frase o en su bloque ("Media España amanece bajo cero. Y en el sureste, aviso naranja.").
 GANCHO DE HOY: {gancho}
 - En al menos dos bloques regionales, interpela a la gente de una ciudad concreta ("Si eres de Bilbao,
   hoy...", "Gente de Sevilla, ...").

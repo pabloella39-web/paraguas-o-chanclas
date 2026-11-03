@@ -55,3 +55,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   cuando: el propio [DATO REAL] dice si esta vez se puede o no.
 - Comentarios: NO se contestan insultos, frases sin sentido ni provocaciones o críticas que buscan discusión
   ("alarmistas", "no sois oficiales", "ya avisa la Generalitat", "mentira", chemtrails…).
+- Alcance del gancho: la primera frase tiene que importarle a media España. Un aviso en ciudades pequeñas (Lorca,
+  Cartagena…) va en la segunda frase o en su bloque, no abriendo el vídeo (03/11/2026: abrir con "Lorca y Cartagena"
+  dejó el parte en 165 visualizaciones; el 53 % se fue en 2 segundos).
