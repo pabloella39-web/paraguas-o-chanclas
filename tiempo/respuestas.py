@@ -168,7 +168,9 @@ humor ligero y cercano. Clasifica CADA comentario en uno de estos tipos:
   más. Si merece, escribe una "respuesta" SUGERIDA (el dueño la revisa antes de publicarla): máximo 140 caracteres,
   de tú, cercana y con humor ligero, 1 emoji, sin inventar datos del tiempo; ante una queja, reconoce y explica sin
   discutir.
-- "ignorar": insultos, spam, enlaces o cosas sin sentido.
+- "ignorar": insultos, spam, enlaces o cosas sin sentido. También las provocaciones y críticas al canal que solo
+  buscan discusión: "alarmistas", "metéis miedo", "no sois oficiales", "ya avisa la Generalitat/el ayuntamiento",
+  "mentira", "no acertáis ni una" sin dato concreto, conspiraciones (chemtrails…). No se contestan nunca.
 Para "pregunta" y "ciudad" devuelve también: lugar (nombre limpio y bien escrito), provincia o región si se deduce (o
 ""), pais (ISO de 2 letras; "ES" si no se dice otra cosa) y dia: "hoy", "mañana" o "".
 
