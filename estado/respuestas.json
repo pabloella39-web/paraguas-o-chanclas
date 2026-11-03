@@ -386,7 +386,13 @@
   "7703934866144887584",
   "7703971757433062146",
   "7703966051717186326",
-  "7703954830742012694"
+  "7703954830742012694",
+  "7703976622278542102",
+  "7703976029518119702",
+  "7703974271508972310",
+  "7703990215581680416",
+  "7703984204510429974",
+  "7703981551864677142"
  ],
  "hechas": [
   {
@@ -596,6 +602,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Alhama de Murcia: 22°/13°, 93 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-03",
+   "clave": "tortosa|2026-11-04",
+   "lugar": "Tortosa",
+   "usuarios": [
+    "pepeeeeee.85"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Tortosa: 16°/7°, 3 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
