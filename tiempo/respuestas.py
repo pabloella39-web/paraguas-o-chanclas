@@ -128,7 +128,7 @@ def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
         cur = pg.get("next_cursor")
         if not pg.get("has_next") or cur is None:
             break
-        for n in ([nombre] if nombre else ["cursor", "next_cursor", "offset", "after", "page_token"]):
+        for n in ([nombre] if nombre else ["after", "cursor", "next_cursor", "offset"]):
             try:
                 j2 = pedir(**{n: cur})
             except Exception:  # noqa: BLE001
@@ -147,7 +147,7 @@ def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
     return out
 
 
-def comentarios_nuevos(estado: dict, n: int = 8, limit: int = 50, paginas: int = 1) -> list[dict]:
+def comentarios_nuevos(estado: dict, n: int = 8, limit: int = 50, paginas: int = 10) -> list[dict]:
     vistos = set(estado["vistos"])
     nuevos = []
     for vid in videos_recientes(n):
@@ -747,7 +747,7 @@ def main():
     if lugar:
         est = _cargar()
         hechas = set(est.get("escritas", []))
-        todos = comentarios_nuevos({"vistos": []}, n=15, limit=50, paginas=6)
+        todos = comentarios_nuevos({"vistos": []}, n=15, limit=50, paginas=40)
         claves = [w for w in _norm(lugar).split() if len(w) > 3]
         for c in todos:   # para depurar: los que se le parecen
             if any(w in _norm(c["texto"]) for w in claves):
