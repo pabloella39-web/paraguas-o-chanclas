@@ -1,0 +1,23 @@
+name: Prueba del mapa (avisos, olas, nieve)
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/prueba_mapa.py"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prueba:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt
+      - env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: python scripts/prueba_mapa.py > registro.txt 2>&1 || echo FALLO >> registro.txt; mkdir -p prueba; mv registro.txt prueba/
+      - if: always()
+        run: |
+          cd prueba && git init -q -b registro-mapa
+          git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"
+          git add -A && git commit -qm "Prueba mapa"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" registro-mapa
