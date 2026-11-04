@@ -313,11 +313,27 @@ def comunidades_olvidadas(hoy: date, minimo: int = 2, maximo: int = 2) -> list[s
     return sorted(sin, key=lambda c: (-sin[c], -pob.get(c, 0)))[:maximo]
 
 
+def comunidades_forzadas(hoy: date) -> list[str]:
+    """Las que el dueño pide a mano para un día concreto (estado/comunidades_forzadas.json: {"AAAA-MM-DD": [...]})."""
+    import json as _json
+    from .config import RAIZ
+    try:
+        return _json.loads((RAIZ / "estado" / "comunidades_forzadas.json").read_text(encoding="utf-8")).get(
+            hoy.isoformat(), [])
+    except Exception:  # noqa: BLE001
+        return []
+
+
 def nota_olvidadas(hoy: date) -> str:
-    olv = comunidades_olvidadas(hoy)
+    forz = comunidades_forzadas(hoy)
+    olv = [c for c in comunidades_olvidadas(hoy) if c not in forz]
+    texto = ""
+    if forz:
+        texto = (f"[OBLIGATORIO] Hoy nombra {' y '.join(forz)} con un dato concreto (ciudad y tiempo), en su bloque: los "
+                 "seguidores de allí lo están pidiendo en los comentarios. ")
     if not olv:
-        return ""
-    return (f"Llevas unos días sin nombrar {' ni '.join(olv)}. Primero lo importante, como siempre; después, en su "
+        return texto.strip()
+    return texto + (f"Llevas unos días sin nombrar {' ni '.join(olv)}. Primero lo importante, como siempre; después, en su "
             "bloque, dales una mención rápida con su dato (una frase corta, sin quitar protagonismo a lo importante). "
             "Aragón va en INTERIOR y Extremadura en SUR.")
 
