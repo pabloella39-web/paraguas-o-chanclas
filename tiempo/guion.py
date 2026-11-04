@@ -623,7 +623,7 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
     # Cada región: primero TODAS las ciudades que nombra el guion (habituales o extra); después se rellenan los huecos
     # del mapa con otras ciudades, aunque no se nombren (Tarragona, Cuenca, Huesca, Ciudad Real…), eligiendo siempre
     # la más alejada de las que ya hay para cubrir toda la región. Así ninguna zona se queda vacía.
-    MAX = {"islas": 5, "interior": 8, "sur": 7, "norte": 6, "mediterraneo": 6}
+    MAX = {"islas": 6, "interior": 9, "sur": 8, "norte": 7, "mediterraneo": 7}
     def dist(a, b):
         return math.hypot((a["lat"] - b["lat"]), (a["lon"] - b["lon"]) * math.cos(math.radians(40)))
     extras_ok = [dict(e, extra=True) for e in extra if e.get("lat") and e.get("tmax") is not None]
@@ -637,11 +637,13 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
         tope = MAX.get(region, 6)
         if not sel and base:
             sel = [base[0]]; resto = [c for c in resto if c is not base[0]]
-        while len(sel) < tope and resto:
-            # la más alejada de las elegidas; las habituales (más vistas) tienen un pequeño plus
-            c = max(resto, key=lambda c: min(dist(c, x) for x in sel) + (0.6 if not c.get("extra") else 0))
-            if min(dist(c, x) for x in sel) < (0.5 if region == "islas" else 1.0):   # más cerca se pisarían
+        umbral = 0.5 if region == "islas" else 0.85   # más cerca se pisarían las tarjetas
+        while len(sel) < tope:
+            libres = [c for c in resto if min(dist(c, x) for x in sel) >= umbral]
+            if not libres:
                 break
+            # la más alejada de las elegidas; las habituales (más vistas) tienen un pequeño plus
+            c = max(libres, key=lambda c: min(dist(c, x) for x in sel) + (0.6 if not c.get("extra") else 0))
             sel.append(c); resto.remove(c)
         out += sel + [c for c in base if c["nombre"] in ("Ceuta", "Melilla") and c not in sel]
     # Ceuta y Melilla: basta con la tarjeta de una (se alternan por días), salvo que el guion nombre a las dos
