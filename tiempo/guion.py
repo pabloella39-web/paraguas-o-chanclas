@@ -282,25 +282,31 @@ NOMBRES_COMUNIDAD = {
 }
 
 
-def comunidades_olvidadas(hoy: date, dias: int = 3) -> list[str]:
-    """Comunidades que no se han nombrado en ninguno de los vídeos de los últimos `dias` días (partes y especiales)."""
+def comunidades_olvidadas(hoy: date, minimo: int = 2, maximo: int = 5) -> list[str]:
+    """Comunidades que llevan `minimo` días o más sin nombrarse (partes y especiales), las más olvidadas primero."""
     import json as _json
     from datetime import timedelta as _td
     from .config import RAIZ
-    textos = []
-    for k in range(0, dias + 1):
+    por_dia = []
+    for k in range(0, 8):
         d = (hoy - _td(days=k)).isoformat()
         rutas = [RAIZ / "historial" / f"{d}.json"] + list((RAIZ / "historial_especiales").glob(f"*-{d}*.json"))
+        textos = []
         for ruta in rutas:
             try:
                 g = _json.loads(ruta.read_text(encoding="utf-8")).get("guion") or {}
                 textos.append(" ".join(str(v) for v in (g.values() if isinstance(g, dict) else [g])))
             except Exception:  # noqa: BLE001
                 continue
-    if len(textos) < 2:
+        por_dia.append(" ".join(textos).lower())
+    if sum(bool(t) for t in por_dia) < 2:
         return []
-    todo = " ".join(textos).lower()
-    return [c for c, ns in NOMBRES_COMUNIDAD.items() if not any(n.lower() in todo for n in ns)]
+    sin = {}
+    for c, ns in NOMBRES_COMUNIDAD.items():
+        k = next((k for k, t in enumerate(por_dia) if any(n.lower() in t for n in ns)), 8)
+        if k >= minimo:
+            sin[c] = k
+    return sorted(sin, key=lambda c: -sin[c])[:maximo]
 
 
 def nota_olvidadas(hoy: date) -> str:
