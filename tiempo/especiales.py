@@ -24,8 +24,9 @@ import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+import numpy as np
 import requests
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 from . import cumplido, eleven, musica, voz
 from . import guion as g
@@ -715,24 +716,18 @@ def _vista_zonas(grupos):
 
 
 def _capa_poligonos(grupos, con_lista=False, consejos=None):
+    cache = {}
+
     def dibujar(capa, pr, dt):
         from .mapa import es_canaria, lonlat_mapa
         d = ImageDraw.Draw(capa)
         pulso = 0.75 + 0.25 * math.sin(dt * 4)
-        for gr in sorted(grupos, key=lambda x: NIVELES[x["nivel"]]):
-            col = COLOR_NIVEL[gr["nivel"]]
-            for pol in gr["poligonos"]:
-                pts = []
-                for lo, la in pol:
-                    if es_canaria(la):
-                        if not pr.muestra_canarias:
-                            continue
-                        lo, la = lonlat_mapa(lo, la, True)
-                    x, y = pr(lo, la)
-                    pts.append((x, MAPA_Y0 + y))
-                if len(pts) >= 3:
-                    d.polygon(pts, fill=col + (int(150 * pulso),), outline=col + (255,))
-                    d.line(pts + [pts[0]], fill=(255, 255, 255, 200), width=3)
+        clave = (tuple(pr.vista), pr.ancho, pr.alto)
+        if clave not in cache:   # provincias pintadas enteras y costa subrayada (se calcula una vez)
+            cache[clave] = pintar_avisos(grupos, pr, alfa=170)[0]
+        lay = cache[clave].copy()
+        lay.putalpha(lay.getchannel("A").point(lambda a: int(a * pulso)))
+        capa.alpha_composite(lay, (0, MAPA_Y0))
         if con_lista:  # etiquetas con el nivel y el fenómeno
             y = MAPA_Y0 + 30
             for gr in grupos[:3]:
@@ -758,31 +753,71 @@ def _capa_poligonos(grupos, con_lista=False, consejos=None):
     return dibujar
 
 
+def pintar_avisos(grupos, pr, alfa=120):
+    """Capa (ANCHO × MAPA_H) con los avisos pintados como se ven en la tele:
+    - oleaje / fenómenos costeros: se subraya la LÍNEA DE COSTA de la zona afectada con el color del nivel;
+    - el resto: se pinta ENTERA la provincia (o provincias) del aviso con el color del nivel."""
+    import numpy as np
+    from .mapa import es_canaria, etiquetas_provincias, lonlat_mapa
+    lab, nombres, costa = etiquetas_provincias(pr)
+    h, w = lab.shape
+    out = np.zeros((h, w, 4), np.uint8)
+    vistos = []
+    for gr in sorted(grupos, key=lambda x: NIVELES[x["nivel"]]):          # el nivel más alto queda encima
+        col = COLOR_NIVEL[gr["nivel"]]
+        poli = Image.new("L", (w, h), 0)
+        dp = ImageDraw.Draw(poli)
+        for pol in gr["poligonos"]:
+            pts = []
+            for lo, la in pol:
+                if es_canaria(la):
+                    if not pr.muestra_canarias:
+                        continue
+                    lo, la = lonlat_mapa(lo, la, True)
+                pts.append(pr(lo, la))
+            if len(pts) >= 3:
+                dp.polygon(pts, fill=255)
+        pm = np.array(poli) > 0
+        if not pm.any():
+            continue
+        if "coster" in gr["fenomeno"].lower():
+            cerca = np.array(poli.filter(ImageFilter.MaxFilter(31))) > 0
+            linea = Image.fromarray(((costa & cerca) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(9))
+            m = np.array(linea) > 0
+            if m.any():
+                out[m] = col + (235,)
+                vistos.append(gr)
+        else:
+            dentro = lab[pm]
+            dentro = dentro[dentro > 0]
+            if dentro.size == 0:
+                continue
+            idx, cuenta = np.unique(dentro, return_counts=True)
+            pintada = False
+            for i, c in zip(idx, cuenta):
+                total = (lab == i).sum()
+                if c >= 0.25 * dentro.size or c >= 0.15 * total:     # la provincia está afectada de verdad
+                    out[lab == i] = col + (alfa,)
+                    pintada = True
+            if pintada:
+                vistos.append(gr)
+    return Image.fromarray(out, "RGBA"), vistos
+
+
 def capa_avisos_suave(grupos):
     """Zonas con aviso (amarillo, naranja o rojo) coloreadas suavemente bajo las tarjetas del parte, con leyenda."""
+    cache = {}
+
     def dibujar(capa, pr, dt):
-        from .mapa import es_canaria, lonlat_mapa
-        lay = Image.new("RGBA", capa.size, (0, 0, 0, 0))
-        d = ImageDraw.Draw(lay)
         aparece = min(1.0, max(0.0, dt / 0.6))
-        vistos = []
-        for gr in sorted(grupos, key=lambda x: NIVELES[x["nivel"]]):
-            col = COLOR_NIVEL[gr["nivel"]]
-            dentro = False
-            for pol in gr["poligonos"]:
-                pts = []
-                for lo, la in pol:
-                    if es_canaria(la):
-                        if not pr.muestra_canarias:
-                            continue
-                        lo, la = lonlat_mapa(lo, la, True)
-                    x, y = pr(lo, la)
-                    pts.append((x, MAPA_Y0 + y))
-                if len(pts) >= 3 and any(0 <= x <= ANCHO and MAPA_Y0 <= y <= MAPA_Y0 + MAPA_H for x, y in pts):
-                    d.polygon(pts, fill=col + (int(120 * aparece),), outline=col + (int(230 * aparece),))
-                    dentro = True
-            if dentro:
-                vistos.append(gr)
+        clave = (tuple(pr.vista), pr.ancho, pr.alto)
+        if clave not in cache:
+            img, vis = pintar_avisos(grupos, pr)
+            full = Image.new("RGBA", capa.size, (0, 0, 0, 0)); full.alpha_composite(img, (0, MAPA_Y0))
+            cache[clave] = (full, vis)
+        lay, vistos = cache[clave]
+        if aparece < 1:
+            lay = lay.copy(); lay.putalpha(lay.getchannel("A").point(lambda a: int(a * aparece)))
         capa.alpha_composite(lay)
         d = ImageDraw.Draw(capa)
         y = MAPA_Y0 + MAPA_H - 80            # leyenda abajo a la izquierda

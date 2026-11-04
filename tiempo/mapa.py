@@ -107,6 +107,31 @@ def mascara_tierra(pr: "Proyeccion") -> Image.Image:
     return _TIERRA[clave]
 
 
+_ETIQ = {}
+
+
+def etiquetas_provincias(pr: "Proyeccion"):
+    """(array con el índice+1 de la provincia en cada píxel, lista de nombres, máscara de costa) para esta vista."""
+    import numpy as np
+    clave = (tuple(pr.vista), pr.ancho, pr.alto)
+    if clave not in _ETIQ:
+        lab = Image.new("I", (int(pr.ancho), int(pr.alto)), 0)
+        d = ImageDraw.Draw(lab)
+        nombres = []
+        for k, p in enumerate(provincias()):
+            canaria = p["nombre"] in PROVINCIAS_CANARIAS
+            nombres.append(p["nombre"])
+            if canaria and not pr.muestra_canarias:
+                continue
+            for anillo in p["anillos"]:
+                d.polygon([pr(*lonlat_mapa(x, y, canaria)) for x, y in anillo], fill=k + 1)
+        arr = np.array(lab, dtype=np.int32)
+        tierra = Image.fromarray(((arr > 0) * 255).astype(np.uint8))
+        costa = np.array(tierra.filter(ImageFilter.MaxFilter(5))) & ~np.array(tierra)   # borde tierra-mar
+        _ETIQ[clave] = (arr, nombres, costa > 0)
+    return _ETIQ[clave]
+
+
 def dibujar_mapa(vista, ancho, alto, foco: str | None = None, ss: int = 2) -> Image.Image:
     """Renderiza el mapa (con antialiasing por supermuestreo)."""
     W, H = ancho * ss, alto * ss
