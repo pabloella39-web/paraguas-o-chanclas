@@ -306,7 +306,11 @@ def comunidades_olvidadas(hoy: date, minimo: int = 2, maximo: int = 5) -> list[s
         k = next((k for k, t in enumerate(por_dia) if any(n.lower() in t for n in ns)), 8)
         if k >= minimo:
             sin[c] = k
-    return sorted(sin, key=lambda c: -sin[c])[:maximo]
+    pob = {"Andalucía": 8.6, "Cataluña": 8.0, "Madrid": 7.0, "Comunidad Valenciana": 5.3, "Galicia": 2.7,
+           "Castilla y León": 2.4, "País Vasco": 2.2, "Canarias": 2.2, "Castilla-La Mancha": 2.1, "Murcia": 1.6,
+           "Aragón": 1.35, "Baleares": 1.2, "Extremadura": 1.05, "Asturias": 1.0, "Navarra": 0.68,
+           "Cantabria": 0.59, "La Rioja": 0.32}
+    return sorted(sin, key=lambda c: (-sin[c], -pob.get(c, 0)))[:maximo]
 
 
 def nota_olvidadas(hoy: date) -> str:
