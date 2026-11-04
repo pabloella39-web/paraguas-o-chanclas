@@ -690,10 +690,12 @@ def main():
     if corregir:
         est = _cargar()
         hechas = set(est.get("escritas", []))
+        usuarios = {u for h in est.get("hechas", []) if _norm(corregir) in _norm(h.get("clave", "")) for u in h.get("usuarios", [])}
         todos = comentarios_nuevos({"vistos": []})
         corr = est.setdefault("corregidas", [])
         for c in todos:
-            if c["id"] not in hechas or c["id"] in corr or _norm(corregir) not in _norm(c["texto"]):
+            if (c["id"] not in hechas and c["usuario"] not in usuarios) or c["id"] in corr \
+                    or _norm(corregir) not in _norm(c["texto"]):
                 continue
             q = {"id": c["id"], "lugar": corregir, "pais": "ES", "dia": ""}
             msg = texto_ciudad(q, ahora())
