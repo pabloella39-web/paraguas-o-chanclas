@@ -269,6 +269,41 @@ def icono(tipo: str, tam: int, fase: int = 0) -> Image.Image:
         if tipo == "tormenta" and (f < 0.12 or 0.25 <= f < 0.31):   # el rayo destella dos veces por bucle
             d.polygon([(s * 0.52, s * 0.56), (s * 0.40, s * 0.78), (s * 0.50, s * 0.78), (s * 0.44, s * 0.96),
                        (s * 0.64, s * 0.70), (s * 0.54, s * 0.70), (s * 0.60, s * 0.56)], fill=AMARILLO)
+    elif tipo == "calor":      # sol que late con ondas de calor subiendo
+        _sol(d, s * 0.5, s * 0.38, s * 0.17, s, giro=f * math.pi / 2, pulso=1 + 0.22 * onda)
+        for i, x0 in enumerate((0.28, 0.5, 0.72)):
+            k = (f + i * 0.33) % 1.0
+            pts = [(s * x0 + s * 0.035 * math.sin(2 * math.pi * (j / 10 * 1.5 + f * 2)), s * (0.95 - 0.28 * j / 10 - 0.08 * k))
+                   for j in range(11)]
+            d.line(pts, fill=(255, 140, 60, int(255 * (1 - k * 0.5))), width=int(s * 0.035), joint="curve")
+    elif tipo == "helada":     # cristal de hielo girando con destellos
+        cx, cy, r = s * 0.5, s * 0.5, s * 0.36
+        giro = f * math.pi / 3
+        col = (200, 235, 255)
+        for j in range(6):
+            a = giro + j * math.pi / 3
+            x1, y1 = cx + math.cos(a) * r, cy + math.sin(a) * r
+            d.line([(cx, cy), (x1, y1)], fill=col, width=int(s * 0.05))
+            for fr in (0.45, 0.7):
+                bx, by = cx + math.cos(a) * r * fr, cy + math.sin(a) * r * fr
+                for da in (0.7, -0.7):
+                    d.line([(bx, by), (bx + math.cos(a + da) * r * 0.25, by + math.sin(a + da) * r * 0.25)],
+                           fill=col, width=int(s * 0.035))
+        for j in range(3):     # destellos
+            k = (f * 2 + j / 3) % 1.0
+            a = j * 2.1
+            x, y = cx + math.cos(a) * r * 1.05, cy + math.sin(a) * r * 1.05
+            t_ = s * 0.06 * math.sin(math.pi * k)
+            d.line([(x - t_, y), (x + t_, y)], fill=(255, 255, 255), width=int(s * 0.02))
+            d.line([(x, y - t_), (x, y + t_)], fill=(255, 255, 255), width=int(s * 0.02))
+    elif tipo == "granizo":    # nube oscura con bolitas de granizo cayendo y rebotando
+        for i, cx in enumerate((0.30, 0.46, 0.62, 0.76)):
+            k = (f + i * 0.27) % 1.0
+            y = s * (0.62 + 0.30 * k)
+            r = s * 0.045
+            d.ellipse([s * cx - r, y - r, s * cx + r, y + r], fill=(235, 245, 255), outline=(150, 190, 230),
+                      width=int(s * 0.012))
+        _nube(d, s * (0.48 + 0.015 * onda), s * 0.30, s * 0.72, NUBE_OSCURA)
     elif tipo == "niebla":
         _nube(d, s * 0.50, s * 0.22, s * 0.66, (220, 226, 236))
         for i, w in enumerate((0.70, 0.56, 0.66)):

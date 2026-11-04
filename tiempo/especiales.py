@@ -949,7 +949,7 @@ def nieblas_de(grupos) -> list[dict]:
 
 
 ICONO_AVISO = {"lluvias": "lluvia", "tormentas": "tormenta", "nevadas": "nieve", "vientos": "viento",
-               "nieblas": "niebla", "costeros": "viento", "temperaturas máximas": "sol", "temperaturas mínimas": "nieve"}
+               "nieblas": "niebla", "costeros": "viento", "temperaturas máximas": "calor", "temperaturas mínimas": "helada"}
 
 
 def _nombre_prov(n: str) -> str:
@@ -985,14 +985,14 @@ def capa_fichas(grupos, prev_dia=None):
         pd = prev_dia or []
         for c in sorted(pd, key=lambda c: -c["tmax"])[:2]:          # ola de calor / calor extremo
             if c["tmax"] >= 38:
-                extra.append((c, "sol", (255, 120, 60), c["nombre"].upper(), f"CALOR EXTREMO · {c['tmax']}°"))
+                extra.append((c, "calor", (255, 120, 60), c["nombre"].upper(), f"CALOR EXTREMO · {c['tmax']}°"))
         for c in sorted(pd, key=lambda c: c["tmin"])[:3]:            # frío extremo y heladas
             if c["tmin"] <= -5:
-                extra.append((c, "nieve", (120, 170, 255), c["nombre"].upper(), f"FRÍO EXTREMO · {c['tmin']}°"))
+                extra.append((c, "helada", (120, 170, 255), c["nombre"].upper(), f"FRÍO EXTREMO · {c['tmin']}°"))
             elif c["tmin"] <= 0:
-                extra.append((c, "nieve", (140, 200, 255), c["nombre"].upper(), f"HELADA · {c['tmin']}°"))
+                extra.append((c, "helada", (140, 200, 255), c["nombre"].upper(), f"HELADA · {c['tmin']}°"))
         for c in [c for c in pd if c.get("granizo")][:2]:              # granizo
-            extra.append((c, "tormenta", (200, 220, 255), c["nombre"].upper(), "POSIBLE GRANIZO"))
+            extra.append((c, "granizo", (200, 220, 255), c["nombre"].upper(), "POSIBLE GRANIZO"))
         for c in [c for c in pd if c.get("icono") == "tormenta" and not c.get("granizo")][:2]:
             extra.append((c, "tormenta", (255, 214, 90), c["nombre"].upper(), "TORMENTAS"))
         for c in sorted(prev_dia or [], key=lambda c: -(c.get("racha") or 0))[:2]:
