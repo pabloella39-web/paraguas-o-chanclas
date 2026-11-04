@@ -114,17 +114,32 @@ def videos_recientes(n: int = 8) -> list[str]:
     return ids[:n]
 
 
-def comentarios_nuevos(estado: dict) -> list[dict]:
+def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
+    out, cursor = [], None
+    for _ in range(paginas):
+        extra = {"cursor": cursor} if cursor else {}
+        j = _get("uploadposts/comments", platform="tiktok", user=uploadpost.perfil("tiempo"), post_id=vid,
+                 limit=limit, **extra)
+        out += j.get("comments", [])
+        nuevo = j.get("cursor") or j.get("next_cursor") or (j.get("pagination") or {}).get("cursor")
+        if paginas > 1:
+            log.info("Vídeo %s: %d comentarios; claves %s", vid, len(out), list(j)[:8])
+        if not nuevo or nuevo == cursor or not (j.get("has_more", True)):
+            break
+        cursor = nuevo
+    return out
+
+
+def comentarios_nuevos(estado: dict, n: int = 8, limit: int = 50, paginas: int = 1) -> list[dict]:
     vistos = set(estado["vistos"])
     nuevos = []
-    for vid in videos_recientes():
+    for vid in videos_recientes(n):
         try:
-            j = _get("uploadposts/comments", platform="tiktok", user=uploadpost.perfil("tiempo"), post_id=vid,
-                     limit=50)
+            lista = _comentarios_de(vid, limit, paginas)
         except Exception as e:  # noqa: BLE001
             log.warning("Comentarios de %s: %s", vid, e)
             continue
-        for c in j.get("comments", []):
+        for c in lista:
             cid = str(c.get("id") or c.get("comment_id") or "")
             u = c.get("user") or {}
             nombre = (u.get("username") or u.get("display_name") or c.get("username") or "").lstrip("@")
@@ -715,7 +730,13 @@ def main():
     if lugar:
         est = _cargar()
         hechas = set(est.get("escritas", []))
-        for c in comentarios_nuevos({"vistos": []}):
+        todos = comentarios_nuevos({"vistos": []}, n=15, limit=100, paginas=6)
+        claves = [w for w in _norm(lugar).split() if len(w) > 3]
+        for c in todos:   # para depurar: los que se le parecen
+            if any(w in _norm(c["texto"]) for w in claves):
+                print(f"::notice::Parecido: {c['id']} en {c.get('video')} ({c['usuario']}, "
+                      f"{'ya contestado' if c['id'] in hechas else 'sin contestar'}): «{c['texto'][:80]}»")
+        for c in todos:
             if c["id"] in hechas or _norm(lugar) not in _norm(c["texto"]):
                 continue
             msg = texto_ciudad({"id": c["id"], "lugar": lugar, "pais": "ES", "dia": ""}, ahora())
