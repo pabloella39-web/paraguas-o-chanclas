@@ -730,7 +730,7 @@ def main():
     if lugar:
         est = _cargar()
         hechas = set(est.get("escritas", []))
-        todos = comentarios_nuevos({"vistos": []}, n=15, limit=100, paginas=6)
+        todos = comentarios_nuevos({"vistos": []}, n=15, limit=50, paginas=6)
         claves = [w for w in _norm(lugar).split() if len(w) > 3]
         for c in todos:   # para depurar: los que se le parecen
             if any(w in _norm(c["texto"]) for w in claves):
