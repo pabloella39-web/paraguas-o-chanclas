@@ -70,7 +70,12 @@ def _norm(s: str) -> str:
 
 # ================================================================ comentarios (Upload-Post)
 def _get(ruta: str, **params):
-    r = requests.get(f"{API}/{ruta}", headers=uploadpost._cabeceras(), params=params, timeout=40)
+    import time
+    for k in range(3):   # límite por minuto de Upload-Post: esperar y reintentar
+        r = requests.get(f"{API}/{ruta}", headers=uploadpost._cabeceras(), params=params, timeout=40)
+        if r.status_code != 429:
+            break
+        time.sleep(62)
     if r.status_code >= 400:
         raise RuntimeError(f"Upload-Post {ruta} HTTP {r.status_code}: {r.text[:200]}")
     return r.json()
@@ -143,7 +148,7 @@ def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
             log.info("Vídeo %s: no consigo pasar de página", vid)
             break
     for c in list(out):   # respuestas dentro de hilos (p. ej. las que contestan a nuestro «Reto: dime tu pueblo»)
-        if (c.get("replies") or 0) > 0:
+        if (c.get("replies") or 0) > 0 and c.get("owner") is True:   # solo hilos de nuestros comentarios
             try:
                 hilo = pedir(comment_id=str(c.get("id") or c.get("comment_id"))).get("comments", [])
             except Exception as e:  # noqa: BLE001
@@ -187,9 +192,14 @@ def comentarios_nuevos(estado: dict, n: int = 8, limit: int = 50, paginas: int =
 
 
 def responder_texto(com: dict, mensaje: str):
-    r = requests.post(f"{API}/uploadposts/comments/create", headers=uploadpost._cabeceras(), json={
-        "platform": "tiktok", "user": uploadpost.perfil("tiempo"), "post_id": com["video"],
-        "comment_id": com["id"], "message": mensaje[:150]}, timeout=40)
+    import time
+    for _ in range(3):
+        r = requests.post(f"{API}/uploadposts/comments/create", headers=uploadpost._cabeceras(), json={
+            "platform": "tiktok", "user": uploadpost.perfil("tiempo"), "post_id": com["video"],
+            "comment_id": com["id"], "message": mensaje[:150]}, timeout=40)
+        if r.status_code != 429:   # 429 = límite por minuto: no se publicó, se puede reintentar
+            break
+        time.sleep(62)
     ok = r.status_code < 400
     try:
         ok = ok and r.json().get("success", True) is not False
@@ -810,7 +820,7 @@ def main():
     if lugar:
         est = _cargar()
         hechas = set(est.get("escritas", []))
-        todos = comentarios_nuevos({"vistos": []}, n=15, limit=50, paginas=40)
+        todos = comentarios_nuevos({"vistos": []}, n=6, limit=50, paginas=40)
         lugar, _, extra = lugar.partition("|")   # "Sitio|id_comentario" contesta a ese; "Sitio|palabra,palabra" solo lista
         lugar = lugar.strip()
         objetivo = extra.strip() if extra.strip().isdigit() else None
