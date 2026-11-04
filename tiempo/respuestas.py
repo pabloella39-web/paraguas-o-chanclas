@@ -121,10 +121,12 @@ def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
         j = _get("uploadposts/comments", platform="tiktok", user=uploadpost.perfil("tiempo"), post_id=vid,
                  limit=limit, **extra)
         out += j.get("comments", [])
-        nuevo = j.get("cursor") or j.get("next_cursor") or (j.get("pagination") or {}).get("cursor")
+        pg = j.get("pagination") or {}
+        nuevo = j.get("cursor") or j.get("next_cursor") or pg.get("cursor") or pg.get("next_cursor") \
+            or pg.get("after") or (pg.get("cursors") or {}).get("after")
         if paginas > 1:
-            log.info("Vídeo %s: %d comentarios; claves %s", vid, len(out), list(j)[:8])
-        if not nuevo or nuevo == cursor or not (j.get("has_more", True)):
+            log.info("Vídeo %s: %d comentarios; paginación %s", vid, len(out), json.dumps(j.get("pagination"))[:300])
+        if not nuevo or nuevo == cursor or not (j.get("has_more", pg.get("has_more", True))):
             break
         cursor = nuevo
     return out
