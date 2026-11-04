@@ -420,7 +420,8 @@ PREVS_DIA = {}       # previsión de cada día (para las heladas y rachas del bl
 def _merece_bloque(k) -> bool:
     gr = AVISOS_DIA.get(k) or []
     ol, ni = MAR_NIEVE.get(k, ([], []))
-    return (any(NIVELES[x["nivel"]] >= 2 for x in gr) or len(gr) >= 3
+    # solo si hay algo reseñable: aviso naranja o rojo, mar fuerte o nieve importante (los amarillos sueltos, no)
+    return (any(NIVELES[x["nivel"]] >= 2 for x in gr)
             or any(o["olas"] >= 4 for o in ol) or any(n["cota"] < 1000 or n["cm"] >= 10 for n in ni))
 MAR_NIEVE = {}   # {día: (olas, nieve)} para dibujarlos en el mapa de cada día
 
