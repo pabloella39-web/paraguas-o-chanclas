@@ -115,20 +115,35 @@ def videos_recientes(n: int = 8) -> list[str]:
 
 
 def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
-    out, cursor = [], None
-    for _ in range(paginas):
-        extra = {"cursor": cursor} if cursor else {}
-        j = _get("uploadposts/comments", platform="tiktok", user=uploadpost.perfil("tiempo"), post_id=vid,
-                 limit=limit, **extra)
-        out += j.get("comments", [])
+    """Comentarios de un vídeo; con paginas > 1 sigue la paginación (TikTok da 30 por página)."""
+    def pedir(**extra):
+        return _get("uploadposts/comments", platform="tiktok", user=uploadpost.perfil("tiempo"), post_id=vid,
+                    limit=limit, **extra)
+    j = pedir()
+    out = list(j.get("comments", []))
+    ids = {str(c.get("id") or c.get("comment_id")) for c in out}
+    nombre = None
+    for _ in range(paginas - 1):
         pg = j.get("pagination") or {}
-        nuevo = j.get("cursor") or j.get("next_cursor") or pg.get("cursor") or pg.get("next_cursor") \
-            or pg.get("after") or (pg.get("cursors") or {}).get("after")
-        if paginas > 1:
-            log.info("Vídeo %s: %d comentarios; paginación %s", vid, len(out), json.dumps(j.get("pagination"))[:300])
-        if not nuevo or nuevo == cursor or not (j.get("has_more", pg.get("has_more", True))):
+        cur = pg.get("next_cursor")
+        if not pg.get("has_next") or cur is None:
             break
-        cursor = nuevo
+        for n in ([nombre] if nombre else ["cursor", "next_cursor", "offset", "after", "page_token"]):
+            try:
+                j2 = pedir(**{n: cur})
+            except Exception:  # noqa: BLE001
+                continue
+            nuevos = [c for c in j2.get("comments", []) if str(c.get("id") or c.get("comment_id")) not in ids]
+            if nuevos:
+                nombre, j = n, j2
+                out += nuevos
+                ids |= {str(c.get("id") or c.get("comment_id")) for c in nuevos}
+                break
+        else:
+            log.info("Vídeo %s: no consigo pasar de página", vid)
+            break
+    if paginas > 1:
+        log.info("Vídeo %s: %d comentarios (parámetro de página: %s)", vid, len(out), nombre)
     return out
 
 
