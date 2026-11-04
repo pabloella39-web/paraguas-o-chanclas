@@ -415,6 +415,23 @@ EXTRA_SEMANA: list = []
 AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
 AVISOS_DIA = {}
 AVISOS_BLOQUE = []
+MESES_LARGOS = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE",
+                "NOVIEMBRE", "DICIEMBRE"]
+COMUNIDAD_PROV = {
+    "A Coruña": "Galicia", "Lugo": "Galicia", "Ourense": "Galicia", "Pontevedra": "Galicia", "Asturias": "Asturias",
+    "Cantabria": "Cantabria", "Bizkaia/Vizcaya": "País Vasco", "Gipuzkoa/Guipúzcoa": "País Vasco",
+    "Araba/Álava": "País Vasco", "Navarra": "Navarra", "La Rioja": "La Rioja", "Huesca": "Aragón", "Zaragoza": "Aragón",
+    "Teruel": "Aragón", "Girona": "Cataluña", "Barcelona": "Cataluña", "Tarragona": "Cataluña", "Lleida": "Cataluña",
+    "Castelló/Castellón": "C. Valenciana", "València/Valencia": "C. Valenciana", "Alacant/Alicante": "C. Valenciana",
+    "Murcia": "Murcia", "Illes Balears": "Baleares", "Madrid": "Madrid", "León": "Castilla y León",
+    "Palencia": "Castilla y León", "Burgos": "Castilla y León", "Soria": "Castilla y León", "Zamora": "Castilla y León",
+    "Valladolid": "Castilla y León", "Segovia": "Castilla y León", "Ávila": "Castilla y León",
+    "Salamanca": "Castilla y León", "Guadalajara": "Castilla-La Mancha", "Cuenca": "Castilla-La Mancha",
+    "Toledo": "Castilla-La Mancha", "Ciudad Real": "Castilla-La Mancha", "Albacete": "Castilla-La Mancha",
+    "Cáceres": "Extremadura", "Badajoz": "Extremadura", "Huelva": "Andalucía", "Sevilla": "Andalucía",
+    "Cádiz": "Andalucía", "Málaga": "Andalucía", "Córdoba": "Andalucía", "Jaén": "Andalucía", "Granada": "Andalucía",
+    "Almería": "Andalucía", "Las Palmas": "Canarias", "Santa Cruz De Tenerife": "Canarias", "Ceuta": "Ceuta",
+    "Melilla": "Melilla"}
 PREVS_DIA = {}       # previsión de cada día (para las heladas y rachas del bloque de avisos)   # días con bloque propio de avisos (mapa de España con avisos, olas, nieve y niebla)
 
 
@@ -691,7 +708,8 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     }
     video = _producir(f"{MODOS_SEMANA[MODO_SEMANA]['archivo']}_{lun.isoformat()}", guion, plan, total, trozos, kwargs,
                       prevs[_dias()[0]], extremos,
-                      ("SEMANA " if MODO_SEMANA == "semana" else "HASTA EL DOMINGO ") + rango, salida, trabajo)
+                      (f"DEL {lun.day} AL {vie.day} DE {MESES_LARGOS[vie.month - 1]}" if lun.month == vie.month
+                       else ("SEMANA " if MODO_SEMANA == "semana" else "HASTA EL DOMINGO ") + rango), salida, trabajo)
     caption = caption_semana(prevs, fechas, guion.get("caption") if guion.get("origen") == "claude" else None)
     return {"tipo": MODO_SEMANA, "fecha": domingo.isoformat(), "video": str(video), "caption": caption,
             "titular": guion.get("titular"), "motor_voz": motor, "origen_guion": guion.get("origen"),
@@ -881,9 +899,17 @@ def pintar_avisos(grupos, pr, alfa=120):
             if m.any():
                 out[m] = col + (235,)
                 vistos.append(gr)
-                ys, xs = np.nonzero(m)
-                gr.setdefault("_donde", {})[tuple(pr.vista)] = (float(xs.mean()), float(ys.mean()),
-                    [nombres[i - 1] for i in np.unique(lab[np.array(poli.filter(ImageFilter.MaxFilter(41))) > 0]) if i > 0])
+                provs = {}
+                cerca2 = np.array(poli.filter(ImageFilter.MaxFilter(41))) > 0
+                for i in np.unique(lab[cerca2]):
+                    if i <= 0:
+                        continue
+                    sel = m & (np.array(Image.fromarray(((lab == i) * 255).astype(np.uint8)).filter(
+                        ImageFilter.MaxFilter(15))) > 0)
+                    if sel.any():
+                        ys, xs = np.nonzero(sel)
+                        provs[nombres[i - 1]] = (float(xs.mean()), float(ys.mean()), int(xs.size))
+                gr.setdefault("_provs", {})[tuple(pr.vista)] = provs
         else:
             dentro = lab[pm]
             dentro = dentro[dentro > 0]
@@ -898,9 +924,11 @@ def pintar_avisos(grupos, pr, alfa=120):
                     pintadas.append(i)
             if pintadas:
                 vistos.append(gr)
-                ys, xs = np.nonzero(np.isin(lab, pintadas))
-                gr.setdefault("_donde", {})[tuple(pr.vista)] = (float(xs.mean()), float(ys.mean()),
-                                                                  [nombres[i - 1] for i in pintadas])
+                provs = {}
+                for i in pintadas:
+                    ys, xs = np.nonzero(lab == i)
+                    provs[nombres[i - 1]] = (float(xs.mean()), float(ys.mean()), int(xs.size))
+                gr.setdefault("_provs", {})[tuple(pr.vista)] = provs
     return Image.fromarray(out, "RGBA"), vistos
 
 
@@ -970,17 +998,22 @@ def capa_fichas(grupos, prev_dia=None):
         puestas = cajas if isinstance(cajas, list) else list(cajas)
         fichas = []
         for gr in sorted(grupos or [], key=lambda x: -NIVELES[x["nivel"]]):
-            donde = (gr.get("_donde") or {}).get(tuple(pr.vista))
-            if not donde:
-                continue
-            x, y, provs = donde
-            sitio = " y ".join(dict.fromkeys(_nombre_prov(p) for p in provs[:2])) or gr["zonas"][0][:22]
-            dato = dato_aviso(gr).replace(" EN 1 HORA", "/H").replace("L/M²", "l/m²").lower() if dato_aviso(gr) else ""
-            if "niebla" in gr["fenomeno"]:
+            provs = (gr.get("_provs") or {}).get(tuple(pr.vista)) or {}
+            if not provs or "niebla" in gr["fenomeno"]:
                 continue   # la niebla ya lleva su insignia animada
-            fichas.append((x, MAPA_Y0 + y, COLOR_NIVEL[gr["nivel"]], ICONO_AVISO.get(gr["fenomeno"].lower(), "lluvia"),
-                           sitio.upper(), (nombre_fen(gr["fenomeno"]) + (f" · {dato}" if dato else "")).upper(),
-                           gr["nivel"]))
+            por_com = {}
+            for p_, (x, y, n) in provs.items():
+                por_com.setdefault(COMUNIDAD_PROV.get(p_, p_), []).append((p_, x, y, n))
+            dato = dato_aviso(gr) if len(por_com) == 1 else ""
+            dato = dato.replace(" EN 1 HORA", "/H") if dato else ""
+            for com, lista in sorted(por_com.items(), key=lambda kv: -sum(t[3] for t in kv[1])):
+                tot = sum(t[3] for t in lista)
+                x = sum(t[1] * t[3] for t in lista) / tot
+                y = sum(t[2] * t[3] for t in lista) / tot
+                sitio = _nombre_prov(lista[0][0]) if len(lista) == 1 else com
+                fichas.append((x, MAPA_Y0 + y, COLOR_NIVEL[gr["nivel"]], ICONO_AVISO.get(gr["fenomeno"].lower(), "lluvia"),
+                               sitio.upper(), (nombre_fen(gr["fenomeno"]) + (f" · {dato}" if dato else "")).upper(),
+                               gr["nivel"]))
         extra = []
         pd = prev_dia or []
         for c in sorted(pd, key=lambda c: -c["tmax"])[:2]:          # ola de calor / calor extremo
@@ -995,6 +1028,13 @@ def capa_fichas(grupos, prev_dia=None):
             extra.append((c, "granizo", (200, 220, 255), c["nombre"].upper(), "POSIBLE GRANIZO"))
         for c in [c for c in pd if c.get("icono") == "tormenta" and not c.get("granizo")][:2]:
             extra.append((c, "tormenta", (255, 214, 90), c["nombre"].upper(), "TORMENTAS"))
+        if pd:   # para que el mapa nunca quede vacío: lo más caluroso y lo más frío del día
+            if not any(e_[4].startswith("CALOR") for e_ in extra):
+                c = max(pd, key=lambda c: c["tmax"])
+                extra.append((c, "sol", (255, 170, 60), c["nombre"].upper(), f"MÁXIMA · {c['tmax']}°"))
+            if not any(e_[4].startswith(("HELADA", "FRÍO")) for e_ in extra):
+                c = min(pd, key=lambda c: c["tmin"])
+                extra.append((c, "nubes", (140, 200, 255), c["nombre"].upper(), f"MÍNIMA · {c['tmin']}°"))
         for c in sorted(prev_dia or [], key=lambda c: -(c.get("racha") or 0))[:2]:
             if (c.get("racha") or 0) >= 60:
                 extra.append((c, "viento", (200, 220, 255), c["nombre"].upper(), f"RACHAS · {round(c['racha'])} KM/H"))
@@ -1002,7 +1042,7 @@ def capa_fichas(grupos, prev_dia=None):
             x, y = pr.ciudad(c)
             fichas.append((x, MAPA_Y0 + y, col, ic, l1, l2, "info"))
         f1, f2 = fuente("Black", 30), fuente("ExtraBold", 24)
-        for k, (x, y, col, ic, l1, l2, nivel) in enumerate(fichas[:7]):
+        for k, (x, y, col, ic, l1, l2, nivel) in enumerate(fichas[:9]):
             w = max(f1.getlength(l1), f2.getlength(l2)) + 112
             h = 76
             pos = None
@@ -1241,7 +1281,8 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | N
             puestas.append((x - w / 2, y - hh / 2, x + w / 2, y + hh / 2))
             d.rounded_rectangle([x - w / 2, y - hh / 2, x + w / 2, y + hh / 2], radius=hh / 2,
                                 fill=(120, 132, 150, int(240 * s_)), outline=(255, 255, 255, int(220 * s_)), width=3)
-            bruma(d, x - w / 2 + 14, y, fase=dt)
+            from .mapa import icono as _icono, fase_de as _fase
+            capa.alpha_composite(_icono("niebla", 56, _fase(dt)), (int(x - w / 2 + 6), int(y - 28)))
             d.text((x - w / 2 + 66, y - (8 if l2 else 0)), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
             if l2:
                 d.text((x - w / 2 + 66, y + 17), l2, font=f2, fill=(225, 232, 245, int(255 * s_)), anchor="lm")
