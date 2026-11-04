@@ -838,20 +838,22 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
     """Altura de las olas en el mar (insignia azul con ola) y cota de nieve en la montaña (copo con la cota)."""
     nieves = sorted(nieves, key=lambda e: (-e["cm"], e["cota"]))[:5]   # solo las principales
     olas = sorted(olas, key=lambda o: -o["olas"])[:5]
-    def ola_icono(d, x, y, w=34, col=(255, 255, 255)):
+    def ola_icono(d, x, y, w=34, col=(255, 255, 255), fase=0.0):
+        """Dos olas que avanzan (la fase corre con el tiempo)."""
         for k in range(2):
-            pts = [(x + i, y + k * 11 + 4 * math.sin(i / w * 2 * math.pi * 1.5)) for i in range(0, w + 1, 2)]
+            pts = [(x + i, y + k * 11 + 4 * math.sin(i / w * 2 * math.pi * 1.5 - fase * 5 - k * 1.2))
+                   for i in range(0, w + 1, 2)]
             d.line(pts, fill=col, width=4)
 
-    def copo(d, x, y, r=17, col=(70, 140, 230)):
+    def copo(d, x, y, r=17, col=(70, 140, 230), giro=0.0):
+        """Copo que gira despacio."""
         for k in range(6):
-            a = k * math.pi / 3
+            a = k * math.pi / 3 + giro
             x1, y1 = x + math.cos(a) * r, y + math.sin(a) * r
             d.line([(x, y), (x1, y1)], fill=col, width=4)
-            for f in (.55,):
-                bx, by = x + math.cos(a) * r * f, y + math.sin(a) * r * f
-                for da in (.7, -.7):
-                    d.line([(bx, by), (bx + math.cos(a + da) * r * .35, by + math.sin(a + da) * r * .35)], fill=col, width=3)
+            bx, by = x + math.cos(a) * r * .55, y + math.sin(a) * r * .55
+            for da in (.7, -.7):
+                d.line([(bx, by), (bx + math.cos(a + da) * r * .35, by + math.sin(a + da) * r * .35)], fill=col, width=3)
 
     def libre(x, y, w, h, cajas, puestas, mar=None):
         """Mueve la insignia lo justo para no tapar tarjetas ni otras insignias (y que no se salga del mapa).
@@ -906,7 +908,7 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
             col = (20, 90, 200) if o["olas"] < 5 else (200, 40, 60)
             d.rounded_rectangle([x - w / 2, y - 28, x + w / 2, y + 28], radius=28, fill=col + (int(240 * s_),),
                                 outline=(255, 255, 255, int(230 * s_)), width=3)
-            ola_icono(d, x - w / 2 + 14, y - 8)
+            ola_icono(d, x - w / 2 + 14, y - 8, fase=dt)
             d.text((x - w / 2 + 58, y), txt, font=f, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
         for n in nieves:
             x, y = pr(n["lon"], n["lat"]); y += MAPA_Y0
@@ -922,7 +924,11 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
             puestas.append((x - w / 2, y - 34, x + w / 2, y + 34))
             d.rounded_rectangle([x - w / 2, y - 34, x + w / 2, y + 34], radius=18, fill=(255, 255, 255, int(245 * s_)),
                                 outline=(70, 140, 230, int(255 * s_)), width=4)
-            copo(d, x - w / 2 + 30, y)
+            copo(d, x - w / 2 + 30, y, giro=dt * 0.9)
+            for k in range(3):   # copitos que caen junto a la insignia
+                u = (dt * 0.6 + k / 3) % 1
+                fx, fy = x - w / 2 + 12 + k * 14, y + 36 + u * 28
+                d.ellipse([fx - 3, fy - 3, fx + 3, fy + 3], fill=(255, 255, 255, int(220 * (1 - u) * s_)))
             d.text((x - w / 2 + 56, y - 9), l1, font=f1, fill=(20, 40, 90, int(255 * s_)), anchor="lm")
             d.text((x - w / 2 + 56, y + 18), l2, font=f2, fill=(70, 120, 200, int(255 * s_)), anchor="lm")
     return dibujar
