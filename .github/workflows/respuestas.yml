@@ -19,6 +19,10 @@ on:
         description: "Respuesta escrita a mano: id_video|id_comentario|texto"
         type: string
         default: ""
+      corregir_lugar:
+        description: "Corregir las respuestas ya dadas a este lugar (p. ej. Asturias)"
+        type: string
+        default: ""
       solo_video:
         description: "Responder por escrito a los comentarios de ciudad de este vídeo (id de TikTok)"
         type: string
@@ -70,6 +74,7 @@ jobs:
           RESPUESTAS_TEXTO_POR_HORA: ${{ vars.RESPUESTAS_TEXTO_POR_HORA || '25' }}
           SOLO_VIDEO: ${{ inputs.solo_video }}
           RESPUESTA_MANUAL: ${{ inputs.respuesta_manual }}
+          CORREGIR_LUGAR: ${{ inputs.corregir_lugar }}
           REPASAR_BANDEJA: ${{ inputs.repasar_bandeja && '1' || '' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then

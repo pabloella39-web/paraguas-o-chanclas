@@ -686,6 +686,29 @@ def main():
         guardar_bandeja([q for q in clasificar([c for c in todos if c["id"] not in mios])
                          if q.get("tipo") == "otro" and q.get("merece")])
         return
+    corregir = os.environ.get("CORREGIR_LUGAR", "").strip()   # una vez: corrige respuestas de ciudad mal geolocalizadas
+    if corregir:
+        est = _cargar()
+        hechas = set(est.get("escritas", []))
+        todos = comentarios_nuevos({"vistos": []})
+        corr = est.setdefault("corregidas", [])
+        for c in todos:
+            if c["id"] not in hechas or c["id"] in corr or _norm(corregir) not in _norm(c["texto"]):
+                continue
+            q = {"id": c["id"], "lugar": corregir, "pais": "ES", "dia": ""}
+            msg = texto_ciudad(q, ahora())
+            if not msg:
+                continue
+            ficha = msg[msg.find("📍"):] if "📍" in msg else msg
+            texto = f"¡Perdona, antes me equivoqué de sitio! 🙈 Ahora sí: {ficha}"[:150]
+            try:
+                responder_texto(c, texto)
+                corr.append(c["id"])
+                print(f"::notice::Corregido {c['id']} ({c['usuario']}): {texto}")
+            except Exception as e:  # noqa: BLE001
+                print(f"::warning::No se pudo corregir {c['id']}: {e}")
+        _guardar(est)
+        return
     manual = os.environ.get("RESPUESTA_MANUAL", "").strip()   # "id_video|id_comentario|texto" (a mano, una vez)
     if manual:   # una o varias líneas "id_video|id_comentario|texto"
         est = _cargar()   # contestado a mano: que la respuesta automática no lo repita
