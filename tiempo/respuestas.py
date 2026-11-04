@@ -291,6 +291,9 @@ def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
     dia = hoy_.date() + timedelta(days=1) if (q.get("dia") == "mañana" or (q.get("dia") != "hoy" and hoy_.hour >= 15)) \
         else hoy_.date()
     p = prevision(sitio, dia)
+    if sitio.get("pais") == "ES" and not (-25 <= p["tmin"] <= p["tmax"] <= 46):
+        log.warning("Previsión rara para %s (%s/%s): no se contesta", sitio["nombre"], p["tmax"], p["tmin"])
+        return None
     ver = veredicto(p)
     corto = {"NI UNO NI OTRO: CHAQUETA": "chaqueta"}.get(ver, ver.lower())
     cuando = "Hoy" if dia == hoy_.date() else "Mañana"
@@ -321,13 +324,40 @@ def _get_reintentos(url: str, params: dict, intentos: int = 4):
             time.sleep(5 * (k + 1))
 
 
+# Comunidades, islas y provincias que no son un pueblo: se usa su capital (el 4/11/2026 "Asturias" se geolocalizó en
+# Filipinas y se contestó "30 grados en Asturias")
+REGION_A_CIUDAD = {
+    "asturias": "Oviedo", "principado de asturias": "Oviedo", "cantabria": "Santander", "la rioja": "Logroño",
+    "rioja": "Logroño", "navarra": "Pamplona", "nafarroa": "Pamplona", "pais vasco": "Bilbao", "euskadi": "Bilbao",
+    "bizkaia": "Bilbao", "vizcaya": "Bilbao", "gipuzkoa": "San Sebastián", "guipuzcoa": "San Sebastián",
+    "alava": "Vitoria-Gasteiz", "araba": "Vitoria-Gasteiz", "galicia": "Santiago de Compostela",
+    "aragon": "Zaragoza", "cataluna": "Barcelona", "catalunya": "Barcelona", "andalucia": "Sevilla",
+    "extremadura": "Mérida", "castilla y leon": "Valladolid", "castilla la mancha": "Toledo",
+    "castilla-la mancha": "Toledo", "la mancha": "Ciudad Real", "comunidad valenciana": "Valencia",
+    "comunitat valenciana": "Valencia", "region de murcia": "Murcia", "comunidad de madrid": "Madrid",
+    "baleares": "Palma", "illes balears": "Palma", "islas baleares": "Palma", "mallorca": "Palma",
+    "menorca": "Mahón", "ibiza": "Ibiza", "eivissa": "Ibiza", "formentera": "Sant Francesc de Formentera",
+    "canarias": "Las Palmas de Gran Canaria", "islas canarias": "Las Palmas de Gran Canaria",
+    "gran canaria": "Las Palmas de Gran Canaria", "tenerife": "Santa Cruz de Tenerife", "lanzarote": "Arrecife",
+    "fuerteventura": "Puerto del Rosario", "la palma": "Santa Cruz de La Palma", "la gomera": "San Sebastián de La Gomera",
+    "el hierro": "Valverde", "pirineo": "Jaca", "costa del sol": "Málaga", "costa brava": "Girona",
+}
+
+
 def geocodificar(lugar: str, provincia: str = "", pais: str = "ES") -> dict | None:
-    r = _get_reintentos("https://geocoding-api.open-meteo.com/v1/search",
-                        {"name": lugar, "count": 10, "language": "es", "format": "json"})
+    pais = (pais or "ES").upper()
+    clave = _norm(lugar).strip()
+    if pais == "ES" and clave in {_norm(k) for k in REGION_A_CIUDAD}:
+        lugar = next(v for k, v in REGION_A_CIUDAD.items() if _norm(k) == clave)
+    params = {"name": lugar, "count": 10, "language": "es", "format": "json"}
+    if pais == "ES":
+        params["countryCode"] = "ES"
+    r = _get_reintentos("https://geocoding-api.open-meteo.com/v1/search", params)
     res = r.json().get("results") or []
+    if pais == "ES":   # nunca contestar con un sitio de otro país si se habla de España
+        res = [x for x in res if x.get("country_code") == "ES"]
     if not res:
         return None
-    pais = (pais or "ES").upper()
     prov = _norm(provincia)
 
     def puntos(x):
