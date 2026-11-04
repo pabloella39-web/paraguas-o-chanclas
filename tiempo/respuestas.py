@@ -748,13 +748,19 @@ def main():
         est = _cargar()
         hechas = set(est.get("escritas", []))
         todos = comentarios_nuevos({"vistos": []}, n=15, limit=50, paginas=40)
-        claves = [w for w in _norm(lugar).split() if len(w) > 3]
+        lugar, _, extra = lugar.partition("|")   # "Sitio|id_comentario" contesta a ese; "Sitio|palabra,palabra" solo lista
+        lugar = lugar.strip()
+        objetivo = extra.strip() if extra.strip().isdigit() else None
+        claves = [w for w in _norm(lugar).split() if len(w) > 3] + \
+            ([_norm(w) for w in extra.split(",") if w.strip()] if extra and not objetivo else [])
         for c in todos:   # para depurar: los que se le parecen
             if any(w in _norm(c["texto"]) for w in claves):
                 print(f"::notice::Parecido: {c['id']} en {c.get('video')} ({c['usuario']}, "
                       f"{'ya contestado' if c['id'] in hechas else 'sin contestar'}): «{c['texto'][:80]}»")
         for c in todos:
-            if c["id"] in hechas or _norm(lugar) not in _norm(c["texto"]):
+            if objetivo and c["id"] != objetivo:
+                continue
+            if not objetivo and (c["id"] in hechas or _norm(lugar) not in _norm(c["texto"])):
                 continue
             msg = texto_ciudad({"id": c["id"], "lugar": lugar, "pais": "ES", "dia": ""}, ahora())
             if not msg:
