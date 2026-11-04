@@ -60,3 +60,5 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   dejó el parte en 165 visualizaciones; el 53 % se fue en 2 segundos).
 - Todas las comunidades, de vez en cuando: el parte va primero con lo importante y, si el prompt dice "Llevas unos días
   sin nombrar…", esas (máx. 2) llevan una mención rápida con su dato en su bloque (Aragón en INTERIOR, Extremadura en SUR).
+- Avisos en sitios pequeños (Lorca, Cartagena, Mazarrón…): el "titular" y la primera frase hablan de la comunidad
+  ("AVISO NARANJA EN MURCIA", "Aviso naranja en la Región de Murcia"), no del pueblo.

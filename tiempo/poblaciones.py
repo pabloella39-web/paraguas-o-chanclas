@@ -51,3 +51,44 @@ def afectadas(poligonos: list, zona_txt: str = "") -> list[str]:
         elif not any(len(p) >= 3 for p in poligonos) and nombre.lower() in zona_txt.lower():
             out.append(nombre)
     return out
+
+
+# Comunidad de cada población grande (para titular los avisos por región cuando no afectan a una ciudad muy grande)
+COMUNIDAD = {
+    "Madrid": "Madrid", "Móstoles": "Madrid", "Alcalá de Henares": "Madrid", "Fuenlabrada": "Madrid", "Leganés": "Madrid",
+    "Getafe": "Madrid", "Alcorcón": "Madrid", "Torrejón de Ardoz": "Madrid", "Parla": "Madrid", "Alcobendas": "Madrid",
+    "Las Rozas": "Madrid",
+    "Barcelona": "Cataluña", "L'Hospitalet de Llobregat": "Cataluña", "Terrassa": "Cataluña", "Badalona": "Cataluña",
+    "Sabadell": "Cataluña", "Lleida": "Cataluña", "Tarragona": "Cataluña", "Mataró": "Cataluña",
+    "Santa Coloma de Gramenet": "Cataluña", "Reus": "Cataluña", "Girona": "Cataluña",
+    "Valencia": "Comunidad Valenciana", "Alicante": "Comunidad Valenciana", "Elche": "Comunidad Valenciana",
+    "Castellón de la Plana": "Comunidad Valenciana", "Torrevieja": "Comunidad Valenciana",
+    "Sevilla": "Andalucía", "Málaga": "Andalucía", "Córdoba": "Andalucía", "Granada": "Andalucía",
+    "Jerez de la Frontera": "Andalucía", "Almería": "Andalucía", "Marbella": "Andalucía", "Huelva": "Andalucía",
+    "Dos Hermanas": "Andalucía", "Algeciras": "Andalucía", "Cádiz": "Andalucía", "Jaén": "Andalucía",
+    "Roquetas de Mar": "Andalucía",
+    "Zaragoza": "Aragón", "Murcia": "Región de Murcia", "Cartagena": "Región de Murcia", "Lorca": "Región de Murcia",
+    "Palma": "Baleares", "Las Palmas de Gran Canaria": "Canarias", "Santa Cruz de Tenerife": "Canarias",
+    "San Cristóbal de La Laguna": "Canarias", "Telde": "Canarias",
+    "Bilbao": "País Vasco", "Vitoria-Gasteiz": "País Vasco", "San Sebastián": "País Vasco", "Barakaldo": "País Vasco",
+    "Valladolid": "Castilla y León", "Burgos": "Castilla y León", "Salamanca": "Castilla y León", "León": "Castilla y León",
+    "Vigo": "Galicia", "A Coruña": "Galicia", "Ourense": "Galicia", "Lugo": "Galicia", "Santiago de Compostela": "Galicia",
+    "Gijón": "Asturias", "Oviedo": "Asturias", "Pamplona": "Navarra", "Albacete": "Castilla-La Mancha",
+    "Santander": "Cantabria", "Logroño": "La Rioja", "Badajoz": "Extremadura", "Cáceres": "Extremadura",
+}
+# Ciudades que por sí solas interesan a media España: estas sí pueden titular un aviso
+MUY_GRANDES = {"Madrid", "Barcelona", "Valencia", "Sevilla", "Zaragoza", "Málaga", "Murcia", "Palma",
+               "Las Palmas de Gran Canaria", "Bilbao", "Alicante", "Córdoba", "Valladolid", "Vigo", "Granada"}
+
+
+def titular_aviso(ciudades: list[str]) -> str:
+    """Lo que encabeza el aviso: la ciudad si es muy grande; si no, su comunidad ("Región de Murcia")."""
+    for c in ciudades:
+        if c in MUY_GRANDES:
+            return c
+    comunidades = list(dict.fromkeys(COMUNIDAD.get(c) for c in ciudades if COMUNIDAD.get(c)))
+    if len(comunidades) == 1:
+        return comunidades[0]
+    if comunidades:
+        return " y ".join(comunidades[:2])
+    return ciudades[0] if ciudades else ""

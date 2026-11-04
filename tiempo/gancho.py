@@ -83,6 +83,9 @@ def fenomeno_del_dia(prev: list[dict], avisos: list[dict] | None = None) -> dict
         ciudades = _ordenar_publico(a.get("ciudades") or _ciudades_en_zonas(prev, a["zonas"]))
         zona = ciudades[0] if ciudades else a["zonas"][0].split(" de ")[-1].strip(" ()")
         c = next((x for x in prev if x["nombre"] == zona), None)
+        from .poblaciones import titular_aviso
+        if ciudades:   # en pantalla, la comunidad si no hay una ciudad muy grande (Lorca → Región de Murcia)
+            zona = titular_aviso(ciudades)
         if c and icono == "viento" and (c.get("racha") or 0) >= 40:
             dato = f"RACHAS DE {round(c['racha'])} KM/H EN {zona.upper()}"
         elif c and icono in ("lluvia", "tormenta") and c["lluvia"] >= 40:

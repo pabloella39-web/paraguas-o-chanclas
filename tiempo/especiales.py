@@ -32,6 +32,7 @@ from . import guion as g
 from .config import (ANCHO, DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, MODELO_CLAUDE, RAIZ, VISTA_GENERAL,
                      VOCES, voz_del_dia)
 from .contexto import notas_rango
+from .poblaciones import titular_aviso
 from .horario import ahora
 from .mapa import fuente
 from .video import MAPA_Y0, Compositor, renderizar
@@ -726,8 +727,9 @@ Hoy es {fecha}. Avisos vigentes o para las próximas horas:
 {avisos}
 
 Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasarse):
-- intro: la PRIMERA FRASE (máx. 8 palabras) es el titular de última hora: CIUDAD (de las grandes ciudades afectadas,
-  la más conocida) + nivel + fenómeno ("Atención Valencia: aviso rojo por lluvias torrenciales."). Luego, en una frase, lo más grave que se espera.
+- intro: la PRIMERA FRASE (máx. 8 palabras) es el titular de última hora: {titular} + nivel + fenómeno ("Atención
+  Valencia: aviso rojo por lluvias torrenciales.", "Aviso naranja en la Región de Murcia."). Si es una comunidad, NO
+  abras con pueblos o ciudades pequeñas (Lorca, Mazarrón…): esos van en "zonas". Luego, en una frase, lo más grave que se espera.
 - zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras).
 - consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
 - cierre: una sola frase: "Compártelo con quien viva allí." (puedes variarla un poco).
@@ -781,6 +783,15 @@ def dato_aviso(gr) -> str:
     return ""
 
 
+def _ciudades_portada(gr) -> list[str]:
+    """Primera línea grande: la ciudad si es muy grande o la comunidad; segunda: las ciudades afectadas."""
+    cs = gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]]
+    tit = titular_aviso(cs)
+    if tit in cs:
+        return [tit] + [c for c in cs if c != tit]
+    return [tit, " · ".join(cs[:3])]
+
+
 def _cuando_portada(gr, hoy: date) -> str:
     """'ESTA NOCHE DESDE LAS 22:00', 'HOY HASTA LAS 18:00', 'MAÑANA DESDE LAS 06:00'…"""
     try:
@@ -811,7 +822,8 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     if not plantilla:
         try:
-            gg = _claude_json(None, None, PROMPT_AVISO.format(presenta=presenta, fecha=g.fecha_larga(hoy),
+            gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_aviso(
+                                  [c for gr in grupos for c in gr.get("ciudades", [])]) or "CIUDAD", presenta=presenta, fecha=g.fecha_larga(hoy),
                                                   avisos=json.dumps(datos, ensure_ascii=False, indent=1),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
             if all(gg["segmentos"].get(s) for s in orden):
@@ -887,7 +899,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"], "fenomeno": "oleaje" if "costeros" in gr["fenomeno"] else gr["fenomeno"],
                           "icono": _gancho_aviso(grupos).get("icono"),
-                          "ciudades": gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]],
+                          "ciudades": _ciudades_portada(gr),
                           "cuando": _cuando_portada(gr, hoy), "dato": dato_aviso(gr),
                           "variante": len(list(HISTORIAL.glob("aviso-*.json")))},
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
