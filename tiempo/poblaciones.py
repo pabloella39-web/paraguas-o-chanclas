@@ -92,3 +92,16 @@ def titular_aviso(ciudades: list[str]) -> str:
     if comunidades:
         return " y ".join(comunidades[:2])
     return ciudades[0] if ciudades else ""
+
+
+def titular_avisos(ciudades: list[str], nivel: str) -> str:
+    """ROJO: el sitio concreto (lo más relevante). NARANJA: si hay varias comunidades, se nombran (hasta 3);
+    si es una sola, su ciudad muy grande (Barcelona) o la comunidad."""
+    if nivel == "rojo":
+        return next((c for c in ciudades if c in MUY_GRANDES), ciudades[0] if ciudades else "")
+    comunidades = list(dict.fromkeys(COMUNIDAD.get(c) for c in ciudades if COMUNIDAD.get(c)))
+    if len(comunidades) >= 2:
+        nombres = [c.replace("Región de Murcia", "Murcia").replace("Comunidad Valenciana", "C. Valenciana")
+                   for c in comunidades[:3]]
+        return ", ".join(nombres[:-1]) + " y " + nombres[-1]
+    return titular_aviso(ciudades)

@@ -32,7 +32,7 @@ from . import guion as g
 from .config import (ANCHO, DURACION_MAX, DURACION_MIN, DURACION_OBJETIVO, MODELO_CLAUDE, RAIZ, VISTA_GENERAL,
                      VOCES, voz_del_dia)
 from .contexto import notas_rango
-from .poblaciones import titular_aviso
+from .poblaciones import titular_aviso, titular_avisos
 from .horario import ahora
 from .mapa import fuente
 from .video import MAPA_Y0, Compositor, renderizar
@@ -792,6 +792,23 @@ def _ciudades_portada(gr) -> list[str]:
     return [tit, " · ".join(cs[:3])]
 
 
+def _ciudades_portada_todos(grupos) -> list[str]:
+    """Rojo: el sitio concreto. Naranja con varias comunidades: todas (hasta 3) en grande y sus ciudades debajo."""
+    gr = grupos[0]
+    if gr["nivel"] == "rojo":   # rojo: el sitio concreto, en grande
+        cs = list(dict.fromkeys(c for x in grupos for c in (x.get("ciudades") or []))) or \
+            [z.split(" - ")[-1] for z in gr["zonas"]]
+        prim = titular_avisos(cs, "rojo")
+        return [prim] + [c for c in cs if c != prim][:2]
+    if len(grupos) == 1 and len(gr.get("ciudades") or []) <= 1:
+        return _ciudades_portada(gr)
+    cs = list(dict.fromkeys(c for x in grupos for c in (x.get("ciudades") or [])))
+    tit = titular_avisos(cs, gr["nivel"])
+    if tit in cs:
+        return [tit] + [c for c in cs if c != tit][:2]
+    return [tit, " · ".join(cs[:3])]
+
+
 def _cuando_portada(gr, hoy: date) -> str:
     """'ESTA NOCHE DESDE LAS 22:00', 'HOY HASTA LAS 18:00', 'MAÑANA DESDE LAS 06:00'…"""
     try:
@@ -822,8 +839,8 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     if not plantilla:
         try:
-            gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_aviso(
-                                  [c for gr in grupos for c in gr.get("ciudades", [])]) or "CIUDAD", presenta=presenta, fecha=g.fecha_larga(hoy),
+            gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_avisos(
+                                  [c for gr in grupos for c in gr.get("ciudades", [])], grupos[0]["nivel"]) or "CIUDAD", presenta=presenta, fecha=g.fecha_larga(hoy),
                                                   avisos=json.dumps(datos, ensure_ascii=False, indent=1),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
             if all(gg["segmentos"].get(s) for s in orden):
@@ -897,9 +914,12 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "capas": {"intro": _capa_poligonos(grupos), "zonas": _capa_poligonos(grupos, con_lista=True),
                   "consejos": _capa_poligonos(grupos, consejos=consejos), "cierre": _capa_poligonos(grupos)},
         "gancho": _gancho_aviso(grupos),
-        "aviso_portada": {"nivel": gr["nivel"], "fenomeno": "oleaje" if "costeros" in gr["fenomeno"] else gr["fenomeno"],
+        "aviso_portada": {"nivel": gr["nivel"],
+                          "fenomeno": " y ".join(dict.fromkeys("oleaje" if "costeros" in x["fenomeno"] else x["fenomeno"]
+                                                               for x in grupos)) if gr["nivel"] == "naranja"
+                          else ("oleaje" if "costeros" in gr["fenomeno"] else gr["fenomeno"]),
                           "icono": _gancho_aviso(grupos).get("icono"),
-                          "ciudades": _ciudades_portada(gr),
+                          "ciudades": _ciudades_portada_todos(grupos),
                           "cuando": _cuando_portada(gr, hoy), "dato": dato_aviso(gr),
                           "variante": len(list(HISTORIAL.glob("aviso-*.json")))},
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
