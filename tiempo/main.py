@@ -167,6 +167,11 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     avisos = [] if demo else gancho_mod.avisos_de_hoy(hoy)
     fen = gancho_mod.fenomeno_del_dia(prev, avisos)
     g.GANCHO, g.GANCHO_TEXTO = fen, gancho_mod.para_guion(fen)
+    if not demo:   # avisos de todos los niveles (coloreados en el mapa) y oleaje fuerte: también al guion
+        from .especiales import texto_avisos
+        from .fuentes import oleaje, texto_oleaje
+        g.GANCHO_TEXTO += texto_avisos({"mañana" if os.environ.get("VISPERA") else "hoy": avisos} if avisos else {}) \
+            + texto_oleaje({"mañana" if os.environ.get("VISPERA") else "hoy": oleaje(hoy)})
     log.info("Gancho: %s · %s · %s", fen["insignia"], fen["dato"], fen["ciudades"])
     # Satélite con el viento animado: solo los días que lo merecen (borrasca, DANA, aviso naranja/rojo...)
     sat = None
@@ -219,7 +224,9 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     extremos = {"calor": max(prev, key=lambda c: c["tmax"]), "frio": min(prev, key=lambda c: c["tmin"])}
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
-                      gancho=fen, satelite=sat)
+                      gancho=fen, satelite=sat,
+                      capas_fondo={"*": __import__("tiempo.especiales", fromlist=["x"]).capa_avisos_suave(avisos)}
+                      if avisos else None)
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

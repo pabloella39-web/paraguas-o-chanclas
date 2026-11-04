@@ -587,7 +587,7 @@ def portada_aviso(a: dict) -> Image.Image:
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
-                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None):
+                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
@@ -603,6 +603,7 @@ class Compositor:
         self.pills = {**PILLS, "satelite": "ASÍ SE MUEVE EL TIEMPO", **(pills or {})}
         self.portada_txt = portada_txt
         self.capas = capas or {}
+        self.capas_fondo = capas_fondo or {}   # {bloque o "*": función(capa, proyección, dt)} debajo de las tarjetas
         self.sin_marcadores = set(sin_marcadores)
         from .estacion import estacion
         self.particulas = Particulas(estacion_override or estacion(fecha or __import__("datetime").date.today()),
@@ -718,6 +719,9 @@ class Compositor:
         img.paste(m, (0, MAPA_Y0))
         self.particulas.dibujar(img, t)
         capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
+        f_fondo = self.capas_fondo.get(seg_real) or (self.capas_fondo.get("*") if seg_real in REGIONES else None)
+        if not en_trans and f_fondo:   # zonas con aviso coloreadas, debajo de las tarjetas
+            f_fondo(capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt)
         d = ImageDraw.Draw(capa)
 
         # Marcadores con animación de entrada escalonada (en el gancho no: solo el titular sobre el mapa)

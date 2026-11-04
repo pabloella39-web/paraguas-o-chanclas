@@ -62,3 +62,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   sin nombrar…", esas (máx. 2) llevan una mención rápida con su dato en su bloque (Aragón en INTERIOR, Extremadura en SUR).
 - Avisos en sitios pequeños (Lorca, Cartagena, Mazarrón…): el "titular" y la primera frase hablan de la comunidad
   ("AVISO NARANJA EN MURCIA", "Aviso naranja en la Región de Murcia"), no del pueblo.
+- Avisos previstos y oleaje: si el prompt trae "AVISOS DE AEMET PREVISTOS" u "OLEAJE FUERTE PREVISTO", menciónalos en el
+  bloque de su zona/día (naranjas y rojos siempre; amarillos de pasada) y di la altura de las olas ("olas de hasta 5
+  metros en Galicia"). Las zonas con aviso salen coloreadas en el mapa.

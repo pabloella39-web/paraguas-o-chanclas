@@ -25,7 +25,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import requests
-from PIL import ImageDraw
+from PIL import Image, ImageDraw
 
 from . import cumplido, eleven, musica, voz
 from . import guion as g
@@ -35,7 +35,7 @@ from .contexto import notas_rango
 from .poblaciones import titular_aviso, titular_avisos
 from .horario import ahora
 from .mapa import fuente
-from .video import MAPA_Y0, Compositor, renderizar
+from .video import MAPA_H, MAPA_Y0, Compositor, renderizar
 
 log = logging.getLogger("tiempo.especiales")
 HISTORIAL = RAIZ / "historial_especiales"
@@ -296,6 +296,8 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         finally:
             if clave_google:
                 os.environ["GOOGLE_WEATHER_API_KEY"] = clave_google
+    if not demo:
+        _preparar_avisos({"sabado": sab, "domingo": dom})
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
@@ -310,6 +312,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     kwargs = {
         "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
                       "domingo": prev_d, "intro": []},
+        "capas_fondo": {k: capa_avisos_suave(v) for k, v in AVISOS_DIA.items()},
         "pills": {"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR PLAN DEL FINDE"},
         "portada_txt": ("EL TIEMPO DEL FINDE", "FIN DE SEMANA", rango,
@@ -397,6 +400,24 @@ Responde SOLO con JSON: {{"segmentos": {{"intro": "...", {claves_dias}, "general
 EXTRA_SEMANA: list = []
 
 
+AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
+AVISOS_DIA = {}
+
+
+def _preparar_avisos(dias: dict):
+    """Avisos (coloreados en el mapa de su día) y oleaje fuerte, para el prompt de los especiales."""
+    from .fuentes import oleaje, texto_oleaje
+    AVISOS_DIA.clear()
+    try:
+        AVISOS_DIA.update(avisos_por_dia(dias))
+    except Exception as e:  # noqa: BLE001
+        log.warning("Avisos por día: %s", e)
+    olas = {}
+    for k, d in dias.items():
+        olas[k] = oleaje(d)
+    AVISOS_TXT[0] = texto_avisos(AVISOS_DIA) + texto_oleaje(olas)
+
+
 def _dato_real() -> str:
     """Lo medido tras el aviso naranja/rojo de anoche (si lo hubo), para una frase en la intro."""
     try:
@@ -409,7 +430,7 @@ def _dato_real() -> str:
         o = g.nota_olvidadas(ahora().date())
     except Exception:  # noqa: BLE001
         o = ""
-    return extra + (f"\n\n{o}" if o else "")
+    return extra + (f"\n\n{o}" if o else "") + AVISOS_TXT[0]
 
 
 def _extra_por_region() -> dict:
@@ -515,6 +536,8 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
             for k, v in guardadas.items():
                 if v:
                     os.environ[k] = v
+    if not demo:
+        _preparar_avisos({d: fechas[d] for d in _dias()})
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
@@ -542,6 +565,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     mapa_dias[primero] = g.prev_para_mapa(prevs[primero], [guion["segmentos"].get(primero, "")], EXTRA_SEMANA)
     kwargs = {
         "satelite": sat,
+        "capas_fondo": {k: capa_avisos_suave(v) for k, v in AVISOS_DIA.items()},
         "datos_seg": {**mapa_dias, "intro": []},
         "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",
@@ -718,6 +742,96 @@ def _capa_poligonos(grupos, con_lista=False, consejos=None):
     return dibujar
 
 
+def capa_avisos_suave(grupos):
+    """Zonas con aviso (amarillo, naranja o rojo) coloreadas suavemente bajo las tarjetas del parte, con leyenda."""
+    def dibujar(capa, pr, dt):
+        from .mapa import es_canaria, lonlat_mapa
+        lay = Image.new("RGBA", capa.size, (0, 0, 0, 0))
+        d = ImageDraw.Draw(lay)
+        aparece = min(1.0, max(0.0, dt / 0.6))
+        vistos = []
+        for gr in sorted(grupos, key=lambda x: NIVELES[x["nivel"]]):
+            col = COLOR_NIVEL[gr["nivel"]]
+            dentro = False
+            for pol in gr["poligonos"]:
+                pts = []
+                for lo, la in pol:
+                    if es_canaria(la):
+                        if not pr.muestra_canarias:
+                            continue
+                        lo, la = lonlat_mapa(lo, la, True)
+                    x, y = pr(lo, la)
+                    pts.append((x, MAPA_Y0 + y))
+                if len(pts) >= 3 and any(0 <= x <= ANCHO and MAPA_Y0 <= y <= MAPA_Y0 + MAPA_H for x, y in pts):
+                    d.polygon(pts, fill=col + (int(120 * aparece),), outline=col + (int(230 * aparece),))
+                    dentro = True
+            if dentro:
+                vistos.append(gr)
+        capa.alpha_composite(lay)
+        d = ImageDraw.Draw(capa)
+        y = MAPA_Y0 + MAPA_H - 80            # leyenda abajo a la izquierda
+        for gr in list(dict.fromkeys((x["nivel"], nombre_fen(x["fenomeno"])) for x in reversed(vistos)))[:3]:
+            nivel, fen = gr
+            txt = f"AVISO {nivel.upper()} · {fen.upper()}"
+            f = fuente("Black", 30)
+            w = f.getlength(txt) + 44
+            col = COLOR_NIVEL[nivel]
+            d.rounded_rectangle([30, y, 30 + w, y + 50], radius=25, fill=col + (int(235 * aparece),))
+            d.text((30 + w / 2, y + 25), txt, font=f, fill=(15, 25, 50) if nivel == "amarillo" else (255, 255, 255),
+                   anchor="mm")
+            y -= 60
+    return dibujar
+
+
+def nombre_fen(f: str) -> str:
+    from .gancho import nombre_fenomeno
+    return nombre_fenomeno(f)
+
+
+def avisos_por_dia(dias: dict) -> dict:
+    """{clave_día: grupos de avisos de AEMET (todos los niveles) que afectan a ese día} para semanales y finde."""
+    clave = os.environ.get("AEMET_API_KEY", "").strip()
+    if not clave:
+        return {}
+    try:
+        avisos = descargar_avisos(clave)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Avisos para el vídeo semanal: %s", e)
+        return {}
+    from zoneinfo import ZoneInfo
+    tz = ZoneInfo("Europe/Madrid")
+    out = {}
+    for k, d in dias.items():
+        ini_d = datetime(d.year, d.month, d.day, tzinfo=tz); fin_d = ini_d + timedelta(days=1)
+        vig = []
+        for a in avisos:
+            try:
+                ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
+            except (TypeError, ValueError):
+                continue
+            if fin > ini_d and ini < fin_d:
+                vig.append(a)
+        if vig:
+            out[k] = agrupar(vig)
+    return out
+
+
+def texto_avisos(por_dia: dict) -> str:
+    """Resumen de los avisos previstos para el prompt (con el dato: litros, km/h, altura de las olas…)."""
+    partes = []
+    for k, grupos in por_dia.items():
+        for gr in sorted(grupos, key=lambda x: -NIVELES[x["nivel"]])[:4]:
+            zonas = ", ".join(z.split(" - ")[-1] for z in gr["zonas"][:3])
+            dato = dato_aviso(gr)
+            partes.append(f"{k}: aviso {gr['nivel']} por {nombre_fen(gr['fenomeno'])} en {zonas}"
+                          + (f" ({dato.lower()})" if dato else ""))
+    if not partes:
+        return ""
+    return ("\n\nAVISOS DE AEMET PREVISTOS (se ven coloreados en el mapa de su día): " + "; ".join(partes)
+            + ". Menciónalos en el bloque de su día: los naranjas y rojos, siempre; los amarillos, de pasada. Si hay "
+              "oleaje o temporal en el mar, di la altura de las olas.")
+
+
 PROMPT_AVISO = """Eres el guionista de "Paraguas o Chanclas", canal de TikTok del tiempo en España. Es un vídeo
 FLASH de 25 segundos por avisos de AEMET: solo para llamar la atención sobre lo urgente. Sin humor, tono directo y
 claro, con urgencia pero sin sensacionalismo. Usa SOLO estos datos oficiales de AEMET (no inventes cifras, zonas, horas
@@ -799,7 +913,8 @@ def _ciudades_portada_todos(grupos) -> list[str]:
         cs = list(dict.fromkeys(c for x in grupos for c in (x.get("ciudades") or []))) or \
             [z.split(" - ")[-1] for z in gr["zonas"]]
         prim = titular_avisos(cs, "rojo")
-        return [prim] + [c for c in cs if c != prim][:2]
+        resto = [c for c in cs if c not in prim]
+        return [prim] + ([" · ".join(resto[:3])] if resto else [])
     if len(grupos) == 1 and len(gr.get("ciudades") or []) <= 1:
         return _ciudades_portada(gr)
     cs = list(dict.fromkeys(c for x in grupos for c in (x.get("ciudades") or [])))

@@ -368,3 +368,44 @@ def previsiones_demo() -> tuple[list[dict], str]:
                     "lluvia": max(0, ll + random.randint(-10, 10)), "viento": random.randint(8, 30),
                     "racha": None, "icono": ic, "cielo": None, "fuentes": ["demo"]})
     return res, ""
+
+
+# ---------------------------------------------------------------- oleaje (Open-Meteo Marine)
+COSTA = [  # puntos mar adentro (la API marina no da datos sobre tierra)
+    ("Rías Baixas (Galicia)", 42.3, -9.2), ("costa de A Coruña", 43.5, -8.6), ("costa de Asturias", 43.7, -5.8),
+    ("costa de Cantabria", 43.6, -3.8), ("costa vasca", 43.5, -2.6), ("Costa Brava", 41.9, 3.4),
+    ("costa de Barcelona", 41.25, 2.3), ("costa de Valencia", 39.4, -0.1), ("costa de Alicante", 38.3, -0.3),
+    ("costa de Murcia", 37.45, -0.8), ("costa de Almería", 36.6, -2.4), ("costa de Málaga", 36.55, -4.3),
+    ("Estrecho y Cádiz", 36.1, -6.2), ("costa de Huelva", 37.0, -7.1), ("Mallorca", 39.35, 2.6),
+    ("norte de Menorca", 40.2, 4.1), ("norte de Canarias", 28.75, -15.6), ("sur de Canarias", 27.6, -15.6),
+]
+
+
+def oleaje(dia: date, minimo: float = 3.0) -> list[tuple[str, float]]:
+    """Zonas de costa con olas de `minimo` metros o más ese día (altura máxima de ola)."""
+    try:
+        r = requests.get("https://marine-api.open-meteo.com/v1/marine", params={
+            "latitude": ",".join(str(c[1]) for c in COSTA), "longitude": ",".join(str(c[2]) for c in COSTA),
+            "daily": "wave_height_max", "timezone": "Europe/Madrid",
+            "start_date": dia.isoformat(), "end_date": dia.isoformat()}, timeout=40)
+        r.raise_for_status()
+        j = r.json()
+        j = j if isinstance(j, list) else [j]
+    except Exception as e:  # noqa: BLE001
+        log.warning("Oleaje no disponible: %s", e)
+        return []
+    out = []
+    for (zona, _, _), d in zip(COSTA, j):
+        v = ((d.get("daily") or {}).get("wave_height_max") or [None])[0]
+        if v is not None and v >= minimo:
+            out.append((zona, round(v, 1)))
+    return sorted(out, key=lambda x: -x[1])
+
+
+def texto_oleaje(por_dia: dict) -> str:
+    partes = [f"{k}: " + ", ".join(f"{z} {str(m).replace('.', ',')} m" for z, m in v[:4]) for k, v in por_dia.items() if v]
+    if not partes:
+        return ""
+    return ("\n\nOLEAJE FUERTE PREVISTO (altura máxima de ola): " + "; ".join(partes) + ". Menciónalo en el bloque de "
+            "esa zona con la altura ('olas de hasta 5 metros en Galicia'), sobre todo si hay temporal o aviso; es "
+            "peligro real: nada de acercarse a diques y paseos marítimos.")
