@@ -58,5 +58,5 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Alcance del gancho: la primera frase tiene que importarle a media España. Un aviso en ciudades pequeñas (Lorca,
   Cartagena…) va en la segunda frase o en su bloque, no abriendo el vídeo (03/11/2026: abrir con "Lorca y Cartagena"
   dejó el parte en 165 visualizaciones; el 53 % se fue en 2 segundos).
-- Todas las comunidades: Aragón (va en INTERIOR) y Extremadura (va en SUR) se quejan si no salen. Si el prompt trae
-  "[OBLIGATORIO] Llevas varios días sin nombrar…", nombra una ciudad de cada una con su dato.
+- Todas las comunidades, de vez en cuando: el parte va primero con lo importante y, si el prompt dice "Llevas unos días
+  sin nombrar…", esas (máx. 2) llevan una mención rápida con su dato en su bloque (Aragón en INTERIOR, Extremadura en SUR).

@@ -282,7 +282,7 @@ NOMBRES_COMUNIDAD = {
 }
 
 
-def comunidades_olvidadas(hoy: date, minimo: int = 2, maximo: int = 5) -> list[str]:
+def comunidades_olvidadas(hoy: date, minimo: int = 2, maximo: int = 2) -> list[str]:
     """Comunidades que llevan `minimo` días o más sin nombrarse (partes y especiales), las más olvidadas primero."""
     import json as _json
     from datetime import timedelta as _td
@@ -317,8 +317,9 @@ def nota_olvidadas(hoy: date) -> str:
     olv = comunidades_olvidadas(hoy)
     if not olv:
         return ""
-    return (f"[OBLIGATORIO] Llevas varios días sin nombrar {', '.join(olv)} (la gente de allí lo nota y lo comenta): hoy nombra "
-            "al menos una ciudad de cada una, con su dato, en su bloque (Aragón va en INTERIOR y Extremadura en SUR).")
+    return (f"Llevas unos días sin nombrar {' ni '.join(olv)}. Primero lo importante, como siempre; después, en su "
+            "bloque, dales una mención rápida con su dato (una frase corta, sin quitar protagonismo a lo importante). "
+            "Aragón va en INTERIOR y Extremadura en SUR.")
 
 
 def ciudades_repetidas(hoy: date, prev: list[dict], dias: int = 4) -> list[str]:
