@@ -818,22 +818,34 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
                 for da in (.7, -.7):
                     d.line([(bx, by), (bx + math.cos(a + da) * r * .35, by + math.sin(a + da) * r * .35)], fill=col, width=3)
 
-    def libre(x, y, w, h, cajas, puestas):
-        """Mueve la insignia lo justo para no tapar tarjetas ni otras insignias (y que no se salga del mapa)."""
-        def choca(cx, cy):
+    def libre(x, y, w, h, cajas, puestas, mar=None):
+        """Mueve la insignia lo justo para no tapar tarjetas ni otras insignias (y que no se salga del mapa).
+        Con `mar` (máscara de tierra): primero se busca un hueco cerca y entero sobre el mar; si no lo hay (costa
+        pegada al borde del mapa), se admite que roce un poco la costa antes que llevársela lejos de su zona."""
+        def tierra(cx, cy):
+            if mar is None:
+                return 0.0
+            caja = mar.crop((int(cx - w / 2), int(cy - MAPA_Y0 - h / 2), int(cx + w / 2), int(cy - MAPA_Y0 + h / 2)))
+            hist = caja.histogram()
+            return 1 - hist[0] / max(1, sum(hist))
+
+        def tapa(cx, cy):
             r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
             return any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in list(cajas) + puestas)
-        for paso in range(0, 16):
-            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)):
-                cx, cy = x + dx * paso * 22, y + dy * paso * 22
-                if 20 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h < cy < MAPA_Y0 + MAPA_H - h and not choca(cx, cy):
-                    return cx, cy
-                if paso == 0:
-                    break
+
+        for tolerancia, pasos in ((0.0, 8), (0.45, 8), (0.0, 11)):   # si no cabe en el mar cerca, no se pone
+            for paso in range(0, pasos):
+                for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)):
+                    cx, cy = x + dx * paso * 22, y + dy * paso * 22
+                    if 4 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h < cy < MAPA_Y0 + MAPA_H - h \
+                            and not tapa(cx, cy) and tierra(cx, cy) <= tolerancia:
+                        return cx, cy
+                    if paso == 0:
+                        break
         return None
 
     def dibujar(capa, pr, dt, cajas=()):
-        from .mapa import es_canaria, lonlat_mapa
+        from .mapa import es_canaria, lonlat_mapa, mascara_tierra
         d = ImageDraw.Draw(capa)
         s_ = min(1.0, max(0.0, (dt - 0.2) / 0.4))
         if s_ <= 0:
@@ -851,7 +863,7 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
             txt = f"{str(o['olas']).replace('.', ',')} m"
             f = fuente("Black", 34)
             w = f.getlength(txt) + 80
-            pos = libre(x, y, w, 56, cajas, puestas)
+            pos = libre(x, y, w, 56, cajas, puestas, mar=mascara_tierra(pr))
             if not pos:
                 continue
             x, y = pos

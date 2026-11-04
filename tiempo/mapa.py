@@ -85,6 +85,28 @@ def interpolar_vista(a, b, t):
     return (c[0] - s[0] / 2, c[0] + s[0] / 2, c[1] - s[1] / 2, c[1] + s[1] / 2)
 
 
+_TIERRA = {}
+
+
+def mascara_tierra(pr: "Proyeccion") -> Image.Image:
+    """Máscara (L, 255 = tierra) con la misma proyección que el mapa, para saber qué es mar."""
+    clave = (tuple(pr.vista), pr.ancho, pr.alto)
+    if clave not in _TIERRA:
+        m = Image.new("L", (int(pr.ancho), int(pr.alto)), 0)
+        d = ImageDraw.Draw(m)
+        for pais in vecinos():
+            for anillo in pais["anillos"]:
+                d.polygon([pr(x, y) for x, y in anillo], fill=255)
+        for p in provincias():
+            canaria = p["nombre"] in PROVINCIAS_CANARIAS
+            if canaria and not pr.muestra_canarias:
+                continue
+            for anillo in p["anillos"]:
+                d.polygon([pr(*lonlat_mapa(x, y, canaria)) for x, y in anillo], fill=255)
+        _TIERRA[clave] = m.filter(ImageFilter.MaxFilter(9))   # un poco de margen con la costa
+    return _TIERRA[clave]
+
+
 def dibujar_mapa(vista, ancho, alto, foco: str | None = None, ss: int = 2) -> Image.Image:
     """Renderiza el mapa (con antialiasing por supermuestreo)."""
     W, H = ancho * ss, alto * ss

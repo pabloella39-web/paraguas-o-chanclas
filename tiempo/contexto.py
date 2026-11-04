@@ -112,9 +112,12 @@ def felicitar(nombre: str, comunidades: str = "") -> str:
             dia = "Diada"
         else:
             dia = nombre.split("(")[-1].rstrip(")") if "(" in nombre else nombre
-        return f' Felicita a la gente de {comunidades} ("¡feliz {dia}!").'
+        return (f' Felicita a la gente de {comunidades} por su {dia}, VARIANDO la fórmula (no siempre "feliz Día de"): '
+                f'"¡Felicidades, {comunidades.split(",")[0]}!", "un abrazo a toda la gente de {comunidades.split(",")[0]} en '
+                f'su día", "hoy es vuestro día: que lo disfrutéis", "¡a celebrarlo!"…')
     dia = _re.sub(r"^(el|la|los|las) ", "", nombre)
-    return f' Felicita a todos ("¡feliz {dia}!" o similar, con naturalidad).'
+    return (f' Felicita a todos por el {dia}, VARIANDO la fórmula (no siempre "feliz…"): "¡felicidades a todos!", '
+            '"que paséis un gran día", "disfrutad del festivo", "y a celebrarlo, que hoy toca"…')
 
 
 def notas_rango(d0: date, d1: date) -> list[str]:
