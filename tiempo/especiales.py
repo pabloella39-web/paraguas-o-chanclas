@@ -1034,11 +1034,17 @@ def dato_aviso(gr) -> str:
     fen = gr.get("fenomeno", "").lower()
     nums = lambda pat: [int(x) for x in re.findall(pat, t)]
     if "lluvia" in fen or "tormenta" in fen:
+        # "Precipitación acumulada en una hora: 20 mm. Precipitación acumulada en 12 horas: 60 mm" → cada cifra con
+        # SUS horas; se prefiere la intensidad en una hora (lo más llamativo y lo que pide la gente)
+        pares = [(1 if hh == "una" else int(hh), int(v))
+                 for hh, v in re.findall(r"en (una|\d+) horas?[^0-9]{0,40}?(\d+)\s*mm", t)]
+        if pares:
+            una = [v for hh, v in pares if hh == 1]
+            horas, v = (1, max(una)) if una else max(pares, key=lambda p: p[1])
+            return f"{v} L/M² EN {horas} HORA{'S' if horas > 1 else ''}"
         mm = nums(r"(\d+)\s*mm")
         if mm:
-            h = re.search(r"en (una|\d+) horas?", t)
-            horas = 1 if not h or h.group(1) == "una" else int(h.group(1))
-            return f"{max(mm)} L/M² EN {horas} HORA{'S' if horas > 1 else ''}"
+            return f"{max(mm)} L/M²"
     if "viento" in fen or "tormenta" in fen:
         kmh = nums(r"(\d+)\s*km/h")
         if kmh:
