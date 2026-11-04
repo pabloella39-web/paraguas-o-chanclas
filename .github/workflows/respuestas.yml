@@ -23,6 +23,10 @@ on:
         description: "Corregir las respuestas ya dadas a este lugar (p. ej. Asturias)"
         type: string
         default: ""
+      responder_lugar:
+        description: "Contestar con la previsión a los comentarios que nombran este sitio (p. ej. Illán de Vacas)"
+        type: string
+        default: ""
       solo_video:
         description: "Responder por escrito a los comentarios de ciudad de este vídeo (id de TikTok)"
         type: string
@@ -75,6 +79,7 @@ jobs:
           SOLO_VIDEO: ${{ inputs.solo_video }}
           RESPUESTA_MANUAL: ${{ inputs.respuesta_manual }}
           CORREGIR_LUGAR: ${{ inputs.corregir_lugar }}
+          RESPONDER_LUGAR: ${{ inputs.responder_lugar }}
           REPASAR_BANDEJA: ${{ inputs.repasar_bandeja && '1' || '' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then

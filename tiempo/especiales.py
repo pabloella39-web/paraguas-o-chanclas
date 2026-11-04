@@ -10,6 +10,8 @@ Llegan como borrador a TikTok (igual que el parte) y se suben a YouTube Shorts.
 """
 from __future__ import annotations
 
+from . import promesas as _prom
+
 import argparse
 import copy
 import io
@@ -193,7 +195,7 @@ Festivos y fiestas este finde (los marcados [SIEMPRE] se nombran siempre, en el 
 tiempo; el resto, solo si no hay nada más relevante): {fiestas}
 
 Bloques (palabras aproximadas por bloque: {palabras}; total ≈ {total}):
-- intro: gancho + promesa del final.
+- intro: gancho + promesa del final. {promesa}
 - sabado: cómo será el sábado en España (lo destacado, agrupando zonas).
 - domingo: cómo cambia (o no) el domingo.
 - general: la recompensa: dónde está el mejor plan del finde (sol y buena temperatura) y dónde mejor sofá y manta,
@@ -233,7 +235,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     if not plantilla:
         try:
-            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "19:50", PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
+            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "19:50", PROMPT_FINDE.format(promesa=_prom.nota("finde", ahora().date()), presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
@@ -326,7 +328,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         "sin_marcadores": _kwargs_avisos({"sabado": "", "domingo": ""})["sin"],
         "pills": {**_kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["pills"],
                   "sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
-                  "promesa": "QUÉDATE: AL FINAL, EL MEJOR PLAN DEL FINDE"},
+                  "promesa": _prom.pill("finde", ahora().date())},
         "portada_txt": ("EL TIEMPO DEL FINDE", "FIN DE SEMANA", rango,
                         ((f"MEJOR PLAN: {ms['nombre'].upper()} {ms['tmax']}°", (255, 196, 45)),
                          (f"MÁX {extremos['calor']['tmax']}° · MÍN {extremos['frio']['tmin']}°", (140, 205, 255)))),
@@ -375,7 +377,7 @@ mejor 'posibles chubascos' que afirmaciones rotundas; con 5 litros o más di cu�
 Varía la fórmula del arranque ("Ojo" vale de vez en cuando, pero no siempre).
 PRIMERA FRASE de la intro: MÁXIMO 8 PALABRAS, corta y seca (ej. "Finde de sol, salvo en dos sitios."); luego ya amplías.
 RETENCIÓN: la intro NO saluda: arranca con lo más llamativo de la semana (¿vuelve la lluvia el miércoles?, ¿bajón
-de temperaturas?, ¿semana de sol?) y promete que al final dirás cuál es el mejor día de la semana y cuál el peor.
+de temperaturas?, ¿semana de sol?) y promete que al final dirás cuál es el mejor día de la semana y cuál el peor. {promesa}
 Un bloque por día, {rango_txt}: lo destacado de ese día en España, agrupando zonas, con alguna ciudad concreta
 y un consejo práctico (paraguas, chaqueta, tender la ropa, ir en bici...). Habla de tú, frases que fluyan, nada de
 listas ni dos puntos, números en cifras con "grados" o "por ciento". Ciudades por su nombre.
@@ -578,7 +580,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
         try:
             datos = {f"{d} {fechas[d].day}": _resumen(prevs[d]) for d in _dias()}
             m = MODOS_SEMANA[MODO_SEMANA]
-            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "19:50", PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
+            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "19:50", PROMPT_SEMANA.format(promesa=_prom.nota("semana", ahora().date()), presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
                                                    palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                    cuando=m["cuando"], rango_txt=m["rango_txt"],
                                                    claves_dias=", ".join(f'"{d}": "..."' for d in orden[1:-2]),
@@ -697,7 +699,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         "pills": {**_kwargs_avisos({d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()})["pills"],
                   **{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",
-                  "promesa": "QUÉDATE: AL FINAL, EL MEJOR Y EL PEOR DÍA"},
+                  "promesa": _prom.pill("semana", ahora().date())},
         # Portada reconocible en el perfil: fondo granate, borde dorado y la tira de días con su icono y máxima
         "dias_portada": [(NOMBRE_DIA[d][:3].upper(), max(set(c["icono"] for c in prevs[d]),
                                                          key=lambda i, pr=prevs[d]: sum(1 for c in pr if c["icono"] == i)),

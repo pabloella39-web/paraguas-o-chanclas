@@ -711,6 +711,27 @@ def main():
                 print(f"::warning::No se pudo corregir {c['id']}: {e}")
         _guardar(est)
         return
+    lugar = os.environ.get("RESPONDER_LUGAR", "").strip()   # una vez: contesta con la previsión a los que nombran ese sitio
+    if lugar:
+        est = _cargar()
+        hechas = set(est.get("escritas", []))
+        for c in comentarios_nuevos({"vistos": []}):
+            if c["id"] in hechas or _norm(lugar) not in _norm(c["texto"]):
+                continue
+            msg = texto_ciudad({"id": c["id"], "lugar": lugar, "pais": "ES", "dia": ""}, ahora())
+            if not msg:
+                print(f"::warning::Sin previsión para {lugar}")
+                break
+            try:
+                responder_texto(c, msg[:150])
+                est.setdefault("escritas", []).append(c["id"])
+                est["vistos"].append(c["id"])
+                print(f"::notice::Respondido {c['id']} ({c['usuario']}: «{c['texto'][:60]}»): {msg[:150]}")
+            except Exception as e:  # noqa: BLE001
+                print(f"::warning::No se pudo responder a {c['id']}: {e}")
+            time.sleep(4)
+        _guardar(est)
+        return
     manual = os.environ.get("RESPUESTA_MANUAL", "").strip()   # "id_video|id_comentario|texto" (a mano, una vez)
     if manual:   # una o varias líneas "id_video|id_comentario|texto"
         est = _cargar()   # contestado a mano: que la respuesta automática no lo repita

@@ -995,7 +995,7 @@ class Compositor:
                     d.text((ANCHO / 2, yd), txt, font=f, fill=(255, 255, 255), anchor="mm")
         s = _ease_back((t - 0.9) / 0.4)
         if s > 0.02:
-            txt = self.pills.get("promesa") or "QUÉDATE: AL FINAL, DÓNDE HARÁ MÁS CALOR Y MÁS FRÍO"
+            txt = self.pills.get("promesa") or __import__("tiempo.promesas", fromlist=["pill"]).pill("parte")
             f = _ajustar(txt, "ExtraBold", int(34 * min(s, 1.2)), 960)
             w = f.getlength(txt) + 50
             y = y_prom

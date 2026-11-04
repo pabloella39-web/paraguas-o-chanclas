@@ -98,7 +98,8 @@ INTERACCIÓN CON EL PÚBLICO (muy importante, es lo que hace crecer el canal):
   no siempre.
   Usa el GANCHO DE HOY de abajo y nombra
   primero las ciudades que más nos ven (Madrid, Barcelona, Málaga, Sevilla, Valencia) si están afectadas. La segunda
-  frase amplía en una línea y promete que al final dirás dónde hará más calor y más frío ("quédate, que al final...").
+  frase amplía en una línea y promete que al final dirás dónde hará más calor y más frío.
+  {promesa}
   Urgencia sí, mentiras no: solo habla de avisos si los hay de verdad.
   ALCANCE DEL GANCHO: la primera frase tiene que importarle a media España. Si lo más fuerte afecta solo a ciudades
   pequeñas o a una zona concreta (Lorca, Cartagena, Mazarrón…), NO abras con ellas: abre con lo que afecta a más
@@ -397,6 +398,7 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                extra=json.dumps(extra, ensure_ascii=False) if extra else "(no disponibles)",
                                repetidas=", ".join(ciudades_repetidas(hoy, prev)) or "(ninguna)",
                                aperturas=" / ".join(f"«{a}»" for a in aperturas_recientes(hoy)) or "ninguno",
+                               promesa=__import__("tiempo.promesas", fromlist=["nota"]).nota("parte", hoy),
                                texto_aemet=texto_aemet[:2500] or "(vacío)",
                                palabras=json.dumps(palabras), total=sum(palabras.values()), presenta=presenta,
                                orden=" → ".join(orden), cta=CTAS[cta_del_dia(hoy)],
@@ -600,7 +602,8 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
         if ciudad:
             gancho = f"Ojo, {ciudad}: {frases.get(GANCHO['icono'], 'hoy toca mirar el cielo')}."
             titular = f"{ciudad.upper()}: {GANCHO['insignia']}"[:30]
-    seg["intro"] = gancho + " Y quédate, que al final te digo dónde hará más calor y más frío de España."
+    from .promesas import _de
+    seg["intro"] = gancho + " " + _de("parte", hoy)[0]
     extra = notas_dia(hoy)
     if extra:
         seg["cierre"] = extra[0] + " " + seg["cierre"]
