@@ -315,6 +315,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     todos = prev_s + prev_d
     extremos = {"calor": max(todos, key=lambda c: c["tmax"]), "frio": min(todos, key=lambda c: c["tmin"])}
     rango = f"{sab.day} {MESES_CORTOS[sab.month - 1]} · {dom.day} {MESES_CORTOS[dom.month - 1]}"
+    PREVS_DIA.clear(); PREVS_DIA.update({"sabado": prev_s, "domingo": prev_d})
     (ms, _), _ = _mejor_plan(prev_s, prev_d)
     kwargs = {
         "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
@@ -412,7 +413,8 @@ EXTRA_SEMANA: list = []
 
 AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
 AVISOS_DIA = {}
-AVISOS_BLOQUE = []   # días con bloque propio de avisos (mapa de España con avisos, olas, nieve y niebla)
+AVISOS_BLOQUE = []
+PREVS_DIA = {}       # previsión de cada día (para las heladas y rachas del bloque de avisos)   # días con bloque propio de avisos (mapa de España con avisos, olas, nieve y niebla)
 
 
 def _merece_bloque(k) -> bool:
@@ -470,8 +472,11 @@ def _capas_encima_dias() -> dict:
     for k in set(MAR_NIEVE) | set(AVISOS_DIA):
         ol, ni = MAR_NIEVE.get(k, ([], []))
         nb = nieblas_de(AVISOS_DIA.get(k))
-        if ol or ni or nb:
-            out[f"avisos_{k}" if k in AVISOS_BLOQUE else k] = capa_mar_nieve(ol, ni, nb)
+        if k in AVISOS_BLOQUE:   # el bloque de avisos nunca vacío: fichas de cada aviso + heladas y rachas del día
+            out[f"avisos_{k}"] = combinar_encima(capa_mar_nieve(ol, ni, nb) if (ol or ni or nb) else None,
+                                                 capa_fichas(AVISOS_DIA.get(k), PREVS_DIA.get(k)))
+        elif ol or ni or nb:
+            out[k] = capa_mar_nieve(ol, ni, nb)
     return out
 
 
@@ -639,6 +644,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
                 log.info("Satélite en el vídeo semanal (%s): %s", motivo, info_sat)
         except Exception as e:  # noqa: BLE001
             log.warning("Sin satélite: %s", e)
+    PREVS_DIA.clear(); PREVS_DIA.update(prevs)
     primero = _dias()[0]
     mapa_dias = {d: prevs[d] for d in _dias()}
     mapa_dias[primero] = g.prev_para_mapa(prevs[primero], [guion["segmentos"].get(primero, "")], EXTRA_SEMANA)
@@ -852,20 +858,26 @@ def pintar_avisos(grupos, pr, alfa=120):
             if m.any():
                 out[m] = col + (235,)
                 vistos.append(gr)
+                ys, xs = np.nonzero(m)
+                gr.setdefault("_donde", {})[tuple(pr.vista)] = (float(xs.mean()), float(ys.mean()),
+                    [nombres[i - 1] for i in np.unique(lab[np.array(poli.filter(ImageFilter.MaxFilter(41))) > 0]) if i > 0])
         else:
             dentro = lab[pm]
             dentro = dentro[dentro > 0]
             if dentro.size == 0:
                 continue
             idx, cuenta = np.unique(dentro, return_counts=True)
-            pintada = False
+            pintadas = []
             for i, c in zip(idx, cuenta):
                 total = (lab == i).sum()
                 if c >= 0.25 * dentro.size or c >= 0.15 * total:     # la provincia está afectada de verdad
                     out[lab == i] = col + (alfa,)
-                    pintada = True
-            if pintada:
+                    pintadas.append(i)
+            if pintadas:
                 vistos.append(gr)
+                ys, xs = np.nonzero(np.isin(lab, pintadas))
+                gr.setdefault("_donde", {})[tuple(pr.vista)] = (float(xs.mean()), float(ys.mean()),
+                                                                  [nombres[i - 1] for i in pintadas])
     return Image.fromarray(out, "RGBA"), vistos
 
 
@@ -911,6 +923,95 @@ def nieblas_de(grupos) -> list[dict]:
                 out.append({"lon": sum(p[0] for p in pol) / len(pol), "lat": sum(p[1] for p in pol) / len(pol),
                             "vis": int(m.group(1)) if m else None, "nivel": gr["nivel"]})
     return out[:4]
+
+
+ICONO_AVISO = {"lluvias": "lluvia", "tormentas": "tormenta", "nevadas": "nieve", "vientos": "viento",
+               "nieblas": "niebla", "costeros": "viento", "temperaturas máximas": "sol", "temperaturas mínimas": "nieve"}
+
+
+def _nombre_prov(n: str) -> str:
+    return n.split("/")[-1].replace("Santa Cruz De Tenerife", "Tenerife").replace("Illes Balears", "Baleares")
+
+
+def capa_fichas(grupos, prev_dia=None):
+    """Para el bloque de avisos: una ficha por aviso junto a su zona (icono animado, nivel, sitio y dato) y, para que
+    el mapa no quede vacío, heladas y rachas fuertes de ese día aunque no tengan aviso."""
+    from .mapa import icono, fase_de
+
+    def dibujar(capa, pr, dt, cajas=()):
+        from .mapa import etiquetas_provincias
+        s_ = min(1.0, max(0.0, (dt - 0.3) / 0.4))
+        if s_ <= 0:
+            return
+        d = ImageDraw.Draw(capa)
+        puestas = cajas if isinstance(cajas, list) else list(cajas)
+        fichas = []
+        for gr in sorted(grupos or [], key=lambda x: -NIVELES[x["nivel"]]):
+            donde = (gr.get("_donde") or {}).get(tuple(pr.vista))
+            if not donde:
+                continue
+            x, y, provs = donde
+            sitio = " y ".join(dict.fromkeys(_nombre_prov(p) for p in provs[:2])) or gr["zonas"][0][:22]
+            dato = dato_aviso(gr).replace(" EN 1 HORA", "/H").replace("L/M²", "l/m²").lower() if dato_aviso(gr) else ""
+            if "niebla" in gr["fenomeno"]:
+                continue   # la niebla ya lleva su insignia animada
+            fichas.append((x, MAPA_Y0 + y, COLOR_NIVEL[gr["nivel"]], ICONO_AVISO.get(gr["fenomeno"].lower(), "lluvia"),
+                           sitio.upper(), (nombre_fen(gr["fenomeno"]) + (f" · {dato}" if dato else "")).upper(),
+                           gr["nivel"]))
+        extra = []
+        for c in sorted(prev_dia or [], key=lambda c: c["tmin"])[:3]:
+            if c["tmin"] <= 0:
+                extra.append((c, "nieve", (140, 200, 255), c["nombre"].upper(), f"HELADA · {c['tmin']}°"))
+        for c in sorted(prev_dia or [], key=lambda c: -(c.get("racha") or 0))[:2]:
+            if (c.get("racha") or 0) >= 60:
+                extra.append((c, "viento", (200, 220, 255), c["nombre"].upper(), f"RACHAS · {round(c['racha'])} KM/H"))
+        for c, ic, col, l1, l2 in extra:
+            x, y = pr.ciudad(c)
+            fichas.append((x, MAPA_Y0 + y, col, ic, l1, l2, "info"))
+        f1, f2 = fuente("Black", 30), fuente("ExtraBold", 24)
+        for k, (x, y, col, ic, l1, l2, nivel) in enumerate(fichas[:7]):
+            w = max(f1.getlength(l1), f2.getlength(l2)) + 112
+            h = 76
+            pos = None
+            for paso in range(0, 22):
+                for dx, dy in ((0, -1), (0, 1), (1, 0), (-1, 0), (1, -1), (-1, -1), (1, 1), (-1, 1)):
+                    cx, cy = x + dx * paso * 22, y - 70 + dy * paso * 22
+                    r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
+                    if 10 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h / 2 < cy < MAPA_Y0 + MAPA_H - h / 2 - 150 \
+                            and not any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas):
+                        pos = (cx, cy)
+                        break
+                    if paso == 0:
+                        break
+                if pos:
+                    break
+            if not pos:
+                continue
+            cx, cy = pos
+            puestas.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
+            a = int(240 * s_)
+            d.line([(cx, cy + h / 2), (x, y)], fill=(255, 255, 255, int(170 * s_)), width=3)
+            d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(255, 255, 255, a), outline=(8, 20, 45, a), width=3)
+            d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=22, fill=(10, 22, 48, a),
+                                outline=col + (a,), width=5)
+            im = icono(ic, 64, fase_de(dt, k * 0.4))
+            if s_ < 1:
+                im = im.copy(); im.putalpha(im.getchannel("A").point(lambda v: int(v * s_)))
+            capa.alpha_composite(im, (int(cx - w / 2 + 14), int(cy - 32)))
+            d.text((cx - w / 2 + 90, cy - 14), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+            d.text((cx - w / 2 + 90, cy + 18), l2, font=f2, fill=col + (int(255 * s_),), anchor="lm")
+    return dibujar
+
+
+def combinar_encima(*funcs):
+    funcs = [f for f in funcs if f]
+    if not funcs:
+        return None
+    def dibujar(capa, pr, dt, cajas=()):
+        acc = list(cajas)   # cada capa añade lo que pone, para que la siguiente no lo pise
+        for f in funcs:
+            f(capa, pr, dt, acc)
+    return dibujar
 
 
 def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | None = None):
@@ -1045,6 +1146,8 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | N
                 d.ellipse([fx - 3, fy - 3, fx + 3, fy + 3], fill=(255, 255, 255, int(220 * (1 - u) * s_)))
             d.text((x - w / 2 + 56, y - 9), l1, font=f1, fill=(20, 40, 90, int(255 * s_)), anchor="lm")
             d.text((x - w / 2 + 56, y + 18), l2, font=f2, fill=(70, 120, 200, int(255 * s_)), anchor="lm")
+        if isinstance(cajas, list):
+            cajas.extend(puestas)
     return dibujar
 
 
