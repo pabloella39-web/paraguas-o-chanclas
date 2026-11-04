@@ -403,7 +403,12 @@ def _dato_real() -> str:
     except Exception as e:  # noqa: BLE001
         log.warning("Dato real del aviso: %s", e)
         n = ""
-    return f"\n\nADEMÁS, en la intro o en el bloque del primer día: {n}" if n else ""
+    extra = f"\n\nADEMÁS, en la intro o en el bloque del primer día: {n}" if n else ""
+    try:
+        o = g.nota_olvidadas(ahora().date())
+    except Exception:  # noqa: BLE001
+        o = ""
+    return extra + (f"\n\n{o}" if o else "")
 
 
 def _extra_por_region() -> dict:

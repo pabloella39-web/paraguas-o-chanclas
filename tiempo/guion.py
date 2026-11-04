@@ -260,6 +260,57 @@ def _dato_real() -> str:
     return _DATO_REAL
 
 
+# Palabras que cuentan como "se ha nombrado" cada comunidad (capitales, ciudades grandes y el nombre de la región)
+NOMBRES_COMUNIDAD = {
+    "Galicia": ["Galicia", "Coruña", "Vigo", "Lugo", "Ourense", "Pontevedra", "Santiago", "Ferrol", "gallego"],
+    "Asturias": ["Asturias", "Oviedo", "Gijón", "Avilés"], "Cantabria": ["Cantabria", "Santander", "Torrelavega"],
+    "País Vasco": ["País Vasco", "Euskadi", "Bilbao", "Donostia", "San Sebastián", "Vitoria"],
+    "Navarra": ["Navarra", "Pamplona", "Tudela"], "La Rioja": ["Rioja", "Logroño"],
+    "Aragón": ["Aragón", "Zaragoza", "Huesca", "Teruel", "Calatayud", "Pirineo aragonés", "aragon"],
+    "Cataluña": ["Cataluña", "Barcelona", "Girona", "Tarragona", "Lleida", "Sabadell", "Terrassa"],
+    "Castilla y León": ["Castilla y León", "Valladolid", "León", "Burgos", "Salamanca", "Ávila", "Segovia", "Soria",
+                        "Zamora", "Palencia", "Ponferrada"],
+    "Madrid": ["Madrid"],
+    "Castilla-La Mancha": ["Castilla-La Mancha", "Toledo", "Cuenca", "Guadalajara", "Albacete", "Ciudad Real",
+                           "Talavera", "Puertollano", "La Mancha"],
+    "Extremadura": ["Extremadura", "Badajoz", "Cáceres", "Mérida", "Plasencia", "extremeñ"],
+    "Comunidad Valenciana": ["Valencia", "Alicante", "Castellón", "Elche", "Benidorm", "Valenciana"],
+    "Murcia": ["Murcia", "Cartagena", "Lorca"],
+    "Andalucía": ["Andalucía", "Sevilla", "Málaga", "Granada", "Córdoba", "Almería", "Cádiz", "Huelva", "Jaén", "Jerez"],
+    "Baleares": ["Baleares", "Mallorca", "Palma", "Ibiza", "Menorca"],
+    "Canarias": ["Canarias", "Tenerife", "Las Palmas", "Gran Canaria", "Lanzarote", "Fuerteventura"],
+}
+
+
+def comunidades_olvidadas(hoy: date, dias: int = 3) -> list[str]:
+    """Comunidades que no se han nombrado en ninguno de los vídeos de los últimos `dias` días (partes y especiales)."""
+    import json as _json
+    from datetime import timedelta as _td
+    from .config import RAIZ
+    textos = []
+    for k in range(0, dias + 1):
+        d = (hoy - _td(days=k)).isoformat()
+        rutas = [RAIZ / "historial" / f"{d}.json"] + list((RAIZ / "historial_especiales").glob(f"*-{d}*.json"))
+        for ruta in rutas:
+            try:
+                g = _json.loads(ruta.read_text(encoding="utf-8")).get("guion") or {}
+                textos.append(" ".join(str(v) for v in (g.values() if isinstance(g, dict) else [g])))
+            except Exception:  # noqa: BLE001
+                continue
+    if len(textos) < 2:
+        return []
+    todo = " ".join(textos).lower()
+    return [c for c, ns in NOMBRES_COMUNIDAD.items() if not any(n.lower() in todo for n in ns)]
+
+
+def nota_olvidadas(hoy: date) -> str:
+    olv = comunidades_olvidadas(hoy)
+    if not olv:
+        return ""
+    return (f"[OBLIGATORIO] Llevas varios días sin nombrar {', '.join(olv)} (la gente de allí lo nota y lo comenta): hoy nombra "
+            "al menos una ciudad de cada una, con su dato, en su bloque (Aragón va en INTERIOR y Extremadura en SUR).")
+
+
 def ciudades_repetidas(hoy: date, prev: list[dict], dias: int = 4) -> list[str]:
     """Ciudades nombradas en la mayoría de los últimos partes (para pedir variedad)."""
     import json as _json
@@ -325,7 +376,8 @@ def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: f
                                gancho=GANCHO_TEXTO or "(sin datos: usa lo más llamativo de los datos)",
                                contexto="\n".join(f"- {n}" for n in notas_dia(hoy) + ([continuidad(hoy)]
                                                                                        if continuidad(hoy) else [])
-                                                 + ([_dato_real()] if _dato_real() else []))
+                                                 + ([_dato_real()] if _dato_real() else [])
+                                                 + ([nota_olvidadas(hoy)] if nota_olvidadas(hoy) else []))
                                or "(nada especial)",
                                motivos=json.dumps({r: m["motivos"] or ["día tranquilo"] for r, m in info.items()},
                                                   ensure_ascii=False))
