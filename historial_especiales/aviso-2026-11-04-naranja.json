@@ -1,0 +1,98 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-04",
+ "caption": "⚠️ Aviso naranja por lluvias esta tarde en Cartagena y Lorca.\n\n🟠 Aviso naranja por lluvia: Lorca, Cartagena\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Lorca",
+ "titular": "CARTAGENA: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 24.37,
+ "firma": "naranja:lluvias:2",
+ "guion": {
+  "intro": "Atención Cartagena: aviso naranja por lluvias. Pueden caer 30 litros por metro cuadrado en una hora, con posibles tormentas.",
+  "zonas": "Lorca, Águilas, Cartagena y Mazarrón. Desde las siete de la tarde hasta medianoche.",
+  "consejos": "Toma precauciones y mantente informado de la predicción actualizada. Si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva allí."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "naranja",
+   "zonas": [
+    "Valle del Guadalentín, Lorca y Águilas",
+    "Campo de Cartagena y Mazarrón"
+   ],
+   "ciudades": [
+    "Lorca",
+    "Cartagena"
+   ],
+   "inicio": "2026-11-04T19:00:00+01:00",
+   "fin": "2026-11-04T23:59:59+01:00",
+   "descripcion": "Precipitación acumulada en una hora: 30 mm. Podrían ir acompañadas de tormentas."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-04T07:44:07.519Z"
+     },
+     "success": true,
+     "platform_post_id": "7704218611757403425",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7704218611757403425",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 5740071,
+     "post_title": "⚠️ Aviso naranja por lluvias esta tarde en Cartagena y Lorca.\n\n🟠 Aviso naranja por lluvia: Lorca, Cartagena\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Lorca",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 24.367,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7704218407687800864",
+     "request_id": "ab521d9159fb4b77be75b394be2b3c2d",
+     "request_id_logs": "ab521d9159fb4b77be75b394be2b3c2d",
+     "job_id": "51f29e08a3ae48f0b19be6ae1be26491",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-04T07:44:07.519Z"
+   },
+   "request_id": "ab521d9159fb4b77be75b394be2b3c2d"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "4st5QhpcIQs",
+  "url": "https://youtube.com/shorts/4st5QhpcIQs",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
