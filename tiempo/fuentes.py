@@ -449,11 +449,13 @@ def nieve(dia: date, cota_max: int = 1500, cm_min: float = 1.0) -> list[dict]:
 
 
 def texto_nieve(por_dia: dict) -> str:
-    partes = [f"{k}: " + ", ".join(f"{e['zona']} (cota {e['cota']} m, hasta {e['cm']} cm)" for e in v[:4])
-              for k, v in por_dia.items() if v]
+    partes = [f"{k}: " + ", ".join(f"{e['zona']} (cota {e['cota']} m, hasta {e['cm']} cm)"
+                                    for e in sorted(v, key=lambda e: (-e['cm'], e['cota']))[:3])
+              + (f" y {len(v) - 3} zonas más" if len(v) > 3 else "") for k, v in por_dia.items() if v]
     if not partes:
         return ""
-    return ("\n\nNIEVE PREVISTA: " + "; ".join(partes) + ". Menciónalo en su bloque con la cota ('nieve a partir de "
+    return ("\n\nNIEVE PREVISTA: " + "; ".join(partes) + ". Si nieva en muchas zonas, dilo en general ('nieve en "
+            "buena parte de las montañas del norte') y nombra solo las principales (2 o 3), nunca todas. Menciónalo en su bloque con la cota ('nieve a partir de "
             "800 metros en el Pirineo, hasta 15 centímetros'); si la cota es baja (menos de 1.000 m) o la nevada es "
             "grande, es noticia: dale protagonismo. En pantalla sale un copo con la cota.")
 

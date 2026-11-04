@@ -94,6 +94,29 @@ def festivos_del_dia(d: date) -> tuple[list[str], list[str]]:
     return reg, loc
 
 
+import re as _re
+DIA_COMUNIDAD = _re.compile(r"(D[ií]a de |Dia de |Diada|Fiesta de la Comunidad|Instituciones de Cantabria|Santiago Ap)")
+SIN_FELICITAR = ("Todos los Santos", "todos los Santos", "Viernes Santo", "Jueves Santo")
+
+
+def felicitar(nombre: str, comunidades: str = "") -> str:
+    """Instrucción para felicitar (festivo nacional a todos; Día de la Comunidad a la gente de esa comunidad)."""
+    if any(x in nombre for x in SIN_FELICITAR):
+        return ""
+    if comunidades:
+        if not DIA_COMUNIDAD.search(nombre) or "Letras" in nombre:
+            return ""
+        if "Santiago Ap" in nombre:   # 25 de julio: Día Nacional de Galicia
+            comunidades, dia = "Galicia", "Día de Galicia"
+        elif "Diada" in nombre:
+            dia = "Diada"
+        else:
+            dia = nombre.split("(")[-1].rstrip(")") if "(" in nombre else nombre
+        return f' Felicita a la gente de {comunidades} ("¡feliz {dia}!").'
+    dia = _re.sub(r"^(el|la|los|las) ", "", nombre)
+    return f' Felicita a todos ("¡feliz {dia}!" o similar, con naturalidad).'
+
+
 def notas_rango(d0: date, d1: date) -> list[str]:
     """Festivos y fiestas entre dos fechas (para los vídeos semanales y del finde)."""
     out = []
@@ -102,8 +125,11 @@ def notas_rango(d0: date, d1: date) -> list[str]:
         nombre = DIAS_SEMANA[d.weekday()]
         reg, loc = festivos_del_dia(d)
         nac = [FESTIVOS[(d.month, d.day)] + " (festivo nacional)"] if (d.month, d.day) in FESTIVOS else []
-        for f in nac + reg:
-            out.append(f"El {nombre} {d.day}: {f} [SIEMPRE].")
+        for f in nac:
+            out.append(f"El {nombre} {d.day}: {f} [SIEMPRE].{felicitar(FESTIVOS[(d.month, d.day)])}")
+        for f in reg:
+            nom, _, com = f.partition(" (festivo en ")
+            out.append(f"El {nombre} {d.day}: {f} [SIEMPRE].{felicitar(nom, com.rstrip(')'))}")
         for f in loc + ([EVENTOS[(d.month, d.day)]] if (d.month, d.day) in EVENTOS else []):
             out.append(f"El {nombre} {d.day}: {f} [solo si no hay nada más relevante].")
         d += timedelta(days=1)
@@ -131,7 +157,8 @@ def notas(d: date) -> list[str]:
     if (d.month, d.day) in INICIO_ESTACION:
         out.append(f"Hoy empieza oficialmente {INICIO_ESTACION[(d.month, d.day)]}.")
     if (d.month, d.day) in FESTIVOS:
-        out.append(f"[OBLIGATORIO] Hoy es {FESTIVOS[(d.month, d.day)]} (festivo nacional): nómbralo siempre.")
+        out.append(f"[OBLIGATORIO] Hoy es {FESTIVOS[(d.month, d.day)]} (festivo nacional): nómbralo siempre."
+                   + felicitar(FESTIVOS[(d.month, d.day)]))
     manana = d + timedelta(days=1)
     for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
         if (dd.month, dd.day) in EVENTOS:
@@ -141,13 +168,14 @@ def notas(d: date) -> list[str]:
     for dd, cuando in ((d, "Hoy"), (manana, "Mañana")):
         reg, loc = festivos_del_dia(dd)
         for f in reg:
+            nom, _, com = f.partition(" (festivo en ")
             out.append(f"[OBLIGATORIO] {cuando} es {f}: nómbralo siempre, relacionando el tiempo con el plan "
-                       "(si acompaña o si lo estropea).")
+                       "(si acompaña o si lo estropea)." + felicitar(nom, com.rstrip(")")))
         for f in loc:
             out.append(f"{cuando} son las {f}: nómbralo SOLO si el día es tranquilo y no hay nada más relevante.")
     if (manana.month, manana.day) in FESTIVOS:
         out.append(f"[OBLIGATORIO] Mañana es {FESTIVOS[(manana.month, manana.day)]} (festivo nacional): nómbralo "
-                   "siempre y di qué tiempo hará para los planes.")
+                   "siempre y di qué tiempo hará para los planes." + felicitar(FESTIVOS[(manana.month, manana.day)]))
     p = _pascua(d.year)
     if d == p - timedelta(days=2):
         out.append("Hoy es Viernes Santo (festivo).")

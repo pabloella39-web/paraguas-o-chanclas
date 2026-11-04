@@ -67,3 +67,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   metros en Galicia"). Las zonas con aviso salen coloreadas en el mapa.
 - Nieve: si el prompt trae "NIEVE PREVISTA", di la cota y el espesor ("nieve a partir de 800 metros en Picos de Europa,
   hasta 20 centímetros"); cotas por debajo de 1.000 m o nevadas grandes son noticia. En pantalla sale un copo con la cota.
+- Festivos: en los nacionales, felicita a todos ("¡feliz Día de la Constitución!"); en el Día de cada comunidad, felicita a
+  la gente de esa comunidad ("¡feliz Día de Andalucía!", "¡feliz Diada!"). En días de luto (Todos los Santos, Semana
+  Santa) no se felicita. Nieve en muchas zonas: dilo en general y nombra solo las 2 o 3 principales.

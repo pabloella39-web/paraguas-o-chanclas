@@ -801,6 +801,8 @@ def capa_avisos_suave(grupos):
 
 def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
     """Altura de las olas en el mar (insignia azul con ola) y cota de nieve en la montaña (copo con la cota)."""
+    nieves = sorted(nieves, key=lambda e: (-e["cm"], e["cota"]))[:5]   # solo las principales
+    olas = sorted(olas, key=lambda o: -o["olas"])[:5]
     def ola_icono(d, x, y, w=34, col=(255, 255, 255)):
         for k in range(2):
             pts = [(x + i, y + k * 11 + 4 * math.sin(i / w * 2 * math.pi * 1.5)) for i in range(0, w + 1, 2)]
