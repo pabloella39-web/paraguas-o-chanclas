@@ -332,10 +332,57 @@ def videos_que_piden_lugar() -> set[str]:
     return ids
 
 
+DIAS_ESPECIAL = {"semana": range(1, 6), "resto": range(1, 5), "finde": range(1, 3)}   # días tras la publicación
+ABREV = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+
+
+def dias_del_video(video: str | None) -> list[date]:
+    """Si el comentario es de un vídeo de varios días (semana, lo que queda de semana, finde), esos días."""
+    if not video:
+        return []
+    for f in sorted((RAIZ / "historial_especiales").glob("*.json"), reverse=True)[:40]:
+        tipo = f.stem.split("-")[0]
+        if tipo not in DIAS_ESPECIAL:
+            continue
+        try:
+            meta = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        if video in json.dumps(meta.get("tiktok") or {}):
+            pub = date.fromisoformat(meta.get("fecha") or f.stem.split("-", 1)[1])
+            return [pub + timedelta(days=k) for k in DIAS_ESPECIAL[tipo]]
+    return []
+
+
+def texto_varios_dias(sitio: dict, dias: list[date], q: dict) -> str | None:
+    """Resumen rápido día a día para un sitio: «📍Toledo: Jue ☀️19/6° · Vie 🌧️15/8° 💧70% ...»."""
+    partes, notas = [], []
+    for d in dias:
+        p = prevision(sitio, d)
+        if not (-25 <= p["tmin"] <= p["tmax"] <= 46):
+            return None
+        partes.append(f"{ABREV[d.weekday()]} {ICONO_EMOJI.get(p['icono'], '🌤️')}{p['tmax']}/{p['tmin']}°"
+                      + (f" 💧{p['lluvia']}%" if p["lluvia"] >= 40 else ""))
+        notas.append((p["lluvia"], -p["tmax"], d))
+    mejor = min(notas)[2]
+    txt = f"📍{sitio['nombre']}: " + " · ".join(partes)
+    cola = f" → el mejor, el {['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'][mejor.weekday()]} 😉"
+    return (txt + cola) if len(txt + cola) <= 150 else txt[:150]
+
+
 def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
     sitio = geocodificar(q["lugar"], q.get("provincia", ""), q.get("pais", "ES"))
     if not sitio:
         return None
+    if q.get("dia") != "hoy":   # en los vídeos de varios días: resumen de todos los días que quedan
+        dias = [d for d in dias_del_video(q.get("video")) if d >= hoy_.date() + timedelta(days=1 if hoy_.hour >= 15 else 0)]
+        if len(dias) >= 2:
+            try:
+                txt = texto_varios_dias(sitio, dias, q)
+                if txt:
+                    return txt
+            except Exception as e:  # noqa: BLE001
+                log.warning("Resumen de varios días para %s: %s", sitio["nombre"], e)
     dia = hoy_.date() + timedelta(days=1) if (q.get("dia") == "mañana" or (q.get("dia") != "hoy" and hoy_.hour >= 15)) \
         else hoy_.date()
     p = prevision(sitio, dia)
