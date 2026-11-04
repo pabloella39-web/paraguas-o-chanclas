@@ -27,3 +27,4 @@ for k in dias:
         base.alpha_composite(capa)
         base.crop((0, MAPA_Y0, ANCHO, MAPA_Y0 + MAPA_H)).convert("RGB").resize((540, 520)).save(out / f"{k}_{nombre}.png")
 print("OK")
+# Wed Nov  4 18:56:02 CET 2026

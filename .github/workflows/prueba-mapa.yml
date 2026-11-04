@@ -14,7 +14,7 @@ jobs:
       - run: pip install -r requirements.txt
       - env:
           AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
-        run: python scripts/prueba_mapa.py > registro.txt 2>&1 || echo FALLO >> registro.txt; mkdir -p prueba; mv registro.txt prueba/
+        run: PYTHONPATH=. python scripts/prueba_mapa.py > registro.txt 2>&1 || echo FALLO >> registro.txt; mkdir -p prueba; mv registro.txt prueba/
       - if: always()
         run: |
           cd prueba && git init -q -b registro-mapa
