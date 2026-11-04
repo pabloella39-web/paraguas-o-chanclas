@@ -432,7 +432,13 @@ def _capas_dias() -> dict:
 
 
 def _capas_encima_dias() -> dict:
-    return {k: capa_mar_nieve(ol, ni) for k, (ol, ni) in MAR_NIEVE.items() if ol or ni}
+    out = {}
+    for k in set(MAR_NIEVE) | set(AVISOS_DIA):
+        ol, ni = MAR_NIEVE.get(k, ([], []))
+        nb = nieblas_de(AVISOS_DIA.get(k))
+        if ol or ni or nb:
+            out[k] = capa_mar_nieve(ol, ni, nb)
+    return out
 
 
 def _dato_real() -> str:
@@ -834,7 +840,21 @@ def capa_avisos_suave(grupos):
     return dibujar
 
 
-def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
+def nieblas_de(grupos) -> list[dict]:
+    """Puntos (centro de cada zona) de los avisos por niebla, con la visibilidad si AEMET la da."""
+    out = []
+    for gr in grupos or []:
+        if "niebla" not in gr["fenomeno"].lower():
+            continue
+        m = re.search(r"visibilidad[^0-9]{0,30}(\d+)\s*m", " ".join(gr.get("descripciones") or [gr.get("descripcion") or ""]).lower())
+        for pol in gr.get("poligonos") or []:
+            if len(pol) >= 3:
+                out.append({"lon": sum(p[0] for p in pol) / len(pol), "lat": sum(p[1] for p in pol) / len(pol),
+                            "vis": int(m.group(1)) if m else None, "nivel": gr["nivel"]})
+    return out[:4]
+
+
+def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | None = None):
     """Altura de las olas en el mar (insignia azul con ola) y cota de nieve en la montaña (copo con la cota)."""
     nieves = sorted(nieves, key=lambda e: (-e["cm"], e["cota"]))[:5]   # solo las principales
     olas = sorted(olas, key=lambda o: -o["olas"])[:5]
@@ -854,6 +874,16 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
             bx, by = x + math.cos(a) * r * .55, y + math.sin(a) * r * .55
             for da in (.7, -.7):
                 d.line([(bx, by), (bx + math.cos(a + da) * r * .35, by + math.sin(a + da) * r * .35)], fill=col, width=3)
+
+    def bruma(d, x, y, w=40, fase=0.0, col=(255, 255, 255)):
+        """Tres franjas de niebla que se deslizan a un lado y a otro."""
+        for k in range(3):
+            desp = math.sin(fase * 1.6 + k * 2.1) * 6
+            y0 = y - 12 + k * 12
+            x0, x1 = x + desp + (k % 2) * 5, x + w + desp - ((k + 1) % 2) * 6
+            d.line([(x0, y0), (x1, y0)], fill=col + (int(255 - k * 40),), width=6)
+            d.ellipse([x0 - 3, y0 - 3, x0 + 3, y0 + 3], fill=col + (int(255 - k * 40),))
+            d.ellipse([x1 - 3, y0 - 3, x1 + 3, y0 + 3], fill=col + (int(255 - k * 40),))
 
     def libre(x, y, w, h, cajas, puestas, mar=None):
         """Mueve la insignia lo justo para no tapar tarjetas ni otras insignias (y que no se salga del mapa).
@@ -910,6 +940,31 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
                                 outline=(255, 255, 255, int(230 * s_)), width=3)
             ola_icono(d, x - w / 2 + 14, y - 8, fase=dt)
             d.text((x - w / 2 + 58, y), txt, font=f, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+        for nb in (nieblas or []):
+            lo, la = nb["lon"], nb["lat"]
+            if es_canaria(la):
+                if not pr.muestra_canarias:
+                    continue
+                lo, la = lonlat_mapa(lo, la, True)
+            x, y = pr(lo, la); y += MAPA_Y0
+            if not (40 < x < ANCHO - 40 and MAPA_Y0 + 20 < y < MAPA_Y0 + MAPA_H - 20):
+                continue
+            l1 = "NIEBLA"
+            l2 = f"visib. {nb['vis']} m" if nb.get("vis") else ""
+            f1, f2 = fuente("Black", 30), fuente("ExtraBold", 22)
+            w = max(f1.getlength(l1), f2.getlength(l2) if l2 else 0) + 84
+            hh = 64 if l2 else 52
+            pos = libre(x, y, w, hh, cajas, puestas)
+            if not pos:
+                continue
+            x, y = pos
+            puestas.append((x - w / 2, y - hh / 2, x + w / 2, y + hh / 2))
+            d.rounded_rectangle([x - w / 2, y - hh / 2, x + w / 2, y + hh / 2], radius=hh / 2,
+                                fill=(120, 132, 150, int(240 * s_)), outline=(255, 255, 255, int(220 * s_)), width=3)
+            bruma(d, x - w / 2 + 14, y, fase=dt)
+            d.text((x - w / 2 + 66, y - (8 if l2 else 0)), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+            if l2:
+                d.text((x - w / 2 + 66, y + 17), l2, font=f2, fill=(225, 232, 245, int(255 * s_)), anchor="lm")
         for n in nieves:
             x, y = pr(n["lon"], n["lat"]); y += MAPA_Y0
             if not (60 < x < ANCHO - 60 and MAPA_Y0 + 30 < y < MAPA_Y0 + MAPA_H - 30):

@@ -44,11 +44,12 @@ def _capas_parte(avisos):
     return {"*": capa_avisos_suave(avisos)} if avisos else None
 
 
-def _capas_encima(mar_nieve):
-    """Altura de las olas en el mar y cota de nieve (encima de todo, esquivando las tarjetas)."""
-    from .especiales import capa_mar_nieve
+def _capas_encima(mar_nieve, avisos=None):
+    """Altura de las olas, cota de nieve y niebla con aviso (encima de todo, esquivando las tarjetas)."""
+    from .especiales import capa_mar_nieve, nieblas_de
     ol, ni = mar_nieve
-    return {"*": capa_mar_nieve(ol, ni)} if (ol or ni) else None
+    nb = nieblas_de(avisos)
+    return {"*": capa_mar_nieve(ol, ni, nb)} if (ol or ni or nb) else None
 
 
 def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
@@ -244,7 +245,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
                       gancho=fen, satelite=sat,
-                      capas_fondo=_capas_parte(avisos), capas_encima=_capas_encima(MAR_NIEVE_HOY))
+                      capas_fondo=_capas_parte(avisos), capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)
