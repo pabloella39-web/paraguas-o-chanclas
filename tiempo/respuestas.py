@@ -743,6 +743,24 @@ def main():
                 print(f"::warning::No se pudo corregir {c['id']}: {e}")
         _guardar(est)
         return
+    if os.environ.get("RESPONDER_LUGAR", "").strip() == "dump":   # depurar: cómo vienen las respuestas a nuestro «Reto»
+        for vid in videos_recientes(6):
+            for c in _comentarios_de(vid, 50, 10):
+                u = c.get("user") or {}
+                if (u.get("username") or c.get("username") or "").lstrip("@").lower() == MIA or "Reto" in str(c.get("text")):
+                    print(f"::notice::RAW {vid}: {json.dumps(c, ensure_ascii=False)[:700]}")
+                    cid = str(c.get("id") or c.get("comment_id"))
+                    for ruta, extra in (("uploadposts/comments", {"comment_id": cid}),
+                                        ("uploadposts/comments", {"parent_comment_id": cid}),
+                                        ("uploadposts/comments", {"parent_id": cid}),
+                                        ("uploadposts/comments/replies", {"comment_id": cid}),
+                                        ("uploadposts/comments/replies", {"parent_comment_id": cid})):
+                        try:
+                            j = _get(ruta, platform="tiktok", user=uploadpost.perfil("tiempo"), post_id=vid, limit=50, **extra)
+                            print(f"::notice::{ruta} {list(extra)[0]}: {json.dumps(j, ensure_ascii=False)[:500]}")
+                        except Exception as e:  # noqa: BLE001
+                            print(f"::notice::{ruta} {list(extra)[0]}: ERROR {str(e)[:200]}")
+        return
     lugar = os.environ.get("RESPONDER_LUGAR", "").strip()   # una vez: contesta con la previsión a los que nombran ese sitio
     if lugar:
         est = _cargar()
