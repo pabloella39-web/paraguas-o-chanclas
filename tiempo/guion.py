@@ -620,20 +620,30 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
         n = n.replace("S.C. Tenerife", "Santa Cruz de Tenerife")
         return _re.search(r"(?<![\wáéíóúñ])" + _re.escape(n) + r"(?![\wáéíóúñ])", texto) is not None
 
-    out = [dict(c) for c in prev]
-    usados = set()
-    for e in extra:
-        if not e.get("lat") or not nombrada(e["nombre"]):
-            continue
-        candidatos = [i for i, c in enumerate(out) if c["region"] == e["region"] and i not in usados
-                      and c["nombre"] not in ("Ceuta", "Melilla") and not nombrada(c["nombre"])]
-        if not candidatos:
-            continue
-        i = min(candidatos, key=lambda i: math.hypot(out[i]["lat"] - e["lat"], out[i]["lon"] - e["lon"]))
-        log.info("Mapa: %s sustituye a %s (la nombra el guion)", e["nombre"], out[i]["nombre"])
-        out[i] = {**out[i], **{k: e[k] for k in ("nombre", "lat", "lon", "tmax", "tmin", "lluvia", "icono")
-                                if e.get(k) is not None}, "racha": e.get("racha"), "extra": True}
-        usados.add(i)
+    # Cada región: primero TODAS las ciudades que nombra el guion (habituales o extra); después se rellenan los huecos
+    # del mapa con otras ciudades, aunque no se nombren (Tarragona, Cuenca, Huesca, Ciudad Real…), eligiendo siempre
+    # la más alejada de las que ya hay para cubrir toda la región. Así ninguna zona se queda vacía.
+    MAX = {"islas": 5, "interior": 8, "sur": 7, "norte": 6, "mediterraneo": 6}
+    def dist(a, b):
+        return math.hypot((a["lat"] - b["lat"]), (a["lon"] - b["lon"]) * math.cos(math.radians(40)))
+    extras_ok = [dict(e, extra=True) for e in extra if e.get("lat") and e.get("tmax") is not None]
+    out = []
+    for region in dict.fromkeys(c["region"] for c in prev):
+        base = [dict(c) for c in prev if c["region"] == region]
+        exs = [e for e in extras_ok if e["region"] == region and e["nombre"] not in {c["nombre"] for c in base}]
+        todos = base + exs
+        sel = [c for c in todos if nombrada(c["nombre"])]
+        resto = [c for c in todos if c not in sel and c["nombre"] not in ("Ceuta", "Melilla")]
+        tope = MAX.get(region, 6)
+        if not sel and base:
+            sel = [base[0]]; resto = [c for c in resto if c is not base[0]]
+        while len(sel) < tope and resto:
+            # la más alejada de las elegidas; las habituales (más vistas) tienen un pequeño plus
+            c = max(resto, key=lambda c: min(dist(c, x) for x in sel) + (0.6 if not c.get("extra") else 0))
+            if min(dist(c, x) for x in sel) < (0.5 if region == "islas" else 1.0):   # más cerca se pisarían
+                break
+            sel.append(c); resto.remove(c)
+        out += sel + [c for c in base if c["nombre"] in ("Ceuta", "Melilla") and c not in sel]
     # Ceuta y Melilla: basta con la tarjeta de una (se alternan por días), salvo que el guion nombre a las dos
     if not (nombrada("Ceuta") and nombrada("Melilla")):
         from datetime import date as _d
