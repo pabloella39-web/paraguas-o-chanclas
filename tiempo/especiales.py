@@ -1014,17 +1014,42 @@ def combinar_encima(*funcs):
     return dibujar
 
 
+_OLAS = {}
+
+
+def _ola_sprite(fase: float) -> Image.Image:
+    """Icono de ola rompiendo (48×44), dibujado con supermuestreo; 24 fotogramas en bucle."""
+    k = int((fase * 12) % 24)
+    if k in _OLAS:
+        return _OLAS[k]
+    S, W, H = 4, 48, 44
+    im = Image.new("RGBA", (W * S, H * S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    t = k / 24 * 2 * math.pi
+    sx, sy = math.sin(t) * 2.5, math.cos(t) * 1.8          # balanceo de la cresta
+    P = lambda px, py: ((px + sx) * S, (py + sy) * S)
+    # cuerpo de la ola: sube desde la izquierda, cresta arriba a la derecha y cae con un rizo
+    cuerpo = [P(2, 40), P(4, 34), P(9, 27), P(15, 19), P(22, 12), P(30, 8), P(37, 8), P(42, 11), P(44, 16),
+              P(42, 21), P(38, 22), P(35, 19), P(36, 15), P(33, 15), P(29, 19), P(28, 26), P(31, 33), P(36, 38),
+              P(40, 40)]
+    d.polygon(cuerpo, fill=(255, 255, 255, 255))
+    # hueco del rizo (azul) y espuma
+    d.ellipse([*P(29, 15), *P(37, 22)], fill=(40, 120, 220, 255))
+    for fx, fy, r in ((40, 10, 2.2), (44, 13, 1.8), (35, 7, 1.6)):
+        cx, cy = P(fx, fy)
+        d.ellipse([cx - r * S, cy - r * S, cx + r * S, cy + r * S], fill=(255, 255, 255, 255))
+    # línea de agua que avanza por debajo
+    pts = [((i) * S, (42 + 1.6 * math.sin(i / 6 - t * 2)) * S) for i in range(0, W + 1)]
+    d.line(pts, fill=(200, 230, 255, 255), width=3 * S)
+    im = im.resize((W, H), Image.LANCZOS)
+    _OLAS[k] = im
+    return im
+
+
 def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | None = None):
     """Altura de las olas en el mar (insignia azul con ola) y cota de nieve en la montaña (copo con la cota)."""
     nieves = sorted(nieves, key=lambda e: (-e["cm"], e["cota"]))[:5]   # solo las principales
     olas = sorted(olas, key=lambda o: -o["olas"])[:5]
-    def ola_icono(d, x, y, w=34, col=(255, 255, 255), fase=0.0):
-        """Dos olas que avanzan (la fase corre con el tiempo)."""
-        for k in range(2):
-            pts = [(x + i, y + k * 11 + 4 * math.sin(i / w * 2 * math.pi * 1.5 - fase * 5 - k * 1.2))
-                   for i in range(0, w + 1, 2)]
-            d.line(pts, fill=col, width=4)
-
     def copo(d, x, y, r=17, col=(70, 140, 230), giro=0.0):
         """Copo que gira despacio."""
         for k in range(6):
@@ -1089,7 +1114,7 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | N
                 continue
             txt = f"{str(o['olas']).replace('.', ',')} m"
             f = fuente("Black", 34)
-            w = f.getlength(txt) + 80
+            w = f.getlength(txt) + 86
             pos = libre(x, y, w, 56, cajas, puestas, mar=mascara_tierra(pr))
             if not pos:
                 continue
@@ -1098,8 +1123,8 @@ def capa_mar_nieve(olas: list[dict], nieves: list[dict], nieblas: list[dict] | N
             col = (20, 90, 200) if o["olas"] < 5 else (200, 40, 60)
             d.rounded_rectangle([x - w / 2, y - 28, x + w / 2, y + 28], radius=28, fill=col + (int(240 * s_),),
                                 outline=(255, 255, 255, int(230 * s_)), width=3)
-            ola_icono(d, x - w / 2 + 14, y - 8, fase=dt)
-            d.text((x - w / 2 + 58, y), txt, font=f, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+            capa.alpha_composite(_ola_sprite(dt), (int(x - w / 2 + 10), int(y - 22)))
+            d.text((x - w / 2 + 64, y), txt, font=f, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
         for nb in (nieblas or []):
             lo, la = nb["lon"], nb["lat"]
             if es_canaria(la):
