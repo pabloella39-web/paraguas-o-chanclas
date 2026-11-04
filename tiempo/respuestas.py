@@ -835,7 +835,7 @@ def main():
                 continue
             if not objetivo and (c["id"] in hechas or _norm(lugar) not in _norm(c["texto"])):
                 continue
-            msg = texto_ciudad({"id": c["id"], "lugar": lugar, "pais": "ES", "dia": ""}, ahora())
+            msg = texto_ciudad({"id": c["id"], "video": c.get("video"), "lugar": lugar, "pais": "ES", "dia": ""}, ahora())
             if not msg:
                 print(f"::warning::Sin previsión para {lugar}")
                 break
