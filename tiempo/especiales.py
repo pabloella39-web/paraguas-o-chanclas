@@ -64,7 +64,7 @@ def duracion(dmin: float, dmax: float, dobj: float):
             m.DURACION_MIN, m.DURACION_MAX, m.DURACION_OBJETIVO = a, b, c
 
 
-DURACION_SEMANA = (85.0, 95.0, 90.0)
+DURACION_SEMANA = (85.0, 100.0, 91.0)
 VOZ_USADA = ""   # voz del especial que se está haciendo (para alternar con el siguiente vídeo)
 
 
@@ -224,8 +224,13 @@ def _mejor_plan(prev_s, prev_d):
 
 
 def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: str, plantilla: bool) -> dict:
-    orden = ["intro", "sabado", "domingo", "general", "cierre"]
-    palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_FINDE.items()}
+    orden = ["intro"] + [x for d in ("sabado", "domingo") for x in ([f"avisos_{d}"] if d in AVISOS_BLOQUE else []) + [d]] \
+        + ["general", "cierre"]
+    base = dict(PALABRAS_FINDE)
+    for d in AVISOS_BLOQUE:
+        base[f"avisos_{d}"] = 20
+        base[d] = max(16, base[d] - 14)
+    palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     if not plantilla:
         try:
             gg = _claude_json(f"finde-{ahora().date().isoformat()}", "19:50", PROMPT_FINDE.format(presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
@@ -234,6 +239,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                   fiestas=(" ".join(notas_rango(sab, dom)) or "(ninguno)") + _dato_real(),
                                                   extra=json.dumps(_extra_por_region(), ensure_ascii=False)))
+            orden = _sin_bloques_vacios(orden, gg)
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 return gg
@@ -314,7 +320,10 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
                       "domingo": prev_d, "intro": []},
         "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
-        "pills": {"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
+        "vistas": _kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["vistas"],
+        "sin_marcadores": _kwargs_avisos({"sabado": "", "domingo": ""})["sin"],
+        "pills": {**_kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["pills"],
+                  "sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR PLAN DEL FINDE"},
         "portada_txt": ("EL TIEMPO DEL FINDE", "FIN DE SEMANA", rango,
                         ((f"MEJOR PLAN: {ms['nombre'].upper()} {ms['tmax']}°", (255, 196, 45)),
@@ -403,6 +412,14 @@ EXTRA_SEMANA: list = []
 
 AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
 AVISOS_DIA = {}
+AVISOS_BLOQUE = []   # días con bloque propio de avisos (mapa de España con avisos, olas, nieve y niebla)
+
+
+def _merece_bloque(k) -> bool:
+    gr = AVISOS_DIA.get(k) or []
+    ol, ni = MAR_NIEVE.get(k, ([], []))
+    return (any(NIVELES[x["nivel"]] >= 2 for x in gr) or len(gr) >= 3
+            or any(o["olas"] >= 4 for o in ol) or any(n["cota"] < 1000 or n["cm"] >= 10 for n in ni))
 MAR_NIEVE = {}   # {día: (olas, nieve)} para dibujarlos en el mapa de cada día
 
 
@@ -424,11 +441,28 @@ def _preparar_avisos(dias: dict):
         ol = [{"zona": z, "olas": m, **next((dict(lat=la, lon=lo) for zz, la, lo in COSTA if zz == z), {})}
               for z, m in olas[k]]
         MAR_NIEVE[k] = (ol, nieves[k])
+    AVISOS_BLOQUE[:] = [k for k in dias if _merece_bloque(k)]
     AVISOS_TXT[0] = texto_avisos(AVISOS_DIA) + texto_oleaje(olas) + texto_nieve(nieves)
+    if AVISOS_BLOQUE:
+        AVISOS_TXT[0] += ("\n\nBLOQUES DE AVISOS: " + ", ".join(f'"avisos_{k}"' for k in AVISOS_BLOQUE)
+                          + ". Cada uno va justo ANTES del bloque de su día, con un mapa de España con los avisos, las "
+                            "olas, la nieve y la niebla: resume ahí en 1-2 frases lo importante de ese día (nivel, zona, "
+                            "dato: litros, olas, cota). En el bloque del día ya NO lo repitas: habla de temperaturas, "
+                            "lluvia y planes.")
 
 
 def _capas_dias() -> dict:
-    return {k: capa_avisos_suave(v) for k, v in AVISOS_DIA.items() if v}
+    """Días con bloque de avisos: ahí, avisos a tope; en el bloque del día, solo un tono suave sin leyenda."""
+    out = {}
+    for k, v in AVISOS_DIA.items():
+        if not v:
+            continue
+        if k in AVISOS_BLOQUE:
+            out[f"avisos_{k}"] = capa_avisos_suave(v, alfa=160)
+            out[k] = capa_avisos_suave(v, alfa=60, leyenda=False)
+        else:
+            out[k] = capa_avisos_suave(v)
+    return out
 
 
 def _capas_encima_dias() -> dict:
@@ -437,8 +471,25 @@ def _capas_encima_dias() -> dict:
         ol, ni = MAR_NIEVE.get(k, ([], []))
         nb = nieblas_de(AVISOS_DIA.get(k))
         if ol or ni or nb:
-            out[k] = capa_mar_nieve(ol, ni, nb)
+            out[f"avisos_{k}" if k in AVISOS_BLOQUE else k] = capa_mar_nieve(ol, ni, nb)
     return out
+
+
+def _sin_bloques_vacios(orden, gg):
+    """Si el guion no trae algún bloque de avisos, ese día va sin bloque (y sus avisos se ven en su mapa normal)."""
+    faltan = [s_ for s_ in orden if s_.startswith("avisos_") and not (gg.get("segmentos") or {}).get(s_)]
+    for s_ in faltan:
+        k = s_[len("avisos_"):]
+        if k in AVISOS_BLOQUE:
+            AVISOS_BLOQUE.remove(k)
+    return [s_ for s_ in orden if s_ not in faltan]
+
+
+def _kwargs_avisos(fechas_dia: dict) -> dict:
+    """Vista de España, sin tarjetas y con su etiqueta para cada bloque de avisos."""
+    return {"vistas": {f"avisos_{k}": VISTA_GENERAL for k in AVISOS_BLOQUE},
+            "sin": [f"avisos_{k}" for k in AVISOS_BLOQUE],
+            "pills": {f"avisos_{k}": f"AVISOS · {fechas_dia[k]}" for k in AVISOS_BLOQUE}}
 
 
 def _dato_real() -> str:
@@ -469,11 +520,15 @@ def _nota_dia(prev):
 
 
 def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, plantilla: bool) -> dict:
-    orden = ["intro"] + _dias() + ["general", "cierre"]
+    orden = ["intro"] + [x for d in _dias() for x in ([f"avisos_{d}"] if d in AVISOS_BLOQUE else []) + [d]] \
+        + ["general", "cierre"]
     # El primer día (mañana) hace de parte diario: bloque largo; los demás, más breves
     resto_dias = round(116 / (len(_dias()) - 1))   # ≈90 s en total: el vídeo estrella de la semana
     base = {"intro": 24, **{d: resto_dias for d in _dias()}, "general": 30, "cierre": 18}
     base[_dias()[0]] = 54
+    for d in AVISOS_BLOQUE:   # lo de los avisos pasa del bloque del día a su bloque propio
+        base[f"avisos_{d}"] = 20
+        base[d] = max(16, base[d] - 14)
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     if not plantilla:
         try:
@@ -482,7 +537,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
             gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "19:50", PROMPT_SEMANA.format(presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
                                                    palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                    cuando=m["cuando"], rango_txt=m["rango_txt"],
-                                                   claves_dias=", ".join(f'"{d}": "..."' for d in _dias()),
+                                                   claves_dias=", ".join(f'"{d}": "..."' for d in orden[1:-2]),
                                                    primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}",
                                                    extra=json.dumps(_extra_por_region(), ensure_ascii=False),
                                                    fiestas=(" ".join(notas_rango(fechas[_dias()[0]], fechas[_dias()[-1]])) or "(ninguno)")
@@ -490,6 +545,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
                                                    repetidas=", ".join(g.ciudades_repetidas(fechas[_dias()[0]],
                                                                                             prevs[_dias()[0]]))
                                                    or "(ninguna)"))
+            orden = _sin_bloques_vacios(orden, gg)
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 return gg
@@ -590,7 +646,10 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         "satelite": sat,
         "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
         "datos_seg": {**mapa_dias, "intro": []},
-        "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
+        "vistas": _kwargs_avisos({d: "" for d in _dias()})["vistas"],
+        "sin_marcadores": _kwargs_avisos({d: "" for d in _dias()})["sin"],
+        "pills": {**_kwargs_avisos({d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()})["pills"],
+                  **{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR Y EL PEOR DÍA"},
         # Portada reconocible en el perfil: fondo granate, borde dorado y la tira de días con su icono y máxima
@@ -810,7 +869,7 @@ def pintar_avisos(grupos, pr, alfa=120):
     return Image.fromarray(out, "RGBA"), vistos
 
 
-def capa_avisos_suave(grupos):
+def capa_avisos_suave(grupos, alfa=120, leyenda=True):
     """Zonas con aviso (amarillo, naranja o rojo) coloreadas suavemente bajo las tarjetas del parte, con leyenda."""
     cache = {}
 
@@ -818,7 +877,7 @@ def capa_avisos_suave(grupos):
         aparece = min(1.0, max(0.0, dt / 0.6))
         clave = (tuple(pr.vista), pr.ancho, pr.alto)
         if clave not in cache:
-            img, vis = pintar_avisos(grupos, pr)
+            img, vis = pintar_avisos(grupos, pr, alfa=alfa)
             full = Image.new("RGBA", capa.size, (0, 0, 0, 0)); full.alpha_composite(img, (0, MAPA_Y0))
             cache[clave] = (full, vis)
         lay, vistos = cache[clave]
@@ -827,7 +886,7 @@ def capa_avisos_suave(grupos):
         capa.alpha_composite(lay)
         d = ImageDraw.Draw(capa)
         y = MAPA_Y0 + MAPA_H - 80            # leyenda abajo a la izquierda
-        for gr in list(dict.fromkeys((x["nivel"], nombre_fen(x["fenomeno"])) for x in reversed(vistos)))[:3]:
+        for gr in ([] if not leyenda else list(dict.fromkeys((x["nivel"], nombre_fen(x["fenomeno"])) for x in reversed(vistos)))[:3]):
             nivel, fen = gr
             txt = f"AVISO {nivel.upper()} · {fen.upper()}"
             f = fuente("Black", 30)
