@@ -296,14 +296,20 @@ def icono(tipo: str, tam: int, fase: int = 0) -> Image.Image:
             t_ = s * 0.06 * math.sin(math.pi * k)
             d.line([(x - t_, y), (x + t_, y)], fill=(255, 255, 255), width=int(s * 0.02))
             d.line([(x, y - t_), (x, y + t_)], fill=(255, 255, 255), width=int(s * 0.02))
-    elif tipo == "granizo":    # nube oscura con bolitas de granizo cayendo y rebotando
-        for i, cx in enumerate((0.30, 0.46, 0.62, 0.76)):
-            k = (f + i * 0.27) % 1.0
-            y = s * (0.62 + 0.30 * k)
-            r = s * 0.045
-            d.ellipse([s * cx - r, y - r, s * cx + r, y + r], fill=(235, 245, 255), outline=(150, 190, 230),
-                      width=int(s * 0.012))
-        _nube(d, s * (0.48 + 0.015 * onda), s * 0.30, s * 0.72, NUBE_OSCURA)
+    elif tipo == "granizo":    # nube oscura que tiembla y suelta bolas de granizo que caen y rebotan
+        tiembla = s * 0.012 * math.sin(2 * math.pi * f * 6)
+        for i, cx in enumerate((0.28, 0.44, 0.60, 0.76, 0.36, 0.68)):
+            k = (f * 1.5 + i * 0.19) % 1.0
+            if k < 0.75:                       # cae
+                y = s * (0.52 + 0.42 * (k / 0.75) ** 1.6)
+            else:                              # rebota en el suelo
+                b = (k - 0.75) / 0.25
+                y = s * (0.94 - 0.10 * math.sin(math.pi * b))
+            r = s * (0.07 if i < 4 else 0.055)
+            x = s * cx + (s * 0.03 * (k - 0.75) * 4 if k >= 0.75 else 0)
+            d.ellipse([x - r, y - r, x + r, y + r], fill=(240, 248, 255), outline=(120, 170, 225), width=int(s * 0.018))
+            d.ellipse([x - r * 0.45, y - r * 0.55, x - r * 0.05, y - r * 0.15], fill=(255, 255, 255))
+        _nube(d, s * 0.48 + tiembla, s * 0.28, s * 0.74, NUBE_OSCURA)
     elif tipo == "niebla":
         _nube(d, s * 0.50, s * 0.22, s * 0.66, (220, 226, 236))
         for i, w in enumerate((0.70, 0.56, 0.66)):
