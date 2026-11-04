@@ -1003,11 +1003,28 @@ def main():
             if hist_n.exists() and not a.demo:
                 log.info("El vídeo de avisos %ss de hoy ya está publicado", nivel)
                 continue
+            if not a.demo and _repetido(del_nivel, hoy, nivel):
+                log.info("Aviso %s ya contado ayer (mismo fenómeno y zona): no se repite el vídeo", nivel)
+                continue
             meta = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
             _cerrar(meta, f"Aviso {nivel}", hist_n, a, hoy)
         return
 
     _cerrar(meta, titulo, hist, a, hoy)
+
+
+def _repetido(grupos, hoy: date, nivel: str) -> bool:
+    """True si ayer ya se publicó un vídeo del mismo nivel, fenómeno y zona (el 4/11/2026 el segundo aviso seguido
+    de Cartagena se quedó en 283 visualizaciones: la gente ya lo había visto). Un rojo nuevo sí sale siempre."""
+    ruta = HISTORIAL / f"aviso-{(hoy - timedelta(days=1)).isoformat()}-{nivel}.json"
+    try:
+        ayer = json.loads(ruta.read_text(encoding="utf-8")).get("avisos") or []
+    except Exception:  # noqa: BLE001
+        return False
+    if nivel == "rojo" or not ayer:
+        return False
+    vistos = {(x["fenomeno"], c) for x in ayer for c in (x.get("ciudades") or [])}
+    return all(any((gr["fenomeno"], c) in vistos for c in (gr.get("ciudades") or [])) for gr in grupos)
 
 
 def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
