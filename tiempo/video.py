@@ -587,7 +587,7 @@ def portada_aviso(a: dict) -> Image.Image:
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
-                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None):
+                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None, capas_encima=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
@@ -603,7 +603,8 @@ class Compositor:
         self.pills = {**PILLS, "satelite": "ASÍ SE MUEVE EL TIEMPO", **(pills or {})}
         self.portada_txt = portada_txt
         self.capas = capas or {}
-        self.capas_fondo = capas_fondo or {}   # {bloque o "*": función(capa, proyección, dt)} debajo de las tarjetas
+        self.capas_fondo = capas_fondo or {}
+        self.capas_encima = capas_encima or {}   # igual, pero encima de las tarjetas y esquivándolas (olas, nieve)   # {bloque o "*": función(capa, proyección, dt)} debajo de las tarjetas
         self.sin_marcadores = set(sin_marcadores)
         from .estacion import estacion
         self.particulas = Particulas(estacion_override or estacion(fecha or __import__("datetime").date.today()),
@@ -742,6 +743,11 @@ class Compositor:
                 imr = im.resize((w, h), Image.BILINEAR) if (w, h) != im.size else im
                 capa.alpha_composite(imr, (int(x + (im.width - w) / 2), int(MAPA_Y0 + y + (im.height - h) / 2)))
 
+        f_encima = self.capas_encima.get(seg_real) or (self.capas_encima.get("*") if seg_real in REGIONES else None)
+        if not en_trans and f_encima and seg_real != "intro":
+            _, its = self.marcadores(seg)
+            cajas = [(x, MAPA_Y0 + y, x + im.width, MAPA_Y0 + y + im.height) for im, (x, y), _, _ in its]
+            f_encima(capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt, cajas)
         # Capas propias de un bloque (p. ej. zonas con aviso)
         if not en_trans and seg_real in self.capas:
             self.capas[seg_real](capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt)

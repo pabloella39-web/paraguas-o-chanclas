@@ -38,6 +38,19 @@ def secuencia(guion: dict) -> list[str]:
     return [s for s in ("intro", *orden, "general", "cierre") if str(guion["segmentos"].get(s, "")).strip()]
 
 
+def _capas_parte(avisos):
+    """Zonas con aviso coloreadas (debajo de las tarjetas), en todos los bloques regionales."""
+    from .especiales import capa_avisos_suave
+    return {"*": capa_avisos_suave(avisos)} if avisos else None
+
+
+def _capas_encima(mar_nieve):
+    """Altura de las olas en el mar y cota de nieve (encima de todo, esquivando las tarjetas)."""
+    from .especiales import capa_mar_nieve
+    ol, ni = mar_nieve
+    return {"*": capa_mar_nieve(ol, ni)} if (ol or ni) else None
+
+
 def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
     """Guion de la longitud justa ANTES de sintetizar (para gastar los mínimos créditos) y una sola toma."""
     objetivo = DURACION_OBJETIVO - INICIO - COLA_ELEVEN - 0.2
@@ -169,9 +182,15 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     g.GANCHO, g.GANCHO_TEXTO = fen, gancho_mod.para_guion(fen)
     if not demo:   # avisos de todos los niveles (coloreados en el mapa) y oleaje fuerte: también al guion
         from .especiales import texto_avisos
-        from .fuentes import oleaje, texto_oleaje
-        g.GANCHO_TEXTO += texto_avisos({"mañana" if os.environ.get("VISPERA") else "hoy": avisos} if avisos else {}) \
-            + texto_oleaje({"mañana" if os.environ.get("VISPERA") else "hoy": oleaje(hoy)})
+        from .fuentes import COSTA, nieve, oleaje, texto_nieve, texto_oleaje
+        cuando = "mañana" if os.environ.get("VISPERA") else "hoy"
+        olas_hoy, nieve_hoy = oleaje(hoy), nieve(hoy)
+        g.GANCHO_TEXTO += texto_avisos({cuando: avisos} if avisos else {}) + texto_oleaje({cuando: olas_hoy}) \
+            + texto_nieve({cuando: nieve_hoy})
+        MAR_NIEVE_HOY = ([{"zona": z, "olas": m, **next((dict(lat=la, lon=lo) for zz, la, lo in COSTA if zz == z), {})}
+                          for z, m in olas_hoy], nieve_hoy)
+    else:
+        MAR_NIEVE_HOY = ([], [])
     log.info("Gancho: %s · %s · %s", fen["insignia"], fen["dato"], fen["ciudades"])
     # Satélite con el viento animado: solo los días que lo merecen (borrasca, DANA, aviso naranja/rojo...)
     sat = None
@@ -225,8 +244,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
                       gancho=fen, satelite=sat,
-                      capas_fondo={"*": __import__("tiempo.especiales", fromlist=["x"]).capa_avisos_suave(avisos)}
-                      if avisos else None)
+                      capas_fondo=_capas_parte(avisos), capas_encima=_capas_encima(MAR_NIEVE_HOY))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

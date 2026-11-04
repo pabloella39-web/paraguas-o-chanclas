@@ -312,7 +312,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     kwargs = {
         "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
                       "domingo": prev_d, "intro": []},
-        "capas_fondo": {k: capa_avisos_suave(v) for k, v in AVISOS_DIA.items()},
+        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
         "pills": {"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}", "general": "EL MEJOR PLAN DEL FINDE",
                   "promesa": "QUÉDATE: AL FINAL, EL MEJOR PLAN DEL FINDE"},
         "portada_txt": ("EL TIEMPO DEL FINDE", "FIN DE SEMANA", rango,
@@ -402,20 +402,36 @@ EXTRA_SEMANA: list = []
 
 AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
 AVISOS_DIA = {}
+MAR_NIEVE = {}   # {día: (olas, nieve)} para dibujarlos en el mapa de cada día
 
 
 def _preparar_avisos(dias: dict):
     """Avisos (coloreados en el mapa de su día) y oleaje fuerte, para el prompt de los especiales."""
-    from .fuentes import oleaje, texto_oleaje
+    from .fuentes import COSTA, oleaje, texto_oleaje
     AVISOS_DIA.clear()
     try:
         AVISOS_DIA.update(avisos_por_dia(dias))
     except Exception as e:  # noqa: BLE001
         log.warning("Avisos por día: %s", e)
-    olas = {}
+    from .fuentes import nieve, texto_nieve
+    olas, nieves = {}, {}
     for k, d in dias.items():
         olas[k] = oleaje(d)
-    AVISOS_TXT[0] = texto_avisos(AVISOS_DIA) + texto_oleaje(olas)
+        nieves[k] = nieve(d)
+    MAR_NIEVE.clear()
+    for k, d in dias.items():
+        ol = [{"zona": z, "olas": m, **next((dict(lat=la, lon=lo) for zz, la, lo in COSTA if zz == z), {})}
+              for z, m in olas[k]]
+        MAR_NIEVE[k] = (ol, nieves[k])
+    AVISOS_TXT[0] = texto_avisos(AVISOS_DIA) + texto_oleaje(olas) + texto_nieve(nieves)
+
+
+def _capas_dias() -> dict:
+    return {k: capa_avisos_suave(v) for k, v in AVISOS_DIA.items() if v}
+
+
+def _capas_encima_dias() -> dict:
+    return {k: capa_mar_nieve(ol, ni) for k, (ol, ni) in MAR_NIEVE.items() if ol or ni}
 
 
 def _dato_real() -> str:
@@ -565,7 +581,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     mapa_dias[primero] = g.prev_para_mapa(prevs[primero], [guion["segmentos"].get(primero, "")], EXTRA_SEMANA)
     kwargs = {
         "satelite": sat,
-        "capas_fondo": {k: capa_avisos_suave(v) for k, v in AVISOS_DIA.items()},
+        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
         "datos_seg": {**mapa_dias, "intro": []},
         "pills": {**{d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()},
                   "general": "EL MEJOR Y EL PEOR DÍA", "cierre": "¡FELIZ SEMANA!" if MODO_SEMANA == "semana" else "¡BUEN FINDE!",
@@ -780,6 +796,96 @@ def capa_avisos_suave(grupos):
             d.text((30 + w / 2, y + 25), txt, font=f, fill=(15, 25, 50) if nivel == "amarillo" else (255, 255, 255),
                    anchor="mm")
             y -= 60
+    return dibujar
+
+
+def capa_mar_nieve(olas: list[dict], nieves: list[dict]):
+    """Altura de las olas en el mar (insignia azul con ola) y cota de nieve en la montaña (copo con la cota)."""
+    def ola_icono(d, x, y, w=34, col=(255, 255, 255)):
+        for k in range(2):
+            pts = [(x + i, y + k * 11 + 4 * math.sin(i / w * 2 * math.pi * 1.5)) for i in range(0, w + 1, 2)]
+            d.line(pts, fill=col, width=4)
+
+    def copo(d, x, y, r=17, col=(70, 140, 230)):
+        for k in range(6):
+            a = k * math.pi / 3
+            x1, y1 = x + math.cos(a) * r, y + math.sin(a) * r
+            d.line([(x, y), (x1, y1)], fill=col, width=4)
+            for f in (.55,):
+                bx, by = x + math.cos(a) * r * f, y + math.sin(a) * r * f
+                for da in (.7, -.7):
+                    d.line([(bx, by), (bx + math.cos(a + da) * r * .35, by + math.sin(a + da) * r * .35)], fill=col, width=3)
+
+    def libre(x, y, w, h, cajas, puestas):
+        """Mueve la insignia lo justo para no tapar tarjetas ni otras insignias (y que no se salga del mapa)."""
+        def choca(cx, cy):
+            r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
+            return any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in list(cajas) + puestas)
+        for paso in range(0, 16):
+            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, 1), (1, -1), (-1, -1)):
+                cx, cy = x + dx * paso * 22, y + dy * paso * 22
+                if 20 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h < cy < MAPA_Y0 + MAPA_H - h and not choca(cx, cy):
+                    return cx, cy
+                if paso == 0:
+                    break
+        return None
+
+    def dibujar(capa, pr, dt, cajas=()):
+        from .mapa import es_canaria, lonlat_mapa
+        d = ImageDraw.Draw(capa)
+        s_ = min(1.0, max(0.0, (dt - 0.2) / 0.4))
+        if s_ <= 0:
+            return
+        puestas = []
+        for o in olas:
+            lo, la = o["lon"], o["lat"]
+            if es_canaria(la):
+                if not pr.muestra_canarias:
+                    continue
+                lo, la = lonlat_mapa(lo, la, True)
+            x, y = pr(lo, la); y += MAPA_Y0
+            if not (60 < x < ANCHO - 60 and MAPA_Y0 + 30 < y < MAPA_Y0 + MAPA_H - 30):
+                continue
+            txt = f"{str(o['olas']).replace('.', ',')} m"
+            f = fuente("Black", 34)
+            w = f.getlength(txt) + 80
+            pos = libre(x, y, w, 56, cajas, puestas)
+            if not pos:
+                continue
+            x, y = pos
+            puestas.append((x - w / 2, y - 28, x + w / 2, y + 28))
+            col = (20, 90, 200) if o["olas"] < 5 else (200, 40, 60)
+            d.rounded_rectangle([x - w / 2, y - 28, x + w / 2, y + 28], radius=28, fill=col + (int(240 * s_),),
+                                outline=(255, 255, 255, int(230 * s_)), width=3)
+            ola_icono(d, x - w / 2 + 14, y - 8)
+            d.text((x - w / 2 + 58, y), txt, font=f, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+        for n in nieves:
+            x, y = pr(n["lon"], n["lat"]); y += MAPA_Y0
+            if not (60 < x < ANCHO - 60 and MAPA_Y0 + 30 < y < MAPA_Y0 + MAPA_H - 30):
+                continue
+            l1, l2 = f"{n['cota']:,} m".replace(",", "."), f"{n['cm']} cm"
+            f1, f2 = fuente("Black", 32), fuente("ExtraBold", 24)
+            w = max(f1.getlength(l1), f2.getlength(l2)) + 74
+            pos = libre(x, y, w, 68, cajas, puestas)
+            if not pos:
+                continue
+            x, y = pos
+            puestas.append((x - w / 2, y - 34, x + w / 2, y + 34))
+            d.rounded_rectangle([x - w / 2, y - 34, x + w / 2, y + 34], radius=18, fill=(255, 255, 255, int(245 * s_)),
+                                outline=(70, 140, 230, int(255 * s_)), width=4)
+            copo(d, x - w / 2 + 30, y)
+            d.text((x - w / 2 + 56, y - 9), l1, font=f1, fill=(20, 40, 90, int(255 * s_)), anchor="lm")
+            d.text((x - w / 2 + 56, y + 18), l2, font=f2, fill=(70, 120, 200, int(255 * s_)), anchor="lm")
+    return dibujar
+
+
+def combinar(*funcs):
+    funcs = [f for f in funcs if f]
+    if not funcs:
+        return None
+    def dibujar(capa, pr, dt):
+        for f in funcs:
+            f(capa, pr, dt)
     return dibujar
 
 

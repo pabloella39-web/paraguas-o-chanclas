@@ -395,11 +395,67 @@ def oleaje(dia: date, minimo: float = 3.0) -> list[tuple[str, float]]:
         log.warning("Oleaje no disponible: %s", e)
         return []
     out = []
-    for (zona, _, _), d in zip(COSTA, j):
+    for (zona, la, lo), d in zip(COSTA, j):
         v = ((d.get("daily") or {}).get("wave_height_max") or [None])[0]
         if v is not None and v >= minimo:
             out.append((zona, round(v, 1)))
+            OLEAJE_PUNTOS.append({"zona": zona, "lat": la, "lon": lo, "olas": round(v, 1), "dia": dia.isoformat()})
     return sorted(out, key=lambda x: -x[1])
+
+
+OLEAJE_PUNTOS: list[dict] = []   # para dibujar la altura de las olas en el mar
+
+
+# ---------------------------------------------------------------- nieve (cota y espesor)
+MONTANA = [
+    ("Pirineo catalán", 42.45, 1.4), ("Pirineo aragonés", 42.7, -0.3), ("Pirineo navarro", 42.9, -1.0),
+    ("montes vascos", 43.0, -2.4), ("Picos de Europa", 43.15, -4.85), ("Cordillera Cantábrica", 42.95, -5.9),
+    ("montaña de Lugo y León", 42.75, -6.9), ("Macizo Galaico", 42.25, -7.2), ("Sistema Ibérico (Soria)", 41.95, -2.7),
+    ("Sierra de Guadarrama", 40.85, -3.95), ("Sierra de Gredos", 40.25, -5.2), ("montes de Teruel", 40.35, -0.95),
+    ("Serranía de Cuenca", 40.3, -1.9), ("Sierra de Cazorla", 37.9, -2.9), ("Sierra Nevada", 37.1, -3.4),
+    ("páramos de Burgos", 42.35, -3.7), ("Montes de Toledo", 39.5, -4.4),
+]
+NIEVE_PUNTOS: list[dict] = []
+
+
+def nieve(dia: date, cota_max: int = 1500, cm_min: float = 1.0) -> list[dict]:
+    """Zonas donde nieva ese día: espesor (cm) y cota de nieve (nivel de congelación − 300 m, en las horas con
+    precipitación). Solo lo relevante: cotas bajas o nevadas grandes."""
+    try:
+        r = requests.get(OPENMETEO_URL, params={
+            "latitude": ",".join(str(c[1]) for c in MONTANA), "longitude": ",".join(str(c[2]) for c in MONTANA),
+            "hourly": "freezing_level_height,precipitation", "daily": "snowfall_sum", "timezone": "Europe/Madrid",
+            "start_date": dia.isoformat(), "end_date": dia.isoformat()}, timeout=40)
+        r.raise_for_status()
+        j = r.json()
+        j = j if isinstance(j, list) else [j]
+    except Exception as e:  # noqa: BLE001
+        log.warning("Nieve no disponible: %s", e)
+        return []
+    out = []
+    for (zona, la, lo), d in zip(MONTANA, j):
+        cm = ((d.get("daily") or {}).get("snowfall_sum") or [0])[0] or 0
+        h = d.get("hourly") or {}
+        niveles = [f for f, p in zip(h.get("freezing_level_height") or [], h.get("precipitation") or [])
+                   if f is not None and (p or 0) >= 0.2]
+        if cm < cm_min or not niveles:
+            continue
+        cota = max(0, int(round((min(niveles) - 300) / 100.0)) * 100)
+        if cota <= cota_max or cm >= 10:
+            e = {"zona": zona, "lat": la, "lon": lo, "cota": cota, "cm": round(cm), "dia": dia.isoformat()}
+            out.append(e)
+            NIEVE_PUNTOS.append(e)
+    return sorted(out, key=lambda e: (e["cota"], -e["cm"]))
+
+
+def texto_nieve(por_dia: dict) -> str:
+    partes = [f"{k}: " + ", ".join(f"{e['zona']} (cota {e['cota']} m, hasta {e['cm']} cm)" for e in v[:4])
+              for k, v in por_dia.items() if v]
+    if not partes:
+        return ""
+    return ("\n\nNIEVE PREVISTA: " + "; ".join(partes) + ". Menciónalo en su bloque con la cota ('nieve a partir de "
+            "800 metros en el Pirineo, hasta 15 centímetros'); si la cota es baja (menos de 1.000 m) o la nevada es "
+            "grande, es noticia: dale protagonismo. En pantalla sale un copo con la cota.")
 
 
 def texto_oleaje(por_dia: dict) -> str:

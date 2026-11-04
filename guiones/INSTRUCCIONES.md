@@ -65,3 +65,5 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Avisos previstos y oleaje: si el prompt trae "AVISOS DE AEMET PREVISTOS" u "OLEAJE FUERTE PREVISTO", menciónalos en el
   bloque de su zona/día (naranjas y rojos siempre; amarillos de pasada) y di la altura de las olas ("olas de hasta 5
   metros en Galicia"). Las zonas con aviso salen coloreadas en el mapa.
+- Nieve: si el prompt trae "NIEVE PREVISTA", di la cota y el espesor ("nieve a partir de 800 metros en Picos de Europa,
+  hasta 20 centímetros"); cotas por debajo de 1.000 m o nevadas grandes son noticia. En pantalla sale un copo con la cota.
