@@ -1024,7 +1024,7 @@ def _repetido(grupos, hoy: date, nivel: str) -> bool:
     if nivel == "rojo" or not ayer:
         return False
     vistos = {(x["fenomeno"], c) for x in ayer for c in (x.get("ciudades") or [])}
-    return all(any((gr["fenomeno"], c) in vistos for c in (gr.get("ciudades") or [])) for gr in grupos)
+    return all(gr.get("ciudades") and all((gr["fenomeno"], c) in vistos for c in gr["ciudades"]) for gr in grupos)
 
 
 def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
