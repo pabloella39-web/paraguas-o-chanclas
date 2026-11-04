@@ -70,3 +70,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Festivos: en los nacionales, felicita a todos ("¡feliz Día de la Constitución!"); en el Día de cada comunidad, felicita a
   la gente de esa comunidad ("¡feliz Día de Andalucía!", "¡feliz Diada!"). En días de luto (Todos los Santos, Semana
   Santa) no se felicita. Nieve en muchas zonas: dilo en general y nombra solo las 2 o 3 principales.
+
+- Comentarios de ciudad en vídeos de varios días (semana, lo que queda de semana, finde): se contesta con un resumen rápido de todos los días que quedan en ese sitio (Jue ☀️19/6° · Vie 🌧️15/8° 💧70% ...) y cuál es el mejor día. En los partes diarios, solo el día siguiente.
+- Las respuestas dentro de los hilos de nuestros comentarios («Reto: dime el pueblo...») también se leen y se contestan.
