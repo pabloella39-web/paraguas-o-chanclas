@@ -304,6 +304,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
             if clave_google:
                 os.environ["GOOGLE_WEATHER_API_KEY"] = clave_google
     if not demo:
+        PREVS_DIA.clear(); PREVS_DIA.update({"sabado": prev_s, "domingo": prev_d})
         _preparar_avisos({"sabado": sab, "domingo": dom})
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
@@ -421,8 +422,10 @@ def _merece_bloque(k) -> bool:
     gr = AVISOS_DIA.get(k) or []
     ol, ni = MAR_NIEVE.get(k, ([], []))
     # solo si hay algo reseñable: aviso naranja o rojo, mar fuerte o nieve importante (los amarillos sueltos, no)
+    pd = PREVS_DIA.get(k) or []
     return (any(NIVELES[x["nivel"]] >= 2 for x in gr)
-            or any(o["olas"] >= 4 for o in ol) or any(n["cota"] < 1000 or n["cm"] >= 10 for n in ni))
+            or any(o["olas"] >= 4 for o in ol) or any(n["cota"] < 1000 or n["cm"] >= 10 for n in ni)
+            or any(c["tmax"] >= 40 or c["tmin"] <= -7 or c.get("granizo") for c in pd))
 MAR_NIEVE = {}   # {día: (olas, nieve)} para dibujarlos en el mapa de cada día
 
 
@@ -445,7 +448,22 @@ def _preparar_avisos(dias: dict):
               for z, m in olas[k]]
         MAR_NIEVE[k] = (ol, nieves[k])
     AVISOS_BLOQUE[:] = [k for k in dias if _merece_bloque(k)]
+    ext = []
+    for k in dias:
+        pd = PREVS_DIA.get(k) or []
+        cal = [f"{c['nombre']} {c['tmax']}°" for c in sorted(pd, key=lambda c: -c["tmax"]) if c["tmax"] >= 38][:2]
+        fri = [f"{c['nombre']} {c['tmin']}°" for c in sorted(pd, key=lambda c: c["tmin"]) if c["tmin"] <= -5][:2]
+        gra = [c["nombre"] for c in pd if c.get("granizo")][:3]
+        tor = [c["nombre"] for c in pd if c.get("icono") == "tormenta"][:3]
+        partes = ([f"calor extremo ({', '.join(cal)})"] if cal else []) + ([f"frío extremo ({', '.join(fri)})"] if fri else []) \
+            + ([f"posible granizo ({', '.join(gra)})"] if gra else []) + ([f"tormentas ({', '.join(tor)})"] if tor else [])
+        if partes:
+            ext.append(f"{k}: " + "; ".join(partes))
     AVISOS_TXT[0] = texto_avisos(AVISOS_DIA) + texto_oleaje(olas) + texto_nieve(nieves)
+    if ext:
+        AVISOS_TXT[0] += ("\n\nFENÓMENOS DESTACADOS (salen en el mapa con su icono animado): " + " | ".join(ext)
+                          + ". Menciónalos en su día: el granizo y las tormentas con prudencia ('posibles'), el calor o "
+                            "el frío extremos con la cifra y un consejo.")
     if AVISOS_BLOQUE:
         AVISOS_TXT[0] += ("\n\nBLOQUES DE AVISOS: " + ", ".join(f'"avisos_{k}"' for k in AVISOS_BLOQUE)
                           + ". Cada uno va justo ANTES del bloque de su día, con un mapa de España con los avisos, las "
@@ -470,14 +488,17 @@ def _capas_dias() -> dict:
 
 def _capas_encima_dias() -> dict:
     out = {}
-    for k in set(MAR_NIEVE) | set(AVISOS_DIA):
+    for k in set(MAR_NIEVE) | set(AVISOS_DIA) | set(PREVS_DIA):
         ol, ni = MAR_NIEVE.get(k, ([], []))
         nb = nieblas_de(AVISOS_DIA.get(k))
         if k in AVISOS_BLOQUE:   # el bloque de avisos nunca vacío: fichas de cada aviso + heladas y rachas del día
             out[f"avisos_{k}"] = combinar_encima(capa_mar_nieve(ol, ni, nb) if (ol or ni or nb) else None,
                                                  capa_fichas(AVISOS_DIA.get(k), PREVS_DIA.get(k)))
-        elif ol or ni or nb:
-            out[k] = capa_mar_nieve(ol, ni, nb)
+        else:
+            out_k = combinar_encima(capa_mar_nieve(ol, ni, nb) if (ol or ni or nb) else None,
+                                    capa_tormentas(PREVS_DIA.get(k)))
+            if out_k:
+                out[k] = out_k
     return out
 
 
@@ -622,6 +643,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
                 if v:
                     os.environ[k] = v
     if not demo:
+        PREVS_DIA.clear(); PREVS_DIA.update(prevs)
         _preparar_avisos({d: fechas[d] for d in _dias()})
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
@@ -960,9 +982,19 @@ def capa_fichas(grupos, prev_dia=None):
                            sitio.upper(), (nombre_fen(gr["fenomeno"]) + (f" · {dato}" if dato else "")).upper(),
                            gr["nivel"]))
         extra = []
-        for c in sorted(prev_dia or [], key=lambda c: c["tmin"])[:3]:
-            if c["tmin"] <= 0:
+        pd = prev_dia or []
+        for c in sorted(pd, key=lambda c: -c["tmax"])[:2]:          # ola de calor / calor extremo
+            if c["tmax"] >= 38:
+                extra.append((c, "sol", (255, 120, 60), c["nombre"].upper(), f"CALOR EXTREMO · {c['tmax']}°"))
+        for c in sorted(pd, key=lambda c: c["tmin"])[:3]:            # frío extremo y heladas
+            if c["tmin"] <= -5:
+                extra.append((c, "nieve", (120, 170, 255), c["nombre"].upper(), f"FRÍO EXTREMO · {c['tmin']}°"))
+            elif c["tmin"] <= 0:
                 extra.append((c, "nieve", (140, 200, 255), c["nombre"].upper(), f"HELADA · {c['tmin']}°"))
+        for c in [c for c in pd if c.get("granizo")][:2]:              # granizo
+            extra.append((c, "tormenta", (200, 220, 255), c["nombre"].upper(), "POSIBLE GRANIZO"))
+        for c in [c for c in pd if c.get("icono") == "tormenta" and not c.get("granizo")][:2]:
+            extra.append((c, "tormenta", (255, 214, 90), c["nombre"].upper(), "TORMENTAS"))
         for c in sorted(prev_dia or [], key=lambda c: -(c.get("racha") or 0))[:2]:
             if (c.get("racha") or 0) >= 60:
                 extra.append((c, "viento", (200, 220, 255), c["nombre"].upper(), f"RACHAS · {round(c['racha'])} KM/H"))
@@ -1001,6 +1033,68 @@ def capa_fichas(grupos, prev_dia=None):
             capa.alpha_composite(im, (int(cx - w / 2 + 14), int(cy - 32)))
             d.text((cx - w / 2 + 90, cy - 14), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
             d.text((cx - w / 2 + 90, cy + 18), l2, font=f2, fill=col + (int(255 * s_),), anchor="lm")
+    return dibujar
+
+
+def capa_tormentas(prev):
+    """Insignia con rayo que parpadea donde hay tormentas (y 'GRANIZO' si es posible), esquivando las tarjetas."""
+    sitios = [c for c in prev or [] if c.get("icono") == "tormenta" or c.get("granizo")]
+    sitios = sorted(sitios, key=lambda c: (not c.get("granizo"), -(c.get("lluvia") or 0)))[:3]
+
+    def rayo(d, x, y, brillo):
+        pts = [(x + 6, y - 14), (x - 4, y + 2), (x + 2, y + 2), (x - 3, y + 15), (x + 9, y - 3), (x + 3, y - 3), (x + 8, y - 14)]
+        d.polygon(pts, fill=(255, 214, 40, int(255 * brillo)))
+
+    def dibujar(capa, pr, dt, cajas=()):
+        if not sitios:
+            return
+        s_ = min(1.0, max(0.0, (dt - 0.3) / 0.4))
+        if s_ <= 0:
+            return
+        d = ImageDraw.Draw(capa)
+        puestas = cajas if isinstance(cajas, list) else list(cajas)
+        f = fuente("Black", 28)
+        from .video import CAJAS_CIUDAD
+        for k, c in enumerate(sitios):
+            x, y = pr.ciudad(c); y += MAPA_Y0
+            txt = "GRANIZO" if c.get("granizo") else "TORMENTA"
+            w, h = f.getlength(txt) + 70, 50
+            pos = None
+            cj = CAJAS_CIUDAD.get(c["nombre"])
+            if cj:   # pegada a su tarjeta: justo debajo (o encima si no cabe)
+                for cy in (cj[3] + h / 2 - 6, cj[1] - h / 2 + 6):
+                    cx = (cj[0] + cj[2]) / 2
+                    r = (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+                    if MAPA_Y0 + h / 2 < cy < MAPA_Y0 + MAPA_H - h / 2 and not any(
+                            r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas if b != cj):
+                        pos = (cx, cy)
+                        break
+            for paso in range(0 if not pos else 99, 8):   # cerca de su ciudad o nada (la tarjeta ya lleva la tormenta)
+                for dx, dy in ((0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, 1)):
+                    cx, cy = x + dx * paso * 22, y + 38 + dy * paso * 22
+                    r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
+                    if 10 + w / 2 < cx < ANCHO - 20 - w / 2 and MAPA_Y0 + h < cy < MAPA_Y0 + MAPA_H - h \
+                            and not any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas):
+                        pos = (cx, cy); break
+                    if paso == 0:
+                        break
+                if pos:
+                    break
+            if not pos:
+                continue
+            cx, cy = pos
+            puestas.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
+            fl = (math.sin(dt * 9 + k * 2) > 0.55)           # destello del rayo
+            fondo = (70, 60, 110) if not fl else (110, 95, 170)
+            d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=25,
+                                fill=fondo + (int(240 * s_),), outline=(255, 214, 40, int(230 * s_)), width=3)
+            rayo(d, cx - w / 2 + 22, cy, s_ * (1.0 if fl else 0.75))
+            if c.get("granizo"):
+                for j in range(3):
+                    u = (dt * 1.2 + j / 3) % 1
+                    gx, gy = cx - w / 2 + 34 + j * 6, cy - 6 + u * 16
+                    d.ellipse([gx - 3, gy - 3, gx + 3, gy + 3], fill=(230, 240, 255, int(230 * (1 - u) * s_)))
+            d.text((cx - w / 2 + 48, cy), txt, font=f, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
     return dibujar
 
 

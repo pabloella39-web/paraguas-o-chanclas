@@ -44,12 +44,13 @@ def _capas_parte(avisos):
     return {"*": capa_avisos_suave(avisos)} if avisos else None
 
 
-def _capas_encima(mar_nieve, avisos=None):
-    """Altura de las olas, cota de nieve y niebla con aviso (encima de todo, esquivando las tarjetas)."""
-    from .especiales import capa_mar_nieve, nieblas_de
+def _capas_encima(mar_nieve, avisos=None, prev=None):
+    """Olas, nieve, niebla con aviso y tormentas/granizo (encima de todo, esquivando las tarjetas)."""
+    from .especiales import capa_mar_nieve, capa_tormentas, combinar_encima, nieblas_de
     ol, ni = mar_nieve
     nb = nieblas_de(avisos)
-    return {"*": capa_mar_nieve(ol, ni, nb)} if (ol or ni or nb) else None
+    f = combinar_encima(capa_mar_nieve(ol, ni, nb) if (ol or ni or nb) else None, capa_tormentas(prev))
+    return {"*": f} if f else None
 
 
 def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
@@ -188,6 +189,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         olas_hoy, nieve_hoy = oleaje(hoy), nieve(hoy)
         g.GANCHO_TEXTO += texto_avisos({cuando: avisos} if avisos else {}) + texto_oleaje({cuando: olas_hoy}) \
             + texto_nieve({cuando: nieve_hoy})
+        gra = [c["nombre"] for c in prev if c.get("granizo")][:3]
+        if gra:
+            g.GANCHO_TEXTO += (f" POSIBLE GRANIZO en {', '.join(gra)} (sale en el mapa): menciónalo con prudencia "
+                               "('no se descarta granizo') y un consejo (el coche a cubierto).")
         MAR_NIEVE_HOY = ([{"zona": z, "olas": m, **next((dict(lat=la, lon=lo) for zz, la, lo in COSTA if zz == z), {})}
                           for z, m in olas_hoy], nieve_hoy)
     else:
@@ -245,7 +250,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
                       gancho=fen, satelite=sat,
-                      capas_fondo=_capas_parte(avisos), capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos))
+                      capas_fondo=_capas_parte(avisos), capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

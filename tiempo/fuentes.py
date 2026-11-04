@@ -242,6 +242,8 @@ def _openmeteo_todas(ciudades: list[dict], hoy: date) -> dict[str, dict]:
             "racha": _mediana(serie("wind_gusts_10m_max")),
             "icono": icono,
             "modelos": len(serie("temperature_2m_max")),
+            # granizo posible: tormenta con granizo (WMO 96/99) en al menos un tercio de los modelos
+            "granizo": bool(codigos) and sum(1 for c_ in codigos if int(c_) in (96, 99)) * 3 >= len(codigos),
         }
     return out
 
@@ -279,6 +281,7 @@ def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
         "lluvia_mm": (f.get("Open-Meteo") or {}).get("lluvia_mm"),          # litros previstos (mediana de modelos)
         "lluvia_franjas": (f.get("AEMET") or {}).get("lluvia_franjas"),      # % por mañana / tarde / noche
         "icono": icono,
+        "granizo": bool((f.get("Open-Meteo") or {}).get("granizo")),
         "cielo": next((f[k].get("cielo") for k in ("AEMET", "Google") if k in f and f[k].get("cielo")), None),
         "fuentes": list(f),
     }

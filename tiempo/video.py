@@ -584,6 +584,9 @@ def portada_aviso(a: dict) -> Image.Image:
     return im
 
 
+CAJAS_CIUDAD: dict = {}   # tarjeta de cada ciudad en el fotograma actual (para pegarle insignias)
+
+
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
@@ -747,6 +750,8 @@ class Compositor:
         if not en_trans and f_encima and seg_real != "intro":
             _, its = self.marcadores(seg)
             cajas = [(x, MAPA_Y0 + y, x + im.width, MAPA_Y0 + y + im.height) for im, (x, y), _, _ in its]
+            CAJAS_CIUDAD.clear()
+            CAJAS_CIUDAD.update({c["nombre"]: cj for (_, _, _, c), cj in zip(its, cajas)})
             f_encima(capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt, cajas)
         # Capas propias de un bloque (p. ej. zonas con aviso)
         if not en_trans and seg_real in self.capas:
