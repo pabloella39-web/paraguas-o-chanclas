@@ -99,6 +99,10 @@ def _ids_en(obj) -> list[str]:
     return list(dict.fromkeys(out))
 
 
+HORAS_VIDEO = 24
+PUBLICADO: dict = {}   # id de vídeo → hora de publicación (epoch)
+
+
 def videos_recientes(n: int = 8) -> list[str]:
     perfil = uploadpost.perfil("tiempo")
     ids = []
@@ -106,6 +110,9 @@ def videos_recientes(n: int = 8) -> list[str]:
         j = _get("uploadposts/media", platform="tiktok", user=perfil, limit=n)
         items = j.get("media") or j.get("data") or j.get("items") or j
         ids = _ids_en(items)
+        for it in items if isinstance(items, list) else []:
+            if isinstance(it, dict) and it.get("id") and isinstance(it.get("timestamp"), (int, float)):
+                PUBLICADO[str(it["id"])] = float(it["timestamp"])
         for it in items if isinstance(items, list) else []:   # la descripción también puede pedir el pueblo
             if isinstance(it, dict) and it.get("id") and PIDE_LUGAR.search(str(it.get("caption") or "")):
                 PIDEN_POR_COMENTARIO.add(str(it["id"]))
@@ -164,10 +171,15 @@ def _comentarios_de(vid: str, limit: int, paginas: int) -> list[dict]:
     return out
 
 
-def comentarios_nuevos(estado: dict, n: int = 8, limit: int = 50, paginas: int = 10) -> list[dict]:
+def comentarios_nuevos(estado: dict, n: int = 8, limit: int = 50, paginas: int = 10,
+                       max_horas: float | None = None) -> list[dict]:
+    """max_horas: solo vídeos publicados hace menos de eso (no se contesta en vídeos de hace días)."""
     vistos = set(estado["vistos"])
     nuevos = []
     for vid in videos_recientes(n):
+        pub = PUBLICADO.get(vid) or (int(vid) >> 32 if vid.isdigit() else None)   # el id de TikTok lleva la hora
+        if max_horas and pub and time.time() - pub > max_horas * 3600:
+            continue
         try:
             lista = _comentarios_de(vid, limit, paginas)
         except Exception as e:  # noqa: BLE001
@@ -900,7 +912,8 @@ def main():
     if not estado.get("v2"):  # nueva versión: también se contesta por escrito; se repasan los comentarios recientes
         estado["vistos"], estado["v2"] = [], True
     hechas_hoy = [h for h in estado["hechas"] if h["fecha"] == hoy_.date().isoformat()]
-    coms = comentarios_nuevos(estado)
+    # Solo los vídeos del día: los publicados en las últimas 24 h (el parte de las 20:30 se comenta hasta el día siguiente)
+    coms = comentarios_nuevos(estado, max_horas=None if SOLO_VIDEO else HORAS_VIDEO)
     clasif = clasificar(coms)
     preguntas = [q for q in clasif if q.get("tipo") == "pregunta" and q.get("lugar")]
     log.info("Comentarios: %d · preguntas: %d · ciudades: %d · otros: %d", len(coms), len(preguntas),

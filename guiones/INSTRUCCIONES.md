@@ -73,3 +73,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 
 - Comentarios de ciudad en vídeos de varios días (semana, lo que queda de semana, finde): se contesta con un resumen rápido de todos los días que quedan en ese sitio (Jue ☀️19/6° · Vie 🌧️15/8° 💧70% ...) y cuál es el mejor día. En los partes diarios, solo el día siguiente.
 - Las respuestas dentro de los hilos de nuestros comentarios («Reto: dime el pueblo...») también se leen y se contestan.
+- Comentarios: solo se contestan en los vídeos del día (publicados en las últimas 24 h); los de vídeos de días anteriores no se contestan.
