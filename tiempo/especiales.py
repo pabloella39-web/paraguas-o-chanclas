@@ -1487,6 +1487,16 @@ def _cuando_portada(gr, hoy: date) -> str:
     return f"{dia} DESDE LAS {ini:%H:%M}"
 
 
+def _fecha_portada(gr, hoy: date) -> str:
+    """'JUEVES 5 DE NOVIEMBRE': el día en que empieza el aviso (o hoy, si ya está en curso)."""
+    try:
+        from zoneinfo import ZoneInfo
+        d = max(datetime.fromisoformat(gr["inicio"]).astimezone(ZoneInfo("Europe/Madrid")).date(), hoy)
+    except Exception:  # noqa: BLE001
+        d = hoy
+    return f"{g.DIAS[d.weekday()].upper()} {d.day} DE {MESES_LARGOS[d.month - 1]}"
+
+
 def _hora_txt(iso: str) -> str:
     d = datetime.fromisoformat(iso)
     return f"{g.DIAS[d.weekday()]} {d.day} a las {d:%H:%M}"
@@ -1583,6 +1593,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                           "icono": _gancho_aviso(grupos).get("icono"),
                           "ciudades": _ciudades_portada_todos(grupos),
                           "cuando": _cuando_portada(gr, hoy), "dato": dato_aviso(gr),
+                          "fecha": _fecha_portada(gr, hoy),
                           "variante": len(list(HISTORIAL.glob("aviso-*.json")))},
         "portada_txt": ("AVISO DE AEMET", f"AVISO {gr['nivel'].upper()}", gr["fenomeno"].upper(),
                         tuple((z.upper()[:30], COLOR_NIVEL.get(gr["nivel"], (255, 205, 40)))

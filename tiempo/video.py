@@ -484,7 +484,8 @@ def portada_aviso(a: dict) -> Image.Image:
     ciudades = [c.upper() for c in (a.get("ciudades") or [])][:2]
     dato = (a.get("dato") or "").upper()
     cuando = (a.get("cuando") or "").upper()
-    pie = "AVISO OFICIAL DE AEMET · COMPÁRTELO"
+    fecha = (a.get("fecha") or "").upper()
+    pie = f"{fecha} · AEMET" if fecha else "AVISO OFICIAL DE AEMET · COMPÁRTELO"
     v = int(a.get("variante") or 0) % VARIANTES_AVISO
 
     if v == 0:  # franjas de peligro + triángulo (fondo de color)
@@ -503,7 +504,7 @@ def portada_aviso(a: dict) -> Image.Image:
             _texto(d, (ANCHO / 2, cy + 300), dato, "Black", 96, 900, col)
         if cuando:
             _texto(d, (ANCHO / 2, cy + 420), cuando, "ExtraBold", 54, 900, claro)
-        _texto(d, (ANCHO / 2, cy + 560), pie, "ExtraBold", 42, 920, sobre_col)
+        _texto(d, (ANCHO / 2, cy + 565), pie, "Black", 52, 920, sobre_col)
 
     elif v == 1:  # fondo oscuro con marco grueso del color del nivel
         im = _degradado((24, 30, 48), 0.25)
@@ -522,7 +523,7 @@ def portada_aviso(a: dict) -> Image.Image:
             _texto(d, (ANCHO / 2, cy + 225 + k * 95), c, "Black", 86 if k == 0 else 58, 940, claro)
         if cuando:
             _texto(d, (ANCHO / 2, cy + 440), cuando, "Black", 58, 940, col)
-        _texto(d, (ANCHO / 2, cy + 580), pie, "ExtraBold", 40, 900, (200, 205, 220))
+        _texto(d, (ANCHO / 2, cy + 585), pie, "Black", 50, 900, claro)
 
     elif v == 2:  # diagonal: color arriba, oscuro abajo, icono del fenómeno grande
         im = _degradado(col)
@@ -542,7 +543,7 @@ def portada_aviso(a: dict) -> Image.Image:
             w = f.getlength(cuando) + 70
             d.rounded_rectangle([ANCHO / 2 - w / 2, cy + 435, ANCHO / 2 + w / 2, cy + 525], radius=45, fill=col)
             d.text((ANCHO / 2, cy + 480), cuando, font=f, fill=sobre_col, anchor="mm")
-        _texto(d, (ANCHO / 2, cy + 600), pie, "ExtraBold", 40, 900, (200, 205, 220))
+        _texto(d, (ANCHO / 2, cy + 605), pie, "Black", 50, 900, claro)
 
     else:  # anillos de alerta + cinta de precaución cruzada, la ciudad en grande
         im = _degradado(col, 0.45)
@@ -580,7 +581,7 @@ def portada_aviso(a: dict) -> Image.Image:
             d.text((ANCHO / 2, cy + 410), dato, font=f, fill=col, anchor="mm")
         if cuando:
             _texto(d, (ANCHO / 2, cy + 537), cuando, "Black", 56, 960, sobre_col)
-        _texto(d, (ANCHO / 2, cy + 615), pie, "ExtraBold", 38, 900, sobre_col)
+        _texto(d, (ANCHO / 2, cy + 620), pie, "Black", 48, 900, sobre_col)
     return im
 
 
