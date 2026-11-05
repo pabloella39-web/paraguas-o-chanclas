@@ -218,7 +218,11 @@ class Particulas:
         for _ in range(5):
             y0 = rnd.uniform(380, ALTO - 300)
             x = -400 + fase * (ANCHO + 800) * rnd.uniform(0.8, 1.2)
-            img.alpha_composite(e, (int(x) % (ANCHO + 400) - 340, int(y0 - fase * 60)))
+            pos = (int(x) % (ANCHO + 400) - 340, int(y0 - fase * 60))
+            if img.mode == "RGBA" and pos[0] >= 0 and pos[1] >= 0:
+                img.alpha_composite(e, pos)
+            else:   # el fotograma puede venir en RGB (o la estela asomar por la izquierda): pegar con máscara
+                img.paste(e, pos, e)
 
     def dibujar(self, img: Image.Image, t: float):
         if self.modo == "rafagas" and self.est != "verano":
