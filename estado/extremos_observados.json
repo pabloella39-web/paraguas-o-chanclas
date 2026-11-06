@@ -1,0 +1,30 @@
+{
+ "2026-11-05": {
+  "min": {
+   "valor": -4.9,
+   "sitio": "Puerto el Pico",
+   "zona": "Ávila",
+   "hora": "2026-11-05T22:00:00+0000"
+  },
+  "max": {
+   "valor": 24.3,
+   "sitio": "Tuineje-puerto Gran Tarajal",
+   "zona": "Las Palmas",
+   "hora": "2026-11-05T21:00:00+0000"
+  }
+ },
+ "2026-11-06": {
+  "min": {
+   "valor": -7.4,
+   "sitio": "Cubillo de Ebro",
+   "zona": "Cantabria",
+   "hora": "2026-11-06T07:00:00+0000"
+  },
+  "max": {
+   "valor": 24.3,
+   "sitio": "Sabinosa-balneario",
+   "zona": "Santa Cruz de Tenerife",
+   "hora": "2026-11-05T23:00:00+0000"
+  }
+ }
+}
