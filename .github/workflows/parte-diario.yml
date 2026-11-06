@@ -132,3 +132,7 @@ jobs:
           # El canal económico también sube cambios: se integra lo remoto antes de subir (si no, se perdería el
           # historial y el siguiente intento programado repetiría el parte)
           for i in 1 2 3 4; do git pull --rebase -q && git push && break; sleep 5; done
+      - name: Avisar si se publicó con la voz gratuita
+        if: always()
+        run: |
+          if [ -f aviso_voz.txt ]; then echo "::error::$(cat aviso_voz.txt)"; exit 1; fi

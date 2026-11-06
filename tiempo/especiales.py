@@ -67,6 +67,7 @@ def duracion(dmin: float, dmax: float, dobj: float):
 
 
 DURACION_SEMANA = (85.0, 100.0, 91.0)
+DURACION_FINDE = (66.0, 85.0, 75.0)   # el finde lleva dos días (y a veces avisos): algo más de margen
 VOZ_USADA = ""   # voz del especial que se está haciendo (para alternar con el siguiente vídeo)
 
 
@@ -91,6 +92,8 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
             return guion, plan, total, [(wav, INICIO)], f"elevenlabs ({eleven.modelo()})"
         except Exception as e:  # noqa: BLE001
             log.warning("ElevenLabs no disponible (%s): voz gratuita", e)
+            from .main import avisar_voz_gratuita
+            avisar_voz_gratuita(str(e)[:200], f"Especial ({MODO_SEMANA if 'MODO_SEMANA' in globals() else 'especial'})")
     factor, mejor = 1.0, None
     for intento in range(3):
         guion = escribir(factor, demo)
@@ -1704,7 +1707,8 @@ def main():
         if hist.exists() and not a.demo:
             log.info("El vídeo del finde ya está hecho")
             return
-        meta = fin_de_semana(hoy, Path(a.salida), a.demo)
+        with duracion(*DURACION_FINDE):
+            meta = fin_de_semana(hoy, Path(a.salida), a.demo)
         titulo = "Fin de semana"
     elif a.tipo in ("semana", "resto"):
         global MODO_SEMANA

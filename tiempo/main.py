@@ -80,6 +80,28 @@ def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
     return guion, bloques, wav, dur, lim, pal
 
 
+def _alargar(nuevo_max: float):
+    """Sube el máximo de duración del vídeo en curso (en este módulo y en el de especiales)."""
+    import sys
+    global DURACION_MAX
+    DURACION_MAX = nuevo_max
+    esp = sys.modules.get("tiempo.especiales")
+    if esp is not None:
+        esp.DURACION_MAX = nuevo_max
+
+
+AVISO_VOZ = RAIZ / "aviso_voz.txt"
+
+
+def avisar_voz_gratuita(motivo: str, que: str):
+    """Deja constancia para que el workflow falle al final (y llegue el correo de GitHub) si se publicó con la voz
+    gratuita en vez de la de ElevenLabs."""
+    try:
+        AVISO_VOZ.write_text(f"{que}: se usó la voz gratuita en vez de ElevenLabs ({motivo})", encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def plan_eleven(bloques, wav, dur, lim, pal):
     """Encaja la toma en 65-70 s: ajuste fino con atempo (sin cambiar el tono) y cola al final."""
     max_habla = DURACION_MAX - 0.6 - INICIO - COLA_ELEVEN
@@ -90,7 +112,14 @@ def plan_eleven(bloques, wav, dur, lim, pal):
     elif dur < min_habla:
         tempo = max(dur / min_habla, 0.92)
     if tempo > 1.15:
-        raise RuntimeError(f"La locución dura {dur:.1f} s: demasiado larga")
+        # Antes de caer en la voz gratuita: el vídeo puede alargarse (la duración es flexible por encima de 65 s)
+        tempo = 1.10
+        nuevo_max = INICIO + dur / tempo + COLA_ELEVEN + 0.8
+        if nuevo_max > DURACION_MAX + 25:
+            raise RuntimeError(f"La locución dura {dur:.1f} s: demasiado larga")
+        log.warning("Locución larga (%.1f s): el vídeo se alarga a %.1f s en vez de usar la voz gratuita", dur, nuevo_max)
+        _alargar(nuevo_max)
+        max_habla = DURACION_MAX - 0.6 - INICIO - COLA_ELEVEN
     if abs(tempo - 1) > 0.002:
         log.info("Ajustando la toma x%.3f", tempo)
         wav = voz.acelerar(wav, tempo)
@@ -236,6 +265,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             trozos, motor = [(wav, INICIO)], f"elevenlabs ({eleven.modelo()})"
         except Exception as e:  # noqa: BLE001
             log.warning("ElevenLabs no disponible (%s): se usa la voz gratuita", e)
+            avisar_voz_gratuita(str(e)[:200], "Parte diario")
             plan = None
     if plan is None:
         guion, bloques, wavs, durs = generar_locucion(prev, hoy, texto_aemet, trabajo, demo, tipo_voz)
