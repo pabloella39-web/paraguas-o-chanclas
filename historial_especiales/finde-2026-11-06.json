@@ -1,0 +1,83 @@
+{
+ "tipo": "finde",
+ "fecha": "2026-11-06",
+ "caption": "Sábado de terraza y domingo de paraguas en Sevilla… ¿qué plan tienes? ☀️☔\n\nEl tiempo del fin de semana en España, 7-8 de noviembre 🇪🇸\n☀️ Mejor plan: Las Palmas (28° / 29°)\n🔥 Máxima del finde: 29° en Las Palmas\n🌧️ Lluvia en A Coruña, Badajoz, Ceuta\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+ "titular": "EL SUR SE MOJA EL DOMINGO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 102.63,
+ "guion": {
+  "intro": "Sábado de terraza y domingo con sorpresa. Sevilla y Badajoz sacan el paraguas el domingo. Te guardo para el final dónde toca terraza y dónde toca sofá.",
+  "avisos_sabado": "Mañana sábado, aviso naranja por lluvia en La Palma, hasta 30 litros en una hora, y amarillo allí por viento, tormentas y oleaje.",
+  "sabado": "Mañana sábado, en el norte, chubascos en Galicia, con un 77 por ciento en Santiago, mientras Bilbao llega a 20 grados. Gente de Pamplona, madrugada de 3 grados, abrigo para salir. En el interior, cielo gris y lloviznas en Ávila y Salamanca, con Madrid a 17 grados y Burgos a 13. El Mediterráneo, seco, con Barcelona a 19 grados y Murcia a 24. Y el sur, de terraza total, con Sevilla a 26 y Badajoz a 25.",
+  "avisos_domingo": "El domingo, en La Palma el viento también sube a naranja, con rachas de 90 kilómetros por hora, y sigue el naranja por lluvia. Amarillo en el norte de Tenerife, La Gomera y El Hierro.",
+  "domingo": "El domingo cambia el sur. Gente de Sevilla, lluvia probable, un 89 por ciento, y en Badajoz casi 5 litros. Madrid baja a 16 grados y Zaragoza se queda con sol.",
+  "general": "Lo prometido. Terraza el sábado en Sevilla, con 26 grados, y en Las Palmas, la capital más calurosa, con 28, aunque La Aldea de San Nicolás llega a 29. Y sofá y manta en Pamplona, con 3 grados al amanecer, o en Puigcerdà, en Girona, con 1.",
+  "cierre": "¿Sábado de calle o domingo de manta? Una palabra en comentarios. Y sigue a Paraguas o Chanclas para tener el tiempo de cada día."
+ },
+ "primer_comentario": "📍 Tu pueblo + 👇 = tu previsión de mañana. ¡Prueba!",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-06T21:54:04.108Z"
+     },
+     "success": true,
+     "platform_post_id": "7705179812859612448",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7705179812859612448",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 16509621,
+     "post_title": "Sábado de terraza y domingo de paraguas en Sevilla… ¿qué plan tienes? ☀️☔\n\nEl tiempo del fin de semana en España, 7-8 de noviembre 🇪🇸\n☀️ Mejor plan: Las Palmas (28° / 29°)\n🔥 Máxima del finde: 29° en Las Palmas\n🌧️ Lluvia en A Coruña, Badajoz, Ceuta\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 102.634,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7705179373376309281",
+     "first_comment_posted": true,
+     "request_id": "4a818bf8897f4410a825055d0d1e6702",
+     "request_id_logs": "4a818bf8897f4410a825055d0d1e6702",
+     "job_id": "f40fab7c7e9a4a97876fc722f4dab42c",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-06T21:54:04.108Z"
+   },
+   "request_id": "4a818bf8897f4410a825055d0d1e6702"
+  }
+ },
+ "tipo_youtube": "finde",
+ "youtube": {
+  "id": "Rxf7u8xXxVo",
+  "url": "https://youtube.com/shorts/Rxf7u8xXxVo",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
