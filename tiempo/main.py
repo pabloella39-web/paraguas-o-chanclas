@@ -112,13 +112,11 @@ def plan_eleven(bloques, wav, dur, lim, pal):
         tempo = dur / max_habla
     elif dur < min_habla:
         tempo = max(dur / min_habla, 0.92)
-    if tempo > 1.15:
-        # Antes de caer en la voz gratuita: el vídeo puede alargarse (la duración es flexible por encima de 65 s)
-        tempo = 1.10
-        nuevo_max = INICIO + dur / tempo + COLA_ELEVEN + 0.8
-        if nuevo_max > DURACION_MAX + 25:
-            raise RuntimeError(f"La locución dura {dur:.1f} s: demasiado larga")
-        log.warning("Locución larga (%.1f s): el vídeo se alarga a %.1f s en vez de usar la voz gratuita", dur, nuevo_max)
+    if tempo > 1.06:
+        # No hay máximo de duración: en vez de acelerar la voz (o caer en la voz gratuita) se alarga el vídeo
+        tempo = 1.0
+        nuevo_max = INICIO + dur + COLA_ELEVEN + 0.8
+        log.warning("Locución larga (%.1f s): el vídeo se alarga a %.1f s", dur, nuevo_max)
         _alargar(nuevo_max)
         max_habla = DURACION_MAX - 0.6 - INICIO - COLA_ELEVEN
     if abs(tempo - 1) > 0.002:

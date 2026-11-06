@@ -75,3 +75,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Las respuestas dentro de los hilos de nuestros comentarios («Reto: dime el pueblo...») también se leen y se contestan.
 - Comentarios: solo se contestan en los vídeos del día (publicados en las últimas 24 h); los de vídeos de días anteriores no se contestan.
 - Lo más frío y lo más caluroso: se dicen las dos cosas: la capital (o capitales) más fría y, si hay un sitio aún más frío, ese pueblo con su provincia, esté donde esté (no tiene que ser de la misma provincia). Igual con el calor. El prompt lo trae en «LO MÁS FRÍO Y LO MÁS CALUROSO DE ESPAÑA».
+- Duración de los vídeos: mínimo 65 s, sin máximo. Si la locución sale larga, el vídeo se alarga (no se acelera la voz ni se cambia a la voz gratuita).
