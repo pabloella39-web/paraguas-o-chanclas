@@ -184,6 +184,7 @@ CIERRES_PLANTILLA = {
 }
 
 
+EXTREMOS: dict | None = None   # lo pone main: pueblo más frío / caluroso si gana a las capitales
 GANCHO_TEXTO = ""   # lo rellena main.py con tiempo.gancho.para_guion() antes de escribir el guion
 GANCHO = None       # dict de tiempo.gancho.fenomeno_del_dia (también para la plantilla sin IA)
 
@@ -497,8 +498,8 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     """Guion sin IA (respaldo). factor < 0.85 quita los comentarios; > 1.1 añade uno al cierre."""
     rnd = random.Random(hoy.toordinal())
     reg = _resumen_datos(prev)
-    caliente = max(prev, key=lambda p: p["tmax"])
-    fria = min(prev, key=lambda p: p["tmin"])
+    caliente = (EXTREMOS or {}).get("calor") or max(prev, key=lambda p: p["tmax"])
+    fria = (EXTREMOS or {}).get("frio") or min(prev, key=lambda p: p["tmin"])
     lluviosas = [_nombre(p) for p in prev if p["lluvia"] >= 50]
     # Con factor 1 hay comentario en 3 regiones; si hay que alargar, en todas; si acortar, en ninguna
     con_chiste = {"norte", "islas"}

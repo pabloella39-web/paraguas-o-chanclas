@@ -32,6 +32,8 @@ COLA_MIN = 1.2     # tras la despedida (tarjeta de "sígueme")
 VEL_MIN, VEL_MAX = 10, 35  # nunca más lenta de +10 %: si sobra tiempo, se alarga el guion
 
 
+EXTREMOS_PUEBLOS: list = [None]   # {calor, frio} con el pueblo si es más extremo que la capital
+
 def secuencia(guion: dict) -> list[str]:
     """Gancho, regiones de más a menos relevantes, la 'recompensa' (más calor y más frío) y la despedida."""
     orden = guion.get("orden") or [s for s in SEGMENTOS if s not in ("intro", "general", "cierre")]
@@ -189,6 +191,14 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         olas_hoy, nieve_hoy = oleaje(hoy), nieve(hoy)
         g.GANCHO_TEXTO += texto_avisos({cuando: avisos} if avisos else {}) + texto_oleaje({cuando: olas_hoy}) \
             + texto_nieve({cuando: nieve_hoy})
+        try:   # el pueblo más frío / más caluroso, no solo la capital (y lo medido esta madrugada)
+            from . import pueblos
+            from datetime import datetime as _dt
+            nota_p, EXTREMOS_PUEBLOS[0] = pueblos.texto(prev, hoy, _dt.now(pueblos.TZ).date(), cuando)
+            g.GANCHO_TEXTO += nota_p
+            g.EXTREMOS = EXTREMOS_PUEBLOS[0]
+        except Exception as e:  # noqa: BLE001
+            log.warning("Extremos en pueblos no disponibles: %s", e)
         gra = [c["nombre"] for c in prev if c.get("granizo")][:3]
         if gra:
             g.GANCHO_TEXTO += (f" POSIBLE GRANIZO en {', '.join(gra)} (sale en el mapa): menciónalo con prudencia "
@@ -246,7 +256,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     audio = trabajo / "pista.wav"
     voz.montar_pista(trozos, total, musica.generar(total, hoy), audio)
 
-    extremos = {"calor": max(prev, key=lambda c: c["tmax"]), "frio": min(prev, key=lambda c: c["tmin"])}
+    extremos = EXTREMOS_PUEBLOS[0] or {"calor": max(prev, key=lambda c: c["tmax"]),
+                                       "frio": min(prev, key=lambda c: c["tmin"])}
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
                       gancho=fen, satelite=sat,

@@ -483,6 +483,29 @@ def _preparar_avisos(dias: dict):
         AVISOS_TXT[0] += ("\n\nFENÓMENOS DESTACADOS (salen en el mapa con su icono animado): " + " | ".join(ext)
                           + ". Menciónalos en su día: el granizo y las tormentas con prudencia ('posibles'), el calor o "
                             "el frío extremos con la cifra y un consejo.")
+    try:   # los pueblos más fríos / calurosos de esos días, no solo las capitales
+        from . import pueblos
+        fr, ca = [], []
+        for k, d in dias.items():
+            pr = pueblos.previstos(d)
+            caps = PREVS_DIA.get(k) or []
+            if pr.get("frio") and caps and pr["frio"]["tmin"] <= min(c["tmin"] for c in caps) - 1:
+                fr.append((pr["frio"]["tmin"], k, pr["frio"]))
+            if pr.get("calor") and caps and pr["calor"]["tmax"] >= max(c["tmax"] for c in caps) + 1:
+                ca.append((-pr["calor"]["tmax"], k, pr["calor"]))
+        trozos_p = []
+        if fr:
+            v, k, x = min(fr, key=lambda t: t[0])
+            trozos_p.append(f"lo más frío: {x['nombre']} ({x['provincia']}) con {v} grados el {k}")
+        if ca:
+            v, k, x = min(ca, key=lambda t: t[0])
+            trozos_p.append(f"lo más caluroso: {x['nombre']} ({x['provincia']}) con {-v} grados el {k}")
+        if trozos_p:
+            AVISOS_TXT[0] += ("\n\nFRÍO Y CALOR DE VERDAD (fuera de las capitales): " + "; ".join(trozos_p)
+                              + ". Cuando digas lo más frío o lo más caluroso, nombra también ese pueblo y su provincia, "
+                                "no solo la capital («Burgos, con −1, aunque en Molina de Aragón, en Guadalajara, bajará a −6»).")
+    except Exception as e:  # noqa: BLE001
+        log.warning("Pueblos extremos no disponibles: %s", e)
     if AVISOS_BLOQUE:
         AVISOS_TXT[0] += ("\n\nBLOQUES DE AVISOS: " + ", ".join(f'"avisos_{k}"' for k in AVISOS_BLOQUE)
                           + ". Cada uno va justo ANTES del bloque de su día, con un mapa de España con los avisos, las "

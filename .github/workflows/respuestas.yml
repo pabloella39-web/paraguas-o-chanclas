@@ -93,6 +93,12 @@ jobs:
         env:
           AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
         run: python -m tiempo.cumplido guardar
+      - name: Guardar la mínima y la máxima más extremas medidas hoy en España (AEMET)
+        if: always() && steps.up.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: python -m tiempo.pueblos registrar
       - name: Guardar estado
         if: always() && steps.up.outputs.ok == 'true'
         run: |

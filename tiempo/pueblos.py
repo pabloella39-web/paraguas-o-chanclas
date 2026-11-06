@@ -1,0 +1,176 @@
+"""Los sitios más fríos y más calurosos de verdad, no solo las capitales.
+
+- Previsión: un puñado de pueblos que suelen ser los más fríos (valles y páramos del interior) o los más calurosos
+  (valle del Guadalquivir, Vegas del Guadiana, sur de Canarias...), con el mismo consenso de modelos que las capitales.
+- Observado: la mínima y la máxima más extremas que han medido las estaciones de AEMET (se guardan cada hora, porque
+  la API solo da las últimas ~12 h).
+"""
+from __future__ import annotations
+
+import json
+import logging
+import math
+import os
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+log = logging.getLogger(__name__)
+RAIZ = Path(__file__).resolve().parent.parent
+OBSERVADOS = RAIZ / "estado" / "extremos_observados.json"
+TZ = ZoneInfo("Europe/Madrid")
+
+# (pueblo, provincia, lat, lon) — pueblos habitados, sin cumbres ni estaciones de esquí
+FRIOS = [
+    ("Molina de Aragón", "Guadalajara", 40.844, -1.886), ("Sigüenza", "Guadalajara", 41.068, -2.643),
+    ("Calamocha", "Teruel", 40.919, -1.298), ("Albarracín", "Teruel", 40.408, -1.444),
+    ("Griegos", "Teruel", 40.422, -1.711), ("Daroca", "Zaragoza", 41.114, -1.414),
+    ("Tragacete", "Cuenca", 40.347, -1.849), ("Medinaceli", "Soria", 41.172, -2.434),
+    ("El Burgo de Osma", "Soria", 41.587, -3.067), ("Aranda de Duero", "Burgos", 41.670, -3.689),
+    ("Villarcayo", "Burgos", 42.938, -3.571), ("Reinosa", "Cantabria", 43.002, -4.137),
+    ("Aguilar de Campoo", "Palencia", 42.794, -4.260), ("Riaño", "León", 42.972, -5.007),
+    ("Astorga", "León", 42.458, -6.056), ("Puebla de Sanabria", "Zamora", 42.054, -6.635),
+    ("Vitigudino", "Salamanca", 41.010, -6.435), ("Guijuelo", "Salamanca", 40.558, -5.671),
+    ("Béjar", "Salamanca", 40.386, -5.763), ("Peñaranda de Bracamonte", "Salamanca", 40.902, -5.205),
+    ("El Barco de Ávila", "Ávila", 40.357, -5.523), ("Navarredonda de Gredos", "Ávila", 40.360, -5.128),
+    ("Cuéllar", "Segovia", 41.401, -4.314), ("Rascafría", "Madrid", 40.904, -3.880),
+    ("Ezcaray", "La Rioja", 42.326, -3.013), ("Isaba", "Navarra", 42.861, -0.921),
+    ("Jaca", "Huesca", 42.570, -0.549), ("Sabiñánigo", "Huesca", 42.519, -0.364),
+    ("Benasque", "Huesca", 42.604, 0.523), ("Vielha", "Lleida", 42.702, 0.796),
+    ("La Seu d'Urgell", "Lleida", 42.358, 1.461), ("Puigcerdà", "Girona", 42.432, 1.928),
+    ("Olot", "Girona", 42.181, 2.490), ("Morella", "Castellón", 40.619, -0.101),
+    ("Vilafranca", "Castellón", 40.415, -0.257), ("Ademuz", "Valencia", 40.061, -1.287),
+    ("Villena", "Alicante", 38.637, -0.866), ("Huéscar", "Granada", 37.810, -2.541),
+    ("Guadix", "Granada", 37.300, -3.137), ("Baza", "Granada", 37.490, -2.773),
+    ("Xinzo de Limia", "Ourense", 42.063, -7.724), ("A Gudiña", "Ourense", 42.061, -7.139),
+]
+CALIDOS = [
+    ("Montoro", "Córdoba", 38.024, -4.383), ("Palma del Río", "Córdoba", 37.700, -5.283),
+    ("Écija", "Sevilla", 37.542, -5.083), ("Lora del Río", "Sevilla", 37.659, -5.527),
+    ("Andújar", "Jaén", 38.039, -4.051), ("El Granado", "Huelva", 37.521, -7.405),
+    ("Don Benito", "Badajoz", 38.956, -5.861), ("Almendralejo", "Badajoz", 38.683, -6.408),
+    ("Talavera de la Reina", "Toledo", 39.963, -4.830), ("Lorca", "Murcia", 37.677, -1.701),
+    ("Orihuela", "Alicante", 38.085, -0.944), ("Xàtiva", "Valencia", 38.990, -0.518),
+    ("Fraga", "Huesca", 41.522, 0.349), ("Caspe", "Zaragoza", 41.235, -0.039),
+    ("Motril", "Granada", 36.745, -3.518), ("Vélez-Málaga", "Málaga", 36.781, -4.101),
+    ("Maspalomas", "Las Palmas", 27.760, -15.586), ("Adeje", "Santa Cruz de Tenerife", 28.122, -16.726),
+    ("La Aldea de San Nicolás", "Las Palmas", 27.984, -15.780), ("Tías", "Las Palmas", 28.961, -13.645),
+]
+
+
+def previstos(dia: date) -> dict:
+    """{'frio': {nombre, provincia, tmin}, 'calor': {nombre, provincia, tmax}} según la previsión de ese día."""
+    from .fuentes import _openmeteo_todas
+    out = {}
+    for clave, lista, var, elegir in (("frio", FRIOS, "tmin", min), ("calor", CALIDOS, "tmax", max)):
+        try:
+            datos = _openmeteo_todas([{"id": n, "lat": la, "lon": lo} for n, _, la, lo in lista], dia)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Previsión de pueblos (%s) no disponible: %s", clave, e)
+            continue
+        vals = [(datos[n][var], n, p) for n, p, _, _ in lista if datos.get(n, {}).get(var) is not None]
+        if vals:
+            v, n, p = elegir(vals)
+            out[clave] = {"nombre": n, "provincia": p, var: round(v)}
+    return out
+
+
+# ---------------------------------------------------------------- observado (estaciones de AEMET)
+def _iso(s: str) -> datetime:
+    d = datetime.fromisoformat(s.replace("+0000", "+00:00"))
+    return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
+
+
+def _cerca_de(la: float, lo: float) -> str:
+    from .poblaciones import GRANDES
+    n, _, _ = min(GRANDES, key=lambda c: math.hypot((c[1] - la), (c[2] - lo) * math.cos(math.radians(la))))
+    return n
+
+
+def _nombre_estacion(s: str) -> str:
+    s = s.split(",")[0].split("/")[0].strip()
+    return " ".join(w.capitalize() if len(w) > 2 else w.lower() for w in s.split())
+
+
+def registrar(ahora: datetime | None = None):
+    """Lo llama el workflow de respuestas cada hora: guarda, por día (hora de Madrid), la mínima y la máxima más
+    extremas medidas en España."""
+    from .fuentes import _aemet_get
+    obs = json.loads(_aemet_get("/observacion/convencional/todas", os.environ.get("AEMET_API_KEY", "")))
+    try:
+        est = json.loads(OBSERVADOS.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        est = {}
+    for o in obs:
+        try:
+            dia = _iso(o["fint"]).astimezone(TZ).date().isoformat()
+            la, lo = float(o["lat"]), float(o["lon"])
+        except Exception:  # noqa: BLE001
+            continue
+        if not (27 <= la <= 44.5 and -18.5 <= lo <= 4.5):
+            continue
+        d = est.setdefault(dia, {})
+        for k, campo, mejor in (("min", "tamin", lambda a, b: a < b), ("max", "tamax", lambda a, b: a > b)):
+            v = o.get(campo)
+            if not isinstance(v, (int, float)) or not -30 <= v <= 50:
+                continue
+            if (o.get("alt") or 0) > 1500:   # cumbres y puertos: no son «un pueblo»
+                continue
+            if k not in d or mejor(v, d[k]["valor"]):
+                d[k] = {"valor": v, "sitio": _nombre_estacion(o.get("ubi", "")), "zona": _cerca_de(la, lo),
+                        "hora": o["fint"]}
+    hoy = (ahora or datetime.now(timezone.utc)).astimezone(TZ).date()
+    est = {k: v for k, v in est.items() if date.fromisoformat(k) >= hoy - timedelta(days=4)}
+    OBSERVADOS.parent.mkdir(exist_ok=True)
+    OBSERVADOS.write_text(json.dumps(est, ensure_ascii=False, indent=1), encoding="utf-8")
+    log.info("Extremos observados de hoy: %s", est.get(hoy.isoformat()))
+
+
+def observados(dia: date) -> dict:
+    try:
+        return json.loads(OBSERVADOS.read_text(encoding="utf-8")).get(dia.isoformat(), {})
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _num(v) -> str:
+    return str(round(v, 1)).replace(".", ",").replace(",0", "")
+
+
+def texto(prev: list[dict], dia: date, hoy: date, cuando: str = "mañana") -> tuple[str, dict]:
+    """Nota para el guion + extremos para el mapa (el pueblo si es más extremo que la capital)."""
+    capf = min(prev, key=lambda c: c["tmin"])
+    capc = max(prev, key=lambda c: c["tmax"])
+    p = previstos(dia)
+    extremos = {"calor": capc, "frio": capf}
+    partes = []
+    f = p.get("frio")
+    if f and f["tmin"] <= capf["tmin"] - 1:
+        partes.append(f"lo más frío de {cuando} no será una capital: {f['nombre']} ({f['provincia']}) bajará a "
+                      f"{f['tmin']} grados; la capital más fría, {capf['nombre']}, {capf['tmin']}")
+        extremos["frio"] = {**capf, "nombre": f["nombre"], "tmin": f["tmin"]}
+    c = p.get("calor")
+    if c and c["tmax"] >= capc["tmax"] + 1:
+        partes.append(f"lo más caluroso, {c['nombre']} ({c['provincia']}) con {c['tmax']} grados; la capital más "
+                      f"calurosa, {capc['nombre']}, {capc['tmax']}")
+        extremos["calor"] = {**capc, "nombre": c["nombre"], "tmax": c["tmax"]}
+    obs = observados(hoy)
+    o = obs.get("min")
+    if o and o["valor"] <= capf["tmin"] - 1 and o["valor"] <= 3:
+        partes.append(f"dato medido: esta madrugada la estación de AEMET de {o['sitio']} (zona de {o['zona']}) "
+                      f"marcó {_num(o['valor'])} grados")
+    if not partes:
+        return "", extremos
+    return ("\n\nFRÍO Y CALOR DE VERDAD (fuera de las capitales): " + "; ".join(partes) + ". En el bloque general "
+            "NO digas solo la capital: di el pueblo y su provincia («la capital más fría será Salamanca, con −2, pero en "
+            "Molina de Aragón, en Guadalajara, se bajará hasta −6») y, si hay dato medido, puedes usarlo como "
+            "curiosidad en media frase. En el mapa sale el pueblo.", extremos)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    import sys
+    if sys.argv[1:] == ["registrar"]:
+        registrar()
+    else:
+        print(previstos(date.today() + timedelta(days=1)))
