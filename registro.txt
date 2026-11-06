@@ -1,0 +1,9 @@
+TEXTO PROMPT: 
+
+AVISOS DE AEMET PREVISTOS (se ven coloreados en el mapa de su día): sábado: aviso naranja por lluvia en Cumbres de La Palma, Este de La Palma, Oeste de La Palma (30 l/m² en 1 hora); sábado: aviso amarillo por viento en Cumbres de La Palma, Este de La Palma, Oeste de La Palma (rachas de 70 km/h); sábado: aviso amarillo por tormentas en Cumbres de La Palma, Este de La Palma, Oeste de La Palma; sábado: aviso amarillo por oleaje en Oeste de La Palma; domingo: aviso naranja por lluvia en Cumbres de La Palma, Este de La Palma, Oeste de La Palma (30 l/m² en 1 hora); domingo: aviso naranja por viento en Cumbres de La Palma, Este de La Palma, Oeste de La Palma (rachas de 90 km/h); domingo: aviso amarillo por lluvia en La Gomera, El Hierro, Norte de Tenerife (25 l/m² en 1 hora); domingo: aviso amarillo por tormentas en Cumbres de La Palma, Este de La Palma, Oeste de La Palma. Menciónalos en el bloque de su día: los naranjas y rojos, siempre; los amarillos, de pasada. Si hay oleaje o temporal en el mar, di la altura de las olas.
+
+BLOQUES DE AVISOS: "avisos_sábado", "avisos_domingo". Cada uno va justo ANTES del bloque de su día, con un mapa de España con los avisos, las olas, la nieve y la niebla: resume ahí en 1-2 frases lo importante de ese día (nivel, zona, dato: litros, olas, cota). En el bloque del día ya NO lo repitas: habla de temperaturas, lluvia y planes.
+AVISOS: {'sábado': [('naranja', 'lluvias', 6), ('amarillo', 'vientos', 4), ('amarillo', 'tormentas', 3), ('amarillo', 'costeros', 1)], 'domingo': [('naranja', 'lluvias', 19), ('naranja', 'vientos', 4), ('amarillo', 'lluvias', 23), ('amarillo', 'tormentas', 20), ('amarillo', 'vientos', 11), ('amarillo', 'costeros', 2)]}
+MAR/NIEVE: {'sábado': (0, 0), 'domingo': (0, 0)}
+CLAVES ['avisos_sábado', 'sábado', 'avisos_domingo', 'domingo'] ['avisos_domingo', 'avisos_sábado']
+OK
