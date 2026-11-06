@@ -1030,6 +1030,11 @@ def capa_fichas(grupos, prev_dia=None):
         puestas = cajas if isinstance(cajas, list) else list(cajas)
         visibles = [x for x in grupos or [] if (x.get("_provs") or {}).get(tuple(pr.vista))]
         n_ley = min(3, len({(x["nivel"], nombre_fen(x["fenomeno"])) for x in visibles}))
+        from .config import RECUADRO_CANARIAS
+        x0_, y1_ = pr(RECUADRO_CANARIAS[0], RECUADRO_CANARIAS[2])
+        x1_, y0_ = pr(RECUADRO_CANARIAS[1], RECUADRO_CANARIAS[3])
+        if 0 <= x0_ < ANCHO and 0 <= y0_ < MAPA_H:   # el recuadro de Canarias tampoco se tapa
+            puestas.append((x0_, MAPA_Y0 + y0_, x1_, MAPA_Y0 + y1_))
         if n_ley:   # la leyenda de avisos (abajo a la derecha) no se pisa
             puestas.append((ANCHO - 560, MAPA_Y0 + MAPA_H - 80 - 60 * (n_ley - 1) - 14, ANCHO, MAPA_Y0 + MAPA_H - 16))
         fichas = []
@@ -1049,7 +1054,7 @@ def capa_fichas(grupos, prev_dia=None):
                 sitio = _nombre_prov(lista[0][0]) if len(lista) == 1 else com
                 fichas.append((x, MAPA_Y0 + y, COLOR_NIVEL[gr["nivel"]], ICONO_AVISO.get(gr["fenomeno"].lower(), "lluvia"),
                                sitio.upper(), (nombre_fen(gr["fenomeno"]) + (f" · {dato}" if dato else "")).upper(),
-                               gr["nivel"]))
+                               gr["nivel"], com.upper()))
         extra = []
         pd = prev_dia or []
         for c in sorted(pd, key=lambda c: -c["tmax"])[:2]:          # ola de calor / calor extremo
@@ -1077,11 +1082,15 @@ def capa_fichas(grupos, prev_dia=None):
         # Una sola ficha por sitio: si en Tenerife hay lluvia, viento, oleaje y tormentas, van juntas (antes salían
         # cuatro fichas apiladas y se solapaban)
         juntas = {}
-        for x, y, col, ic, l1, l2, nivel in fichas:
-            if l1 in juntas:
-                juntas[l1][5].append(l2)
+        for x, y, col, ic, l1, l2, nivel, com in fichas:   # por comunidad: «Tenerife» y «Canarias» van juntas
+            if com in juntas:
+                j_ = juntas[com]
+                if l1 != j_[4]:
+                    j_[4] = com
+                if l2.split(" · ")[0] not in [t.split(" · ")[0] for t in j_[5]]:
+                    j_[5].append(l2)
             else:
-                juntas[l1] = [x, y, col, ic, l1, [l2], nivel]
+                juntas[com] = [x, y, col, ic, l1, [l2], nivel]
         fichas = []
         f2 = fuente("ExtraBold", 24)
         for x, y, col, ic, l1, ls, nivel in juntas.values():
