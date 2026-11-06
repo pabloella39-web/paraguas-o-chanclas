@@ -487,7 +487,7 @@ def _preparar_avisos(dias: dict):
         from . import pueblos
         fr, ca = [], []
         for k, d in dias.items():
-            pr = pueblos.previstos(d)
+            pr = pueblos.previstos(d, aemet=False)
             caps = PREVS_DIA.get(k) or []
             if pr.get("frio") and caps and pr["frio"]["tmin"] <= min(c["tmin"] for c in caps) - 1:
                 fr.append((pr["frio"]["tmin"], k, pr["frio"]))

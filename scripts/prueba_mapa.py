@@ -1,18 +1,17 @@
-"""Prueba: pueblos más fríos y calurosos frente a las capitales, y extremos observados por AEMET."""
+"""Comprobación real: nieve prevista en la montaña los próximos días (sin filtros) y avisos de nieve de AEMET."""
 import logging
 from datetime import date, timedelta
-
-logging.basicConfig(level=logging.INFO)
-from tiempo import pueblos
-from tiempo.fuentes import obtener_previsiones
-
-for k in (1, 2):
-    d = date.today() + timedelta(days=k)
-    prev, _ = obtener_previsiones(d)
-    print(d, "capitales:", min((c["tmin"], c["nombre"]) for c in prev), max((c["tmax"], c["nombre"]) for c in prev))
-    print(d, "pueblos:", pueblos.previstos(d))
-    nota, ext = pueblos.texto(prev, d, date.today(), "mañana")
-    print(nota)
-    print({k: (v["nombre"], v.get("tmin"), v.get("tmax")) for k, v in ext.items()})
-pueblos.registrar()
-print(pueblos.observados(date.today()))
+from pathlib import Path
+logging.basicConfig(level=logging.WARNING)
+from tiempo.fuentes import nieve
+from tiempo import especiales as e
+out = Path("prueba"); out.mkdir(exist_ok=True)
+hoy = date.today()
+for k in range(1, 5):
+    d = hoy + timedelta(days=k)
+    todo = nieve(d, cota_max=4000, cm_min=0.1)
+    print(d, "NIEVE (sin filtros):", [(x["zona"], x["cota"], x["cm"]) for x in todo] or "ninguna")
+av = e.avisos_por_dia({str(hoy + timedelta(days=k)): hoy + timedelta(days=k) for k in range(1, 4)})
+for k, v in av.items():
+    print(k, "AVISOS:", [(g["nivel"], g["fenomeno"], g["zonas"][:3]) for g in v])
+print("OK")

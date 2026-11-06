@@ -73,7 +73,7 @@ def _ids_aemet(clave: str) -> dict:
         ids = json.loads(MUNICIPIOS.read_text(encoding="utf-8"))
     except Exception:  # noqa: BLE001
         ids = {}
-    faltan = [x for x in FRIOS + CALIDOS if x[0] not in ids]
+    faltan = [x for x in FRIOS if x[0] not in ids]
     if faltan and clave:
         from .fuentes import _aemet_get
         try:
@@ -113,9 +113,15 @@ def previstos(dia: date, aemet: bool = True) -> dict:
             log.warning("Previsión de pueblos (%s) no disponible: %s", k, e)
             om = {}
         vals = []
+        # AEMET solo para el frío y para los 12 pueblos más fríos según los modelos (cada consulta tarda; con todos
+        # se iban casi 20 minutos por los límites de AEMET)
+        candidatos = set()
+        if k == "frio":
+            orden = sorted((om[n][var], n) for n, *_ in lista if (om.get(n) or {}).get(var) is not None)
+            candidatos = {n for _, n in orden[:12]} or {n for n, *_ in lista}
         for n, p, _, _ in lista:
             v = None
-            if n in ids:
+            if n in ids and n in candidatos:
                 try:
                     v = aemet_ciudad({"id": ids[n]}, clave, dia)[var]
                 except Exception as e:  # noqa: BLE001
