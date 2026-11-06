@@ -483,27 +483,30 @@ def _preparar_avisos(dias: dict):
         AVISOS_TXT[0] += ("\n\nFENÓMENOS DESTACADOS (salen en el mapa con su icono animado): " + " | ".join(ext)
                           + ". Menciónalos en su día: el granizo y las tormentas con prudencia ('posibles'), el calor o "
                             "el frío extremos con la cifra y un consejo.")
-    try:   # lo más frío y lo más caluroso de esos días, contando pueblos (no solo capitales)
+    try:   # la capital más fría / calurosa de esos días y, además, el sitio más extremo (un pueblo)
         from . import pueblos
-        fr, ca = [], []
+        cf_, cc_, pf_, pc_ = [], [], [], []
         for k, d in dias.items():
             caps = PREVS_DIA.get(k) or []
             if caps:
-                cf, cc = min(caps, key=lambda c: c["tmin"]), max(caps, key=lambda c: c["tmax"])
-                fr.append((cf["tmin"], k, cf["nombre"]))
-                ca.append((cc["tmax"], k, cc["nombre"]))
+                x = min(caps, key=lambda c: c["tmin"]); cf_.append((x["tmin"], k, x["nombre"]))
+                x = max(caps, key=lambda c: c["tmax"]); cc_.append((x["tmax"], k, x["nombre"]))
             pr = pueblos.previstos(d, aemet=False)
             if pr.get("frio"):
-                fr.append((pr["frio"]["tmin"], k, f"{pr['frio']['nombre']} ({pr['frio']['provincia']})"))
+                pf_.append((pr["frio"]["tmin"], k, f"{pr['frio']['nombre']} ({pr['frio']['provincia']})"))
             if pr.get("calor"):
-                ca.append((pr["calor"]["tmax"], k, f"{pr['calor']['nombre']} ({pr['calor']['provincia']})"))
-        if fr and ca:
-            vf, kf, nf = min(fr, key=lambda t: t[0])
-            vc, kc, nc = max(ca, key=lambda t: t[0])
-            AVISOS_TXT[0] += (f"\n\nLO MÁS FRÍO Y LO MÁS CALUROSO DE ESPAÑA EN ESOS DÍAS (contando pueblos): mínima más "
-                              f"baja, {nf} con {vf} grados el {kf}; máxima más alta, {nc} con {vc} grados el {kc}. "
-                              "Cuando digas lo más frío o lo más caluroso, di ESOS sitios (si es un pueblo, con su "
-                              "provincia), sin tener que nombrar además la capital.")
+                pc_.append((pr["calor"]["tmax"], k, f"{pr['calor']['nombre']} ({pr['calor']['provincia']})"))
+        if cf_ and cc_:
+            vf, kf, nf = min(cf_); vc, kc, nc = max(cc_)
+            frio = f"la capital más fría, {nf}, con {vf} grados el {kf}"
+            if pf_ and min(pf_)[0] < vf:
+                v, k, n = min(pf_); frio += f"; y el sitio más frío de España, {n}, con {v} grados el {k}"
+            calor = f"la capital más calurosa, {nc}, con {vc} grados el {kc}"
+            if pc_ and max(pc_)[0] > vc:
+                v, k, n = max(pc_); calor += f"; y el sitio más caluroso de España, {n}, con {v} grados el {k}"
+            AVISOS_TXT[0] += (f"\n\nLO MÁS FRÍO Y LO MÁS CALUROSO DE ESOS DÍAS (capitales y pueblos): FRÍO: {frio}. "
+                              f"CALOR: {calor}. Cuando lo digas, di las dos cosas: la capital y, si lo hay, el pueblo "
+                              "aún más extremo con su provincia, esté donde esté.")
     except Exception as e:  # noqa: BLE001
         log.warning("Pueblos extremos no disponibles: %s", e)
     if AVISOS_BLOQUE:
