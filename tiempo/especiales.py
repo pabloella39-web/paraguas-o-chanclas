@@ -979,15 +979,16 @@ def capa_avisos_suave(grupos, alfa=120, leyenda=True):
             lay = lay.copy(); lay.putalpha(lay.getchannel("A").point(lambda a: int(a * aparece)))
         capa.alpha_composite(lay)
         d = ImageDraw.Draw(capa)
-        y = MAPA_Y0 + MAPA_H - 80            # leyenda abajo a la izquierda
+        y = MAPA_Y0 + MAPA_H - 80            # leyenda abajo a la derecha
         for gr in ([] if not leyenda else list(dict.fromkeys((x["nivel"], nombre_fen(x["fenomeno"])) for x in reversed(vistos)))[:3]):
             nivel, fen = gr
             txt = f"AVISO {nivel.upper()} · {fen.upper()}"
             f = fuente("Black", 30)
             w = f.getlength(txt) + 44
             col = COLOR_NIVEL[nivel]
-            d.rounded_rectangle([30, y, 30 + w, y + 50], radius=25, fill=col + (int(235 * aparece),))
-            d.text((30 + w / 2, y + 25), txt, font=f, fill=(15, 25, 50) if nivel == "amarillo" else (255, 255, 255),
+            x0 = ANCHO - 30 - w   # abajo a la derecha: abajo a la izquierda está el recuadro de Canarias
+            d.rounded_rectangle([x0, y, x0 + w, y + 50], radius=25, fill=col + (int(235 * aparece),))
+            d.text((x0 + w / 2, y + 25), txt, font=f, fill=(15, 25, 50) if nivel == "amarillo" else (255, 255, 255),
                    anchor="mm")
             y -= 60
     return dibujar
@@ -1027,6 +1028,10 @@ def capa_fichas(grupos, prev_dia=None):
             return
         d = ImageDraw.Draw(capa)
         puestas = cajas if isinstance(cajas, list) else list(cajas)
+        visibles = [x for x in grupos or [] if (x.get("_provs") or {}).get(tuple(pr.vista))]
+        n_ley = min(3, len({(x["nivel"], nombre_fen(x["fenomeno"])) for x in visibles}))
+        if n_ley:   # la leyenda de avisos (abajo a la derecha) no se pisa
+            puestas.append((ANCHO - 560, MAPA_Y0 + MAPA_H - 80 - 60 * (n_ley - 1) - 14, ANCHO, MAPA_Y0 + MAPA_H - 16))
         fichas = []
         for gr in sorted(grupos or [], key=lambda x: -NIVELES[x["nivel"]]):
             provs = (gr.get("_provs") or {}).get(tuple(pr.vista)) or {}
@@ -1069,19 +1074,37 @@ def capa_fichas(grupos, prev_dia=None):
         for c in sorted(prev_dia or [], key=lambda c: -(c.get("racha") or 0))[:2]:
             if (c.get("racha") or 0) >= 60:
                 extra.append((c, "viento", (200, 220, 255), c["nombre"].upper(), f"RACHAS · {round(c['racha'])} KM/H"))
+        # Una sola ficha por sitio: si en Tenerife hay lluvia, viento, oleaje y tormentas, van juntas (antes salían
+        # cuatro fichas apiladas y se solapaban)
+        juntas = {}
+        for x, y, col, ic, l1, l2, nivel in fichas:
+            if l1 in juntas:
+                juntas[l1][5].append(l2)
+            else:
+                juntas[l1] = [x, y, col, ic, l1, [l2], nivel]
+        fichas = []
+        f2 = fuente("ExtraBold", 24)
+        for x, y, col, ic, l1, ls, nivel in juntas.values():
+            lineas = [ls[0]]
+            if len(ls) > 1:
+                resto = " · ".join(t.split(" · ")[0] if len(ls) > 2 else t for t in ls[1:])
+                while f2.getlength(resto) > 430 and " · " in resto:
+                    resto = resto.rsplit(" · ", 1)[0] + " Y MÁS"
+                lineas.append(resto)
+            fichas.append((x, y, col, ic, l1, lineas, nivel))
         for c, ic, col, l1, l2 in extra:
             x, y = pr.ciudad(c)
-            fichas.append((x, MAPA_Y0 + y, col, ic, l1, l2, "info"))
-        f1, f2 = fuente("Black", 30), fuente("ExtraBold", 24)
-        for k, (x, y, col, ic, l1, l2, nivel) in enumerate(fichas[:9]):
-            w = max(f1.getlength(l1), f2.getlength(l2)) + 112
-            h = 76
+            fichas.append((x, MAPA_Y0 + y, col, ic, l1, [l2], "info"))
+        f1 = fuente("Black", 30)
+        for k, (x, y, col, ic, l1, lineas, nivel) in enumerate(fichas[:9]):
+            w = max([f1.getlength(l1)] + [f2.getlength(t) for t in lineas]) + 112
+            h = 76 + 30 * (len(lineas) - 1)
             pos = None
             for paso in range(0, 22):
                 for dx, dy in ((0, -1), (0, 1), (1, 0), (-1, 0), (1, -1), (-1, -1), (1, 1), (-1, 1)):
                     cx, cy = x + dx * paso * 22, y - 70 + dy * paso * 22
                     r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
-                    if 10 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h / 2 < cy < MAPA_Y0 + MAPA_H - h / 2 - 150 \
+                    if 10 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h / 2 < cy < MAPA_Y0 + MAPA_H - h / 2 - 20 \
                             and not any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas):
                         pos = (cx, cy)
                         break
@@ -1102,8 +1125,11 @@ def capa_fichas(grupos, prev_dia=None):
             if s_ < 1:
                 im = im.copy(); im.putalpha(im.getchannel("A").point(lambda v: int(v * s_)))
             capa.alpha_composite(im, (int(cx - w / 2 + 14), int(cy - 32)))
-            d.text((cx - w / 2 + 90, cy - 14), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
-            d.text((cx - w / 2 + 90, cy + 18), l2, font=f2, fill=col + (int(255 * s_),), anchor="lm")
+            y0 = cy - h / 2 + 24
+            d.text((cx - w / 2 + 90, y0), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+            for j, t in enumerate(lineas):
+                d.text((cx - w / 2 + 90, y0 + 32 + 30 * j), t, font=f2,
+                       fill=(col if j == 0 else (225, 232, 245)) + (int(255 * s_),), anchor="lm")
     return dibujar
 
 
