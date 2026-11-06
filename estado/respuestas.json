@@ -602,7 +602,14 @@
   "7704935092310655766",
   "7704959195205190422",
   "7704956515237970710",
-  "7704937642357457687"
+  "7704937642357457687",
+  "7704982378276340502",
+  "7704981918194025248",
+  "7704980101742035745",
+  "7704979784904622870",
+  "7704935005735584545",
+  "7704903160368251670",
+  "7704863346144183042"
  ],
  "hechas": [
   {
@@ -967,6 +974,39 @@
    "motor": "solo texto",
    "resumen": "Hoy en Hospitalet de Llobregat: 19°/9°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
+  },
+  {
+   "fecha": "2026-11-06",
+   "clave": "leon|2026-11-06",
+   "lugar": "León",
+   "usuarios": [
+    "miguelvidal1975"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en León: 12°/2°, 8 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-06",
+   "clave": "caceres|2026-11-06",
+   "lugar": "Cáceres",
+   "usuarios": [
+    "oscar.perez.domin8"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Cáceres: 17°/6°, 38 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-06",
+   "clave": "zamora|2026-11-06",
+   "lugar": "Zamora",
+   "usuarios": [
+    "jesus_elturko"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Zamora: 13°/-3°, 33 % de lluvia → paraguas.",
+   "publicado": true
   }
  ],
  "v2": true,
@@ -1227,7 +1267,9 @@
   "7704848139139744534",
   "7704845800668414741",
   "7704824563586614038",
-  "7704811285796717334"
+  "7704811285796717334",
+  "7704982378276340502",
+  "7704981918194025248"
  ],
  "fallos": {
   "7701261555031114528": 1,
