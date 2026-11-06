@@ -216,6 +216,23 @@ def _num(v) -> str:
     return str(round(v, 1)).replace(".", ",").replace(",0", "")
 
 
+FORMULAS = [   # cómo decir «capital más fría + sitio más frío»; rota cada día (ejemplos, los datos son de muestra)
+    "La capital más fría será Burgos, con 0 grados, pero lo más frío de España estará en Molina de Aragón, en "
+    "Guadalajara: −4",
+    "Entre las capitales, Burgos se lleva el frío con 0 grados; aunque si buscas el rincón más helado, Molina de "
+    "Aragón, en Guadalajara, bajará a −4",
+    "Burgos y Soria, las capitales más frías, a 0 grados. Y ojo a Molina de Aragón, en Guadalajara: −4, lo más frío "
+    "de toda España",
+    "¿El frío de verdad? En las capitales, Burgos con 0; pero el récord se lo lleva Molina de Aragón, en "
+    "Guadalajara, con −4",
+    "Abrígate en Burgos, la capital más fría, con 0 grados; y más todavía en Molina de Aragón, en Guadalajara, que "
+    "amanecerá a −4",
+    "Lo más frío: Burgos entre las capitales, con 0, y Molina de Aragón, en Guadalajara, en toda España, con −4",
+    "Si hablamos de capitales, Burgos, con 0 grados; si hablamos de toda España, Molina de Aragón, en Guadalajara, "
+    "con −4",
+]
+
+
 def _capitales(prev, var, elegir) -> tuple[list[str], int]:
     v = elegir(c[var] for c in prev)
     return [c["nombre"] for c in prev if c[var] == v][:3], v
@@ -248,9 +265,9 @@ def texto(prev: list[dict], dia: date, hoy: date, cuando: str = "mañana") -> tu
         extremos["calor"] = {**capc, "nombre": c["nombre"], "tmax": c["tmax"]}
     txt = (f"\n\nLO MÁS FRÍO Y LO MÁS CALUROSO DE ESPAÑA {cuando.upper()} (capitales y pueblos): FRÍO: {frio}. "
            f"CALOR: {calor}. En el bloque general di las DOS cosas: la capital (o capitales) más fría y, si hay un "
-           "sitio aún más frío, ese pueblo con su provincia, esté donde esté («la capital más fría, Burgos, con 0 "
-           "grados; pero lo más frío de España será Molina de Aragón, en Guadalajara, con −4»). Igual con el calor. "
-           "En el mapa sale el sitio más extremo.")
+           "sitio aún más frío, ese pueblo con su provincia, esté donde esté. Igual con el calor. Varía la forma de "
+           f"decirlo cada día; hoy, algo en la línea de «{FORMULAS[dia.toordinal() % len(FORMULAS)]}» (con los "
+           "datos de hoy y tus palabras; claro y natural, sin rodeos). En el mapa sale el sitio más extremo.")
     o = observados(hoy).get("min")
     if o and o["valor"] <= 0:
         txt += (f" Dato medido, si quieres usarlo como curiosidad en media frase: esta madrugada la estación de "
