@@ -74,4 +74,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Comentarios de ciudad en vídeos de varios días (semana, lo que queda de semana, finde): se contesta con un resumen rápido de todos los días que quedan en ese sitio (Jue ☀️19/6° · Vie 🌧️15/8° 💧70% ...) y cuál es el mejor día. En los partes diarios, solo el día siguiente.
 - Las respuestas dentro de los hilos de nuestros comentarios («Reto: dime el pueblo...») también se leen y se contestan.
 - Comentarios: solo se contestan en los vídeos del día (publicados en las últimas 24 h); los de vídeos de días anteriores no se contestan.
-- Lo más frío y lo más caluroso: además de la capital, se nombra el pueblo más extremo con su provincia (el prompt lo trae en «FRÍO Y CALOR DE VERDAD»), y si viene el dato medido de AEMET de esta madrugada, se puede usar como curiosidad.
+- Lo más frío y lo más caluroso: se dice el sitio que de verdad será el más frío / más caluroso de España, sea pueblo (con su provincia) o capital; no hace falta nombrar además la capital más fría ni buscar un pueblo de su provincia. El prompt lo trae en «LO MÁS FRÍO Y LO MÁS CALUROSO DE ESPAÑA».

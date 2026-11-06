@@ -217,33 +217,32 @@ def _num(v) -> str:
 
 
 def texto(prev: list[dict], dia: date, hoy: date, cuando: str = "mañana") -> tuple[str, dict]:
-    """Nota para el guion + extremos para el mapa (el pueblo si es más extremo que la capital)."""
+    """Nota para el guion + extremos para el mapa: el sitio MÁS frío y el MÁS caluroso de España, sea pueblo o
+    capital (no la capital más fría y además un pueblo)."""
     capf = min(prev, key=lambda c: c["tmin"])
     capc = max(prev, key=lambda c: c["tmax"])
     p = previstos(dia)
     extremos = {"calor": capc, "frio": capf}
-    partes = []
+    frio = f"{capf['nombre']} con {capf['tmin']} {_g(capf['tmin'])}"
     f = p.get("frio")
-    if f and f["tmin"] <= capf["tmin"] - 1:
-        partes.append(f"lo más frío de {cuando} no será una capital: {f['nombre']} ({f['provincia']}) bajará a "
-                      f"{f['tmin']} {_g(f['tmin'])}; la capital más fría, {capf['nombre']}, {capf['tmin']}")
+    if f and f["tmin"] < capf["tmin"]:
+        frio = f"{f['nombre']} ({f['provincia']}) con {f['tmin']} {_g(f['tmin'])}"
         extremos["frio"] = {**capf, "nombre": f["nombre"], "tmin": f["tmin"]}
+    calor = f"{capc['nombre']} con {capc['tmax']} {_g(capc['tmax'])}"
     c = p.get("calor")
-    if c and c["tmax"] >= capc["tmax"] + 1:
-        partes.append(f"lo más caluroso, {c['nombre']} ({c['provincia']}) con {c['tmax']} {_g(c['tmax'])}; la capital más "
-                      f"calurosa, {capc['nombre']}, {capc['tmax']}")
+    if c and c["tmax"] > capc["tmax"]:
+        calor = f"{c['nombre']} ({c['provincia']}) con {c['tmax']} {_g(c['tmax'])}"
         extremos["calor"] = {**capc, "nombre": c["nombre"], "tmax": c["tmax"]}
-    obs = observados(hoy)
-    o = obs.get("min")
-    if o and o["valor"] <= capf["tmin"] - 1 and o["valor"] <= 3:
-        partes.append(f"dato medido: esta madrugada la estación de AEMET de {o['sitio']} ({o['zona']}) "
-                      f"marcó {_num(o['valor'])} grados")
-    if not partes:
-        return "", extremos
-    return ("\n\nFRÍO Y CALOR DE VERDAD (fuera de las capitales): " + "; ".join(partes) + ". En el bloque general "
-            "NO digas solo la capital: di el pueblo y su provincia («la capital más fría será Salamanca, con −2, pero en "
-            "Molina de Aragón, en Guadalajara, se bajará hasta −6») y, si hay dato medido, puedes usarlo como "
-            "curiosidad en media frase. En el mapa sale el pueblo.", extremos)
+    txt = (f"\n\nLO MÁS FRÍO Y LO MÁS CALUROSO DE ESPAÑA {cuando.upper()} (contando pueblos, no solo capitales): "
+           f"mínima más baja, {frio}; máxima más alta, {calor}. En el bloque general di ESOS sitios como lo más frío "
+           "y lo más caluroso de España, sean pueblo o capital; si es un pueblo, di su provincia («lo más frío, "
+           "Molina de Aragón, en Guadalajara, con −4»). No hace falta nombrar además la capital más fría ni buscar "
+           "un pueblo de la misma provincia. En el mapa sale ese sitio.")
+    o = observados(hoy).get("min")
+    if o and o["valor"] <= 0:
+        txt += (f" Dato medido, si quieres usarlo como curiosidad en media frase: esta madrugada la estación de "
+                f"AEMET de {o['sitio']} ({o['zona']}) marcó {_num(o['valor'])} grados, lo más frío de España.")
+    return txt, extremos
 
 
 if __name__ == "__main__":
