@@ -58,20 +58,75 @@ CALIDOS = [
 ]
 
 
-def previstos(dia: date) -> dict:
-    """{'frio': {nombre, provincia, tmin}, 'calor': {nombre, provincia, tmax}} según la previsión de ese día."""
-    from .fuentes import _openmeteo_todas
-    out = {}
-    for clave, lista, var, elegir in (("frio", FRIOS, "tmin", min), ("calor", CALIDOS, "tmax", max)):
+MUNICIPIOS = RAIZ / "estado" / "municipios_pueblos.json"
+
+
+def _norm(t: str) -> str:
+    import unicodedata
+    t = unicodedata.normalize("NFD", t.lower())
+    return "".join(c for c in t if unicodedata.category(c) != "Mn").replace("'", "").strip()
+
+
+def _ids_aemet(clave: str) -> dict:
+    """Código de municipio de AEMET de cada pueblo (se busca una vez en /maestro/municipios y se guarda)."""
+    try:
+        ids = json.loads(MUNICIPIOS.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        ids = {}
+    faltan = [x for x in FRIOS + CALIDOS if x[0] not in ids]
+    if faltan and clave:
+        from .fuentes import _aemet_get
         try:
-            datos = _openmeteo_todas([{"id": n, "lat": la, "lon": lo} for n, _, la, lo in lista], dia)
+            maestro = json.loads(_aemet_get("/maestro/municipios", clave))
         except Exception as e:  # noqa: BLE001
-            log.warning("Previsión de pueblos (%s) no disponible: %s", clave, e)
-            continue
-        vals = [(datos[n][var], n, p) for n, p, _, _ in lista if datos.get(n, {}).get(var) is not None]
+            log.warning("Maestro de municipios de AEMET no disponible: %s", e)
+            maestro = []
+        for n, _, la, lo in faltan:
+            cand = []
+            for m in maestro:
+                nombres = {_norm(m.get("nombre", ""))} | {_norm(x) for x in m.get("nombre", "").split("/")}
+                if _norm(n) in nombres or any(_norm(n) == x.split(",")[0] for x in nombres):
+                    try:
+                        d = math.hypot(float(m["latitud_dec"]) - la, float(m["longitud_dec"]) - lo)
+                    except Exception:  # noqa: BLE001
+                        d = 9
+                    cand.append((d, m["id"].replace("id", "")))
+            if cand and min(cand)[0] < 0.3:
+                ids[n] = min(cand)[1]
+        MUNICIPIOS.parent.mkdir(exist_ok=True)
+        MUNICIPIOS.write_text(json.dumps(ids, ensure_ascii=False, indent=1), encoding="utf-8")
+    return ids
+
+
+def previstos(dia: date, aemet: bool = True) -> dict:
+    """{'frio': {nombre, provincia, tmin}, 'calor': {nombre, provincia, tmax}} según la previsión de ese día.
+    Con clave de AEMET se usa su predicción municipal (recoge mejor las heladas de los valles); si no, el consenso de
+    modelos de Open-Meteo (que suaviza mucho las mínimas de los sitios más fríos)."""
+    from .fuentes import _openmeteo_todas, aemet_ciudad
+    clave = os.environ.get("AEMET_API_KEY", "") if aemet else ""
+    ids = _ids_aemet(clave) if clave else {}
+    out = {}
+    for k, lista, var, elegir in (("frio", FRIOS, "tmin", min), ("calor", CALIDOS, "tmax", max)):
+        try:
+            om = _openmeteo_todas([{"id": n, "lat": la, "lon": lo} for n, _, la, lo in lista], dia)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Previsión de pueblos (%s) no disponible: %s", k, e)
+            om = {}
+        vals = []
+        for n, p, _, _ in lista:
+            v = None
+            if n in ids:
+                try:
+                    v = aemet_ciudad({"id": ids[n]}, clave, dia)[var]
+                except Exception as e:  # noqa: BLE001
+                    log.info("AEMET %s: %s", n, e)
+            if v is None:
+                v = (om.get(n) or {}).get(var)
+            if v is not None:
+                vals.append((v, n, p))
         if vals:
             v, n, p = elegir(vals)
-            out[clave] = {"nombre": n, "provincia": p, var: round(v)}
+            out[k] = {"nombre": n, "provincia": p, var: int(round(v))}
     return out
 
 
@@ -81,7 +136,21 @@ def _iso(s: str) -> datetime:
     return d if d.tzinfo else d.replace(tzinfo=timezone.utc)
 
 
+def _dentro(x: float, y: float, anillo) -> bool:
+    dentro = False
+    for (x1, y1), (x2, y2) in zip(anillo, anillo[1:] + anillo[:1]):
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            dentro = not dentro
+    return dentro
+
+
 def _cerca_de(la: float, lo: float) -> str:
+    """Provincia del punto (por los polígonos del mapa); si cae en el mar, la ciudad grande más cercana."""
+    from . import mapa
+    for p in mapa.provincias():
+        if any(_dentro(lo, la, a) for a in p["anillos"]):
+            n = p["nombre"].split("/")[-1]
+            return {"Illes Balears": "Baleares", "Santa Cruz De Tenerife": "Santa Cruz de Tenerife"}.get(n, n)
     from .poblaciones import GRANDES
     n, _, _ = min(GRANDES, key=lambda c: math.hypot((c[1] - la), (c[2] - lo) * math.cos(math.radians(la))))
     return n
@@ -133,6 +202,10 @@ def observados(dia: date) -> dict:
         return {}
 
 
+def _g(v) -> str:
+    return "grado" if abs(v) == 1 else "grados"
+
+
 def _num(v) -> str:
     return str(round(v, 1)).replace(".", ",").replace(",0", "")
 
@@ -147,17 +220,17 @@ def texto(prev: list[dict], dia: date, hoy: date, cuando: str = "mañana") -> tu
     f = p.get("frio")
     if f and f["tmin"] <= capf["tmin"] - 1:
         partes.append(f"lo más frío de {cuando} no será una capital: {f['nombre']} ({f['provincia']}) bajará a "
-                      f"{f['tmin']} grados; la capital más fría, {capf['nombre']}, {capf['tmin']}")
+                      f"{f['tmin']} {_g(f['tmin'])}; la capital más fría, {capf['nombre']}, {capf['tmin']}")
         extremos["frio"] = {**capf, "nombre": f["nombre"], "tmin": f["tmin"]}
     c = p.get("calor")
     if c and c["tmax"] >= capc["tmax"] + 1:
-        partes.append(f"lo más caluroso, {c['nombre']} ({c['provincia']}) con {c['tmax']} grados; la capital más "
+        partes.append(f"lo más caluroso, {c['nombre']} ({c['provincia']}) con {c['tmax']} {_g(c['tmax'])}; la capital más "
                       f"calurosa, {capc['nombre']}, {capc['tmax']}")
         extremos["calor"] = {**capc, "nombre": c["nombre"], "tmax": c["tmax"]}
     obs = observados(hoy)
     o = obs.get("min")
     if o and o["valor"] <= capf["tmin"] - 1 and o["valor"] <= 3:
-        partes.append(f"dato medido: esta madrugada la estación de AEMET de {o['sitio']} (zona de {o['zona']}) "
+        partes.append(f"dato medido: esta madrugada la estación de AEMET de {o['sitio']} ({o['zona']}) "
                       f"marcó {_num(o['valor'])} grados")
     if not partes:
         return "", extremos
