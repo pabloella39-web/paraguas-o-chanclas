@@ -1,0 +1,35 @@
+2026-11-06 21:42:56,010 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-06 21:43:44,658 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-06 21:44:33,084 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-06 21:44:56,601 INFO AEMET pide esperar (límite de peticiones); reintento en 40 s
+2026-11-06 21:45:53,422 INFO Fuentes usadas: AEMET, Open-Meteo
+2026-11-06 21:46:29,781 INFO AEMET pide esperar (límite de peticiones); reintento en 40 s
+2026-11-06 21:47:41,310 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-06 21:48:29,703 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-06 21:48:53,207 INFO AEMET pide esperar (límite de peticiones); reintento en 40 s
+2026-11-06 21:49:46,290 INFO Fuentes usadas: AEMET, Open-Meteo
+2026-11-06 21:49:54,087 INFO Usando el guion escrito con el plan de Claude: guiones/finde-2026-11-06.json
+2026-11-06 21:49:54,389 INFO Usando el guion escrito con el plan de Claude: guiones/finde-2026-11-06.json
+2026-11-06 21:49:54,714 INFO Usando el guion escrito con el plan de Claude: guiones/finde-2026-11-06.json
+2026-11-06 21:50:18,172 INFO ElevenLabs (Pc51tQpUBlUP7gybDfkb, eleven_v4): 1528 caracteres, 101.2 s
+2026-11-06 21:50:18,174 WARNING Locución larga (101.2 s): el vídeo se alarga a 103.4 s
+2026-11-06 21:50:20,135 INFO Música: otono_2026-10-26.mp3
+2026-11-06 21:50:33,351 INFO Renderizando 102.63 s…
+2026-11-06 21:50:33,813 INFO Render 0/3079
+2026-11-06 21:50:44,278 INFO Render 300/3079
+2026-11-06 21:51:02,576 INFO Render 600/3079
+2026-11-06 21:51:11,675 INFO Render 900/3079
+2026-11-06 21:51:20,486 INFO Render 1200/3079
+2026-11-06 21:51:29,271 INFO Render 1500/3079
+2026-11-06 21:51:43,430 INFO Render 1800/3079
+2026-11-06 21:51:56,859 INFO Render 2100/3079
+2026-11-06 21:52:05,598 INFO Render 2400/3079
+2026-11-06 21:52:14,343 INFO Render 2700/3079
+2026-11-06 21:52:22,972 INFO Render 3000/3079
+2026-11-06 21:52:25,405 INFO Especial listo: /home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_especial/finde_2026-11-07.mp4 (102.63 s, voz elevenlabs (eleven_v4), guion claude)
+Created autostash: b2ca8be
+Applied autostash.
+2026-11-06 21:52:28,918 INFO Texto del post publicado en la web (Texto del especial: Fin de semana)
+2026-11-06 21:52:36,476 INFO Upload-Post: subida iniciada (4a818bf8897f4410a825055d0d1e6702)
+2026-11-06 21:54:09,719 INFO Publicado en TikTok vía Upload-Post: {'status': 'completed', 'completed': 1, 'total': 1, 'results': [{'user_email': 'tiempotiktok39@gmail.com', 'profile_username': 'paraguasochanclas', 'platform': 'tiktok', 'media_type': 'video', 'upload_timestamp': {'$date': '2026-11-06T21:54:04.108Z'}, 'success': True, 'platform_post_id': '7705179812
+2026-11-06 21:54:12,014 INFO Subido a YouTube Shorts (Paraguas o Chanclas): https://youtube.com/shorts/Rxf7u8xXxVo

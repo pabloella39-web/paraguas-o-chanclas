@@ -1,0 +1,19 @@
+{
+ "tipo": "finde",
+ "fecha": "2026-11-06",
+ "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_especial/finde_2026-11-07.mp4",
+ "caption": "Sábado de terraza y domingo de paraguas en Sevilla… ¿qué plan tienes? ☀️☔\n\nEl tiempo del fin de semana en España, 7-8 de noviembre 🇪🇸\n☀️ Mejor plan: Las Palmas (28° / 29°)\n🔥 Máxima del finde: 29° en Las Palmas\n🌧️ Lluvia en A Coruña, Badajoz, Ceuta\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+ "titular": "EL SUR SE MOJA EL DOMINGO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 102.63,
+ "guion": {
+  "intro": "Sábado de terraza y domingo con sorpresa. Sevilla y Badajoz sacan el paraguas el domingo. Te guardo para el final dónde toca terraza y dónde toca sofá.",
+  "avisos_sabado": "Mañana sábado, aviso naranja por lluvia en La Palma, hasta 30 litros en una hora, y amarillo allí por viento, tormentas y oleaje.",
+  "sabado": "Mañana sábado, en el norte, chubascos en Galicia, con un 77 por ciento en Santiago, mientras Bilbao llega a 20 grados. Gente de Pamplona, madrugada de 3 grados, abrigo para salir. En el interior, cielo gris y lloviznas en Ávila y Salamanca, con Madrid a 17 grados y Burgos a 13. El Mediterráneo, seco, con Barcelona a 19 grados y Murcia a 24. Y el sur, de terraza total, con Sevilla a 26 y Badajoz a 25.",
+  "avisos_domingo": "El domingo, en La Palma el viento también sube a naranja, con rachas de 90 kilómetros por hora, y sigue el naranja por lluvia. Amarillo en el norte de Tenerife, La Gomera y El Hierro.",
+  "domingo": "El domingo cambia el sur. Gente de Sevilla, lluvia probable, un 89 por ciento, y en Badajoz casi 5 litros. Madrid baja a 16 grados y Zaragoza se queda con sol.",
+  "general": "Lo prometido. Terraza el sábado en Sevilla, con 26 grados, y en Las Palmas, la capital más calurosa, con 28, aunque La Aldea de San Nicolás llega a 29. Y sofá y manta en Pamplona, con 3 grados al amanecer, o en Puigcerdà, en Girona, con 1.",
+  "cierre": "¿Sábado de calle o domingo de manta? Una palabra en comentarios. Y sigue a Paraguas o Chanclas para tener el tiempo de cada día."
+ }
+}
