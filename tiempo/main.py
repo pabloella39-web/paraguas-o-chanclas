@@ -85,9 +85,10 @@ def _alargar(nuevo_max: float):
     import sys
     global DURACION_MAX
     DURACION_MAX = nuevo_max
-    esp = sys.modules.get("tiempo.especiales")
-    if esp is not None:
-        esp.DURACION_MAX = nuevo_max
+    for nombre in ("tiempo.especiales", "__main__"):   # «python -m tiempo.especiales» lo carga como __main__
+        m = sys.modules.get(nombre)
+        if m is not None and hasattr(m, "DURACION_MAX"):
+            m.DURACION_MAX = nuevo_max
 
 
 AVISO_VOZ = RAIZ / "aviso_voz.txt"
