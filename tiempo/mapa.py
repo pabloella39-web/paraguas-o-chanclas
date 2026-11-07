@@ -436,5 +436,43 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         else:
             caja = [px - im.width / 2, py - im.height - 26, im.width, im.height]
         items.append((im, caja, (px, py), c))
+    if estilo == "mini":
+        # Las pastillas pequeñas no llevan nombre: si se apartan de su ciudad parecen de otra (Sevilla «encima de
+        # Huelva»). Cada una va sobre su ciudad o, como mucho, un poco desplazada; si no cabe, no se pone.
+        ax0, ay0, ax1, ay1 = area
+        puestas, out = [], []
+        try:   # si no caben todas, primero las ciudades más grandes y las más extremas del día
+            from .poblaciones import GRANDES
+            rango = {n: i for i, (n, *_) in enumerate(GRANDES)}
+            refs = [pr.ciudad({"lat": la, "lon": lo}) + (n,) for n, la, lo in GRANDES]
+        except Exception:  # noqa: BLE001
+            rango, refs = {}, []
+        refs += [(p_[0], p_[1], c["nombre"]) for _, _, p_, c in items]
+        extremos = {max(items, key=lambda it: it[3]["tmax"])[3]["nombre"] if items else None,
+                    min(items, key=lambda it: it[3].get("tmin", 99))[3]["nombre"] if items else None}
+        items.sort(key=lambda it: (it[3]["nombre"] not in extremos, rango.get(it[3]["nombre"], 999)))
+        offs = sorted({(dx, dy) for dx in range(-80, 81, 10) for dy in range(-60, 61, 10)},
+                      key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
+        for im, caja, (px, py), c in items:
+            w, h = caja[2], caja[3]
+            for dx, dy in offs:
+                x0, y0 = px - w / 2 + dx, py - h / 2 + dy
+                # la columna de botones de TikTok empieza más abajo: arriba se puede llegar casi al borde
+                lim_x = 1080 - 15 if y0 + h < 600 else ax1
+                if not (ax0 <= x0 and x0 + w <= lim_x and ay0 <= y0 and y0 + h <= ay1):
+                    continue
+                if any(x0 < b[0] + b[2] + 6 and x0 + w + 6 > b[0] and y0 < b[1] + b[3] + 6 and y0 + h + 6 > b[1]
+                       for b in puestas):
+                    continue
+                cx, cy = x0 + w / 2, y0 + h / 2
+                propia = math.hypot(cx - px, cy - py)
+                # que la pastilla quede más cerca de su ciudad que de cualquier otra ciudad conocida
+                if any(n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
+                       for rx, ry, n in refs):   # (las ciudades pegadas a la suya, como L'Hospitalet, no cuentan)
+                    continue
+                puestas.append((x0, y0, w, h))
+                out.append((im, (int(x0), int(y0)), (px, py), c))
+                break
+        return out
     cajas = colocar([it[1] for it in items], area)
     return [(im, (int(cj[0]), int(cj[1])), p, c) for (im, _, p, c), cj in zip(items, cajas)]
