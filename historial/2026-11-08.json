@@ -1,0 +1,83 @@
+{
+ "fecha": "2026-11-08",
+ "duracion": 74.3,
+ "caption": "Paraguas en Cádiz y manga corta en Canarias… ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, domingo 8 de noviembre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife y A Coruña\n🔥 Máxima: 28° en Las Palmas\n🥶 Mínima: 5° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Tenerife",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "LA PALMA, AVISO NARANJA",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Norte de Cáceres y La Palma: aviso naranja. Novedad del viernes: en Sevilla, la lluvia llega de noche. Lo más extremo, al final.",
+  "islas": "Mira el satélite: así entra el frente. La Palma, aviso naranja por 30 litros en una hora y rachas de 90. Las Palmas, chubascos y 28 grados.",
+  "norte": "A Coruña, lluvia floja y rachas de 52. Si eres de Oviedo o Gijón, puede caer algo por la tarde. Bilbao, 21 grados.",
+  "sur": "En el sur se moja Cádiz, hasta 5 litros, y hay aviso amarillo por tormentas en Huelva. Gente de Sevilla, 27 grados.",
+  "interior": "Sur de Ávila, también naranja por lluvia. Madrid baja a 16 grados, como te adelanté el viernes, y Zaragoza, seca.",
+  "mediterraneo": "El Mediterráneo se libra: Valencia, 21 grados y ni una gota, y Barcelona con 20.",
+  "general": "Lo prometido: lo más caluroso, Las Palmas y Santa Cruz de Tenerife, con 28 grados. Las capitales más frías, Pamplona y Salamanca, con 5, pero Benasque, en Huesca, baja a 0.",
+  "cierre": "Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas. Sigue a Paraguas o Chanclas. Mañana, paraguas en Cádiz y chanclas en Valencia."
+ },
+ "primer_comentario": "Gente de los pueblos: ¡vuestro momento! Escribid vuestro pueblo y os digo el tiempo de mañana 🙌",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-07T19:28:02.387Z"
+     },
+     "success": true,
+     "platform_post_id": "7705513268688751904",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7705513268688751904",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 21697486,
+     "post_title": "Paraguas en Cádiz y manga corta en Canarias… ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, domingo 8 de noviembre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife y A Coruña\n🔥 Máxima: 28° en Las Palmas\n🥶 Mínima: 5° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Tenerife",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 74.3,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7705512979407652897",
+     "first_comment_posted": true,
+     "request_id": "eff442a7cc664b558a49d3fa18d3ac84",
+     "request_id_logs": "eff442a7cc664b558a49d3fa18d3ac84",
+     "job_id": "16f71842127d410ca4e5fb18cba7f273",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-07T19:28:02.387Z"
+   },
+   "request_id": "eff442a7cc664b558a49d3fa18d3ac84"
+  }
+ },
+ "youtube": {
+  "id": "MaUGu4GW2hQ",
+  "url": "https://youtube.com/shorts/MaUGu4GW2hQ",
+  "canal": "Paraguas o Chanclas"
+ }
+}
