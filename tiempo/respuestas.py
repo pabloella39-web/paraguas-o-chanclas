@@ -1028,7 +1028,6 @@ def _posts_instagram(max_horas: float = HORAS_VIDEO) -> list[str]:
     perfil = uploadpost.perfil_instagram()
     j = _get("uploadposts/media", platform="instagram", user=perfil, limit=8)
     items = j.get("media") or j.get("data") or j.get("items") or j
-    log.info("Instagram media: %s", json.dumps(items, ensure_ascii=False)[:400])
     out = []
     for it in items if isinstance(items, list) else []:
         if not isinstance(it, dict) or not it.get("id"):
