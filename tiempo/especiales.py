@@ -459,6 +459,8 @@ def _preparar_avisos(dias: dict):
         AVISOS_DIA.update(avisos_por_dia(dias))
     except Exception as e:  # noqa: BLE001
         log.warning("Avisos por día: %s", e)
+    for k, pd in PREVS_DIA.items():   # icono de tormenta donde hay aviso por tormentas ese día
+        marcar_tormentas(pd, AVISOS_DIA.get(k))
     from .fuentes import nieve, texto_nieve
     olas, nieves = {}, {}
     for k, d in dias.items():
@@ -873,6 +875,23 @@ def _zona_zoom(grupos):
     clon, clat = (lo0 + lo1) / 2, (la0 + la1) / 2
     dlon, dlat = max(lo1 - lo0 + 0.5, 1.8), max(la1 - la0 + 0.4, 1.4)
     return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
+
+
+def marcar_tormentas(prev, grupos):
+    """Las ciudades dentro (o a un paso) de una zona con aviso por tormentas llevan el icono de tormenta, aunque la
+    previsión diga solo lluvia (en Huelva había aviso por tormentas y salía la animación de lluvia)."""
+    pols = [pol for gr in grupos or [] if "tormenta" in gr["fenomeno"].lower() for pol in gr.get("poligonos") or []]
+    if not pols:
+        return
+    for c in prev or []:
+        la, lo = c.get("lat"), c.get("lon")
+        if la is None or lo is None:
+            continue
+        if any(_dentro(lo + dx, la + dy, pol) for pol in pols
+               for dx, dy in ((0, 0), (0.12, 0), (-0.12, 0), (0, 0.1), (0, -0.1))):
+            if c.get("icono") != "tormenta":
+                log.info("%s: icono de tormenta (aviso por tormentas)", c.get("nombre"))
+            c["icono"] = "tormenta"
 
 
 def _dentro(x, y, pol) -> bool:

@@ -227,6 +227,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     # Gancho de los primeros segundos: fenómeno del día con datos reales (avisos de AEMET, rachas, lluvia...)
     from . import gancho as gancho_mod
     avisos = [] if demo else gancho_mod.avisos_de_hoy(hoy)
+    from .especiales import marcar_tormentas
+    marcar_tormentas(prev, avisos)   # aviso por tormentas → icono de tormenta (no de lluvia) en esas ciudades
     fen = gancho_mod.fenomeno_del_dia(prev, avisos)
     g.GANCHO, g.GANCHO_TEXTO = fen, gancho_mod.para_guion(fen)
     if not demo:   # avisos de todos los niveles (coloreados en el mapa) y oleaje fuerte: también al guion
