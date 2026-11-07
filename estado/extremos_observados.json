@@ -26,5 +26,19 @@
    "zona": "San Cristóbal de La Laguna",
    "hora": "2026-11-06T14:00:00+0000"
   }
+ },
+ "2026-11-07": {
+  "min": {
+   "valor": -4.0,
+   "sitio": "San Pedro Manrique",
+   "zona": "Soria",
+   "hora": "2026-11-07T04:00:00+0000"
+  },
+  "max": {
+   "valor": 23.8,
+   "sitio": "Anaga-col. Rep. Argentina",
+   "zona": "Santa Cruz de Tenerife",
+   "hora": "2026-11-06T23:00:00+0000"
+  }
  }
 }
