@@ -618,7 +618,12 @@
   "7705099411852493601",
   "7705104926448599830",
   "7705327729353065238",
-  "7705213068804064022"
+  "7705213068804064022",
+  "7705398903059923745",
+  "7705364793092571906",
+  "7705352180643218198",
+  "7705349435392639766",
+  "7705349204508361494"
  ],
  "hechas": [
   {
@@ -1015,6 +1020,28 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Zamora: 13°/-3°, 33 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-07",
+   "clave": "lleida|2026-11-07",
+   "lugar": "Lleida",
+   "usuarios": [
+    "maripalomequebau6"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Lleida: 16°/5°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-07",
+   "clave": "salamanca|2026-11-08",
+   "lugar": "Salamanca",
+   "usuarios": [
+    "mitxelcore"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Salamanca: 17°/6°, 35 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
