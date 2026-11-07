@@ -858,6 +858,111 @@ def _vista_zonas(grupos):
     return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
 
 
+def _zona_zoom(grupos):
+    """Encuadre para hacer zoom sobre la zona con aviso (también en Canarias, sobre su recuadro)."""
+    from .mapa import lonlat_mapa
+    pts = [p for gr in grupos for pol in gr["poligonos"] for p in pol]
+    if not pts:
+        return VISTA_GENERAL
+    can = [la < 30 for _, la in pts]
+    if any(can) and not all(can):
+        return VISTA_GENERAL   # península y Canarias a la vez: el mapa entero
+    pts = [lonlat_mapa(lo, la, la < 30) for lo, la in pts]
+    lo0, lo1 = min(p[0] for p in pts), max(p[0] for p in pts)
+    la0, la1 = min(p[1] for p in pts), max(p[1] for p in pts)
+    clon, clat = (lo0 + lo1) / 2, (la0 + la1) / 2
+    dlon, dlat = max(lo1 - lo0 + 0.8, 2.4), max(la1 - la0 + 0.7, 1.9)
+    return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
+
+
+def _dentro(x, y, pol) -> bool:
+    dentro = False
+    for (x1, y1), (x2, y2) in zip(pol, pol[1:] + pol[:1]):
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            dentro = not dentro
+    return dentro
+
+
+def nucleos_afectados(grupos, n: int = 7) -> list[dict]:
+    """Los núcleos de población más grandes dentro de las zonas con aviso (GeoNames)."""
+    try:
+        nucleos = json.loads((RAIZ / "assets" / "nucleos.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    pols = [pol for gr in grupos for pol in gr["poligonos"]]
+    dentro = [(nombre, la, lo, pob, [i for i, pol in enumerate(pols) if _dentro(lo, la, pol)])
+              for nombre, la, lo, pob in nucleos]   # ya vienen de más a menos habitantes
+    dentro = [x for x in dentro if x[4]]
+    out = []
+
+    def poner(nombre, la, lo, pob):
+        if any(o["nombre"] == nombre or math.hypot(la - o["lat"], (lo - o["lon"]) * math.cos(math.radians(la))) < 0.05
+               for o in out):
+            return   # «Realejo Alto» junto a «Los Realejos»: uno basta
+        out.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob})
+
+    # primero el más grande de cada zona (para que salga también San Sebastián de La Gomera), luego por tamaño
+    for i in range(len(pols)):
+        mayor = next((x for x in dentro if i in x[4]), None)
+        if mayor:
+            poner(*mayor[:4])
+    out.sort(key=lambda o: -o["poblacion"])
+    out = out[:n]
+    for x in dentro:
+        if len(out) >= n:
+            break
+        poner(*x[:4])
+    return out
+
+
+def _capa_nucleos(nucleos, color=(255, 255, 255)):
+    """Puntos y nombres de los núcleos afectados, apareciendo uno tras otro tras el zoom."""
+    from .video import TRANSICION
+    f = fuente("ExtraBold", 30)
+
+    def dibujar(capa, pr, dt):
+        d = ImageDraw.Draw(capa)
+        puestas = []
+        for k, c in enumerate(nucleos):
+            s = min(1.0, max(0.0, (dt - TRANSICION - 0.15 - k * 0.35) / 0.3))
+            if s <= 0:
+                continue
+            x, y = pr.ciudad(c)
+            y += MAPA_Y0
+            if not (20 < x < ANCHO - 20 and MAPA_Y0 + 20 < y < MAPA_Y0 + MAPA_H - 20):
+                continue
+            txt = c["nombre"]
+            w, h = f.getlength(txt) + 28, 46
+            for cx0, cy0 in ((x + 16, y - h / 2), (x - 16 - w, y - h / 2), (x - w / 2, y - h - 14),
+                             (x - w / 2, y + 14)):
+                caja = (cx0, cy0, cx0 + w, cy0 + h)
+                if caja[0] < 10 or caja[2] > ANCHO - 10:
+                    continue
+                if any(caja[0] < b[2] + 6 and caja[2] + 6 > b[0] and caja[1] < b[3] + 4 and caja[3] + 4 > b[1]
+                       for b in puestas):
+                    continue
+                break
+            else:
+                continue
+            puestas.append(caja)
+            a = int(255 * s)
+            pulso = 1 + 0.25 * math.sin(dt * 5 + k)
+            r = 9 * pulso
+            d.ellipse([x - r - 5, y - r - 5, x + r + 5, y + r + 5], outline=color + (int(a * 0.6),), width=3)
+            d.ellipse([x - 8, y - 8, x + 8, y + 8], fill=color + (a,), outline=(8, 20, 45, a), width=3)
+            d.rounded_rectangle(caja, radius=h / 2, fill=(8, 20, 45, int(225 * s)))
+            d.text(((caja[0] + caja[2]) / 2, (caja[1] + caja[3]) / 2), txt, font=f, fill=(255, 255, 255, a),
+                   anchor="mm")
+    return dibujar
+
+
+def _juntar_capas(*fs):
+    def dibujar(capa, pr, dt):
+        for f_ in fs:
+            f_(capa, pr, dt)
+    return dibujar
+
+
 def _capa_poligonos(grupos, con_lista=False, consejos=None):
     cache = {}
 
@@ -1449,7 +1554,8 @@ Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasa
 - intro: la PRIMERA FRASE (máx. 8 palabras) es el titular de última hora: {titular} + nivel + fenómeno ("Atención
   Valencia: aviso rojo por lluvias torrenciales.", "Aviso naranja en la Región de Murcia."). Si es una comunidad, NO
   abras con pueblos o ciudades pequeñas (Lorca, Mazarrón…): esos van en "zonas". Luego, en una frase, lo más grave que se espera.
-- zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras).
+- zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras). En pantalla se hace
+  zoom a la zona y se señalan los núcleos de "nucleos_senalados_en_el_mapa": nombra dos o tres de ellos.
 - consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
 - cierre: una sola frase: "Compártelo con quien viva allí." (puedes variarla un poco).
 Frases cortas y directas, de tú; números en cifras con "grados", "por ciento", "litros", "kilómetros por hora".
@@ -1573,6 +1679,8 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "grandes_ciudades_afectadas": gr.get("ciudades", [])[:8],
               "desde": _hora_txt(gr["inicio"]), "hasta": _hora_txt(gr["fin"]), "descripcion": gr["descripcion"],
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
+    if datos:
+        datos[0]["nucleos_senalados_en_el_mapa"] = [c["nombre"] for c in nucleos_afectados(grupos)]
     if not plantilla:
         try:
             gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_avisos(
@@ -1610,7 +1718,8 @@ def caption_aviso(grupos, gancho) -> str:
         icono = {"rojo": "🔴", "naranja": "🟠"}.get(gr["nivel"], "🟡")
         lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:4])}"
                       + (" y más" if len(sitios) > 4 else ""))
-    lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112."]
+    lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.",
+               "Mapa de núcleos: GeoNames (CC BY 4.0)."]
     tags = ["#aviso", "#AEMET", "#eltiempo", "#paraguasochanclas"]
     for gr in grupos[:1]:
         for c in (gr.get("ciudades") or [])[:1]:
@@ -1637,18 +1746,22 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     with duracion(*DURACION_AVISO):  # vídeo flash de 20-30 s
         guion, plan, total, trozos, motor = locutar(
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
-    zona = _vista_zonas(grupos)
+    # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
+    zona = _zona_zoom(grupos)
+    nucleos = nucleos_afectados(grupos)
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]
     kwargs = {
-        "vistas": {"intro": zona, "zonas": zona, "consejos": zona, "cierre": zona},
+        "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "consejos": zona, "cierre": zona},
         "sin_marcadores": ("intro", "zonas", "consejos", "cierre"),
         "pills": {"zonas": "ZONAS Y HORAS", "consejos": "QUÉ HACER", "cierre": "COMPÁRTELO",
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
-        "capas": {"intro": _capa_poligonos(grupos), "zonas": _capa_poligonos(grupos, con_lista=True),
-                  "consejos": _capa_poligonos(grupos, consejos=consejos), "cierre": _capa_poligonos(grupos)},
+        "capas": {"intro": _capa_poligonos(grupos),
+                  "zonas": _juntar_capas(_capa_poligonos(grupos, con_lista=True), _capa_nucleos(nucleos)),
+                  "consejos": _juntar_capas(_capa_poligonos(grupos, consejos=consejos), _capa_nucleos(nucleos[:4])),
+                  "cierre": _capa_poligonos(grupos)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],
                           "fenomeno": " y ".join(dict.fromkeys("oleaje" if "costeros" in x["fenomeno"] else x["fenomeno"]
