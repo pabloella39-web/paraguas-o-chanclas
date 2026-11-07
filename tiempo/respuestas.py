@@ -370,7 +370,7 @@ def dias_del_video(video: str | None) -> list[date]:
             meta = json.loads(f.read_text(encoding="utf-8"))
         except Exception:  # noqa: BLE001
             continue
-        if video in json.dumps(meta.get("tiktok") or {}):
+        if video in json.dumps(meta.get("tiktok") or {}) or video in json.dumps(meta.get("instagram") or {}):
             pub = date.fromisoformat(meta.get("fecha") or f.stem.split("-", 1)[1])
             return [pub + timedelta(days=k) for k in DIAS_ESPECIAL[tipo]]
     return []
@@ -1017,5 +1017,110 @@ def main():
             _guardar(estado)
 
 
-if __name__ == "__main__":
+# ================================================================ Instagram
+ESTADO_IG = RAIZ / "estado" / "respuestas_instagram.json"
+MAX_IG = int(os.environ.get("RESPUESTAS_IG_POR_HORA", "15"))
+
+
+def _posts_instagram(max_horas: float = HORAS_VIDEO) -> list[str]:
+    """Reels de Instagram publicados en las últimas horas (solo se contesta en los del día, como en TikTok)."""
+    perfil = uploadpost.perfil_instagram()
+    j = _get("uploadposts/media", platform="instagram", user=perfil, limit=8)
+    items = j.get("media") or j.get("data") or j.get("items") or j
+    out = []
+    for it in items if isinstance(items, list) else []:
+        if not isinstance(it, dict) or not it.get("id"):
+            continue
+        ts = it.get("timestamp")
+        if isinstance(ts, str):
+            try:
+                ts = datetime.fromisoformat(ts.replace("Z", "+00:00").replace("+0000", "+00:00")).timestamp()
+            except ValueError:
+                ts = None
+        if isinstance(ts, (int, float)) and time.time() - ts > max_horas * 3600:
+            continue
+        out.append(str(it["id"]))
+    return out
+
+
+def comentarios_instagram(vistos: set) -> list[dict]:
+    perfil = uploadpost.perfil_instagram()
+    out = []
+    for pid in _posts_instagram():
+        try:
+            j = _get("uploadposts/comments", platform="instagram", user=perfil, post_id=pid, limit=50)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Comentarios de Instagram %s: %s", pid, e)
+            continue
+        for c in j.get("comments", []):
+            cid = str(c.get("id") or "")
+            u = (c.get("user") or {}).get("username") or c.get("username") or ""
+            texto = (c.get("text") or "").strip()
+            if not cid or cid in vistos or not texto or u.lower().lstrip("@") == MIA:
+                continue
+            out.append({"id": cid, "video": pid, "usuario": u, "texto": texto[:300]})
+    return out
+
+
+def responder_instagram_texto(com: dict, mensaje: str):
+    for _ in range(3):
+        r = requests.post(f"{API}/uploadposts/comments/public-reply", headers=uploadpost._cabeceras(), json={
+            "platform": "instagram", "user": uploadpost.perfil_instagram(), "comment_id": com["id"],
+            "message": mensaje[:300]}, timeout=40)
+        if r.status_code != 429:
+            break
+        time.sleep(62)
+    if r.status_code >= 400:
+        raise RuntimeError(f"HTTP {r.status_code}: {r.text[:200]}")
+
+
+def responder_instagram(publicar: bool):
+    """Mismas reglas que en TikTok: a quien pide su pueblo, su previsión; insultos, provocaciones y sinsentidos no
+    se contestan. Solo en los Reels del día."""
+    try:
+        est = json.loads(ESTADO_IG.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        est = {"vistos": [], "escritas": []}
+    coms = comentarios_instagram(set(est["vistos"]))
+    if not coms:
+        return
+    hoy_ = ahora()
+    escritas = 0
+    for q in clasificar(coms):
+        if q.get("tipo") != "ciudad" or not q.get("lugar"):
+            est["vistos"].append(q["id"])
+            continue
+        if escritas >= MAX_IG:
+            break   # sin marcar como visto: queda para la próxima hora
+        try:
+            msg = texto_ciudad(q, hoy_)
+            if msg and publicar:
+                responder_instagram_texto(q, msg)
+                est["escritas"].append(q["id"])
+                log.info("Instagram: respuesta a @%s («%s»): %s", q["usuario"], q["texto"][:40], msg)
+            escritas += 1
+        except Exception as e:  # noqa: BLE001
+            log.warning("Instagram: respuesta a %s falló: %s", q["id"], e)
+            continue
+        est["vistos"].append(q["id"])
+    est["vistos"] = est["vistos"][-3000:]
+    ESTADO_IG.parent.mkdir(exist_ok=True)
+    ESTADO_IG.write_text(json.dumps(est, ensure_ascii=False), encoding="utf-8")
+
+
+def main_todo():
     main()
+    if os.environ.get("SIN_INSTAGRAM") or any(os.environ.get(k) for k in (
+            "REPASAR_BANDEJA", "CORREGIR_LUGAR", "RESPONDER_LUGAR", "RESPUESTA_MANUAL")) or SOLO_VIDEO:
+        return
+    import sys
+    if "--demo" in sys.argv or "--comprobar" in sys.argv or not uploadpost.disponible():
+        return
+    try:
+        responder_instagram("--publicar" in sys.argv)
+    except Exception as e:  # noqa: BLE001
+        log.error("Respuestas de Instagram: %s", e)
+
+
+if __name__ == "__main__":
+    main_todo()

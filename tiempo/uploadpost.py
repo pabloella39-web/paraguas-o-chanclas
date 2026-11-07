@@ -121,9 +121,30 @@ def _portada_jpg(video: Path) -> Path | None:
         return None
 
 
+GENERICOS_IG = ["#eltiempo", "#previsiondeltiempo", "#tiempoespaña", "#meteorologia"]
+GENERICOS_TK = {"#eltiempo", "#tiempomañana", "#paraguasochanclas", "#lluvia", "#aviso", "#aemet", "#fyp",
+                "#parati", "#tiempo", "#finde", "#findesemana", "#frio", "#calor"}
+
+
+def caption_instagram(caption: str) -> str:
+    """El texto de TikTok adaptado a Instagram: mismo gancho y resumen (Instagram busca por esas palabras), una
+    línea con palabras de búsqueda y 5 hashtags en vez de la lista de TikTok."""
+    import re
+    lineas = caption.rstrip().splitlines()
+    tags = []
+    while lineas and (lineas[-1].strip().startswith("#") or not lineas[-1].strip()):
+        tags = re.findall(r"#\w+", lineas.pop()) + tags
+    locales = [t for t in tags if t.lower() not in GENERICOS_TK][:1]
+    aviso = any(t.lower() in ("#aviso", "#aemet") for t in tags)
+    nuevos = (["#avisoaemet"] if aviso else []) + GENERICOS_IG[:3] + locales + GENERICOS_IG[3:]
+    cuerpo = "\n".join(lineas).rstrip()
+    clave = "Previsión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día"
+    return f"{cuerpo}\n\n{clave}\n\n{' '.join(dict.fromkeys(nuevos[:5]))}"[:2200]
+
+
 def publicar_instagram(video: Path, caption: str, espera_max: int = 900) -> dict:
     """Publica el vídeo como Reel (también en el feed) en el Instagram del canal."""
-    datos = {"user": perfil_instagram(), "platform[]": "instagram", "title": caption[:2200],
+    datos = {"user": perfil_instagram(), "platform[]": "instagram", "title": caption_instagram(caption),
              "media_type": "REELS", "share_to_feed": "true", "async_upload": "true"}
     portada = _portada_jpg(video)
     with open(video, "rb") as f:
