@@ -1,30 +1,24 @@
-"""Prueba real (GitHub Actions): avisos, oleaje y nieve de los próximos días y un fotograma del mapa con todo."""
-import sys, json, logging
-from datetime import date, timedelta
+"""Genera assets/nucleos.json: núcleos de población de España (GeoNames, CC BY 4.0) con más de 800 habitantes."""
+import io
+import json
+import urllib.request
+import zipfile
 from pathlib import Path
-logging.basicConfig(level=logging.INFO)
-from PIL import Image
-from tiempo import mapa, especiales as e
-from tiempo.config import REGIONES, ANCHO, ALTO, VISTA_GENERAL
-from tiempo.video import MAPA_H, MAPA_Y0
-out = Path("prueba"); out.mkdir(exist_ok=True)
-hoy = date.today()
-dias = {"sábado": date(2026, 11, 7), "domingo": date(2026, 11, 8)}
-e._preparar_avisos(dias)
-print("TEXTO PROMPT:", e.AVISOS_TXT[0][:3000])
-print("AVISOS:", {k: [(g["nivel"], g["fenomeno"], len(g["poligonos"])) for g in v] for k, v in e.AVISOS_DIA.items()})
-print("MAR/NIEVE:", {k: (len(o), len(n)) for k, (o, n) in e.MAR_NIEVE.items()})
-fondos, encima = e._capas_dias(), e._capas_encima_dias()
-print("CLAVES", list(fondos), list(encima))
-for k in sorted(set(fondos) | set(encima)):
-    for nombre, vista, foco in (("espana", VISTA_GENERAL, None), ("norte", REGIONES["norte"]["vista"], "norte"),
-                                ("med", REGIONES["mediterraneo"]["vista"], "mediterraneo")):
-        base = Image.new("RGBA", (ANCHO, ALTO), (10, 20, 40, 255))
-        base.alpha_composite(mapa.dibujar_mapa(vista, ANCHO, MAPA_H, foco=foco).convert("RGBA"), (0, MAPA_Y0))
-        pr = mapa.Proyeccion(vista, ANCHO, MAPA_H)
-        capa = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
-        if k in fondos: fondos[k](capa, pr, 2.0)
-        if k in encima: encima[k](capa, pr, 2.0, [])
-        base.alpha_composite(capa)
-        base.crop((0, MAPA_Y0, ANCHO, MAPA_Y0 + MAPA_H)).convert("RGB").resize((540, 520)).save(out / f"{k}_{nombre}.png")
-print("OK")
+
+datos = urllib.request.urlopen("https://download.geonames.org/export/dump/ES.zip", timeout=120).read()
+z = zipfile.ZipFile(io.BytesIO(datos))
+out = []
+with z.open("ES.txt") as f:
+    for linea in io.TextIOWrapper(f, encoding="utf-8"):
+        c = linea.rstrip("\n").split("\t")
+        if c[6] != "P" or c[7] not in ("PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLC"):
+            continue
+        pob = int(c[14] or 0)
+        if pob < 800:
+            continue
+        out.append([c[1], round(float(c[4]), 4), round(float(c[5]), 4), pob])
+out.sort(key=lambda x: -x[3])
+Path("prueba").mkdir(exist_ok=True)
+Path("prueba/nucleos.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+print(len(out), out[:5])
+print([x for x in out if 27.9 < x[1] < 28.7 and -17.5 < x[2] < -16][:30])
