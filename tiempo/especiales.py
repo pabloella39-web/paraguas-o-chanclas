@@ -247,6 +247,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
             orden = _sin_bloques_vacios(orden, gg)
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
+                _completar_sitios(gg, grupos)
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del finde con Claude falló: %s", e)
@@ -1586,14 +1587,16 @@ def texto_avisos(por_dia: dict) -> str:
     partes = []
     for k, grupos in por_dia.items():
         for gr in sorted(grupos, key=lambda x: -NIVELES[x["nivel"]])[:4]:
-            zonas = ", ".join(z.split(" - ")[-1] for z in gr["zonas"][:3])
+            sit = sitios_aviso(gr)
+            zonas = ", ".join(sit if gr["nivel"] in ("rojo", "naranja") else sit[:3])
             dato = dato_aviso(gr)
             partes.append(f"{k}: aviso {gr['nivel']} por {nombre_fen(gr['fenomeno'])} en {zonas}"
                           + (f" ({dato.lower()})" if dato else ""))
     if not partes:
         return ""
     return ("\n\nAVISOS DE AEMET PREVISTOS (se ven coloreados en el mapa de su día): " + "; ".join(partes)
-            + ". Menciónalos en el bloque de su día: los naranjas y rojos, siempre; los amarillos, de pasada. Si hay "
+            + ". Menciónalos en el bloque de su día: los naranjas y rojos, siempre y nombrando los sitios (en Canarias, "
+              "las islas; en los ROJOS, TODOS los sitios, es imprescindible); los amarillos, de pasada. Si hay "
               "oleaje o temporal en el mar, di la altura de las olas.")
 
 
@@ -1609,8 +1612,10 @@ Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasa
 - intro: la PRIMERA FRASE (máx. 8 palabras) es el titular de última hora: {titular} + nivel + fenómeno ("Atención
   Valencia: aviso rojo por lluvias torrenciales.", "Aviso naranja en la Región de Murcia."). Si es una comunidad, NO
   abras con pueblos o ciudades pequeñas (Lorca, Mazarrón…): esos van en "zonas". Luego, en una frase, lo más grave que se espera.
-- zonas: dónde y cuándo, muy resumido (las zonas principales y desde qué hora; horas en palabras). En pantalla se hace
-  zoom a la zona y se señalan los núcleos de "nucleos_senalados_en_el_mapa": nombra dos o tres de ellos.
+- zonas: dónde y cuándo (desde qué hora; horas en palabras). Nombra TODOS los sitios de "sitios_afectados" (en
+  Canarias, todas las islas: si el aviso es de cuatro islas no puede salir solo Tenerife); si son muchos, agrúpalos
+  («todo el litoral de Valencia y el norte de Alicante»). Si el aviso es ROJO es OBLIGATORIO nombrar cada sitio, aunque el
+  bloque quede más largo. En pantalla se hace zoom a la zona y se señalan los núcleos de "nucleos_senalados_en_el_mapa".
 - consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
 - cierre: una sola frase: "Compártelo con quien viva allí." (puedes variarla un poco).
 Frases cortas y directas, de tú; números en cifras con "grados", "por ciento", "litros", "kilómetros por hora".
@@ -1730,6 +1735,41 @@ def _hora_txt(iso: str) -> str:
     return f"{g.DIAS[d.weekday()]} {d.day} a las {d:%H:%M}"
 
 
+def sitios_aviso(gr) -> list[str]:
+    """Los sitios que hay que nombrar: en Canarias, las islas; si no, las zonas de AEMET (todas en rojo, hasta 6 en
+    naranja), sin repetir."""
+    islas = islas_de(gr["zonas"])
+    if len(islas) >= 2:
+        return islas
+    zonas = list(dict.fromkeys(z.split(" - ")[-1] for z in gr["zonas"]))
+    return zonas[:12] if gr["nivel"] == "rojo" else zonas[:6]
+
+
+def _completar_sitios(gg: dict, grupos):
+    """Si el guion se dejó algún sitio (islas en Canarias, o cualquier zona en un aviso rojo), se añade una frase."""
+    texto = _norm_txt(" ".join(gg["segmentos"].values()))
+    faltan = []
+    for gr in grupos[:4]:
+        if gr["nivel"] != "rojo" and len(islas_de(gr["zonas"])) < 2:
+            continue
+        for sitio in sitios_aviso(gr):
+            # todas sus palabras con sentido («norte» y «valencia» en «Litoral norte de Valencia»)
+            claves = [w for w in _norm_txt(sitio).replace(",", " ").split()
+                      if (len(w) > 3 or w in ("sur", "este")) and w not in ("litoral", "zona", "area", "zonas")]
+            if claves and not all(w in texto for w in claves) and sitio not in faltan:
+                faltan.append(sitio)
+    if faltan:
+        lista = faltan[0] if len(faltan) == 1 else ", ".join(faltan[:-1]) + " y " + faltan[-1]
+        gg["segmentos"]["zonas"] = gg["segmentos"]["zonas"].rstrip() + f" También afecta a {lista}."
+        log.info("Aviso: se añaden al guion los sitios que faltaban: %s", lista)
+
+
+def _norm_txt(t: str) -> str:
+    import unicodedata
+    t = unicodedata.normalize("NFD", t.lower())
+    return "".join(c for c in t if unicodedata.category(c) != "Mn")
+
+
 def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool) -> dict:
     orden = ["intro", "zonas", "consejos", "cierre"]
     palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_AVISO.items()}
@@ -1737,6 +1777,10 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "grandes_ciudades_afectadas": gr.get("ciudades", [])[:8],
               "desde": _hora_txt(gr["inicio"]), "hasta": _hora_txt(gr["fin"]), "descripcion": gr["descripcion"],
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
+    for d_, gr in zip(datos, grupos[:4]):
+        d_["sitios_afectados"] = sitios_aviso(gr)
+    extra = max(0, sum(len(sitios_aviso(gr)) for gr in grupos[:4]) - 3)
+    palabras["zonas"] += 3 * extra   # con muchos sitios, el bloque de zonas puede alargarse
     if datos:
         datos[0]["nucleos_senalados_en_el_mapa"] = [c["nombre"] for c in nucleos_afectados(grupos)]
     if not plantilla:
@@ -1753,7 +1797,8 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     if not plantilla and not os.environ.get("PERMITIR_PLANTILLA"):
         raise RuntimeError("Sin guion escrito ni API: no se publica la plantilla básica")
     gr = grupos[0]
-    zonas = ", ".join(z.split(" - ")[-1] for z in gr["zonas"][:4])
+    sit = sitios_aviso(gr)
+    zonas = (", ".join(sit[:-1]) + " y " + sit[-1]) if len(sit) > 1 else (sit[0] if sit else "")
     from .gancho import nombre_fenomeno
     fen = nombre_fenomeno(gr["fenomeno"])
     seg = {
@@ -1772,10 +1817,11 @@ def caption_aviso(grupos, gancho) -> str:
     lineas = []
     for gr in grupos[:4]:
         from .gancho import nombre_fenomeno
-        sitios = gr.get("ciudades") or [z.split(" - ")[-1] for z in gr["zonas"]]
+        sitios = list(dict.fromkeys(sitios_aviso(gr) + [c for c in gr.get("ciudades") or [] if c not in ISLAS]))
         icono = {"rojo": "🔴", "naranja": "🟠"}.get(gr["nivel"], "🟡")
-        lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:4])}"
-                      + (" y más" if len(sitios) > 4 else ""))
+        n = 12 if gr["nivel"] == "rojo" else 6   # en rojo, todos los sitios
+        lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:n])}"
+                      + (" y más" if len(sitios) > n else ""))
     lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.",
                "Mapa de núcleos: GeoNames (CC BY 4.0)."]
     tags = ["#aviso", "#AEMET", "#eltiempo", "#paraguasochanclas"]
