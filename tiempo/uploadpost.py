@@ -103,6 +103,73 @@ def publicar_tiktok(video: Path, caption: str, canal: str = "tiempo", espera_max
     return {"via": "upload-post", "pendiente": True, "request_id": rid}
 
 
+def perfil_instagram() -> str:
+    """El Instagram del canal del tiempo quedó conectado en el perfil «default» de Upload-Post."""
+    return os.environ.get("UPLOADPOST_PERFIL_INSTAGRAM", "").strip() or "default"
+
+
+def _portada_jpg(video: Path) -> Path | None:
+    """El primer fotograma (la portada con la fecha) como JPEG, para la portada del Reel."""
+    import subprocess
+    out = video.with_suffix(".portada.jpg")
+    try:
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", "0", "-i", str(video), "-frames:v", "1",
+                        "-q:v", "3", str(out)], check=True, timeout=60)
+        return out if out.exists() and out.stat().st_size < 8_000_000 else None
+    except Exception as e:  # noqa: BLE001
+        log.warning("Sin portada para Instagram: %s", e)
+        return None
+
+
+def publicar_instagram(video: Path, caption: str, espera_max: int = 900) -> dict:
+    """Publica el vídeo como Reel (también en el feed) en el Instagram del canal."""
+    datos = {"user": perfil_instagram(), "platform[]": "instagram", "title": caption[:2200],
+             "media_type": "REELS", "share_to_feed": "true", "async_upload": "true"}
+    portada = _portada_jpg(video)
+    with open(video, "rb") as f:
+        files = {"video": (video.name, f, "video/mp4")}
+        if portada:
+            files["cover_image"] = (portada.name, open(portada, "rb"), "image/jpeg")
+        r = requests.post(f"{API}/upload", headers=_cabeceras(), data=datos, files=files, timeout=600)
+    if r.status_code >= 400:
+        raise RuntimeError(f"Upload-Post (Instagram) HTTP {r.status_code}: {r.text[:300]}")
+    j = r.json()
+    rid = j.get("request_id")
+    log.info("Instagram: subida iniciada (%s)", rid or str(j)[:200])
+    if not rid:
+        return {"via": "upload-post", "respuesta": j}
+    t0 = time.time()
+    estado = {}
+    while time.time() - t0 < espera_max:
+        time.sleep(15)
+        s_ = requests.get(f"{API}/uploadposts/status", headers=_cabeceras(), params={"request_id": rid}, timeout=30)
+        if s_.status_code >= 400:
+            continue
+        estado = s_.json()
+        st = str(estado.get("status") or estado.get("state") or "").lower()
+        if st in ("completed", "complete", "success", "finished", "done", "published"):
+            ig = (estado.get("results") or {}).get("instagram") if isinstance(estado.get("results"), dict) else None
+            if isinstance(ig, dict) and ig.get("success") is False:
+                raise RuntimeError(f"Instagram falló: {ig.get('error') or ig}")
+            log.info("Publicado en Instagram: %s", str(ig or estado)[:300])
+            return {"via": "upload-post", "respuesta": ig or estado}
+        if st in ("failed", "error", "cancelled"):
+            raise RuntimeError(f"Instagram rechazó la publicación: {str(estado)[:400]}")
+    log.warning("Instagram sin confirmación tras %d s: %s", espera_max, str(estado)[:300])
+    return {"via": "upload-post", "pendiente": True, "request_id": rid}
+
+
+def instagram_seguro(meta: dict):
+    """Publica en Instagram sin que un fallo afecte a TikTok ni a YouTube."""
+    if os.environ.get("SIN_INSTAGRAM") or not disponible():
+        return
+    try:
+        meta["instagram"] = publicar_instagram(Path(meta["video"]), meta["caption"])
+    except Exception as e:  # noqa: BLE001
+        log.error("Instagram falló: %s", e)
+        meta["instagram"] = {"error": str(e)[:300]}
+
+
 def _comprobar(j: dict) -> dict:
     resultados = j.get("results") or j.get("result") or {}
     tk = resultados.get("tiktok") if isinstance(resultados, dict) else None

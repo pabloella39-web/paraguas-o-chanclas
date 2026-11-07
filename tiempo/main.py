@@ -437,6 +437,7 @@ def main():
         log.info("Publicado en TikTok: %s", res)
     if a.publicar:
         publicar_youtube(meta, hoy)
+        uploadpost.instagram_seguro(meta)   # también como Reel en Instagram
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
             f.write(f"## Parte del {hoy.isoformat()} ({meta['duracion']} s)\n\n"

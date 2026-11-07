@@ -1,0 +1,38 @@
+name: Publicar en Instagram un vídeo ya hecho
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Ejecución cuyo vídeo (artefacto) se publica en Instagram"
+        required: true
+      artefacto:
+        description: "Nombre del artefacto (por defecto parte-<run_id>)"
+        default: ""
+permissions:
+  contents: read
+  actions: read
+jobs:
+  instagram:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt && sudo apt-get install -y -qq ffmpeg > /dev/null
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artefacto || format('parte-{0}', inputs.run_id) }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: salida
+      - env:
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+        run: |
+          ls -la salida
+          PYTHONPATH=. python - <<'PY'
+          import json, logging
+          from pathlib import Path
+          logging.basicConfig(level=logging.INFO)
+          from tiempo import uploadpost
+          meta = json.loads(Path("salida/meta.json").read_text(encoding="utf-8"))
+          video = next(Path("salida").glob("*.mp4"))
+          print(uploadpost.publicar_instagram(video, meta["caption"]))
+          PY

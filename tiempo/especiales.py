@@ -1847,6 +1847,7 @@ def _publicar(meta: dict, hoy: date):
         meta["tiktok"] = publicar_con_reintentos(Path(meta["video"]), meta["caption"], 0)
     meta["tipo_youtube"] = {"semana": "semana", "resto": "semana", "finde": "finde"}.get(meta.get("tipo"), "aviso")
     publicar_youtube(meta, hoy)
+    uploadpost.instagram_seguro(meta)   # también como Reel en Instagram
 
 
 def _guardar_texto(meta: dict, titulo: str):
