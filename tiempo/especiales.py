@@ -871,7 +871,7 @@ def _zona_zoom(grupos):
     lo0, lo1 = min(p[0] for p in pts), max(p[0] for p in pts)
     la0, la1 = min(p[1] for p in pts), max(p[1] for p in pts)
     clon, clat = (lo0 + lo1) / 2, (la0 + la1) / 2
-    dlon, dlat = max(lo1 - lo0 + 0.8, 2.4), max(la1 - la0 + 0.7, 1.9)
+    dlon, dlat = max(lo1 - lo0 + 0.5, 1.8), max(la1 - la0 + 0.4, 1.4)
     return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
 
 
@@ -918,11 +918,11 @@ def nucleos_afectados(grupos, n: int = 7) -> list[dict]:
 def _capa_nucleos(nucleos, color=(255, 255, 255)):
     """Puntos y nombres de los núcleos afectados, apareciendo uno tras otro tras el zoom."""
     from .video import TRANSICION
-    f = fuente("ExtraBold", 30)
+    f = fuente("ExtraBold", 27)
 
     def dibujar(capa, pr, dt):
         d = ImageDraw.Draw(capa)
-        puestas = []
+        puestas = []   # nombres y puntos ya puestos (por orden de importancia: el grande nunca se queda fuera)
         for k, c in enumerate(nucleos):
             s = min(1.0, max(0.0, (dt - TRANSICION - 0.15 - k * 0.35) / 0.3))
             if s <= 0:
@@ -931,10 +931,15 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
             y += MAPA_Y0
             if not (20 < x < ANCHO - 20 and MAPA_Y0 + 20 < y < MAPA_Y0 + MAPA_H - 20):
                 continue
+            punto = (x - 11, y - 11, x + 11, y + 11)
+            if any(punto[0] < b[2] and punto[2] > b[0] and punto[1] < b[3] and punto[3] > b[1] for b in puestas):
+                continue   # su punto quedaría debajo del nombre o el punto de otro más importante
             txt = c["nombre"]
-            w, h = f.getlength(txt) + 28, 46
-            for cx0, cy0 in ((x + 16, y - h / 2), (x - 16 - w, y - h / 2), (x - w / 2, y - h - 14),
-                             (x - w / 2, y + 14)):
+            w, h = f.getlength(txt) + 24, 40
+            cands = [(x + 16, y - h / 2), (x - 16 - w, y - h / 2), (x - w / 2, y - h - 14), (x - w / 2, y + 14)]
+            if x < ANCHO / 2:   # hacia fuera de la zona: a la izquierda los de la izquierda (si no, arriba o abajo)
+                cands = [cands[1], cands[2], cands[3], cands[0]]
+            for cx0, cy0 in cands:
                 caja = (cx0, cy0, cx0 + w, cy0 + h)
                 if caja[0] < 10 or caja[2] > ANCHO - 10:
                     continue
@@ -944,7 +949,7 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
                 break
             else:
                 continue
-            puestas.append(caja)
+            puestas += [caja, punto]
             a = int(255 * s)
             pulso = 1 + 0.25 * math.sin(dt * 5 + k)
             r = 9 * pulso
