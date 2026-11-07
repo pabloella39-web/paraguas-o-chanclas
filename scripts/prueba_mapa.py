@@ -1,24 +1,38 @@
-"""Genera assets/nucleos.json: núcleos de población de España (GeoNames, CC BY 4.0) con más de 800 habitantes."""
-import io
+"""Descarga la foto de perfil actual de TikTok (@paraguasochanclas)."""
 import json
+import os
+import re
 import urllib.request
-import zipfile
 from pathlib import Path
 
-datos = urllib.request.urlopen("https://download.geonames.org/export/dump/ES.zip", timeout=120).read()
-z = zipfile.ZipFile(io.BytesIO(datos))
-out = []
-with z.open("ES.txt") as f:
-    for linea in io.TextIOWrapper(f, encoding="utf-8"):
-        c = linea.rstrip("\n").split("\t")
-        if c[6] != "P" or c[7] not in ("PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLC"):
-            continue
-        pob = int(c[14] or 0)
-        if pob < 800:
-            continue
-        out.append([c[1], round(float(c[4]), 4), round(float(c[5]), 4), pob])
-out.sort(key=lambda x: -x[3])
 Path("prueba").mkdir(exist_ok=True)
-Path("prueba/nucleos.json").write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-print(len(out), out[:5])
-print([x for x in out if 27.9 < x[1] < 28.7 and -17.5 < x[2] < -16][:30])
+urls = []
+try:   # 1) Upload-Post: perfiles con sus cuentas conectadas
+    from tiempo import uploadpost
+    import requests
+    r = requests.get("https://api.upload-post.com/api/uploadposts/users", headers=uploadpost._cabeceras(), timeout=40)
+    t = r.text
+    print("upload-post", r.status_code, t[:300])
+    urls += re.findall(r'https://[^"\s]+(?:tiktokcdn|ibyteimg|muscdn)[^"\s]*', t)
+except Exception as e:  # noqa: BLE001
+    print("upload-post", e)
+try:   # 2) la página pública del perfil
+    req = urllib.request.Request("https://www.tiktok.com/@paraguasochanclas",
+                                 headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                          "(KHTML, like Gecko) Chrome/120 Safari/537.36", "Accept-Language": "es-ES"})
+    html = urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "ignore")
+    for k in ("avatarLarger", "avatarMedium", "avatarThumb"):
+        m = re.search(rf'"{k}":"([^"]+)"', html)
+        if m:
+            urls.append(m.group(1).encode().decode("unicode_escape"))
+    print("pagina", len(html))
+except Exception as e:  # noqa: BLE001
+    print("pagina", e)
+print("URLS", urls[:6])
+for i, u in enumerate(urls[:4]):
+    try:
+        req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Referer": "https://www.tiktok.com/"})
+        Path(f"prueba/avatar_{i}.img").write_bytes(urllib.request.urlopen(req, timeout=40).read())
+        print("ok", i)
+    except Exception as e:  # noqa: BLE001
+        print("fallo", i, e)
