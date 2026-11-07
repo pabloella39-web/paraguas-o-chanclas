@@ -1,0 +1,37 @@
+name: Comprobar que Instagram y TikTok siguen conectados
+
+# Dos veces al día, con tiempo de sobra antes del parte de las 20:30: si alguna red se ha desconectado
+# (sesión caducada, permisos retirados...) esta ejecución falla y llega el correo de GitHub para reconectarla.
+on:
+  schedule:
+    - cron: "17 10 * * *"   # 11:17 / 12:17 (hora de Madrid, invierno / verano)
+    - cron: "47 15 * * *"   # 16:47 / 17:47
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q requests
+      - env:
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import sys
+          from tiempo import uploadpost
+          redes = uploadpost.redes_conectadas()
+          print(redes)
+          mal = []
+          if not (redes.get(uploadpost.perfil_instagram()) or {}).get("instagram"):
+              mal.append(f"Instagram no está conectado en el perfil «{uploadpost.perfil_instagram()}»")
+          if not (redes.get(uploadpost.perfil("tiempo")) or {}).get("tiktok"):
+              mal.append(f"TikTok no está conectado en el perfil «{uploadpost.perfil('tiempo')}»")
+          for m in mal:
+              print(f"::error::{m}: reconéctalo en app.upload-post.com/manage-users antes de las 20:30")
+          sys.exit(1 if mal else 0)
+          PY

@@ -161,15 +161,58 @@ def publicar_instagram(video: Path, caption: str, espera_max: int = 900) -> dict
     return {"via": "upload-post", "pendiente": True, "request_id": rid}
 
 
-def instagram_seguro(meta: dict):
-    """Publica en Instagram sin que un fallo afecte a TikTok ni a YouTube."""
+def redes_conectadas() -> dict:
+    """{perfil: {red: usuario}} según Upload-Post."""
+    r = requests.get(f"{API}/uploadposts/users", headers=_cabeceras(), timeout=40)
+    r.raise_for_status()
+    return {p["username"]: {k: (v.get("handle") if isinstance(v, dict) else v)
+                            for k, v in (p.get("social_accounts") or {}).items() if v}
+            for p in r.json().get("profiles", [])}
+
+
+def comprobar_instagram():
+    """Falla si el Instagram del canal ya no está conectado (sesión caducada, permisos retirados...)."""
+    redes = redes_conectadas()
+    if not (redes.get(perfil_instagram()) or {}).get("instagram"):
+        raise RuntimeError(f"Instagram no está conectado en el perfil «{perfil_instagram()}» de Upload-Post "
+                           f"(conectadas: {redes})")
+
+
+def _avisar(motivo: str):
+    """Deja constancia para que el workflow termine en rojo (y llegue el correo de GitHub)."""
+    from .config import RAIZ
+    try:
+        (RAIZ / "aviso_instagram.txt").write_text(motivo[:500], encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def instagram_seguro(meta: dict, intentos: int = 3):
+    """Publica en Instagram sin que un fallo afecte a TikTok ni a YouTube: comprueba antes la conexión, reintenta si
+    Instagram rechaza la subida (un rechazo no publica nada, así que no hay duplicados) y, si al final no sale,
+    avisa (el workflow acaba en rojo y llega el correo)."""
     if os.environ.get("SIN_INSTAGRAM") or not disponible():
         return
     try:
-        meta["instagram"] = publicar_instagram(Path(meta["video"]), meta["caption"])
+        comprobar_instagram()
     except Exception as e:  # noqa: BLE001
-        log.error("Instagram falló: %s", e)
+        log.error("Instagram: %s", e)
         meta["instagram"] = {"error": str(e)[:300]}
+        _avisar(f"No se publicó en Instagram: {e}")
+        return
+    for i in range(1, intentos + 1):
+        try:
+            meta["instagram"] = publicar_instagram(Path(meta["video"]), meta["caption"])
+            if meta["instagram"].get("pendiente"):
+                _avisar("Instagram no confirmó la publicación a tiempo: revisa si salió el Reel "
+                        f"(request_id {meta['instagram'].get('request_id')})")
+            return
+        except Exception as e:  # noqa: BLE001
+            log.error("Instagram falló (intento %d/%d): %s", i, intentos, e)
+            meta["instagram"] = {"error": str(e)[:300]}
+            if i < intentos:
+                time.sleep(90 * i)
+    _avisar(f"No se publicó en Instagram tras {intentos} intentos: {meta['instagram'].get('error')}")
 
 
 def _comprobar(j: dict) -> dict:
@@ -179,3 +222,15 @@ def _comprobar(j: dict) -> dict:
         raise RuntimeError(f"Upload-Post: TikTok falló: {tk.get('error') or tk}")
     log.info("Publicado en TikTok vía Upload-Post: %s", str(tk or j)[:300])
     return {"via": "upload-post", "respuesta": tk or j}
+
+
+if __name__ == "__main__":
+    import sys
+    logging.basicConfig(level=logging.INFO)
+    if sys.argv[1:] == ["comprobar"]:
+        try:
+            comprobar_instagram()
+            print("Instagram conectado:", redes_conectadas().get(perfil_instagram()))
+        except Exception as e:  # noqa: BLE001
+            print(f"::error::{e}")
+            _avisar(str(e))
