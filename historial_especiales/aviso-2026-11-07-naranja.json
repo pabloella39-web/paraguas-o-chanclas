@@ -1,0 +1,97 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-07",
+ "caption": "⚠️ Aviso naranja por lluvias en Tenerife el domingo. Mantente informado.\n\n🟠 Aviso naranja por lluvia: Santa Cruz de Tenerife, San Cristóbal de La Laguna\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
+ "titular": "TENERIFE: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 23.83,
+ "firma": "naranja:lluvias:1",
+ "guion": {
+  "intro": "Aviso naranja por lluvias en Tenerife. Pueden caer 100 litros por metro cuadrado en 12 horas.",
+  "zonas": "Área metropolitana de Tenerife, con Santa Cruz y La Laguna. Domingo, desde la medianoche hasta las seis de la tarde.",
+  "consejos": "Prepárate y mantente informado. Toma precauciones. Si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva en Tenerife."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "naranja",
+   "zonas": [
+    "Área metropolitana de Tenerife"
+   ],
+   "ciudades": [
+    "Santa Cruz de Tenerife",
+    "San Cristóbal de La Laguna"
+   ],
+   "inicio": "2026-11-08T00:00:00-00:00",
+   "fin": "2026-11-08T17:59:59-00:00",
+   "descripcion": "Precipitación acumulada en 12 horas: 100 mm. Afectando principalmente a vertientes oeste y sur."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-07T15:00:49.372Z"
+     },
+     "success": true,
+     "platform_post_id": "7705444396493262113",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7705444396493262113",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 5228607,
+     "post_title": "⚠️ Aviso naranja por lluvias en Tenerife el domingo. Mantente informado.\n\n🟠 Aviso naranja por lluvia: Santa Cruz de Tenerife, San Cristóbal de La Laguna\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 23.834,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7705444103596640288",
+     "request_id": "2fcbed0e485c4df19b61476b9257a7d5",
+     "request_id_logs": "2fcbed0e485c4df19b61476b9257a7d5",
+     "job_id": "6fa27d42cd1146acb098f7e31e3d9a18",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-07T15:00:49.372Z"
+   },
+   "request_id": "2fcbed0e485c4df19b61476b9257a7d5"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "jeE_VFJsGWo",
+  "url": "https://youtube.com/shorts/jeE_VFJsGWo",
+  "canal": "Paraguas o Chanclas"
+ },
+ "voz": "masculina"
+}
