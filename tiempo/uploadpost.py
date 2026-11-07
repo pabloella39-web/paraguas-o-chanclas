@@ -148,7 +148,9 @@ def publicar_instagram(video: Path, caption: str, espera_max: int = 900) -> dict
         estado = s_.json()
         st = str(estado.get("status") or estado.get("state") or "").lower()
         if st in ("completed", "complete", "success", "finished", "done", "published"):
-            ig = (estado.get("results") or {}).get("instagram") if isinstance(estado.get("results"), dict) else None
+            res = estado.get("results")
+            ig = res.get("instagram") if isinstance(res, dict) else \
+                next((x for x in res or [] if isinstance(x, dict) and x.get("platform") == "instagram"), None)
             if isinstance(ig, dict) and ig.get("success") is False:
                 raise RuntimeError(f"Instagram falló: {ig.get('error') or ig}")
             log.info("Publicado en Instagram: %s", str(ig or estado)[:300])
