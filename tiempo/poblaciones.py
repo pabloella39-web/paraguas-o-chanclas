@@ -94,9 +94,23 @@ def titular_aviso(ciudades: list[str]) -> str:
     return ciudades[0] if ciudades else ""
 
 
+ISLA_DE = {"Santa Cruz de Tenerife": "Tenerife", "San Cristóbal de La Laguna": "Tenerife", "Tenerife": "Tenerife",
+           "Las Palmas de Gran Canaria": "Gran Canaria", "Telde": "Gran Canaria", "Gran Canaria": "Gran Canaria",
+           "Lanzarote": "Lanzarote", "Fuerteventura": "Fuerteventura", "La Palma": "La Palma",
+           "La Gomera": "La Gomera", "El Hierro": "El Hierro"}
+
+
+def _islas(ciudades: list[str]) -> list[str]:
+    return list(dict.fromkeys(ISLA_DE[c] for c in ciudades if c in ISLA_DE))
+
+
 def titular_avisos(ciudades: list[str], nivel: str) -> str:
     """ROJO: el sitio concreto (lo más relevante). NARANJA: si hay varias comunidades, se nombran (hasta 3);
     si es una sola, su ciudad muy grande (Barcelona) o la comunidad."""
+    islas = _islas(ciudades)
+    if len(islas) >= 2 and all(COMUNIDAD.get(c) == "Canarias" or c in ISLA_DE for c in ciudades):
+        # Canarias en varias islas: se nombran las islas (hasta 3); con más, «Canarias»
+        return ", ".join(islas[:-1]) + " y " + islas[-1] if len(islas) <= 3 else "Canarias"
     if nivel == "rojo":   # los sitios concretos (hasta 3), los más grandes primero
         orden = sorted(dict.fromkeys(ciudades), key=lambda c: (c not in MUY_GRANDES, ciudades.index(c)))[:3]
         return orden[0] if len(orden) == 1 else ", ".join(orden[:-1]) + " y " + orden[-1] if orden else ""

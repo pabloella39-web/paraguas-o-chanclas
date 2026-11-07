@@ -825,7 +825,30 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
         ciudades = afectadas([a.get("poligono") or []], a.get("zona", ""))
         if ciudades:
             out.append({**a, "ciudades": ciudades})
+    # El mismo aviso (fenómeno y nivel) en otras zonas sin ciudades grandes también entra: si el naranja por lluvias
+    # es en Tenerife, La Palma, La Gomera y El Hierro, el vídeo no puede hablar solo de Tenerife
+    claves = {(a["fenomeno"], a["nivel"]) for a in out}
+    ya = {id(a) for a in avisos if any(a.get("zona") == o.get("zona") and a["fenomeno"] == o["fenomeno"]
+                                      and a["nivel"] == o["nivel"] for o in out)}
+    for a in avisos:
+        if id(a) in ya or (a["fenomeno"], a["nivel"]) not in claves:
+            continue
+        try:
+            ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
+        except (TypeError, ValueError):
+            continue
+        if fin > momento and ini < momento + timedelta(hours=horas):
+            out.append({**a, "ciudades": []})
     return out
+
+
+ISLAS = ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma", "La Gomera", "El Hierro"]
+
+
+def islas_de(zonas) -> list[str]:
+    """Islas canarias que aparecen en los nombres de zona de AEMET («Este, sur y oeste de La Palma»...)."""
+    t = " | ".join(zonas).lower()
+    return [i for i in ISLAS if i.lower() in t or (i == "La Gomera" and "gomera" in t) or (i == "El Hierro" and "hierro" in t)]
 
 
 def agrupar(avisos: list[dict]) -> list[dict]:
@@ -842,6 +865,10 @@ def agrupar(avisos: list[dict]) -> list[dict]:
                 gr["ciudades"].append(c)
         if a["zona"] not in gr["zonas"]:
             gr["zonas"].append(a["zona"])
+        for isla in islas_de([a["zona"]]):   # en Canarias, las islas también cuentan como «sitios»
+            if isla not in gr["ciudades"] and not (isla == "Tenerife" and any("Tenerife" in c for c in gr["ciudades"])) \
+                    and not (isla == "Gran Canaria" and any("Gran Canaria" in c for c in gr["ciudades"])):
+                gr["ciudades"].append(isla)
         gr["inicio"], gr["fin"] = min(gr["inicio"], a["inicio"]), max(gr["fin"], a["fin"])
         if a["poligono"]:
             gr["poligonos"].append(a["poligono"])
@@ -1664,6 +1691,9 @@ def _ciudades_portada_todos(grupos) -> list[str]:
         return _ciudades_portada(gr)
     cs = list(dict.fromkeys(c for x in grupos for c in (x.get("ciudades") or [])))
     tit = titular_avisos(cs, gr["nivel"])
+    from .poblaciones import _islas
+    if len(_islas(cs)) >= 2:   # Canarias: debajo, las islas afectadas
+        return [tit, " · ".join(_islas(cs)[:4])] if tit == "Canarias" else [tit]
     if tit in cs:
         return [tit] + [c for c in cs if c != tit][:2]
     return [tit, " · ".join(cs[:3])]
