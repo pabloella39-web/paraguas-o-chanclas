@@ -78,3 +78,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Duración de los vídeos: mínimo 65 s, sin máximo. Si la locución sale larga, el vídeo se alarga (no se acelera la voz ni se cambia a la voz gratuita).
 - Vídeo de aviso naranja/rojo: empieza con el mapa entero y luego hace zoom a la zona (también en Canarias), señalando los principales núcleos afectados (los más grandes de cada zona, datos de GeoNames). En «zonas» se nombran dos o tres de esos núcleos.
 - Parte diario con aviso naranja o rojo: tramo «aviso» justo después del gancho, con zoom a la zona y los núcleos afectados señalados (el prompt lo pide en «TRAMO DE AVISO»).
+- Duración objetivo: ~70 s el parte (finde ~75, semana ~90). Solo se alarga si hay aviso naranja/rojo o temporal; si la locución sale larga igualmente, el vídeo se alarga (no se acelera la voz).

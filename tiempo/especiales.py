@@ -484,6 +484,10 @@ def _preparar_avisos(dias: dict):
         if partes:
             ext.append(f"{k}: " + "; ".join(partes))
     AVISOS_TXT[0] = texto_avisos(AVISOS_DIA) + texto_oleaje(olas) + texto_nieve(nieves)
+    graves_ = any(x["nivel"] in ("naranja", "rojo") for v in AVISOS_DIA.values() for x in v or [])
+    AVISOS_TXT[0] += ("\n\nDURACIÓN: respeta las palabras de cada bloque (no te alargues"
+                      + (": hay aviso naranja o rojo, así que el bloque de avisos puede ser algo más largo)." if graves_
+                         else "; si sobra algo, recorta lo menos importante)."))
     if ext:
         AVISOS_TXT[0] += ("\n\nFENÓMENOS DESTACADOS (salen en el mapa con su icono animado): " + " | ".join(ext)
                           + ". Menciónalos en su día: el granizo y las tormentas con prudencia ('posibles'), el calor o "

@@ -247,6 +247,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         except Exception as e:  # noqa: BLE001
             log.warning("Extremos en pueblos no disponibles: %s", e)
         graves = [x for x in avisos if x["nivel"] in ("naranja", "rojo") and x.get("poligonos")]
+        # Duración: lo que mejor funciona ronda los 70 s; solo se alarga cuando de verdad hay mucho que contar
+        g.GANCHO_TEXTO += ("\n\nDURACIÓN: el vídeo debe rondar los 70 segundos: respeta las palabras de cada bloque. "
+                           + ("Hoy hay aviso naranja o rojo: puedes alargar un poco (hasta un 20 % más) para el tramo de "
+                              "aviso." if graves else "No te alargues: si sobra algo, recorta lo menos importante."))
         if graves:   # tramo «aviso»: zoom a la zona con los núcleos afectados señalados
             from .especiales import nucleos_afectados
             AVISO_GRAVE[0] = graves
