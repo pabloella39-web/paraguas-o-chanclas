@@ -1019,6 +1019,7 @@ def main():
 
 # ================================================================ Instagram
 ESTADO_IG = RAIZ / "estado" / "respuestas_instagram.json"
+IG_POSTS: list = []
 MAX_IG = int(os.environ.get("RESPUESTAS_IG_POR_HORA", "15"))
 
 
@@ -1027,6 +1028,7 @@ def _posts_instagram(max_horas: float = HORAS_VIDEO) -> list[str]:
     perfil = uploadpost.perfil_instagram()
     j = _get("uploadposts/media", platform="instagram", user=perfil, limit=8)
     items = j.get("media") or j.get("data") or j.get("items") or j
+    log.info("Instagram media: %s", json.dumps(items, ensure_ascii=False)[:400])
     out = []
     for it in items if isinstance(items, list) else []:
         if not isinstance(it, dict) or not it.get("id"):
@@ -1046,7 +1048,8 @@ def _posts_instagram(max_horas: float = HORAS_VIDEO) -> list[str]:
 def comentarios_instagram(vistos: set) -> list[dict]:
     perfil = uploadpost.perfil_instagram()
     out = []
-    for pid in _posts_instagram():
+    IG_POSTS[:] = _posts_instagram()
+    for pid in IG_POSTS:
         try:
             j = _get("uploadposts/comments", platform="instagram", user=perfil, post_id=pid, limit=50)
         except Exception as e:  # noqa: BLE001
@@ -1082,6 +1085,7 @@ def responder_instagram(publicar: bool):
     except Exception:  # noqa: BLE001
         est = {"vistos": [], "escritas": []}
     coms = comentarios_instagram(set(est["vistos"]))
+    log.info("Instagram: %d Reels del día, %d comentarios nuevos", len(IG_POSTS), len(coms))
     if not coms:
         return
     hoy_ = ahora()
