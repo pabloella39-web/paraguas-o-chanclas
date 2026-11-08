@@ -89,3 +89,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Avisos por lluvia/tormentas: tramo «¿Cuándo lloverá más?» con la lluvia hora a hora animada (tipo radar, reloj y barra de tiempo, ~0,5 s por fotograma, hasta 18 fotogramas) y la voz diciendo cuándo y dónde llueve más fuerte; después «¿Cuánto va a llover?» con el acumulado.
 - Zoom de avisos: zona afectada y colindantes (península: margen ~0,9° y mínimo 3°×2,3°; Canarias: todas las islas). El mapa de lluvia cubre todo el zoom, y si en provincias vecinas sin aviso también llueve bastante (≥15 l/m²), la voz lo menciona.
 - Mapas: las temperaturas nunca en medio del mar (las pastillas de ciudades de costa se meten hacia tierra; solo islas, Ceuta y Melilla pueden ir sobre el mar).
+- Semanal (domingo), media semana (miércoles) y finde (viernes): son los más importantes; tienen que estar impolutos y todo perfectamente explicado. Objetivo ~1:50 el semanal y ~1:30 el finde; pueden llegar a 2:30.

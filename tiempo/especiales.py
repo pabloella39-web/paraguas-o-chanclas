@@ -66,8 +66,8 @@ def duracion(dmin: float, dmax: float, dobj: float):
             m.DURACION_MIN, m.DURACION_MAX, m.DURACION_OBJETIVO = a, b, c
 
 
-DURACION_SEMANA = (85.0, 100.0, 91.0)
-DURACION_FINDE = (66.0, 85.0, 75.0)   # el finde lleva dos días (y a veces avisos): algo más de margen
+DURACION_SEMANA = (90.0, 150.0, 110.0)   # el más importante: bien explicado, hasta 2:30
+DURACION_FINDE = (70.0, 150.0, 90.0)   # el finde lleva dos días (y a veces avisos): algo más de margen
 VOZ_USADA = ""   # voz del especial que se está haciendo (para alternar con el siguiente vídeo)
 
 
@@ -147,6 +147,8 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
         # con avisos naranja o rojo el vídeo puede pasar de 1:40 (hasta ~2:25) para explicarlos bien
         _m.HAY_AVISOS_GRAVES[0] = any(x["nivel"] in ("naranja", "rojo") for v in AVISOS_DIA.values() for x in v or []) \
             or MODO_AVISO[0]
+        # semanal, media semana y finde: los más importantes, todo bien explicado, hasta 2:30
+        _m.MAXIMO_ESPECIAL[0] = 0.0 if MODO_AVISO[0] else 150.0
         try:
             objetivo = DURACION_OBJETIVO - INICIO - COLA_ELEVEN - 0.2
             meta = eleven.ritmo(eleven.voz_id(tipo_voz)) * objetivo

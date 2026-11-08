@@ -150,8 +150,11 @@ MAXIMO_CON_AVISOS = 145.0   # ...salvo con avisos naranja o rojo, para explicarl
 HAY_AVISOS_GRAVES = [False]
 
 
+MAXIMO_ESPECIAL = [0.0]   # semanal, media semana y finde: hasta 2:30 (los fija especiales)
+
+
 def maximo_absoluto() -> float:
-    return MAXIMO_CON_AVISOS if HAY_AVISOS_GRAVES[0] else MAXIMO_ABSOLUTO
+    return max(MAXIMO_ESPECIAL[0], MAXIMO_CON_AVISOS if HAY_AVISOS_GRAVES[0] else MAXIMO_ABSOLUTO)
 
 
 def recortar_si_largo(guion: dict, bloques: list[str], largo: float, meta: float):
