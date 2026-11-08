@@ -651,8 +651,9 @@ class Compositor:
         """Fila de días bajo el mapa: el que se está contando, en amarillo; los ya contados, en blanco; los que
         faltan, apagados. Así se ve cuánto queda hasta «tu» día y la gente aguanta."""
         dia = seg_real[7:] if seg_real.startswith("avisos_") else seg_real
-        idx = self.barra_dias.index(dia) if dia in self.barra_dias else (len(self.barra_dias) if seg_real in
-                                                                          ("general", "cierre") else -1)
+        if dia not in self.barra_dias:
+            return   # en el resumen final van las tarjetas de más calor / más frío en ese sitio: no pisarlas
+        idx = self.barra_dias.index(dia)
         n = len(self.barra_dias)
         r, sep = 22, 60
         x0 = ANCHO - 40 - 34 - (n - 1) * sep    # arriba a la derecha del mapa (abajo van atribución y subtítulos)

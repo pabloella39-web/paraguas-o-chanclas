@@ -406,9 +406,9 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     BARRA[0] = ["sabado", "domingo"]
     (ms, _), _ = _mejor_plan(prev_s, prev_d)
     kwargs = {
-        "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
+        "datos_seg": {"sabado": (m_sab := g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA)),
                       "domingo": g.prev_para_mapa(prev_d, [guion["segmentos"].get("domingo", "")], EXTRA_DOMINGO),
-                      "intro": []},
+                      "intro": [], "general": m_sab, "cierre": m_sab},   # resumen final también sin huecos
         "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
         "vistas": _kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["vistas"],
         "sin_marcadores": _kwargs_avisos({"sabado": "", "domingo": ""})["sin"],
@@ -818,7 +818,8 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     kwargs = {
         "satelite": sat,
         "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
-        "datos_seg": {**mapa_dias, "intro": []},
+        # «mejor y peor día» y despedida: también con las ciudades extra (antes salía el mapa pelado, con huecos)
+        "datos_seg": {**mapa_dias, "intro": [], "general": mapa_dias[mejor], "cierre": mapa_dias[mejor]},
         "vistas": _kwargs_avisos({d: "" for d in _dias()})["vistas"],
         "sin_marcadores": _kwargs_avisos({d: "" for d in _dias()})["sin"],
         "pills": {**_kwargs_avisos({d: f"{NOMBRE_DIA[d]} {fechas[d].day}" for d in _dias()})["pills"],
