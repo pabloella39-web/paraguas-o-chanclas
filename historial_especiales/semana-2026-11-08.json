@@ -1,0 +1,23 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-11-08",
+ "caption": "Llueve en media España y el miércoles pinta fatal ☔ ¿Cuál es el mejor día? 🩴\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "SEMANA DE PARAGUAS",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 189.27,
+ "guion": {
+  "intro": "Semana de paraguas, y empieza fuerte. Mañana llueve en Madrid, Sevilla y media península, y el miércoles Sevilla puede acumular 53 litros. Y atento al final: te digo el mejor día y el peor de la semana.",
+  "avisos_lunes": "Aviso naranja por lluvia en Norte de Cáceres, Sur de Ávila, Aracena, Andévalo y Condado, Litoral de Huelva y Sierra norte de Sevilla, con 30 litros en una hora. Naranja por viento en Tenerife y La Palma, con rachas de 100 kilómetros por hora. Olas de hasta 4,6 metros en las Rías Baixas, lejos de diques y paseos.",
+  "lunes": "Ayer Izaña, en Tenerife, midió 9 litros por metro cuadrado. Mañana, en el norte, Santiago y Vigo con lluvia segura, más de 14 litros. Santander, solo llovizna con 23 grados, y Logroño con lluvia y 18 grados. En el interior, Madrid se lleva casi 16 litros con 17 grados y Toledo 10, así que paraguas y nada de bici. El Mediterráneo se salva, con Barcelona a 20 grados y Murcia a 24, ideal para tender. En el sur, Marbella y Algeciras pasan de 30 litros, y hay posibles tormentas en Sevilla y Badajoz. En las islas, Palma seca con 23 grados y posibles tormentas en Las Palmas.",
+  "avisos_martes": "Aviso naranja por lluvia en Sur de Ávila y Norte de Cáceres, con hasta 100 litros en 12 horas. Amarillo por lluvia y viento en Tenerife, Gran Canaria y La Palma, y por tormentas en el oeste de Galicia.",
+  "martes": "Sigue el paraguas en el interior, con Salamanca rozando los 17 litros y Madrid 13, a 16 grados. Sevilla y Badajoz, otros 13 litros. En el Mediterráneo, sol y hasta 26 grados en Murcia, así que saca la ropa.",
+  "avisos_miercoles": "Aviso amarillo por lluvia y viento en Tenerife, Gran Canaria y La Palma. Olas de hasta 4,5 metros en las Rías Baixas y en el norte de Canarias, y de 3,4 en la costa de A Coruña.",
+  "miercoles": "El día más mojado de la semana. Sevilla podría llegar a 53 litros y Badajoz a 35, con chubascos fuertes posibles en el suroeste. Madrid sigue con lluvia y 15 grados, así que lleva chaqueta. Tenerife, la capital más calurosa, llega a 28 grados.",
+  "jueves": "Posibles chubascos fuertes en el este, con Palma en 13 litros, y Barcelona y Valencia en 12. En Toledo, otros 12 litros. En Canarias, olas de hasta 3,6 metros en el norte, así que cuidado en la costa.",
+  "viernes": "El frío aprieta, con Valladolid a 9 grados de mínima y Puigcerdà, en Girona, a 4. En Valencia, Alicante y Murcia, sol y hasta 25 grados, tiempo de terraza. En Galicia, olas de 3,4 metros.",
+  "general": "El mejor día es el viernes, con sol en el Mediterráneo y casi nada de lluvia en media España. El peor, el miércoles, con 53 litros en Sevilla y 35 en Badajoz, y mucho paraguas en el interior.",
+  "cierre": "¿Paraguas o chanclas esta semana? Te leo en comentarios, y sigue la cuenta para tener el tiempo de cada día."
+ },
+ "voz": "masculina"
+}
