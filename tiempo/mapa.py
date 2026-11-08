@@ -88,6 +88,10 @@ def interpolar_vista(a, b, t):
 _TIERRA = {}
 
 
+ISLAS_Y_CIUDADES_AUTONOMAS = {"Palma", "Ibiza", "Mahón", "Ceuta", "Melilla", "Las Palmas", "S.C. Tenerife", "Arrecife",
+                              "Puerto del Rosario", "Santa Cruz de La Palma"}
+
+
 def mascara_tierra(pr: "Proyeccion") -> Image.Image:
     """Máscara (L, 255 = tierra) con la misma proyección que el mapa, para saber qué es mar."""
     clave = (tuple(pr.vista), pr.ancho, pr.alto)
@@ -452,6 +456,20 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         extremos = {max(items, key=lambda it: it[3]["tmax"])[3]["nombre"] if items else None,
                     min(items, key=lambda it: it[3].get("tmin", 99))[3]["nombre"] if items else None}
         items.sort(key=lambda it: (it[3]["nombre"] not in extremos, rango.get(it[3]["nombre"], 999)))
+        # tierra estricta (sin el margen de costa de la máscara): la pastilla entera tiene que caer en tierra
+        tierra = mascara_tierra(pr).filter(ImageFilter.MinFilter(15))
+
+        def _en_tierra(x0, y0, w, h):
+            """La mayor parte de la pastilla (centro y 4 puntos interiores) sobre tierra."""
+            pts = [(x0 + w / 2, y0 + h / 2), (x0 + w * 0.2, y0 + h / 2), (x0 + w * 0.8, y0 + h / 2),
+                   (x0 + w / 2, y0 + h * 0.25), (x0 + w / 2, y0 + h * 0.75)]
+            dentro = 0
+            for x, y in pts:
+                xi, yi = int(x), int(y)
+                if 0 <= xi < tierra.width and 0 <= yi < tierra.height and tierra.getpixel((xi, yi)) > 0:
+                    dentro += 1
+            return dentro >= 5 and tierra.getpixel((min(max(int(x0 + w / 2), 0), tierra.width - 1),
+                                                                    min(max(int(y0 + h / 2), 0), tierra.height - 1))) > 0
         offs = sorted({(dx, dy) for dx in range(-80, 81, 10) for dy in range(-60, 61, 10)},
                       key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
         # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
@@ -475,6 +493,8 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                 break
             im, caja, (px, py), c = it_
             w, h = caja[2], caja[3]
+            # las islas (Baleares, Canarias) y Ceuta y Melilla no tienen tierra alrededor: ahí sí vale el mar
+            isla_c = c["nombre"] in ISLAS_Y_CIUDADES_AUTONOMAS or c.get("lat", 40) < 30
             for dx, dy in offs:
                 x0, y0 = px - w / 2 + dx, py - h / 2 + dy
                 # la columna de botones de TikTok empieza más abajo: arriba se puede llegar casi al borde
@@ -485,6 +505,8 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                        for b in puestas):
                     continue
                 cx, cy = x0 + w / 2, y0 + h / 2
+                if not isla_c and not _en_tierra(x0, y0, w, h):
+                    continue   # nada de temperaturas en medio del mar
                 propia = math.hypot(cx - px, cy - py)
                 # que la pastilla quede más cerca de su ciudad que de cualquier otra ciudad conocida
                 if any(n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
