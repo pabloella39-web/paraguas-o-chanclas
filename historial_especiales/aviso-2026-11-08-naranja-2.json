@@ -1,0 +1,156 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-08",
+ "caption": "⚠️ Aviso naranja por lluvias en cinco islas de Canarias.\n\n🟠 Aviso naranja por lluvia: Tenerife, Gran Canaria, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna, Telde\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
+ "titular": "CANARIAS: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 24.3,
+ "firma": "naranja:lluvias:12",
+ "guion": {
+  "intro": "AEMET amplía el aviso naranja a Gran Canaria. Lluvias de 100 litros por metro cuadrado en 12 horas.",
+  "zonas": "Tenerife, Gran Canaria, La Palma, La Gomera y El Hierro, sobre todo oeste y sur. Activo desde el sábado a las nueve de la noche.",
+  "consejos": "Toma precauciones y mantente informado. Si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva allí."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "naranja",
+   "zonas": [
+    "Área metropolitana de Tenerife",
+    "Este, sur y oeste de Gran Canaria",
+    "Sur de Ávila",
+    "Cumbres de La Palma",
+    "Este de La Palma",
+    "Oeste de La Palma",
+    "La Gomera",
+    "El Hierro",
+    "Norte de Tenerife",
+    "Este, sur y oeste de Tenerife",
+    "Cumbres de Gran Canaria",
+    "Norte de Cáceres"
+   ],
+   "ciudades": [
+    "Santa Cruz de Tenerife",
+    "San Cristóbal de La Laguna",
+    "Telde",
+    "Gran Canaria",
+    "La Palma",
+    "La Gomera",
+    "El Hierro"
+   ],
+   "inicio": "2026-11-07T21:00:00-00:00",
+   "fin": "2026-11-09T09:59:59+01:00",
+   "descripcion": "Precipitación acumulada en 12 horas: 100 mm. Afectando principalmente a vertientes oeste y sur."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-08T09:21:07.056Z"
+     },
+     "success": true,
+     "platform_post_id": "7705727941937745185",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7705727941937745185",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 5589373,
+     "post_title": "⚠️ Aviso naranja por lluvias en cinco islas de Canarias.\n\n🟠 Aviso naranja por lluvia: Tenerife, Gran Canaria, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna, Telde\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 24.3,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7705727451892189217",
+     "request_id": "5dee5e0824254744977958a69695541c",
+     "request_id_logs": "5dee5e0824254744977958a69695541c",
+     "job_id": "212b224142f9484ba2d11c107330e7dd",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-08T09:21:07.056Z"
+   },
+   "request_id": "5dee5e0824254744977958a69695541c"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "pxIBNw8TYgI",
+  "url": "https://youtube.com/shorts/pxIBNw8TYgI",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-08T09:22:05.291Z"
+   },
+   "success": true,
+   "platform_post_id": "18147473977580379",
+   "post_url": "https://www.instagram.com/reel/DfebDVyCOmW/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 5589373,
+   "post_title": "⚠️ Aviso naranja por lluvias en cinco islas de Canarias.\n\n🟠 Aviso naranja por lluvia: Tenerife, Gran Canaria, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna, Telde\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Santa",
+   "post_caption": "⚠️ Aviso naranja por lluvias en cinco islas de Canarias.\n\n🟠 Aviso naranja por lluvia: Tenerife, Gran Canaria, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna, Telde\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Santa",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 24.3,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "1c33ab6e5fd849cba62d2df31c4a7182",
+   "request_id_logs": "1c33ab6e5fd849cba62d2df31c4a7182",
+   "job_id": "ecf99a024f7045beb2a3a567fd9f2673",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
