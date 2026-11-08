@@ -145,7 +145,13 @@ def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
     return guion, bloques, wav, dur, lim, pal
 
 
-MAXIMO_ABSOLUTO = 100.0   # ningún vídeo pasa de 1 minuto 40
+MAXIMO_ABSOLUTO = 100.0   # ningún vídeo pasa de 1 minuto 40...
+MAXIMO_CON_AVISOS = 145.0   # ...salvo con avisos naranja o rojo, para explicarlos bien (hasta ~2:25, nunca 3 min)
+HAY_AVISOS_GRAVES = [False]
+
+
+def maximo_absoluto() -> float:
+    return MAXIMO_CON_AVISOS if HAY_AVISOS_GRAVES[0] else MAXIMO_ABSOLUTO
 
 
 def recortar_si_largo(guion: dict, bloques: list[str], largo: float, meta: float):
@@ -191,11 +197,11 @@ def plan_eleven(bloques, wav, dur, lim, pal):
         # Se alarga el vídeo en vez de acelerar la voz (o caer en la voz gratuita)... pero NUNCA más de 1:40
         tempo = 1.0
         nuevo_max = INICIO + dur + COLA_ELEVEN + 0.8
-        if nuevo_max > MAXIMO_ABSOLUTO:
-            tempo = dur / (MAXIMO_ABSOLUTO - 0.8 - INICIO - COLA_ELEVEN)
+        if nuevo_max > maximo_absoluto():
+            tempo = dur / (maximo_absoluto() - 0.8 - INICIO - COLA_ELEVEN)
             if tempo > 1.15:
-                raise RuntimeError(f"La locución dura {dur:.1f} s: no cabe en 1:40")
-            nuevo_max = MAXIMO_ABSOLUTO
+                raise RuntimeError(f"La locución dura {dur:.1f} s: no cabe en {maximo_absoluto():.0f} s")
+            nuevo_max = maximo_absoluto()
         log.warning("Locución larga (%.1f s): el vídeo se alarga a %.1f s", dur, nuevo_max)
         _alargar(nuevo_max)
         max_habla = DURACION_MAX - 0.6 - INICIO - COLA_ELEVEN
@@ -315,6 +321,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         g.GANCHO_TEXTO += ("\n\nDURACIÓN: el vídeo debe rondar los 70 segundos: respeta las palabras de cada bloque. "
                            + ("Hoy hay aviso naranja o rojo: puedes alargar un poco (hasta un 20 % más) para el tramo de "
                               "aviso." if graves else "No te alargues: si sobra algo, recorta lo menos importante."))
+        HAY_AVISOS_GRAVES[0] = bool(graves)
         if graves:   # tramo «aviso»: zoom a la zona con los núcleos afectados señalados
             from .especiales import nucleos_afectados, sitios_aviso
             AVISO_GRAVE[0] = graves

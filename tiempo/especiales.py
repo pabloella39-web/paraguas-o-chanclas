@@ -143,6 +143,10 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     """escribir(factor, plantilla) -> guion con 'segmentos' y 'orden'. Devuelve (guion, plan, total, trozos, motor)."""
     from .main import COLA_ELEVEN, INICIO, VEL_MAX, VEL_MIN, _habla_objetivo, plan_eleven, planificar
     if not demo and eleven.disponible(tipo_voz):
+        from . import main as _m
+        # con avisos naranja o rojo el vídeo puede pasar de 1:40 (hasta ~2:25) para explicarlos bien
+        _m.HAY_AVISOS_GRAVES[0] = any(x["nivel"] in ("naranja", "rojo") for v in AVISOS_DIA.values() for x in v or []) \
+            or MODO_AVISO[0]
         try:
             objetivo = DURACION_OBJETIVO - INICIO - COLA_ELEVEN - 0.2
             meta = eleven.ritmo(eleven.voz_id(tipo_voz)) * objetivo
@@ -375,6 +379,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
             from .fuentes import EXTRA
             EXTRA_SEMANA[:] = list(EXTRA)   # otras ciudades para el bloque largo del sábado
             prev_d, _ = obtener_previsiones(dom)
+            EXTRA_DOMINGO[:] = list(EXTRA)
         finally:
             if clave_google:
                 os.environ["GOOGLE_WEATHER_API_KEY"] = clave_google
@@ -395,7 +400,8 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     (ms, _), _ = _mejor_plan(prev_s, prev_d)
     kwargs = {
         "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
-                      "domingo": prev_d, "intro": []},
+                      "domingo": g.prev_para_mapa(prev_d, [guion["segmentos"].get("domingo", "")], EXTRA_DOMINGO),
+                      "intro": []},
         "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
         "vistas": _kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["vistas"],
         "sin_marcadores": _kwargs_avisos({"sabado": "", "domingo": ""})["sin"],
@@ -489,6 +495,9 @@ EXTRA_SEMANA: list = []
 
 AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
 AVISOS_DIA = {}
+MODO_AVISO = [False]   # el vídeo que se está haciendo es de aviso naranja/rojo
+EXTRAS_DIA: dict = {}      # ciudades extra (Ourense, León, Ciudad Real...) de cada día del semanal
+EXTRA_DOMINGO: list = []
 AVISOS_BLOQUE = []
 MESES_LARGOS = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE",
                 "NOVIEMBRE", "DICIEMBRE"]
@@ -759,8 +768,9 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         try:
             for d in _dias():
                 prevs[d], _ = obtener_previsiones(fechas[d])
+                from .fuentes import EXTRA
+                EXTRAS_DIA[d] = list(EXTRA)   # otras ciudades de ese día: el mapa no se queda con huecos
                 if d == _dias()[0]:  # otras ciudades para el bloque largo de mañana
-                    from .fuentes import EXTRA
                     EXTRA_SEMANA[:] = list(EXTRA)
         finally:
             for k, v in guardadas.items():
@@ -793,8 +803,9 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
             log.warning("Sin satélite: %s", e)
     PREVS_DIA.clear(); PREVS_DIA.update(prevs)
     primero = _dias()[0]
-    mapa_dias = {d: prevs[d] for d in _dias()}
-    mapa_dias[primero] = g.prev_para_mapa(prevs[primero], [guion["segmentos"].get(primero, "")], EXTRA_SEMANA)
+    # todos los días con las ciudades extra para rellenar huecos (Asturias, León, Ourense, La Mancha...)
+    mapa_dias = {d: g.prev_para_mapa(prevs[d], [guion["segmentos"].get(d, "")], EXTRAS_DIA.get(d) or EXTRA_SEMANA)
+                 for d in _dias()}
     kwargs = {
         "satelite": sat,
         "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
@@ -2143,6 +2154,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     global VOZ_USADA
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
+    MODO_AVISO[0] = True
     CAMPO_AVISO[0] = None if demo else _campo_aviso(grupos, hoy)
     dur_aviso = ((36.0, 56.0, 44.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
                  else (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO)

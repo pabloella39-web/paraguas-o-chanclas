@@ -75,7 +75,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Las respuestas dentro de los hilos de nuestros comentarios («Reto: dime el pueblo...») también se leen y se contestan.
 - Comentarios: solo se contestan en los vídeos del día (publicados en las últimas 24 h); los de vídeos de días anteriores no se contestan.
 - Lo más frío y lo más caluroso: se dicen las dos cosas: la capital (o capitales) más fría y, si hay un sitio aún más frío, ese pueblo con su provincia, esté donde esté (no tiene que ser de la misma provincia). Igual con el calor. El prompt lo trae en «LO MÁS FRÍO Y LO MÁS CALUROSO DE ESPAÑA».
-- Duración de los vídeos: mínimo 65 s y MÁXIMO 1:40 (100 s), nunca más. Si la locución sale larga, el vídeo se alarga (no se acelera la voz ni se cambia a la voz gratuita).
+- Duración de los vídeos: mínimo 65 s y MÁXIMO 1:40 (100 s). Con avisos naranja o rojo se puede pasar para explicarlos bien, hasta ~2:25 (145 s), nunca 3 minutos. Si la locución sale larga, el vídeo se alarga (no se acelera la voz ni se cambia a la voz gratuita).
 - Vídeo de aviso naranja/rojo: empieza con el mapa entero y luego hace zoom a la zona (también en Canarias), señalando los principales núcleos afectados (los más grandes de cada zona, datos de GeoNames). En «zonas» se nombran dos o tres de esos núcleos.
 - Parte diario con aviso naranja o rojo: tramo «aviso» justo después del gancho, con zoom a la zona y los núcleos afectados señalados (el prompt lo pide en «TRAMO DE AVISO»).
 - Duración objetivo: ~70 s el parte (finde ~75, semana ~90). Solo se alarga si hay aviso naranja/rojo o temporal; si la locución sale larga igualmente, el vídeo se alarga (no se acelera la voz).

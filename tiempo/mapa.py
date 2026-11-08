@@ -354,15 +354,16 @@ def _texto(d, xy, txt, f, color, sombra=True, anchor="la"):
 
 @lru_cache(maxsize=None)
 def _marcador_mini(nombre, tmax, ic, fase=0) -> Image.Image:
-    f = fuente("Black", 40)
+    # algo más compacta que antes: caben más ciudades y el mapa no se queda con huecos
+    f = fuente("Black", 35)
     txt = f"{tmax}°"
     tw = int(f.getlength(txt))
-    w, h = 64 + tw + 26, 66
+    w, h = 54 + tw + 18, 58
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 6, w - 1, h - 6], radius=27, fill=(8, 20, 45, 190))
-    im.alpha_composite(icono(ic, 60, fase), (4, 3))
-    _texto(d, (64, h / 2), txt, f, color_temp(tmax), anchor="lm")
+    d.rounded_rectangle([0, 5, w - 1, h - 5], radius=24, fill=(8, 20, 45, 190))
+    im.alpha_composite(icono(ic, 52, fase), (3, 3))
+    _texto(d, (54, h / 2), txt, f, color_temp(tmax), anchor="lm")
     return im
 
 
@@ -453,7 +454,26 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         items.sort(key=lambda it: (it[3]["nombre"] not in extremos, rango.get(it[3]["nombre"], 999)))
         offs = sorted({(dx, dy) for dx in range(-80, 81, 10) for dy in range(-60, 61, 10)},
                       key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
-        for im, caja, (px, py), c in items:
+        # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
+        primeras = [it for it in items if it[3]["nombre"] in extremos or rango.get(it[3]["nombre"], 999) < 25]
+        resto = [it for it in items if it not in primeras]
+
+        def siguiente():
+            if primeras:
+                return primeras.pop(0)
+            if not resto:
+                return None
+            if not out:
+                return resto.pop(0)
+            lejos = max(resto, key=lambda it: min(math.hypot(it[2][0] - o[2][0], it[2][1] - o[2][1]) for o in out))
+            resto.remove(lejos)
+            return lejos
+
+        while True:
+            it_ = siguiente()
+            if it_ is None:
+                break
+            im, caja, (px, py), c = it_
             w, h = caja[2], caja[3]
             for dx, dy in offs:
                 x0, y0 = px - w / 2 + dx, py - h / 2 + dy
@@ -461,7 +481,7 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                 lim_x = 1080 - 15 if y0 + h < 600 else ax1
                 if not (ax0 <= x0 and x0 + w <= lim_x and ay0 <= y0 and y0 + h <= ay1):
                     continue
-                if any(x0 < b[0] + b[2] + 6 and x0 + w + 6 > b[0] and y0 < b[1] + b[3] + 6 and y0 + h + 6 > b[1]
+                if any(x0 < b[0] + b[2] + 4 and x0 + w + 4 > b[0] and y0 < b[1] + b[3] + 2 and y0 + h + 2 > b[1]
                        for b in puestas):
                     continue
                 cx, cy = x0 + w / 2, y0 + h / 2
