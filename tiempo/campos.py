@@ -90,7 +90,7 @@ def maximos(lons, lats, v, cajas: dict) -> dict:
 
 
 # Escala «de mapa de modelo» (como Meteologix/ECMWF): del azul al morado pasando por verde, amarillo y rojo
-ESCALA_FUERTE = [(0.2, (198, 225, 245)), (1, (150, 200, 240)), (2, (100, 170, 235)), (3, (60, 135, 225)),
+ESCALA_FUERTE = [(0.1, (198, 225, 245)), (1, (150, 200, 240)), (2, (100, 170, 235)), (3, (60, 135, 225)),
                  (5, (35, 100, 210)), (7, (25, 150, 140)), (10, (40, 170, 80)), (15, (100, 200, 50)),
                  (20, (170, 220, 40)), (25, (235, 230, 40)), (30, (250, 200, 30)), (40, (250, 160, 20)),
                  (50, (245, 115, 20)), (60, (235, 70, 25)), (70, (215, 30, 30)), (80, (185, 15, 50)),
@@ -147,9 +147,19 @@ def capa_lluvia_fuerte(campos_: list, titulo: str):
     cache: dict = {}
     f, fpeq = fuente("ExtraBold", 26), fuente("Bold", 20)
 
+    from . import mapa as mapa_
+    provs = mapa_.provincias()
+
     def dibujar(capa, pr, dt):
         for n, (img, caja) in enumerate(imgs):
             _pegar(capa, img, caja, pr, MAPA_Y0, cache, f"f{n}")
+        # costas y límites encima del color, para que se vea dónde cae cada cosa (como en los mapas de modelo)
+        d = ImageDraw.Draw(capa)
+        for p in provs:
+            for anillo in p["anillos"]:
+                pts = [pr(*lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
+                d.line([(x, y + MAPA_Y0) for x, y in pts] + [(pts[0][0], pts[0][1] + MAPA_Y0)],
+                       fill=(255, 255, 255, 210), width=3)
         _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq)
     return dibujar
 

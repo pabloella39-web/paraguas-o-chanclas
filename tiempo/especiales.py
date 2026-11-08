@@ -925,7 +925,7 @@ def _zona_zoom(grupos):
         cajas = list(CAJA_ISLA.values())
         if cajas:
             return _encuadre(min(c[0] for c in cajas), max(c[1] for c in cajas), min(c[2] for c in cajas),
-                             max(c[3] for c in cajas), True)
+                             max(c[3] for c in cajas), True, margen=(0.12, 0.25))
     return _encuadre(min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts),
                      max(p[1] for p in pts), False, margen=(0.25, 0.2), minimo=(1.8, 1.4))
 
@@ -1041,6 +1041,9 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
             cands = [(x + 16, y - h / 2), (x - 16 - w, y - h / 2), (x - w / 2, y - h - 14), (x - w / 2, y + 14)]
             if x < ANCHO / 2:   # hacia fuera de la zona: a la izquierda los de la izquierda (si no, arriba o abajo)
                 cands = [cands[1], cands[2], cands[3], cands[0]]
+            if pr.vista[1] - pr.vista[0] > 3.5:   # vista amplia (todas las Canarias): arriba o abajo, sobre el mar
+                arriba, abajo = (x - w / 2, y - h - 14), (x - w / 2, y + 14)
+                cands = ([arriba, abajo] if k % 2 == 0 else [abajo, arriba]) + cands
             for cx0, cy0 in cands:
                 caja = (cx0, cy0, cx0 + w, cy0 + h)
                 if caja[0] < 10 or caja[2] > ANCHO - 10:
