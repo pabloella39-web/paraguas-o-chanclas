@@ -1,2 +1,2 @@
 semana
-# versión con los avisos bien explicados
+# con mapas sin huecos y avisos explicados
