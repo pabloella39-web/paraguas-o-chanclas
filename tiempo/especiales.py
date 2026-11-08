@@ -845,6 +845,7 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
     return out
 
 
+AMARILLOS: list = []    # avisos amarillos del mismo fenómeno en la misma zona (Lanzarote y Fuerteventura, 8/11)
 AMPLIACION: list = []   # sitios nuevos cuando AEMET amplía un aviso ya publicado hoy
 ISLAS = ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma", "La Gomera", "El Hierro"]
 
@@ -895,38 +896,53 @@ def _vista_zonas(grupos):
     return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
 
 
-def _zona_zoom(grupos):
-    """Encuadre para hacer zoom sobre la zona con aviso (también en Canarias, sobre su recuadro)."""
+CAJA_ISLA = {"Tenerife": (-16.93, -16.12, 28.0, 28.59), "Gran Canaria": (-15.84, -15.36, 27.73, 28.18),
+             "La Palma": (-18.01, -17.72, 28.45, 28.86), "La Gomera": (-17.35, -17.09, 28.01, 28.22),
+             "El Hierro": (-18.17, -17.87, 27.63, 27.86), "Lanzarote": (-13.88, -13.41, 28.84, 29.24),
+             "Fuerteventura": (-14.52, -13.82, 28.04, 28.76)}
+
+
+def _encuadre(lo0, lo1, la0, la1, canaria, margen=(0.18, 0.14), minimo=(1.1, 0.8)):
     from .mapa import lonlat_mapa
+    lo0, la0 = lonlat_mapa(lo0, la0, canaria)
+    lo1, la1 = lonlat_mapa(lo1, la1, canaria)
+    clon, clat = (lo0 + lo1) / 2, (la0 + la1) / 2
+    dlon, dlat = max(lo1 - lo0 + 2 * margen[0], minimo[0]), max(la1 - la0 + 2 * margen[1], minimo[1])
+    return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
+
+
+def _zona_zoom(grupos):
+    """Encuadre ajustado a la zona con aviso (también en Canarias, sobre su recuadro). En Canarias se usa la tierra de
+    las islas afectadas: los polígonos de AEMET de costa se meten mucho en el mar y el zoom quedaba lejos."""
     pts = [p for gr in grupos for pol in gr["poligonos"] for p in pol]
     if not pts:
         return VISTA_GENERAL
     can = [la < 30 for _, la in pts]
     if any(can) and not all(can):
         return VISTA_GENERAL   # península y Canarias a la vez: el mapa entero
-    pts = [lonlat_mapa(lo, la, la < 30) for lo, la in pts]
-    lo0, lo1 = min(p[0] for p in pts), max(p[0] for p in pts)
-    la0, la1 = min(p[1] for p in pts), max(p[1] for p in pts)
-    clon, clat = (lo0 + lo1) / 2, (la0 + la1) / 2
-    dlon, dlat = max(lo1 - lo0 + 0.5, 1.8), max(la1 - la0 + 0.4, 1.4)
-    return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
+    if all(can):
+        islas = islas_de([z for gr in grupos for z in gr["zonas"]]) or \
+            [i for i, (a, b, c, d) in CAJA_ISLA.items() if any(a <= lo <= b and c <= la <= d for lo, la in pts)]
+        cajas = [CAJA_ISLA[i] for i in islas if i in CAJA_ISLA]
+        if cajas:
+            return _encuadre(min(c[0] for c in cajas), max(c[1] for c in cajas), min(c[2] for c in cajas),
+                             max(c[3] for c in cajas), True)
+    return _encuadre(min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts),
+                     max(p[1] for p in pts), False, margen=(0.25, 0.2), minimo=(1.8, 1.4))
 
 
-def marcar_tormentas(prev, grupos):
-    """Las ciudades dentro (o a un paso) de una zona con aviso por tormentas llevan el icono de tormenta, aunque la
-    previsión diga solo lluvia (en Huelva había aviso por tormentas y salía la animación de lluvia)."""
-    pols = [pol for gr in grupos or [] if "tormenta" in gr["fenomeno"].lower() for pol in gr.get("poligonos") or []]
-    if not pols:
-        return
-    for c in prev or []:
-        la, lo = c.get("lat"), c.get("lon")
-        if la is None or lo is None:
-            continue
-        if any(_dentro(lo + dx, la + dy, pol) for pol in pols
-               for dx, dy in ((0, 0), (0.12, 0), (-0.12, 0), (0, 0.1), (0, -0.1))):
-            if c.get("icono") != "tormenta":
-                log.info("%s: icono de tormenta (aviso por tormentas)", c.get("nombre"))
-            c["icono"] = "tormenta"
+def _zona_cerca(grupos, nucleos):
+    """Segundo zoom, más cerca: los núcleos más poblados afectados (si la zona es grande)."""
+    ancho = _zona_zoom(grupos)
+    if ancho[1] - ancho[0] < 2.2 or len(nucleos) < 2:
+        return ancho
+    top = sorted(nucleos, key=lambda c: -c["poblacion"])[:3]
+    can = top[0]["lat"] < 30
+    top = [c for c in top if (c["lat"] < 30) == can]
+    # que no se aleje demasiado: los que estén a menos de 1,6° del mayor
+    top = [c for c in top if abs(c["lon"] - top[0]["lon"]) < 1.6 and abs(c["lat"] - top[0]["lat"]) < 1.2]
+    return _encuadre(min(c["lon"] for c in top), max(c["lon"] for c in top), min(c["lat"] for c in top),
+                     max(c["lat"] for c in top), can, margen=(0.35, 0.3), minimo=(1.2, 0.9))
 
 
 def _dentro(x, y, pol) -> bool:
@@ -1738,6 +1754,44 @@ def _hora_txt(iso: str) -> str:
     return f"{g.DIAS[d.weekday()]} {d.day} a las {d:%H:%M}"
 
 
+def amarillos_cerca(todos, grupos, momento) -> list[dict]:
+    """Avisos amarillos del mismo fenómeno, en las próximas 24 h y en la misma zona que los naranjas/rojos (en
+    Canarias, el resto de islas): para decir «en Lanzarote y Fuerteventura, aviso amarillo» y que nadie crea que se
+    ha librado."""
+    if not grupos:
+        return []
+    fen = {g["fenomeno"] for g in grupos}
+    pts = [p for g in grupos for pol in g["poligonos"] for p in pol]
+    canaria = bool(pts) and all(la < 30 for _, la in pts)
+    lo0, lo1 = min(p[0] for p in pts or [(0, 0)]), max(p[0] for p in pts or [(0, 0)])
+    la0, la1 = min(p[1] for p in pts or [(0, 0)]), max(p[1] for p in pts or [(0, 0)])
+    out = []
+    for a in todos:
+        if a["nivel"] != "amarillo" or a["fenomeno"] not in fen or not a.get("poligono"):
+            continue
+        try:
+            ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
+        except (TypeError, ValueError):
+            continue
+        if not (fin > momento and ini < momento + timedelta(hours=24)):
+            continue
+        cx = sum(p[0] for p in a["poligono"]) / len(a["poligono"])
+        cy = sum(p[1] for p in a["poligono"]) / len(a["poligono"])
+        if canaria:
+            if cy >= 30:
+                continue
+        elif not (lo0 - 1.5 <= cx <= lo1 + 1.5 and la0 - 1.2 <= cy <= la1 + 1.2):
+            continue
+        out.append({**a, "ciudades": []})
+    gs = agrupar(out)
+    # sin repetir zonas que ya están en naranja/rojo (el amarillo de 1 hora dentro del naranja de 12 horas)
+    ya = {z for g in grupos for z in g["zonas"]}
+    ya_islas = set(islas_de(list(ya)))
+    for g in gs:
+        g["zonas"] = [z for z in g["zonas"] if z not in ya and not (set(islas_de([z])) & ya_islas)]
+    return [g for g in gs if g["zonas"]]
+
+
 def sitios_aviso(gr) -> list[str]:
     """Los sitios que hay que nombrar: en Canarias, las islas; si no, las zonas de AEMET (todas en rojo, hasta 6 en
     naranja), sin repetir."""
@@ -1782,6 +1836,12 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     for d_, gr in zip(datos, grupos[:4]):
         d_["sitios_afectados"] = sitios_aviso(gr)
+    if datos and AMARILLOS:
+        datos[0]["ADEMAS_AVISO_AMARILLO"] = [f"{nombre_fen(g['fenomeno'])} en " + ", ".join(sitios_aviso(g))
+                                             for g in AMARILLOS]
+        datos[0]["nota_amarillo"] = ("Al final de «zonas» añade una frase corta con los avisos amarillos de "
+                                     "ADEMAS_AVISO_AMARILLO («En Lanzarote y Fuerteventura, aviso amarillo por lluvias y "
+                                     "tormentas»), para que nadie de esas zonas crea que se ha librado.")
     if datos and AMPLIACION:
         datos[0]["NOVEDAD"] = ("AEMET AMPLÍA el aviso a: " + ", ".join(AMPLIACION) + ". Empieza el vídeo con eso "
                                "(«AEMET amplía el aviso naranja a Gran Canaria») y luego nombra TODOS los sitios.")
@@ -1828,6 +1888,8 @@ def caption_aviso(grupos, gancho) -> str:
         n = 14   # todos los sitios
         lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:n])}"
                       + (" y más" if len(sitios) > n else ""))
+    for g in AMARILLOS:
+        lineas.append(f"🟡 Aviso amarillo por {nombre_fenomeno(g['fenomeno'])}: {', '.join(sitios_aviso(g))}")
     lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.",
                "Mapa de núcleos: GeoNames (CC BY 4.0)."]
     tags = ["#aviso", "#AEMET", "#eltiempo", "#paraguasochanclas"]
@@ -1863,15 +1925,16 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]
     kwargs = {
-        "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "consejos": zona, "cierre": zona},
+        "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "consejos": _zona_cerca(grupos, nucleos), "cierre": zona},
         "sin_marcadores": ("intro", "zonas", "consejos", "cierre"),
         "pills": {"zonas": "ZONAS Y HORAS", "consejos": "QUÉ HACER", "cierre": "COMPÁRTELO",
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
-        "capas": {"intro": _capa_poligonos(grupos),
-                  "zonas": _juntar_capas(_capa_poligonos(grupos, con_lista=True), _capa_nucleos(nucleos)),
-                  "consejos": _juntar_capas(_capa_poligonos(grupos, consejos=consejos), _capa_nucleos(nucleos[:4])),
-                  "cierre": _capa_poligonos(grupos)},
+        "capas": {"intro": _capa_poligonos(grupos + AMARILLOS),
+                  "zonas": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, con_lista=True), _capa_nucleos(nucleos)),
+                  "consejos": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, consejos=consejos),
+                                            _capa_nucleos(nucleos[:4])),
+                  "cierre": _capa_poligonos(grupos + AMARILLOS)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],
                           "fenomeno": " y ".join(dict.fromkeys("oleaje" if "costeros" in x["fenomeno"] else x["fenomeno"]
@@ -1984,7 +2047,9 @@ def main():
             grupos = avisos_demo()
         else:
             clave = os.environ.get("AEMET_API_KEY", "")
-            grupos = agrupar(avisos_relevantes(descargar_avisos(clave), datetime.now().astimezone()))
+            todos = descargar_avisos(clave)
+            grupos = agrupar(avisos_relevantes(todos, datetime.now().astimezone()))
+            AMARILLOS[:] = amarillos_cerca(todos, grupos, datetime.now().astimezone())
         if not grupos:
             log.info("No hay avisos naranjas ni rojos en poblaciones de más de 100.000 habitantes")
             return
@@ -2005,10 +2070,12 @@ def main():
                         ya |= set(x.get("ciudades") or []) | set(x.get("zonas") or [])
                 nuevos = list(dict.fromkeys(c for x in del_nivel for c in sitios_aviso(x) + (x.get("ciudades") or [])
                                             if c not in ya and not any(c in z for z in ya)))
+                if os.environ.get("REHACER"):   # a mano: rehacer el vídeo de hoy (zoom más cerca, etc.)
+                    nuevos = nuevos or ["(rehecho)"]
                 if not nuevos or len(previos) >= 3:
                     log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos)", nivel)
                     continue
-                AMPLIACION[:] = nuevos
+                AMPLIACION[:] = [x for x in nuevos if x != "(rehecho)"]
                 log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)
                 hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}-{len(previos) + 1}.json"
             if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
