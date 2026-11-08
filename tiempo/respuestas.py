@@ -1122,7 +1122,7 @@ def comentar_publicaciones(lineas: str):
         r = requests.post(f"{API}/uploadposts/comments/create", headers=uploadpost._cabeceras(), json={
             "platform": plat, "user": perfil, "post_id": pid.strip(), "message": texto.strip()[:300]}, timeout=40)
         print(f"::notice::Comentario en {plat} {pid}: HTTP {r.status_code} {r.text[:300]}")
-        time.sleep(3)
+        time.sleep(20)
 
 
 def main_todo():
