@@ -1924,6 +1924,16 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]
+    lluvia_aviso = None
+    if not demo and any("lluvia" in x["fenomeno"].lower() for x in grupos):   # en el zoom, la lluvia en colores
+        try:
+            from . import campos
+            from zoneinfo import ZoneInfo
+            dia = max(datetime.fromisoformat(gr["inicio"]).astimezone(ZoneInfo("Europe/Madrid")).date(), hoy)
+            lluvia_aviso = campos.capa_lluvia(dia, con_canarias=any(la < 30 for x in grupos for pol in x["poligonos"]
+                                                                    for _, la in pol))
+        except Exception as e:  # noqa: BLE001
+            log.warning("Lluvia en colores para el aviso: %s", e)
     kwargs = {
         "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "consejos": _zona_cerca(grupos, nucleos), "cierre": zona},
         "sin_marcadores": ("intro", "zonas", "consejos", "cierre"),
@@ -1933,7 +1943,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "capas": {"intro": _capa_poligonos(grupos + AMARILLOS),
                   "zonas": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, con_lista=True), _capa_nucleos(nucleos)),
                   "consejos": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, consejos=consejos),
-                                            _capa_nucleos(nucleos[:4])),
+                                            *([lluvia_aviso] if lluvia_aviso else []), _capa_nucleos(nucleos[:4])),
                   "cierre": _capa_poligonos(grupos + AMARILLOS)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],

@@ -32,7 +32,47 @@ COLA_MIN = 1.2     # tras la despedida (tarjeta de "sígueme")
 VEL_MIN, VEL_MAX = 10, 35  # nunca más lenta de +10 %: si sobra tiempo, se alarga el guion
 
 
-AVISO_GRAVE: list = [None]   # avisos naranja/rojo del día (para el tramo «aviso» con zoom)
+AVISO_GRAVE: list = [None]
+MAPA_EXTRA: list = [None]   # (capa, pastilla) para el bloque «general»: lluvia en colores o isobaras, de vez en cuando
+
+
+def _kwargs_juntos(a: dict, b: dict) -> dict:
+    out = dict(a)
+    for k, v in b.items():
+        out[k] = {**(out.get(k) or {}), **v} if isinstance(v, dict) else v
+    return out
+
+
+def mapa_extra(prev, avisos, hoy) -> str:
+    """De vez en cuando, más información en el bloque general: el mapa de lluvia en escala de colores (si es un día de
+    lluvia) o el de isobaras (si hay una borrasca o un anticiclón que manda). Devuelve la nota para el guion."""
+    from . import campos
+    lluviosas = [c for c in prev if c.get("lluvia", 0) >= 50]
+    hay_aviso_lluvia = any("lluvia" in x["fenomeno"].lower() or "tormenta" in x["fenomeno"].lower() for x in avisos)
+    try:
+        if (len(lluviosas) >= 4 or hay_aviso_lluvia) and hoy.toordinal() % 2 == 0:
+            capa = campos.capa_lluvia(hoy)
+            if capa:
+                MAPA_EXTRA[0] = (capa, "LLUVIA PREVISTA (L/M²)")
+                return ("\n\nMAPA DE LLUVIA: en el bloque «general» sale el mapa de lluvia acumulada en colores (de "
+                        "celeste a morado: de 1 a más de 120 litros). Dedícale una frase: dónde se acumulará más lluvia "
+                        "(«fíjate en las zonas en verde y amarillo: ahí caerán más de 15 litros»).")
+        if hoy.toordinal() % 3 == 0 or (len(lluviosas) >= 4 and hoy.toordinal() % 2 == 1):
+            r = campos.capa_isobaras(hoy)
+            if r:
+                capa, centros, pmin, pmax = r
+                fuertes = [c for c in centros if (c[0] == "B" and c[3] <= 1005) or (c[0] == "A" and c[3] >= 1026)]
+                if fuertes:
+                    MAPA_EXTRA[0] = (capa, "ISOBARAS · MEDIODÍA")
+                    desc = "; ".join(f"{'borrasca' if t == 'B' else 'anticiclón'} de {p:.0f} hPa"
+                                     f" ({'al oeste' if lo < -10 else 'al norte' if la > 45 else 'cerca'})"
+                                     for t, lo, la, p in fuertes[:3])
+                    return ("\n\nMAPA DE ISOBARAS: en el bloque «general» sale el mapa de isobaras del mediodía con "
+                            f"las altas (A) y bajas (B): {desc}. Dedícale una frase sencilla que explique qué "
+                            "significa para el tiempo (líneas muy juntas = viento; la B trae lluvia; la A, estabilidad).")
+    except Exception as e:  # noqa: BLE001
+        log.warning("Mapa extra no disponible: %s", e)
+    return ""   # avisos naranja/rojo del día (para el tramo «aviso» con zoom)
 
 
 def _kwargs_aviso(graves) -> dict:
@@ -246,6 +286,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             g.EXTREMOS = EXTREMOS_PUEBLOS[0]
         except Exception as e:  # noqa: BLE001
             log.warning("Extremos en pueblos no disponibles: %s", e)
+        g.GANCHO_TEXTO += mapa_extra(prev, avisos, hoy)
         graves = [x for x in avisos if x["nivel"] in ("naranja", "rojo") and x.get("poligonos")]
         # Duración: lo que mejor funciona ronda los 70 s; solo se alarga cuando de verdad hay mucho que contar
         g.GANCHO_TEXTO += ("\n\nDURACIÓN: el vídeo debe rondar los 70 segundos: respeta las palabras de cada bloque. "
@@ -324,8 +365,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
                       gancho=fen, satelite=sat,
-                      capas_fondo=_capas_parte(avisos), capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa),
-                      **_kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None))
+                      capas_fondo={**(_capas_parte(avisos) or {}), **({"general": MAPA_EXTRA[0][0]} if MAPA_EXTRA[0] else {})},
+                      capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa),
+                      **_kwargs_juntos(_kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None),
+                                       {"pills": {"general": MAPA_EXTRA[0][1]}} if MAPA_EXTRA[0] else {}))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)

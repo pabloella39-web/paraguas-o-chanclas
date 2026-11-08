@@ -20,9 +20,9 @@ log = logging.getLogger(__name__)
 URL = "https://api.open-meteo.com/v1/forecast"
 
 # Rejillas (lon0, lon1, lat0, lat1, paso)
-PENINSULA = (-9.8, 4.6, 35.6, 44.0, 0.4)
-CANARIAS = (-18.3, -13.3, 27.5, 29.5, 0.25)
-ISOBARAS = (-24.0, 12.0, 29.0, 50.0, 1.0)   # más amplia: las borrascas vienen de lejos
+PENINSULA = (-11.2, 5.2, 34.8, 44.8, 0.4)
+CANARIAS = (-18.6, -13.0, 27.3, 29.7, 0.25)
+ISOBARAS = (-30.0, 12.0, 28.0, 55.0, 1.0)   # más amplia: las borrascas vienen de lejos
 
 # Escala de lluvia (l/m² en el día) — de celeste a morado
 ESCALA = [(1, (154, 215, 245)), (3, (79, 179, 232)), (7, (43, 123, 217)), (15, (47, 191, 113)),
@@ -95,6 +95,11 @@ def _imagen_lluvia(lons, lats, v, canaria=False) -> tuple[Image.Image, tuple]:
         m = fino >= umbral
         rgba[m, :3] = col
         rgba[m, 3] = 175
+    # sin cortes rectos en los bordes de la rejilla: el campo se desvanece hacia fuera
+    borde = max(8, int(0.9 * PX_GRADO * (lons[1] - lons[0])))
+    yy, xx = np.mgrid[0:h, 0:w]
+    dist = np.minimum.reduce([xx, w - 1 - xx, yy, h - 1 - yy]).astype(float)
+    rgba[..., 3] = (rgba[..., 3] * np.clip(dist / borde, 0, 1)).astype(np.uint8)
     # bordes suaves entre colores
     img = Image.fromarray(rgba[::-1], "RGBA")   # filas de norte a sur
     from PIL import ImageFilter
@@ -118,8 +123,10 @@ def _imagen_isobaras(lons, lats, v) -> tuple[Image.Image, tuple]:
     ax.set_ylim(lats[0], lats[-1])
     ax.axis("off")
     niveles = np.arange(math.floor(v.min() / 4) * 4, v.max() + 4, 4)
-    cs = ax.contour(lons, lats, v, levels=niveles, colors="white", linewidths=2.2, alpha=0.9)
-    ax.clabel(cs, fmt="%d", fontsize=13, colors="white", inline=True)
+    # fondo suave: azul donde la presión es baja, rojo donde es alta (como en los mapas de la tele)
+    ax.contourf(lons, lats, v, levels=np.arange(960, 1050, 2), cmap="RdBu_r", alpha=0.32, vmin=990, vmax=1035)
+    cs = ax.contour(lons, lats, v, levels=niveles, colors="white", linewidths=4.5, alpha=0.95)
+    ax.clabel(cs, fmt="%d", fontsize=24, colors="white", inline=True, inline_spacing=12)
     fig.patch.set_alpha(0)
     fig.canvas.draw()
     img = Image.frombuffer("RGBA", fig.canvas.get_width_height(), fig.canvas.buffer_rgba()).copy()
@@ -132,10 +139,10 @@ def centros(lons, lats, v) -> list[tuple[str, float, float, float]]:
     from scipy.ndimage import gaussian_filter, maximum_filter, minimum_filter
     s = gaussian_filter(v, 1.5)
     out = []
-    for tipo, filtro, cond in (("A", maximum_filter, lambda x: x >= 1022), ("B", minimum_filter, lambda x: x <= 1008)):
-        m = (filtro(s, size=9) == s)
+    for tipo, filtro, cond in (("A", maximum_filter, lambda x: x >= 1020), ("B", minimum_filter, lambda x: x <= 1010)):
+        m = (filtro(s, size=11) == s)
         for i, j in zip(*np.nonzero(m)):
-            if 2 <= i < s.shape[0] - 2 and 2 <= j < s.shape[1] - 2 and cond(s[i, j]):
+            if 1 <= i < s.shape[0] - 1 and 1 <= j < s.shape[1] - 1 and cond(s[i, j]):
                 out.append((tipo, float(lons[j]), float(lats[i]), float(s[i, j])))
     return out
 
