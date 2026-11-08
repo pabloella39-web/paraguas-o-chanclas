@@ -385,6 +385,8 @@ def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA
         t = _dt.fromisoformat(horas[k])
         fotos.append((img, caja, f"{DIAS_CORTOS[t.weekday()]} {t.hour:02d}:00"))
     cache: dict = {}
+    from . import mapa as mapa_
+    provs = mapa_.provincias()
     f, fpeq, freloj = fuente("ExtraBold", 26), fuente("Bold", 20), fuente("Black", 54)
 
     def dibujar(capa, pr, dt):
@@ -396,6 +398,11 @@ def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA
             for k in list(cache)[:-2]:
                 cache.pop(k, None)
         d = ImageDraw.Draw(capa)
+        for p_ in provs:   # costas encima del color
+            for anillo in p_["anillos"]:
+                pts = [pr(*lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
+                d.line([(x, y + MAPA_Y0) for x, y in pts] + [(pts[0][0], pts[0][1] + MAPA_Y0)],
+                       fill=(255, 255, 255, 210), width=3)
         w = freloj.getlength(reloj) + 48
         d.rounded_rectangle([ANCHO - 40 - w, MAPA_Y0 + 24, ANCHO - 40, MAPA_Y0 + 104], radius=22, fill=(8, 20, 45, 225))
         d.text((ANCHO - 40 - w / 2, MAPA_Y0 + 64), reloj, font=freloj, fill=(255, 255, 255, 255), anchor="mm")
