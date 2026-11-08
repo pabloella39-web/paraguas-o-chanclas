@@ -43,16 +43,16 @@
  },
  "2026-11-08": {
   "min": {
-   "valor": 0.0,
-   "sitio": "Evc_campisabalos",
-   "zona": "Guadalajara",
-   "hora": "2026-11-07T23:00:00+0000"
+   "valor": -2.4,
+   "sitio": "Martinet",
+   "zona": "Lleida",
+   "hora": "2026-11-08T07:00:00+0000"
   },
   "max": {
-   "valor": 28.1,
-   "sitio": "Valle de la Orotava",
-   "zona": "Santa Cruz de Tenerife",
-   "hora": "2026-11-07T23:00:00+0000"
+   "valor": 29.0,
+   "sitio": "Agaete-casco",
+   "zona": "Las Palmas de Gran Canaria",
+   "hora": "2026-11-08T00:00:00+0000"
   }
  }
 }
