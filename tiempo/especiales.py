@@ -876,6 +876,7 @@ def agrupar(avisos: list[dict]) -> list[dict]:
         gr["inicio"], gr["fin"] = min(gr["inicio"], a["inicio"]), max(gr["fin"], a["fin"])
         if a["poligono"]:
             gr["poligonos"].append(a["poligono"])
+            gr.setdefault("zona_poligono", []).append((a["zona"], a["poligono"]))
     return sorted(grupos.values(), key=lambda gr: (-NIVELES[gr["nivel"]], -len(gr.get("ciudades", [])),
                                                    -len(gr["zonas"])))
 
@@ -920,14 +921,46 @@ def _zona_zoom(grupos):
     if any(can) and not all(can):
         return VISTA_GENERAL   # península y Canarias a la vez: el mapa entero
     if all(can):
-        islas = islas_de([z for gr in grupos for z in gr["zonas"]]) or \
-            [i for i, (a, b, c, d) in CAJA_ISLA.items() if any(a <= lo <= b and c <= la <= d for lo, la in pts)]
-        cajas = [CAJA_ISLA[i] for i in islas if i in CAJA_ISLA]
+        # todas las islas (también las que no tienen aviso): la gente se sitúa y se ve el archipiélago entero
+        cajas = list(CAJA_ISLA.values())
         if cajas:
             return _encuadre(min(c[0] for c in cajas), max(c[1] for c in cajas), min(c[2] for c in cajas),
                              max(c[3] for c in cajas), True)
     return _encuadre(min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts),
                      max(p[1] for p in pts), False, margen=(0.25, 0.2), minimo=(1.8, 1.4))
+
+
+def _campo_aviso(grupos, hoy: date):
+    """Rejilla fina de lluvia acumulada durante el aviso (si es por lluvia) y el máximo por sitio. None si no toca."""
+    if not any("lluvia" in x["fenomeno"].lower() for x in grupos):
+        return None
+    from . import campos
+    from zoneinfo import ZoneInfo
+    tz = ZoneInfo("Europe/Madrid")
+    try:
+        ini = max(min(datetime.fromisoformat(x["inicio"]) for x in grupos).astimezone(tz).date(), hoy)
+        fin = max(datetime.fromisoformat(x["fin"]) for x in grupos).astimezone(tz).date()
+        fin = min(max(fin, ini), ini + timedelta(days=2))
+        pts = [p for x in grupos for pol in x["poligonos"] for p in pol]
+        if pts and all(la < 30 for _, la in pts):
+            lons, lats, v = campos.lluvia(ini, campos.CANARIAS_FINA, fin)
+            stats = campos.maximos(lons, lats, v, CAJA_ISLA)
+            return [(lons, lats, v, True)], {k: x for k, x in sorted(stats.items(), key=lambda t: -t[1]) if x >= 1}
+        lo0, lo1 = min(p[0] for p in pts) - 0.8, max(p[0] for p in pts) + 0.8
+        la0, la1 = min(p[1] for p in pts) - 0.6, max(p[1] for p in pts) + 0.6
+        paso = 0.1 if (lo1 - lo0) * (la1 - la0) < 12 else 0.2
+        lons, lats, v = campos.lluvia(ini, (lo0, lo1, la0, la1, paso), fin)
+        cajas = {}
+        for x in grupos:
+            for z, pol in x.get("zona_poligono") or []:
+                cajas[z.split(" - ")[-1]] = (min(p[0] for p in pol), max(p[0] for p in pol),
+                                             min(p[1] for p in pol), max(p[1] for p in pol))
+        stats = campos.maximos(lons, lats, v, cajas)
+        top = dict(sorted(stats.items(), key=lambda t: -t[1])[:6])
+        return [(lons, lats, v, False)], top
+    except Exception as e:  # noqa: BLE001
+        log.warning("Mapa de lluvia del aviso no disponible: %s", e)
+        return None
 
 
 def _zona_cerca(grupos, nucleos):
@@ -1634,6 +1667,10 @@ Bloques (palabras aproximadas: {palabras}; total ≈ {total}; es crucial no pasa
   Canarias, todas las islas: si el aviso es de cuatro islas no puede salir solo Tenerife); si son muchos, agrúpalos
   («todo el litoral de Valencia y el norte de Alicante»). Si el aviso es ROJO es OBLIGATORIO nombrar cada sitio, aunque el
   bloque quede más largo. En pantalla se hace zoom a la zona y se señalan los núcleos de "nucleos_senalados_en_el_mapa".
+- lluvia (SOLO si en los datos viene "lluvia_prevista_max_l_m2"): en pantalla sale el mapa de lluvia acumulada con
+  escala de colores. Explica cuánta lluvia se espera y dónde más (de mayor a menor, con cifras redondas: «En La Palma
+  se pueden superar los 100 litros; en Tenerife y La Gomera, unos 60; en Gran Canaria, 40»). Nombra las zonas más
+  afectadas.
 - consejos: los dos consejos más importantes de la "instrucción" de AEMET + "y si hay una emergencia, llama al 112".
 - cierre: una sola frase: "Compártelo con quien viva allí." (puedes variarla un poco).
 Frases cortas y directas, de tú; números en cifras con "grados", "por ciento", "litros", "kilómetros por hora".
@@ -1643,9 +1680,10 @@ Nombres de fenómeno naturales: "oleaje" (no "costeros"), "viento", "lluvias", "
 "consejos_pantalla": 3 consejos MUY cortos (máx. 26 caracteres cada uno) para la pantalla.
 "caption": una frase (máx. 90 caracteres) con 1 emoji ⚠️, sin hashtags.
 
-Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "consejos": "...", "cierre": "..."}},
-"titular": "...", "consejos_pantalla": ["...", "...", "..."], "caption": "..."}}"""
+Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "lluvia": "... (solo si toca)",
+"consejos": "...", "cierre": "..."}}, "titular": "...", "consejos_pantalla": ["...", "...", "..."], "caption": "..."}}"""
 PALABRAS_AVISO = {"intro": 20, "zonas": 20, "consejos": 18, "cierre": 6}
+CAMPO_AVISO: list = [None]   # (campos para el mapa, máximos por sitio) cuando el aviso es por lluvia
 DURACION_AVISO = (20.0, 30.0, 25.0)
 CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAMA AL 112"],
                  "tormentas": ["RESGUÁRDATE BAJO TECHO", "LEJOS DE ÁRBOLES", "LLAMA AL 112"],
@@ -1828,7 +1866,11 @@ def _norm_txt(t: str) -> str:
 
 def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool) -> dict:
     orden = ["intro", "zonas", "consejos", "cierre"]
-    palabras = {k: max(8, round(v * factor)) for k, v in PALABRAS_AVISO.items()}
+    base = dict(PALABRAS_AVISO)
+    if CAMPO_AVISO[0]:
+        orden.insert(2, "lluvia")
+        base["lluvia"] = 26
+    palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     datos = [{"nivel": gr["nivel"], "fenomeno": gr["fenomeno"], "zonas": gr["zonas"][:12],
               "grandes_ciudades_afectadas": gr.get("ciudades", [])[:8],
               "desde": _hora_txt(gr["inicio"]), "hasta": _hora_txt(gr["fin"]), "descripcion": gr["descripcion"],
@@ -1848,6 +1890,8 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     palabras["zonas"] += 3 * extra   # con muchos sitios, el bloque de zonas puede alargarse
     if datos:
         datos[0]["nucleos_senalados_en_el_mapa"] = [c["nombre"] for c in nucleos_afectados(grupos)]
+    if datos and CAMPO_AVISO[0]:
+        datos[0]["lluvia_prevista_max_l_m2"] = CAMPO_AVISO[0][1]
     if not plantilla:
         try:
             gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_avisos(
@@ -1873,6 +1917,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         "consejos": "Extrema la precaución y, si hay una emergencia, llama al 112.",
         "cierre": "Compártelo con quien viva allí.",
     }
+    if CAMPO_AVISO[0]:
+        top = sorted(CAMPO_AVISO[0][1].items(), key=lambda x: -x[1])[:3]
+        seg["lluvia"] = "Lo que más: " + "; ".join(f"en {n}, hasta {v} litros por metro cuadrado" for n, v in top) + "."
     return {"segmentos": seg, "orden": orden, "titular": f"AVISO {gr['nivel'].upper()}",
             "caption": f"⚠️ Aviso {gr['nivel']} por {gr['fenomeno']}: lo que tienes que saber",
             "consejos_pantalla": CONSEJOS_BASE.get(gr["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"]),
@@ -1894,8 +1941,9 @@ def caption_aviso(grupos, gancho) -> str:
                "Mapa de núcleos: GeoNames (CC BY 4.0)."]
     tags = ["#aviso", "#AEMET", "#eltiempo", "#paraguasochanclas"]
     for gr in grupos[:1]:
-        for c in (gr.get("ciudades") or [])[:1]:
-            tags.append("#" + re.sub(r"\W", "", c.split()[0]))
+        islas_ = [c for c in gr.get("ciudades") or [] if c in ISLAS]
+        for c in (["Canarias"] if len(islas_) >= 2 else (gr.get("ciudades") or [])[:1]):
+            tags.append("#" + re.sub(r"\W", "", c))
     return (f"{(gancho or '⚠️ Aviso de AEMET: lo que tienes que saber').strip()}\n\n" + "\n".join(lineas)
             + "\n\n" + " ".join(dict.fromkeys(tags)))[:2200]
 
@@ -1915,7 +1963,9 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     global VOZ_USADA
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
-    with duracion(*DURACION_AVISO):  # vídeo flash de 20-30 s
+    CAMPO_AVISO[0] = None if demo else _campo_aviso(grupos, hoy)
+    dur_aviso = (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO
+    with duracion(*dur_aviso):  # vídeo flash (algo más largo si lleva el mapa de lluvia)
         guion, plan, total, trozos, motor = locutar(
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
@@ -1924,26 +1974,22 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]
-    lluvia_aviso = None
-    if not demo and any("lluvia" in x["fenomeno"].lower() for x in grupos):   # en el zoom, la lluvia en colores
-        try:
-            from . import campos
-            from zoneinfo import ZoneInfo
-            dia = max(datetime.fromisoformat(gr["inicio"]).astimezone(ZoneInfo("Europe/Madrid")).date(), hoy)
-            lluvia_aviso = campos.capa_lluvia(dia, con_canarias=any(la < 30 for x in grupos for pol in x["poligonos"]
-                                                                    for _, la in pol))
-        except Exception as e:  # noqa: BLE001
-            log.warning("Lluvia en colores para el aviso: %s", e)
+    lluvia_capa = None
+    if CAMPO_AVISO[0] and "lluvia" in guion["segmentos"]:
+        from . import campos
+        lluvia_capa = campos.capa_lluvia_fuerte(CAMPO_AVISO[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)")
     kwargs = {
-        "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "consejos": _zona_cerca(grupos, nucleos), "cierre": zona},
-        "sin_marcadores": ("intro", "zonas", "consejos", "cierre"),
-        "pills": {"zonas": "ZONAS Y HORAS", "consejos": "QUÉ HACER", "cierre": "COMPÁRTELO",
+        "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "lluvia": zona, "consejos": zona, "cierre": zona},
+        "sin_marcadores": ("intro", "zonas", "lluvia", "consejos", "cierre"),
+        "pills": {"zonas": "ZONAS Y HORAS", "lluvia": "¿CUÁNTO VA A LLOVER?", "consejos": "QUÉ HACER",
+                  "cierre": "COMPÁRTELO",
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
         "capas": {"intro": _capa_poligonos(grupos + AMARILLOS),
                   "zonas": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, con_lista=True), _capa_nucleos(nucleos)),
+                  **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(nucleos))} if lluvia_capa else {}),
                   "consejos": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, consejos=consejos),
-                                            *([lluvia_aviso] if lluvia_aviso else []), _capa_nucleos(nucleos[:4])),
+                                            _capa_nucleos(nucleos[:4])),
                   "cierre": _capa_poligonos(grupos + AMARILLOS)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],

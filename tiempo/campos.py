@@ -64,12 +64,94 @@ def _pedir(puntos, params) -> list[dict]:
     return out
 
 
-def lluvia(dia: date, caja=PENINSULA) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+CANARIAS_FINA = (-18.4, -13.2, 27.5, 29.5, 0.1)   # las islas son pequeñas: rejilla fina para el aviso
+
+
+def lluvia(dia: date, caja=PENINSULA, hasta: date | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Lluvia acumulada (l/m²) del día, o de varios días seguidos si se da «hasta»."""
     lons, lats = _rejilla(caja)
     puntos = [(la, lo) for la in lats for lo in lons]
-    js = _pedir(puntos, {"daily": "precipitation_sum", "start_date": dia.isoformat(), "end_date": dia.isoformat()})
-    v = np.array([(j.get("daily") or {}).get("precipitation_sum", [0])[0] or 0 for j in js], dtype=float)
+    fin = hasta or dia
+    js = _pedir(puntos, {"daily": "precipitation_sum", "start_date": dia.isoformat(), "end_date": fin.isoformat()})
+    v = np.array([sum(x or 0 for x in (j.get("daily") or {}).get("precipitation_sum", [0])) for j in js], dtype=float)
     return lons, lats, v.reshape(len(lats), len(lons))
+
+
+def maximos(lons, lats, v, cajas: dict) -> dict:
+    """Lluvia máxima prevista dentro de cada caja {nombre: (lon0, lon1, lat0, lat1)}."""
+    out = {}
+    for n, (a, b, c, d) in cajas.items():
+        mi = (lons >= a - 0.05) & (lons <= b + 0.05)
+        mj = (lats >= c - 0.05) & (lats <= d + 0.05)
+        sub = v[np.ix_(mj, mi)]
+        if sub.size:
+            out[n] = int(round(float(sub.max())))
+    return out
+
+
+# Escala «de mapa de modelo» (como Meteologix/ECMWF): del azul al morado pasando por verde, amarillo y rojo
+ESCALA_FUERTE = [(0.2, (198, 225, 245)), (1, (150, 200, 240)), (2, (100, 170, 235)), (3, (60, 135, 225)),
+                 (5, (35, 100, 210)), (7, (25, 150, 140)), (10, (40, 170, 80)), (15, (100, 200, 50)),
+                 (20, (170, 220, 40)), (25, (235, 230, 40)), (30, (250, 200, 30)), (40, (250, 160, 20)),
+                 (50, (245, 115, 20)), (60, (235, 70, 25)), (70, (215, 30, 30)), (80, (185, 15, 50)),
+                 (100, (200, 40, 140)), (125, (210, 80, 210)), (150, (175, 120, 235)), (200, (230, 190, 245))]
+
+
+def _imagen_lluvia_fuerte(lons, lats, v, canaria=False) -> tuple[Image.Image, tuple]:
+    """Campo continuo y opaco (también sobre el mar), interpolado entre colores de la escala."""
+    from scipy.ndimage import zoom
+    from PIL import ImageFilter
+    f = PX_GRADO * (lons[1] - lons[0])
+    fino = np.clip(zoom(v, f, order=3), 0, None)
+    umbrales = np.array([u for u, _ in ESCALA_FUERTE])
+    cols = np.array([c for _, c in ESCALA_FUERTE], dtype=float)
+    idx = np.clip(np.searchsorted(umbrales, fino, side="right") - 1, 0, len(umbrales) - 1)
+    sig = np.clip(idx + 1, 0, len(umbrales) - 1)
+    t = np.clip((fino - umbrales[idx]) / np.maximum(umbrales[sig] - umbrales[idx], 1e-6), 0, 1)[..., None]
+    rgb = cols[idx] * (1 - t) + cols[sig] * t
+    alfa = np.where(fino >= umbrales[0], 225, 0).astype(float)
+    h, w = fino.shape
+    borde = max(8, int(0.6 * PX_GRADO * (lons[1] - lons[0])))
+    yy, xx = np.mgrid[0:h, 0:w]
+    dist = np.minimum.reduce([xx, w - 1 - xx, yy, h - 1 - yy]).astype(float)
+    alfa *= np.clip(dist / borde, 0, 1)
+    rgba = np.dstack([rgb, alfa]).astype(np.uint8)
+    img = Image.fromarray(rgba[::-1], "RGBA").filter(ImageFilter.GaussianBlur(1.2))
+    lon0, lat0 = lonlat_mapa(float(lons[0]), float(lats[0]), canaria)
+    lon1, lat1 = lonlat_mapa(float(lons[-1]), float(lats[-1]), canaria)
+    return img, (lon0, lon1, lat0, lat1)
+
+
+def _leyenda_horizontal(capa, y, titulo, f, fpeq):
+    """Barra de colores horizontal con sus cifras, como en los mapas de los modelos."""
+    from .config import ANCHO
+    d = ImageDraw.Draw(capa)
+    x0, x1 = 40, ANCHO - 40
+    n = len(ESCALA_FUERTE)
+    paso = (x1 - x0) / n
+    d.rounded_rectangle([x0 - 16, y - 46, x1 + 16, y + 64], radius=18, fill=(8, 20, 45, 215))
+    d.text((x0, y - 24), titulo, font=f, fill=(255, 255, 255, 255), anchor="lm")
+    for k, (u, col) in enumerate(ESCALA_FUERTE):
+        d.rectangle([x0 + k * paso, y, x0 + (k + 1) * paso, y + 24], fill=col + (255,))
+        if k % 2 == 1 or k == 0:
+            d.text((x0 + k * paso, y + 42), f"{u:g}".replace(".", ","), font=fpeq, fill=(230, 236, 245, 255),
+                   anchor="mm")
+
+
+def capa_lluvia_fuerte(campos_: list, titulo: str):
+    """Capa con el campo de lluvia «de modelo» (opaco, escala completa) y la leyenda horizontal abajo.
+    campos_: lista de (lons, lats, v, canaria)."""
+    from .video import MAPA_Y0, MAPA_H
+    from .especiales import fuente
+    imgs = [_imagen_lluvia_fuerte(lo, la, v, can) for lo, la, v, can in campos_]
+    cache: dict = {}
+    f, fpeq = fuente("ExtraBold", 26), fuente("Bold", 20)
+
+    def dibujar(capa, pr, dt):
+        for n, (img, caja) in enumerate(imgs):
+            _pegar(capa, img, caja, pr, MAPA_Y0, cache, f"f{n}")
+        _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq)
+    return dibujar
 
 
 def presion(dia: date, hora: int = 12, caja=ISOBARAS) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
