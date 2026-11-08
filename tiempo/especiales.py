@@ -72,6 +72,30 @@ VOZ_USADA = ""   # voz del especial que se está haciendo (para alternar con el 
 
 
 # ================================================================ voz (común)
+def _completar_avisos_dias(guion: dict):
+    """En el semanal/finde: si el bloque «avisos_<día>» se deja algún sitio con aviso naranja o rojo, se añade."""
+    segs = guion.get("segmentos") or {}
+    for k, grupos in (AVISOS_DIA or {}).items():
+        clave = f"avisos_{k}"
+        if clave not in segs:
+            continue
+        texto = _norm_txt(segs[clave])
+        for gr in grupos or []:
+            if gr["nivel"] not in ("naranja", "rojo"):
+                continue
+            faltan = []
+            for sitio in sitios_aviso(gr):
+                claves = [w for w in _norm_txt(sitio).replace(",", " ").split()
+                          if (len(w) > 3 or w in ("sur", "este")) and w not in ("litoral", "zona", "area", "zonas")]
+                if claves and not all(w in texto for w in claves):
+                    faltan.append(sitio)
+            if faltan:
+                lista = faltan[0] if len(faltan) == 1 else ", ".join(faltan[:-1]) + " y " + faltan[-1]
+                segs[clave] = segs[clave].rstrip() + (f" También aviso {gr['nivel']} por "
+                                                      f"{nombre_fen(gr['fenomeno']).lower()} en {lista}.")
+                texto = _norm_txt(segs[clave])
+
+
 def _recortar(guion: dict, bloques: list[str], proporcion: float):
     """Recorta frases del final de los bloques más largos hasta quedarse en «proporcion» de las palabras. El gancho, el
     cierre y los bloques de avisos (los sitios con aviso se nombran siempre) no se tocan."""
@@ -82,12 +106,35 @@ def _recortar(guion: dict, bloques: list[str], proporcion: float):
     total = sum(len(segs[b].split()) for b in bloques)
     objetivo = total * proporcion
     frases = {b: re.split(r"(?<=[.!?])\s+", segs[b].strip()) for b in bloques if b not in intocables}
+
+    def protegida(b, f):   # las frases de avisos naranja o rojo no se recortan nunca
+        return b.startswith("aviso") and re.search(r"naranja|rojo|También aviso", f, re.I)
+
+    def opciones():
+        """(prioridad, -largo del bloque, bloque, índice de frase): se quita primero lo de menor prioridad."""
+        out = []
+        for b, fs in frases.items():
+            if len(fs) < 2:
+                continue
+            largo = len(segs[b].split())
+            for i, f in enumerate(fs):
+                if protegida(b, f):
+                    continue
+                if not b.startswith("aviso") and re.search(r"\bayer\b|midió|marcó", f, re.I):
+                    out.append((0, -largo, b, i))          # el dato de ayer, lo primero que sobra
+                elif b.startswith("aviso"):
+                    if i > 0:
+                        out.append((2, -largo, b, i))      # amarillos, olas... antes que dejar un día en nada
+                elif i > 0:
+                    out.append((1 if len(fs) > 2 else 3, -largo, b, i))
+        return out
+
     while sum(len(segs[b].split()) for b in bloques) > objetivo:
-        cand = [b for b in frases if len(frases[b]) > 1]
-        if not cand:
+        ops = opciones()
+        if not ops:
             break
-        b = max(cand, key=lambda x: len(segs[x].split()))
-        frases[b].pop()
+        _, _, b, i = min(ops, key=lambda o: (o[0], o[1], -o[3]))
+        frases[b].pop(i)
         segs[b] = " ".join(frases[b])
     log.warning("Guion recortado: de %d a %d palabras", total, sum(len(segs[b].split()) for b in bloques))
 
@@ -102,6 +149,7 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
             factor = 1.0
             for _ in range(3):
                 guion = escribir(factor, False)
+                _completar_avisos_dias(guion)
                 bloques = [s for s in guion["orden"] if guion["segmentos"].get(s, "").strip()]
                 largo = eleven.longitud_hablada([guion["segmentos"][s] for s in bloques])
                 if abs(largo - meta) / meta <= 0.08 or guion.get("origen") != "claude":
