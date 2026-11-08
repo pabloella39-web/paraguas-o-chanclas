@@ -132,6 +132,7 @@ def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
         if abs(largo - meta) / meta <= 0.08 or guion.get("origen") != "claude":
             break
         factor *= meta / largo
+    recortar_si_largo(guion, bloques, largo, meta)
     textos = [guion["segmentos"][s] for s in bloques]
     wav, dur, lim, pal = eleven.sintetizar(textos, tipo_voz, trabajo, "1")
     if not 0.88 * objetivo <= dur <= 1.12 * objetivo and guion.get("origen") == "claude":
@@ -142,6 +143,16 @@ def generar_eleven(prev, hoy, texto_aemet, trabajo: Path, tipo_voz: str):
         textos = [guion["segmentos"][s] for s in bloques]
         wav, dur, lim, pal = eleven.sintetizar(textos, tipo_voz, trabajo, "2")
     return guion, bloques, wav, dur, lim, pal
+
+
+MAXIMO_ABSOLUTO = 100.0   # ningún vídeo pasa de 1 minuto 40
+
+
+def recortar_si_largo(guion: dict, bloques: list[str], largo: float, meta: float):
+    """Si el guion sigue largo tras pedirlo más corto, se recortan frases (como en los especiales)."""
+    if largo > meta * 1.15:
+        from .especiales import _recortar
+        _recortar(guion, bloques, meta * 1.08 / largo)
 
 
 def _alargar(nuevo_max: float):
@@ -177,9 +188,14 @@ def plan_eleven(bloques, wav, dur, lim, pal):
     elif dur < min_habla:
         tempo = max(dur / min_habla, 0.92)
     if tempo > 1.06:
-        # No hay máximo de duración: en vez de acelerar la voz (o caer en la voz gratuita) se alarga el vídeo
+        # Se alarga el vídeo en vez de acelerar la voz (o caer en la voz gratuita)... pero NUNCA más de 1:40
         tempo = 1.0
         nuevo_max = INICIO + dur + COLA_ELEVEN + 0.8
+        if nuevo_max > MAXIMO_ABSOLUTO:
+            tempo = dur / (MAXIMO_ABSOLUTO - 0.8 - INICIO - COLA_ELEVEN)
+            if tempo > 1.15:
+                raise RuntimeError(f"La locución dura {dur:.1f} s: no cabe en 1:40")
+            nuevo_max = MAXIMO_ABSOLUTO
         log.warning("Locución larga (%.1f s): el vídeo se alarga a %.1f s", dur, nuevo_max)
         _alargar(nuevo_max)
         max_habla = DURACION_MAX - 0.6 - INICIO - COLA_ELEVEN

@@ -107,8 +107,8 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
                 if abs(largo - meta) / meta <= 0.08 or guion.get("origen") != "claude":
                     break
                 factor *= meta / largo
-            if largo > meta * 1.2:   # el guion sigue largo (el 8/11 salió un semanal de 3 minutos): se recorta
-                _recortar(guion, bloques, meta * 1.1 / largo)
+            if largo > meta * 1.15:   # el guion sigue largo (el 8/11 salió un semanal de 3 minutos): se recorta
+                _recortar(guion, bloques, meta * 1.05 / largo)
             wav, dur, lim, pal = eleven.sintetizar([guion["segmentos"][s] for s in bloques], tipo_voz, trabajo, "esp")
             plan, total, wav = plan_eleven(bloques, wav, dur, lim, pal)
             return guion, plan, total, [(wav, INICIO)], f"elevenlabs ({eleven.modelo()})"
