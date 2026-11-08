@@ -247,7 +247,6 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
             orden = _sin_bloques_vacios(orden, gg)
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
-                _completar_sitios(gg, grupos)
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del finde con Claude falló: %s", e)
@@ -1857,6 +1856,7 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
+                _completar_sitios(gg, grupos)
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del aviso con Claude falló: %s", e)
