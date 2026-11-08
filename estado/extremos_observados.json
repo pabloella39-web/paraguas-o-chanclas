@@ -54,5 +54,19 @@
    "zona": "Las Palmas",
    "hora": "2026-11-08T15:00:00+0000"
   }
+ },
+ "2026-11-09": {
+  "min": {
+   "valor": 5.6,
+   "sitio": "Martinet",
+   "zona": "Lleida",
+   "hora": "2026-11-08T23:00:00+0000"
+  },
+  "max": {
+   "valor": 25.1,
+   "sitio": "Fuerteventura",
+   "zona": "Las Palmas",
+   "hora": "2026-11-08T23:00:00+0000"
+  }
  }
 }
