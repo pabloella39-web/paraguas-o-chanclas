@@ -110,6 +110,8 @@ def titular_avisos(ciudades: list[str], nivel: str) -> str:
     islas = _islas(ciudades)
     if len(islas) >= 2 and all(COMUNIDAD.get(c) == "Canarias" or c in ISLA_DE for c in ciudades):
         # Canarias en varias islas: se nombran las islas (hasta 3); con más, «Canarias»
+        if len(islas) >= 7:
+            return "todas las islas"
         return ", ".join(islas[:-1]) + " y " + islas[-1] if len(islas) <= 3 else "Canarias"
     if nivel == "rojo":   # los sitios concretos (hasta 3), los más grandes primero
         orden = sorted(dict.fromkeys(ciudades), key=lambda c: (c not in MUY_GRANDES, ciudades.index(c)))[:3]

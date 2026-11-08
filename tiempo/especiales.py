@@ -838,11 +838,14 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
             ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
         except (TypeError, ValueError):
             continue
-        if fin > momento and ini < momento + timedelta(hours=horas):
+        # las demás zonas con ese aviso en las próximas 24 h (el de Gran Canaria empezaba a las 12:00 y el vídeo de
+        # la medianoche lo dejó fuera)
+        if fin > momento and ini < momento + timedelta(hours=max(horas, 24)):
             out.append({**a, "ciudades": []})
     return out
 
 
+AMPLIACION: list = []   # sitios nuevos cuando AEMET amplía un aviso ya publicado hoy
 ISLAS = ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma", "La Gomera", "El Hierro"]
 
 
@@ -1698,7 +1701,7 @@ def _ciudades_portada_todos(grupos) -> list[str]:
     tit = titular_avisos(cs, gr["nivel"])
     from .poblaciones import _islas
     if len(_islas(cs)) >= 2:   # Canarias: debajo, las islas afectadas
-        return [tit, " · ".join(_islas(cs)[:4])] if tit == "Canarias" else [tit]
+        return [tit, " · ".join(_islas(cs)[:5])] if tit == "Canarias" else [tit]
     if tit in cs:
         return [tit] + [c for c in cs if c != tit][:2]
     return [tit, " · ".join(cs[:3])]
@@ -1742,7 +1745,7 @@ def sitios_aviso(gr) -> list[str]:
     if len(islas) >= 2:
         return islas
     zonas = list(dict.fromkeys(z.split(" - ")[-1] for z in gr["zonas"]))
-    return zonas[:12] if gr["nivel"] == "rojo" else zonas[:6]
+    return zonas[:14]   # todas: es lo que evita que alguien se lleve un susto
 
 
 def _completar_sitios(gg: dict, grupos):
@@ -1750,7 +1753,7 @@ def _completar_sitios(gg: dict, grupos):
     texto = _norm_txt(" ".join(gg["segmentos"].values()))
     faltan = []
     for gr in grupos[:4]:
-        if gr["nivel"] != "rojo" and len(islas_de(gr["zonas"])) < 2:
+        if gr["nivel"] not in ("rojo", "naranja"):
             continue
         for sitio in sitios_aviso(gr):
             # todas sus palabras con sentido («norte» y «valencia» en «Litoral norte de Valencia»)
@@ -1779,6 +1782,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     for d_, gr in zip(datos, grupos[:4]):
         d_["sitios_afectados"] = sitios_aviso(gr)
+    if datos and AMPLIACION:
+        datos[0]["NOVEDAD"] = ("AEMET AMPLÍA el aviso a: " + ", ".join(AMPLIACION) + ". Empieza el vídeo con eso "
+                               "(«AEMET amplía el aviso naranja a Gran Canaria») y luego nombra TODOS los sitios.")
     extra = max(0, sum(len(sitios_aviso(gr)) for gr in grupos[:4]) - 3)
     palabras["zonas"] += 3 * extra   # con muchos sitios, el bloque de zonas puede alargarse
     if datos:
@@ -1819,7 +1825,7 @@ def caption_aviso(grupos, gancho) -> str:
         from .gancho import nombre_fenomeno
         sitios = list(dict.fromkeys(sitios_aviso(gr) + [c for c in gr.get("ciudades") or [] if c not in ISLAS]))
         icono = {"rojo": "🔴", "naranja": "🟠"}.get(gr["nivel"], "🟡")
-        n = 12 if gr["nivel"] == "rojo" else 6   # en rojo, todos los sitios
+        n = 14   # todos los sitios
         lineas.append(f"{icono} Aviso {gr['nivel']} por {nombre_fenomeno(gr['fenomeno'])}: {', '.join(sitios[:n])}"
                       + (" y más" if len(sitios) > n else ""))
     lineas += ["ℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.",
@@ -1988,10 +1994,24 @@ def main():
             if not del_nivel:
                 continue
             hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}.json"
+            AMPLIACION[:] = []
             if hist_n.exists() and not a.demo:
-                log.info("El vídeo de avisos %ss de hoy ya está publicado", nivel)
-                continue
-            if not a.demo and _repetido(del_nivel, hoy, nivel):
+                # Ya salió el de hoy: solo se hace otro si AEMET ha AMPLIADO el aviso a sitios nuevos (Gran Canaria
+                # el 8/11/2026). Nunca más de tres vídeos del mismo nivel en un día.
+                previos = sorted(HISTORIAL.glob(f"aviso-{hoy.isoformat()}-{nivel}*.json"))
+                ya = set()
+                for f in previos:
+                    for x in json.loads(f.read_text(encoding="utf-8")).get("avisos") or []:
+                        ya |= set(x.get("ciudades") or []) | set(x.get("zonas") or [])
+                nuevos = list(dict.fromkeys(c for x in del_nivel for c in sitios_aviso(x) + (x.get("ciudades") or [])
+                                            if c not in ya and not any(c in z for z in ya)))
+                if not nuevos or len(previos) >= 3:
+                    log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos)", nivel)
+                    continue
+                AMPLIACION[:] = nuevos
+                log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)
+                hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}-{len(previos) + 1}.json"
+            if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
                 log.info("Aviso %s ya contado ayer (mismo fenómeno y zona): no se repite el vídeo", nivel)
                 continue
             meta = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
