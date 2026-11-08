@@ -159,8 +159,12 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
                 if abs(largo - meta) / meta <= 0.08 or guion.get("origen") != "claude":
                     break
                 factor *= meta / largo
-            if largo > meta * 1.15:   # el guion sigue largo (el 8/11 salió un semanal de 3 minutos): se recorta
-                _recortar(guion, bloques, meta * 1.05 / largo)
+            # Si el guion sigue largo (el 8/11 salió un semanal de 3 minutos) se recorta, pero SOLO lo que no cabe en el
+            # máximo (1:40, o ~2:25 con avisos naranja/rojo): recortar hasta el objetivo dejaba el vídeo más corto que
+            # antes y con menos explicación
+            cabe = meta * (_m.maximo_absoluto() - INICIO - COLA_ELEVEN - 1.5) / objetivo
+            if largo > cabe:
+                _recortar(guion, bloques, cabe / largo)
             wav, dur, lim, pal = eleven.sintetizar([guion["segmentos"][s] for s in bloques], tipo_voz, trabajo, "esp")
             plan, total, wav = plan_eleven(bloques, wav, dur, lim, pal)
             return guion, plan, total, [(wav, INICIO)], f"elevenlabs ({eleven.modelo()})"

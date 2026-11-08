@@ -155,10 +155,11 @@ def maximo_absoluto() -> float:
 
 
 def recortar_si_largo(guion: dict, bloques: list[str], largo: float, meta: float):
-    """Si el guion sigue largo tras pedirlo más corto, se recortan frases (como en los especiales)."""
-    if largo > meta * 1.15:
+    """Si el guion no cabe en el máximo (1:40, o ~2:25 con avisos naranja/rojo), se recortan frases; solo lo que sobra."""
+    cabe = meta * (maximo_absoluto() - INICIO - COLA_ELEVEN - 1.5) / (DURACION_OBJETIVO - INICIO - COLA_ELEVEN - 0.2)
+    if largo > cabe:
         from .especiales import _recortar
-        _recortar(guion, bloques, meta * 1.08 / largo)
+        _recortar(guion, bloques, cabe / largo)
 
 
 def _alargar(nuevo_max: float):
