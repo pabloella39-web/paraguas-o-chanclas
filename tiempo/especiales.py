@@ -932,7 +932,7 @@ def _zona_zoom(grupos):
 
 def _campo_aviso(grupos, hoy: date):
     """Rejilla fina de lluvia acumulada durante el aviso (si es por lluvia) y el máximo por sitio. None si no toca."""
-    if not any("lluvia" in x["fenomeno"].lower() for x in grupos):
+    if not any(("lluvia" in x["fenomeno"].lower() or "tormenta" in x["fenomeno"].lower()) for x in grupos):
         return None
     from . import campos
     from zoneinfo import ZoneInfo
@@ -1065,6 +1065,23 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
             d.rounded_rectangle(caja, radius=h / 2, fill=(8, 20, 45, int(225 * s)))
             d.text(((caja[0] + caja[2]) / 2, (caja[1] + caja[3]) / 2), txt, font=f, fill=(255, 255, 255, a),
                    anchor="mm")
+    return dibujar
+
+
+def _capa_despues(a, b, t_cambio: float, fundido: float = 0.8):
+    """Dibuja «a» y, a partir de t_cambio (segundos dentro del bloque), funde «b» encima."""
+    def dibujar(capa, pr, dt):
+        if a:
+            a(capa, pr, dt)
+        if b and dt > t_cambio:
+            s = min(1.0, (dt - t_cambio) / fundido)
+            if s >= 1:
+                b(capa, pr, dt)
+                return
+            tmp = Image.new("RGBA", capa.size, (0, 0, 0, 0))
+            b(tmp, pr, dt)
+            tmp.putalpha(tmp.getchannel("A").point(lambda v: int(v * s)))
+            capa.alpha_composite(tmp)
     return dibujar
 
 

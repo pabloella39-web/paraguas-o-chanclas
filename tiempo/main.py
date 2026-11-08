@@ -33,6 +33,7 @@ VEL_MIN, VEL_MAX = 10, 35  # nunca más lenta de +10 %: si sobra tiempo, se alar
 
 
 AVISO_GRAVE: list = [None]
+CAMPO_PARTE: list = [None]   # lluvia acumulada del aviso (campos, máximos por sitio)
 MAPA_EXTRA: list = [None]   # (capa, pastilla) para el bloque «general»: lluvia en colores o isobaras, de vez en cuando
 
 
@@ -79,12 +80,18 @@ def _kwargs_aviso(graves) -> dict:
     """Zoom a la zona del aviso, con las provincias pintadas y los núcleos afectados señalados."""
     if not graves:
         return {}
-    from .especiales import (_capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom, nucleos_afectados)
+    from .especiales import (_capa_despues, _capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom,
+                             nucleos_afectados)
     nivel = "rojo" if any(x["nivel"] == "rojo" for x in graves) else "naranja"
+    nucleos = nucleos_afectados(graves)
+    capa = _juntar_capas(_capa_poligonos(graves, con_lista=True), _capa_nucleos(nucleos))
+    if CAMPO_PARTE[0]:   # aviso por lluvia o tormentas: tras las zonas, el mapa de lluvia acumulada en colores
+        from . import campos
+        lluvia = _juntar_capas(campos.capa_lluvia_fuerte(CAMPO_PARTE[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)"),
+                               _capa_nucleos(nucleos))
+        capa = _capa_despues(capa, lluvia, 4.5)
     return {"vistas": {"aviso": _zona_zoom(graves)}, "sin_marcadores": ("aviso",),
-            "capas": {"aviso": _juntar_capas(_capa_poligonos(graves, con_lista=True),
-                                             _capa_nucleos(nucleos_afectados(graves)))},
-            "pills": {"aviso": f"AVISO {nivel.upper()}"}}
+            "capas": {"aviso": capa}, "pills": {"aviso": f"AVISO {nivel.upper()}"}}
 
 
 EXTREMOS_PUEBLOS: list = [None]   # {calor, frio} con el pueblo si es más extremo que la capital
@@ -293,14 +300,22 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                            + ("Hoy hay aviso naranja o rojo: puedes alargar un poco (hasta un 20 % más) para el tramo de "
                               "aviso." if graves else "No te alargues: si sobra algo, recorta lo menos importante."))
         if graves:   # tramo «aviso»: zoom a la zona con los núcleos afectados señalados
-            from .especiales import nucleos_afectados
+            from .especiales import nucleos_afectados, sitios_aviso
             AVISO_GRAVE[0] = graves
             nombres = [c["nombre"] for c in nucleos_afectados(graves)]
+            from .especiales import _campo_aviso
+            CAMPO_PARTE[0] = _campo_aviso(graves, hoy)
+            if CAMPO_PARTE[0]:
+                top = sorted(CAMPO_PARTE[0][1].items(), key=lambda t: -t[1])[:5]
+                g.GANCHO_TEXTO += ("\n\nEn el tramo «aviso», tras las zonas sale el mapa de lluvia acumulada en colores; "
+                                   "lluvia máxima prevista por zona (l/m²): " + ", ".join(f"{n} {v}" for n, v in top)
+                                   + ". Di cuánta lluvia y dónde más (cifras redondas).")
             g.GANCHO_TEXTO += (
-                "\n\nTRAMO DE AVISO: añade a \"segmentos\" la clave \"aviso\" (unas 22 palabras), que va justo después "
+                "\n\nTRAMO DE AVISO: añade a \"segmentos\" la clave \"aviso\" (unas " + ("34" if CAMPO_PARTE[0] else "22") + " palabras), que va justo después "
                 "del gancho: en pantalla se hace zoom a la zona con aviso " + "/".join(dict.fromkeys(x["nivel"] for x in graves))
-                + " y se señalan estos núcleos: " + ", ".join(nombres) + ". Di qué aviso es, dónde (nombra dos o tres de "
-                "esos núcleos), cuándo y lo más grave que se espera, con un consejo corto. El gancho puede anunciarlo en "
+                + " y se señalan estos núcleos: " + ", ".join(nombres) + ". Di qué aviso es, dónde (nombra TODAS las zonas "
+                "afectadas: " + "; ".join(", ".join(sitios_aviso(x)) for x in graves) + "), cuándo y lo más grave que "
+                "se espera, con un consejo corto. El gancho puede anunciarlo en "
                 "pocas palabras, pero el detalle va en \"aviso\".")
         gra = [c["nombre"] for c in prev if c.get("granizo")][:3]
         if gra:
