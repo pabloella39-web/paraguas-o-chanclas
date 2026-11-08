@@ -1,0 +1,23 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-11-08",
+ "caption": "Llueve en media España y el miércoles es el peor día ☔ ¿Cuál es el tuyo?\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "SEMANA DE PARAGUAS",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 123.5,
+ "guion": {
+  "intro": "Semana de paraguas en media España. Y atento al final: el día que más te va a fastidiar y el mejor para salir.",
+  "avisos_lunes": "Aviso naranja por lluvia, 30 litros en una hora, en norte de Cáceres, sur de Ávila, Aracena, Andévalo, litoral de Huelva y sierra norte de Sevilla. Viento naranja de 100 kilómetros por hora en Tenerife y La Palma. Olas de 4,6 metros en las Rías Baixas: lejos de los diques. También aviso naranja por lluvia en Andévalo y Condado.",
+  "lunes": "Ayer Izaña midió 9 litros por metro cuadrado. Mañana, paraguas en Galicia, con 15 litros en Santiago, y en Madrid, 17 grados y 16 litros. Sevilla y Badajoz, posibles tormentas; Algeciras, 34 litros. Barcelona y Valencia, 20 grados y casi secas: tiende ropa ahí. Gijón, 23 grados. Las Palmas, 26 y posible tormenta.",
+  "avisos_martes": "Aviso naranja por lluvia en sur de Ávila y norte de Cáceres, con 100 litros en 12 horas. Amarillo por tormentas en Galicia, y por lluvia y viento en Tenerife, Gran Canaria y La Palma.",
+  "martes": "Madrid, Valladolid y Salamanca, empapados, con hasta 17 litros. El Mediterráneo, seco y con 25 grados.",
+  "avisos_miercoles": "Aviso amarillo por viento y lluvia en Tenerife, Gran Canaria y La Palma. Olas de 4,5 metros en las Rías Baixas y el norte de Canarias.",
+  "miercoles": "Sevilla recibe 53 litros y Badajoz 35, así que paraguas y botas. Tenerife, en cambio, llega a 28 grados.",
+  "jueves": "Posibles chubascos en Valencia, Barcelona y Palma, de unos 13 litros. Y en Navarredonda de Gredos, en Ávila, bajan a 5 grados.",
+  "viernes": "Viernes 13 con sol en Valencia, Alicante y Murcia. Valladolid amanece con 9 grados: lleva chaqueta.",
+  "general": "El mejor día, el viernes: Madrid sin lluvia y sol en el Mediterráneo. El peor, el miércoles: 53 litros en Sevilla y 35 en Badajoz.",
+  "cierre": "¿Qué día te toca mojarte a ti? Cuéntamelo y sigue la cuenta para tener el tiempo de cada día."
+ },
+ "voz": "masculina"
+}
