@@ -1,2 +1,2 @@
 semana
-# versión corta
+# versión con los avisos bien explicados
