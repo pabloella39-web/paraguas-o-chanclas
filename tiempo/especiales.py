@@ -926,8 +926,9 @@ def _zona_zoom(grupos):
         if cajas:
             return _encuadre(min(c[0] for c in cajas), max(c[1] for c in cajas), min(c[2] for c in cajas),
                              max(c[3] for c in cajas), True, margen=(0.12, 0.25))
+    # Península: la zona con aviso y las colindantes alrededor, para ver si la lluvia (o lo que sea) también les llega
     return _encuadre(min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts),
-                     max(p[1] for p in pts), False, margen=(0.25, 0.2), minimo=(1.8, 1.4))
+                     max(p[1] for p in pts), False, margen=(0.9, 0.7), minimo=(3.0, 2.3))
 
 
 def _campo_aviso(grupos, hoy: date):
@@ -948,9 +949,11 @@ def _campo_aviso(grupos, hoy: date):
         if canaria:
             caja, cajas = campos.CANARIAS_FINA, CAJA_ISLA
         else:
-            lo0, lo1 = min(p[0] for p in pts) - 0.8, max(p[0] for p in pts) + 0.8
-            la0, la1 = min(p[1] for p in pts) - 0.6, max(p[1] for p in pts) + 0.6
-            caja = (lo0, lo1, la0, la1, 0.1 if (lo1 - lo0) * (la1 - la0) < 12 else 0.2)
+            # la rejilla cubre todo lo que se ve en el zoom (zona con aviso y colindantes) y un poco más
+            z = _zona_zoom(grupos)
+            lo0, lo1, la0, la1 = z[0] - 0.4, z[1] + 0.4, z[2] - 0.3, z[3] + 0.3
+            caja = (lo0, lo1, la0, la1, 0.1 if (lo1 - lo0) * (la1 - la0) < 14 else 0.15 if (lo1 - lo0) * (la1 - la0) < 30
+                    else 0.2)
             cajas = {}
             for x in grupos:
                 for z, pol in x.get("zona_poligono") or []:
@@ -965,6 +968,21 @@ def _campo_aviso(grupos, hoy: date):
         acum = cubo.sum(axis=0)
         stats = campos.maximos(lons, lats, acum, cajas)
         stats = dict(sorted(((k, v) for k, v in stats.items() if v >= 1), key=lambda t: -t[1])[:7])
+        if not canaria:   # provincias colindantes que se ven en el zoom: ¿les llega también?
+            from . import mapa as mapa_
+            z = _zona_zoom(grupos)
+            vecinas = {}
+            for pv in mapa_.provincias():
+                anillos = [a for a in pv["anillos"] if a and a[0][1] >= 30]
+                if not anillos:
+                    continue
+                bx = (min(p[0] for a in anillos for p in a), max(p[0] for a in anillos for p in a),
+                      min(p[1] for a in anillos for p in a), max(p[1] for a in anillos for p in a))
+                if bx[0] < z[1] and bx[1] > z[0] and bx[2] < z[3] and bx[3] > z[2]:
+                    vecinas[pv["nombre"].split("/")[-1]] = (max(bx[0], z[0]), min(bx[1], z[1]),
+                                                           max(bx[2], z[2]), min(bx[3], z[3]))
+            vec = campos.maximos(lons, lats, acum, vecinas)
+            COLINDANTES[:] = [(k, v) for k, v in sorted(vec.items(), key=lambda t: -t[1]) if v >= 15][:6]
         pic = campos.picos(lons, lats, horas, cubo, {k: cajas[k] for k in stats if k in cajas})
         horario = {"lons": lons, "lats": lats, "horas": horas, "cubo": cubo, "canaria": canaria, "picos": pic}
         return [(lons, lats, acum, canaria)], stats, horario
@@ -1742,7 +1760,8 @@ Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "evoluc
 "lluvia": "... (solo si toca)",
 "consejos": "...", "cierre": "..."}}, "titular": "...", "consejos_pantalla": ["...", "...", "..."], "caption": "..."}}"""
 PALABRAS_AVISO = {"intro": 20, "zonas": 20, "consejos": 18, "cierre": 6}
-CAMPO_AVISO: list = [None]   # (campos para el mapa, máximos por sitio) cuando el aviso es por lluvia
+CAMPO_AVISO: list = [None]
+COLINDANTES: list = []   # provincias del zoom (con o sin aviso) donde también lloverá bastante   # (campos para el mapa, máximos por sitio) cuando el aviso es por lluvia
 DURACION_AVISO = (20.0, 30.0, 25.0)
 CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAMA AL 112"],
                  "tormentas": ["RESGUÁRDATE BAJO TECHO", "LEJOS DE ÁRBOLES", "LLAMA AL 112"],
@@ -1954,6 +1973,11 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         datos[0]["nucleos_senalados_en_el_mapa"] = [c["nombre"] for c in nucleos_afectados(grupos)]
     if datos and CAMPO_AVISO[0]:
         datos[0]["lluvia_prevista_max_l_m2"] = CAMPO_AVISO[0][1]
+        if COLINDANTES:
+            datos[0]["lluvia_en_provincias_del_mapa_l_m2"] = dict(COLINDANTES)
+            datos[0]["nota_colindantes"] = ("Si en provincias vecinas SIN aviso también se esperan cantidades altas, "
+                                            "dilo en media frase en «lluvia» («y ojo, que en Albacete también caerán "
+                                            "unos 30 litros»).")
         if len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos"):
             datos[0]["lluvia_hora_a_hora"] = {
                 k: f"lo más fuerte el {_hora_legible(v['hora'])}: {v['l_m2_en_una_hora']} l/m² en una hora"
