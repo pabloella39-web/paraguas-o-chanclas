@@ -20,9 +20,9 @@ log = logging.getLogger(__name__)
 URL = "https://api.open-meteo.com/v1/forecast"
 
 # Rejillas (lon0, lon1, lat0, lat1, paso)
-PENINSULA = (-9.8, 4.6, 35.6, 44.0, 0.25)
-CANARIAS = (-18.3, -13.3, 27.5, 29.5, 0.2)
-ISOBARAS = (-24.0, 12.0, 29.0, 50.0, 0.75)   # más amplia: las borrascas vienen de lejos
+PENINSULA = (-9.8, 4.6, 35.6, 44.0, 0.4)
+CANARIAS = (-18.3, -13.3, 27.5, 29.5, 0.25)
+ISOBARAS = (-24.0, 12.0, 29.0, 50.0, 1.0)   # más amplia: las borrascas vienen de lejos
 
 # Escala de lluvia (l/m² en el día) — de celeste a morado
 ESCALA = [(1, (154, 215, 245)), (3, (79, 179, 232)), (7, (43, 123, 217)), (15, (47, 191, 113)),
@@ -38,16 +38,22 @@ def _rejilla(caja):
 
 def _pedir(puntos, params) -> list[dict]:
     """Open-Meteo admite varias ubicaciones por petición: se piden en tandas."""
+    import time
     out = []
-    for i in range(0, len(puntos), 200):
-        tanda = puntos[i:i + 200]
+    for i in range(0, len(puntos), 100):
+        if i:
+            time.sleep(11)   # Open-Meteo cuenta cada punto como una consulta (máx. 600 por minuto)
+        tanda = puntos[i:i + 100]
         q = {**params, "latitude": ",".join(f"{la:.2f}" for la, _ in tanda),
              "longitude": ",".join(f"{lo:.2f}" for _, lo in tanda), "timezone": "Europe/Madrid"}
         for intento in range(3):
-            r = requests.get(URL, params=q, timeout=60)
+            try:
+                r = requests.get(URL, params=q, timeout=120)
+            except requests.RequestException:
+                time.sleep(15)
+                continue
             if r.status_code == 429:
-                import time
-                time.sleep(20 * (intento + 1))
+                time.sleep(30 * (intento + 1))
                 continue
             r.raise_for_status()
             j = r.json()
