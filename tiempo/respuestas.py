@@ -1111,7 +1111,24 @@ def responder_instagram(publicar: bool):
     ESTADO_IG.write_text(json.dumps(est, ensure_ascii=False), encoding="utf-8")
 
 
+def comentar_publicaciones(lineas: str):
+    """Comentario propio (no respuesta) en publicaciones concretas: «plataforma|id|texto» por línea."""
+    for linea in lineas.splitlines():
+        if not linea.strip():
+            continue
+        plat, pid, texto = linea.split("|", 2)
+        plat = plat.strip().lower()
+        perfil = uploadpost.perfil_instagram() if plat == "instagram" else uploadpost.perfil("tiempo")
+        r = requests.post(f"{API}/uploadposts/comments/create", headers=uploadpost._cabeceras(), json={
+            "platform": plat, "user": perfil, "post_id": pid.strip(), "message": texto.strip()[:300]}, timeout=40)
+        print(f"::notice::Comentario en {plat} {pid}: HTTP {r.status_code} {r.text[:300]}")
+        time.sleep(3)
+
+
 def main_todo():
+    if os.environ.get("COMENTAR", "").strip():
+        comentar_publicaciones(os.environ["COMENTAR"])
+        return
     main()
     if os.environ.get("SIN_INSTAGRAM") or any(os.environ.get(k) for k in (
             "REPASAR_BANDEJA", "CORREGIR_LUGAR", "RESPONDER_LUGAR", "RESPUESTA_MANUAL")) or SOLO_VIDEO:

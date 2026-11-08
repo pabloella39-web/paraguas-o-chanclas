@@ -23,6 +23,10 @@ on:
         description: "Corregir las respuestas ya dadas a este lugar (p. ej. Asturias)"
         type: string
         default: ""
+      comentar:
+        description: "Comentarios propios: «plataforma|id_publicacion|texto» por línea"
+        type: string
+        default: ""
       responder_lugar:
         description: "Contestar con la previsión a los comentarios que nombran este sitio (p. ej. Illán de Vacas)"
         type: string
@@ -80,6 +84,7 @@ jobs:
           RESPUESTA_MANUAL: ${{ inputs.respuesta_manual }}
           CORREGIR_LUGAR: ${{ inputs.corregir_lugar }}
           RESPONDER_LUGAR: ${{ inputs.responder_lugar }}
+          COMENTAR: ${{ inputs.comentar }}
           REPASAR_BANDEJA: ${{ inputs.repasar_bandeja && '1' || '' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.comprobar }}" = "true" ]; then
