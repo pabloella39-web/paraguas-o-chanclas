@@ -595,7 +595,8 @@ CAJAS_CIUDAD: dict = {}   # tarjeta de cada ciudad en el fotograma actual (para 
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
-                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None, capas_encima=None):
+                 gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None, capas_encima=None,
+                 barra_dias=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
@@ -612,6 +613,7 @@ class Compositor:
         self.portada_txt = portada_txt
         self.capas = capas or {}
         self.capas_fondo = capas_fondo or {}
+        self.barra_dias = barra_dias or []   # semanal/finde: «L M X J V» con el día que se está contando resaltado
         self.capas_encima = capas_encima or {}   # igual, pero encima de las tarjetas y esquivándolas (olas, nieve)   # {bloque o "*": función(capa, proyección, dt)} debajo de las tarjetas
         self.sin_marcadores = set(sin_marcadores)
         from .estacion import estacion
@@ -642,6 +644,34 @@ class Compositor:
         self.sat_ini, self.sat_dur = self.fin_intro, 6.0
 
     # ------------------------------------------------ capas estáticas
+    LETRA_DIA = {"lunes": "L", "martes": "M", "miercoles": "X", "miércoles": "X", "jueves": "J", "viernes": "V",
+                 "sabado": "S", "sábado": "S", "domingo": "D"}
+
+    def _barra_dias(self, d, seg_real):
+        """Fila de días bajo el mapa: el que se está contando, en amarillo; los ya contados, en blanco; los que
+        faltan, apagados. Así se ve cuánto queda hasta «tu» día y la gente aguanta."""
+        dia = seg_real[7:] if seg_real.startswith("avisos_") else seg_real
+        idx = self.barra_dias.index(dia) if dia in self.barra_dias else (len(self.barra_dias) if seg_real in
+                                                                          ("general", "cierre") else -1)
+        n = len(self.barra_dias)
+        r, sep = 22, 60
+        x0 = ANCHO - 40 - 34 - (n - 1) * sep    # arriba a la derecha del mapa (abajo van atribución y subtítulos)
+        y = MAPA_Y0 + 42
+        f = fuente("Black", 26)
+        d.rounded_rectangle([x0 - 34, y - 30, x0 + (n - 1) * sep + 34, y + 30], radius=30, fill=(8, 20, 45, 200))
+        for k, dk in enumerate(self.barra_dias):
+            cx = x0 + k * sep
+            if k == idx:
+                col, txt = (255, 201, 60), (8, 20, 45)
+                d.ellipse([cx - r - 3, y - r - 3, cx + r + 3, y + r + 3], fill=col)
+            elif k < idx:
+                col, txt = (255, 255, 255), (8, 20, 45)
+                d.ellipse([cx - r, y - r, cx + r, y + r], fill=col)
+            else:
+                col, txt = (60, 80, 110), (200, 210, 225)
+                d.ellipse([cx - r, y - r, cx + r, y + r], fill=col)
+            d.text((cx, y + 1), self.LETRA_DIA.get(dk, dk[:1].upper()), font=f, fill=txt, anchor="mm")
+
     def _cabecera(self):
         im = Image.new("RGBA", (ANCHO, MAPA_Y0), (0, 0, 0, 0))
         d = ImageDraw.Draw(im)
@@ -773,6 +803,8 @@ class Compositor:
             self._efecto(img, t, 1.0 if t < self.fin_intro else 1 - (t - self.fin_intro) / 0.5)
         d = ImageDraw.Draw(img)
         self._pill(img, d, seg_real, dt)
+        if self.barra_dias:
+            self._barra_dias(d, seg_real)
         if seg_real == "intro":
             self._intro(img, d, t)
         if seg_real == "cierre":

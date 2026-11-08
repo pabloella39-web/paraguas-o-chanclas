@@ -403,12 +403,13 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     extremos = {"calor": max(todos, key=lambda c: c["tmax"]), "frio": min(todos, key=lambda c: c["tmin"])}
     rango = f"{sab.day} {MESES_CORTOS[sab.month - 1]} · {dom.day} {MESES_CORTOS[dom.month - 1]}"
     PREVS_DIA.clear(); PREVS_DIA.update({"sabado": prev_s, "domingo": prev_d})
+    BARRA[0] = ["sabado", "domingo"]
     (ms, _), _ = _mejor_plan(prev_s, prev_d)
     kwargs = {
         "datos_seg": {"sabado": g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA),
                       "domingo": g.prev_para_mapa(prev_d, [guion["segmentos"].get("domingo", "")], EXTRA_DOMINGO),
                       "intro": []},
-        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
+        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
         "vistas": _kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["vistas"],
         "sin_marcadores": _kwargs_avisos({"sabado": "", "domingo": ""})["sin"],
         "pills": {**_kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["pills"],
@@ -501,6 +502,7 @@ EXTRA_SEMANA: list = []
 
 AVISOS_TXT = [""]   # avisos y oleaje previstos para los días del vídeo (lo rellenan la_semana y fin_de_semana)
 AVISOS_DIA = {}
+BARRA: list = [[]]   # días de la barra «L M X J V» del semanal / «S D» del finde
 MODO_AVISO = [False]   # el vídeo que se está haciendo es de aviso naranja/rojo
 EXTRAS_DIA: dict = {}      # ciudades extra (Ourense, León, Ciudad Real...) de cada día del semanal
 EXTRA_DOMINGO: list = []
@@ -808,13 +810,14 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         except Exception as e:  # noqa: BLE001
             log.warning("Sin satélite: %s", e)
     PREVS_DIA.clear(); PREVS_DIA.update(prevs)
+    BARRA[0] = list(_dias())
     primero = _dias()[0]
     # todos los días con las ciudades extra para rellenar huecos (Asturias, León, Ourense, La Mancha...)
     mapa_dias = {d: g.prev_para_mapa(prevs[d], [guion["segmentos"].get(d, "")], EXTRAS_DIA.get(d) or EXTRA_SEMANA)
                  for d in _dias()}
     kwargs = {
         "satelite": sat,
-        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(),
+        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
         "datos_seg": {**mapa_dias, "intro": []},
         "vistas": _kwargs_avisos({d: "" for d in _dias()})["vistas"],
         "sin_marcadores": _kwargs_avisos({d: "" for d in _dias()})["sin"],
