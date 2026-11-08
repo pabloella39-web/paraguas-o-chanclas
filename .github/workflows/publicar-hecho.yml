@@ -1,0 +1,63 @@
+name: Publicar un vídeo ya revisado
+# Publica en TikTok, YouTube e Instagram el vídeo de una ejecución anterior (por ejemplo, uno generado sin publicar
+# para revisarlo antes).
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Ejecución de «Especiales del tiempo» con el vídeo"
+        required: true
+      tipo:
+        description: "semana / resto / finde / aviso"
+        default: "semana"
+permissions:
+  contents: write
+  actions: read
+concurrency: publicar-hecho
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt && sudo apt-get install -y -qq ffmpeg > /dev/null
+      - uses: actions/download-artifact@v4
+        with:
+          name: especial-${{ inputs.run_id }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: salida
+      - env:
+          UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
+          UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_CIFRADO: ${{ secrets.TIKTOK_CIFRADO }}
+          TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import json, logging
+          from pathlib import Path
+          logging.basicConfig(level=logging.INFO)
+          from tiempo import especiales as e
+          meta = json.loads(Path("salida/meta.json").read_text(encoding="utf-8"))
+          meta["video"] = str(next(Path("salida").glob("*.mp4")))
+          hoy = e.ahora().date()
+          e._publicar(meta, hoy)
+          tipo = "${{ inputs.tipo }}"
+          hist = e.HISTORIAL / f"{tipo}-{hoy.isoformat()}.json"
+          previo = json.loads(hist.read_text(encoding="utf-8")) if hist.exists() else {}
+          previo.update({k: v for k, v in meta.items() if k != "video"})
+          hist.write_text(json.dumps(previo, ensure_ascii=False, indent=1), encoding="utf-8")
+          print("Publicado:", json.dumps({k: str(meta.get(k))[:200] for k in ("tiktok", "youtube", "instagram")}, ensure_ascii=False))
+          PY
+      - name: Guardar historial
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add historial_especiales estado 2>/dev/null || true
+          git commit -m "Publicado vídeo revisado (${{ inputs.tipo }})" || exit 0
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
