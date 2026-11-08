@@ -1013,6 +1013,23 @@ def _zona_cerca(grupos, nucleos):
                      max(c["lat"] for c in top), can, margen=(0.35, 0.3), minimo=(1.2, 0.9))
 
 
+def marcar_tormentas(prev, grupos):
+    """Las ciudades dentro (o a un paso) de una zona con aviso por tormentas llevan el icono de tormenta, aunque la
+    previsión diga solo lluvia (en Huelva había aviso por tormentas y salía la animación de lluvia)."""
+    pols = [pol for gr in grupos or [] if "tormenta" in gr["fenomeno"].lower() for pol in gr.get("poligonos") or []]
+    if not pols:
+        return
+    for c in prev or []:
+        la, lo = c.get("lat"), c.get("lon")
+        if la is None or lo is None:
+            continue
+        if any(_dentro(lo + dx, la + dy, pol) for pol in pols
+               for dx, dy in ((0, 0), (0.12, 0), (-0.12, 0), (0, 0.1), (0, -0.1))):
+            if c.get("icono") != "tormenta":
+                log.info("%s: icono de tormenta (aviso por tormentas)", c.get("nombre"))
+            c["icono"] = "tormenta"
+
+
 def _dentro(x, y, pol) -> bool:
     dentro = False
     for (x1, y1), (x2, y2) in zip(pol, pol[1:] + pol[:1]):
