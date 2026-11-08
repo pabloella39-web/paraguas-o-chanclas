@@ -90,3 +90,8 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Zoom de avisos: zona afectada y colindantes (península: margen ~0,9° y mínimo 3°×2,3°; Canarias: todas las islas). El mapa de lluvia cubre todo el zoom, y si en provincias vecinas sin aviso también llueve bastante (≥15 l/m²), la voz lo menciona.
 - Mapas: las temperaturas nunca en medio del mar (las pastillas de ciudades de costa se meten hacia tierra; solo islas, Ceuta y Melilla pueden ir sobre el mar).
 - Semanal (domingo), media semana (miércoles) y finde (viernes): son los más importantes; tienen que estar impolutos y todo perfectamente explicado. Objetivo ~1:50 el semanal y ~1:30 el finde; pueden llegar a 2:30.
+
+## Retención (análisis TikTok, 8-nov)
+- En semanal y finde, la curva cae a un ritmo constante (~0,4 puntos/s) mientras se cuentan los días: no hay un día que espante. Donde se va la gente es en los últimos ~15 s (mejor/peor día + despedida): se pierde la mitad de lo que quedaba.
+- Por eso: despedida de una frase corta (≤12 palabras) y la promesa del principio se cumple en el bloque «general», no después.
+- El 35-45 % se va en los 3 primeros segundos: el gancho tiene que nombrar ya un sitio o un dato llamativo.

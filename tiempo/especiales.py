@@ -291,7 +291,7 @@ Bloques (palabras aproximadas por bloque: {palabras}; total ≈ {total}):
 
 Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "sabado": "...", "domingo": "...", "general": "...",
 "cierre": "..."}}, "titular": "...", "caption": "..."}}"""
-PALABRAS_FINDE = {"intro": 22, "sabado": 56, "domingo": 36, "general": 30, "cierre": 20}
+PALABRAS_FINDE = {"intro": 22, "sabado": 56, "domingo": 36, "general": 30, "cierre": 12}
 
 
 def _resumen(prev):
@@ -451,7 +451,7 @@ def _dias():
 def _hablado(d: str) -> str:
     return {"miercoles": "miércoles", "sabado": "sábado"}.get(d, d)
 PALABRAS_SEMANA = {"intro": 20, "lunes": 24, "martes": 22, "miercoles": 22, "jueves": 22, "viernes": 24,
-                   "general": 26, "cierre": 18}
+                   "general": 26, "cierre": 12}
 PROMPT_SEMANA = """Eres el guionista de "Paraguas o Chanclas", un canal de TikTok sobre el tiempo en España con humor
 ligero (sin palabrotas, sin política). {cuando}, para que la gente se organice. Usa SOLO estos datos (no inventes). Lo lee {presenta} con voz sintética.
 
@@ -692,7 +692,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
         + ["general", "cierre"]
     # El primer día (mañana) hace de parte diario: bloque largo; los demás, más breves
     resto_dias = round(116 / (len(_dias()) - 1))   # ≈90 s en total: el vídeo estrella de la semana
-    base = {"intro": 24, **{d: resto_dias for d in _dias()}, "general": 30, "cierre": 18}
+    base = {"intro": 24, **{d: resto_dias for d in _dias()}, "general": 30, "cierre": 12}
     base[_dias()[0]] = 54
     for d in AVISOS_BLOQUE:   # lo de los avisos pasa del bloque del día a su bloque propio
         base[f"avisos_{d}"] = 20
