@@ -97,21 +97,22 @@ ESCALA_FUERTE = [(0.1, (198, 225, 245)), (1, (150, 200, 240)), (2, (100, 170, 23
                  (100, (200, 40, 140)), (125, (210, 80, 210)), (150, (175, 120, 235)), (200, (230, 190, 245))]
 
 
-def _imagen_lluvia_fuerte(lons, lats, v, canaria=False) -> tuple[Image.Image, tuple]:
+def _imagen_lluvia_fuerte(lons, lats, v, canaria=False, escala=None, px=None) -> tuple[Image.Image, tuple]:
     """Campo continuo y opaco (también sobre el mar), interpolado entre colores de la escala."""
     from scipy.ndimage import zoom
     from PIL import ImageFilter
-    f = PX_GRADO * (lons[1] - lons[0])
+    escala = escala or ESCALA_FUERTE
+    f = (px or PX_GRADO) * (lons[1] - lons[0])
     fino = np.clip(zoom(v, f, order=3), 0, None)
-    umbrales = np.array([u for u, _ in ESCALA_FUERTE])
-    cols = np.array([c for _, c in ESCALA_FUERTE], dtype=float)
+    umbrales = np.array([u for u, _ in escala])
+    cols = np.array([c for _, c in escala], dtype=float)
     idx = np.clip(np.searchsorted(umbrales, fino, side="right") - 1, 0, len(umbrales) - 1)
     sig = np.clip(idx + 1, 0, len(umbrales) - 1)
     t = np.clip((fino - umbrales[idx]) / np.maximum(umbrales[sig] - umbrales[idx], 1e-6), 0, 1)[..., None]
     rgb = cols[idx] * (1 - t) + cols[sig] * t
     alfa = np.where(fino >= umbrales[0], 225, 0).astype(float)
     h, w = fino.shape
-    borde = max(8, int(0.6 * PX_GRADO * (lons[1] - lons[0])))
+    borde = max(8, int(0.6 * (px or PX_GRADO) * (lons[1] - lons[0])))
     yy, xx = np.mgrid[0:h, 0:w]
     dist = np.minimum.reduce([xx, w - 1 - xx, yy, h - 1 - yy]).astype(float)
     alfa *= np.clip(dist / borde, 0, 1)
@@ -122,16 +123,17 @@ def _imagen_lluvia_fuerte(lons, lats, v, canaria=False) -> tuple[Image.Image, tu
     return img, (lon0, lon1, lat0, lat1)
 
 
-def _leyenda_horizontal(capa, y, titulo, f, fpeq):
+def _leyenda_horizontal(capa, y, titulo, f, fpeq, escala=None):
     """Barra de colores horizontal con sus cifras, como en los mapas de los modelos."""
     from .config import ANCHO
+    escala = escala or ESCALA_FUERTE
     d = ImageDraw.Draw(capa)
     x0, x1 = 40, ANCHO - 40
-    n = len(ESCALA_FUERTE)
+    n = len(escala)
     paso = (x1 - x0) / n
     d.rounded_rectangle([x0 - 16, y - 46, x1 + 16, y + 64], radius=18, fill=(8, 20, 45, 215))
     d.text((x0, y - 24), titulo, font=f, fill=(255, 255, 255, 255), anchor="lm")
-    for k, (u, col) in enumerate(ESCALA_FUERTE):
+    for k, (u, col) in enumerate(escala):
         d.rectangle([x0 + k * paso, y, x0 + (k + 1) * paso, y + 24], fill=col + (255,))
         if k % 2 == 1 or k == 0:
             d.text((x0 + k * paso, y + 42), f"{u:g}".replace(".", ","), font=fpeq, fill=(230, 236, 245, 255),
@@ -316,3 +318,92 @@ def capa_isobaras(dia: date):
             d.text((x, y + 60), f"{p:.0f} hPa", font=f2, fill=(255, 255, 255, 255), anchor="mm",
                    stroke_width=3, stroke_fill=(8, 20, 45, 255))
     return dibujar, cs, float(v.min()), float(v.max())
+
+
+
+# ------------------------------------------------------------------ evolución por horas
+# Intensidad (l/m² en una hora): los mismos colores, umbrales de intensidad
+ESCALA_HORA = [(0.1, ESCALA_FUERTE[0][1]), (0.3, ESCALA_FUERTE[1][1]), (0.6, ESCALA_FUERTE[2][1]),
+               (1, ESCALA_FUERTE[3][1]), (1.5, ESCALA_FUERTE[4][1]), (2, ESCALA_FUERTE[5][1]),
+               (3, ESCALA_FUERTE[6][1]), (4, ESCALA_FUERTE[7][1]), (5, ESCALA_FUERTE[8][1]),
+               (6, ESCALA_FUERTE[9][1]), (8, ESCALA_FUERTE[10][1]), (10, ESCALA_FUERTE[11][1]),
+               (12, ESCALA_FUERTE[12][1]), (15, ESCALA_FUERTE[13][1]), (20, ESCALA_FUERTE[14][1]),
+               (25, ESCALA_FUERTE[15][1]), (30, ESCALA_FUERTE[16][1]), (40, ESCALA_FUERTE[17][1]),
+               (50, ESCALA_FUERTE[18][1]), (60, ESCALA_FUERTE[19][1])]
+
+
+def lluvia_horaria(ini: date, caja, fin: date | None = None):
+    """Lluvia hora a hora (l/m² en cada hora) en la rejilla: (lons, lats, horas ISO, cubo [hora, lat, lon])."""
+    lons, lats = _rejilla(caja)
+    puntos = [(la, lo) for la in lats for lo in lons]
+    js = _pedir(puntos, {"hourly": "precipitation", "start_date": ini.isoformat(),
+                         "end_date": (fin or ini).isoformat()})
+    horas = (js[0].get("hourly") or {}).get("time") or []
+    cubo = np.array([[x or 0 for x in (j.get("hourly") or {}).get("precipitation", [0] * len(horas))] for j in js],
+                    dtype=float)   # [punto, hora]
+    return lons, lats, horas, cubo.T.reshape(len(horas), len(lats), len(lons))
+
+
+def picos(lons, lats, horas, cubo, cajas: dict) -> dict:
+    """Para cada sitio: hora de máxima intensidad y cuánto (l/m² en una hora)."""
+    out = {}
+    for n, (a, b, c, d) in cajas.items():
+        mi = (lons >= a - 0.05) & (lons <= b + 0.05)
+        mj = (lats >= c - 0.05) & (lats <= d + 0.05)
+        sub = cubo[:, mj][:, :, mi]
+        if not sub.size:
+            continue
+        serie = sub.reshape(sub.shape[0], -1).max(axis=1)
+        k = int(serie.argmax())
+        if serie[k] >= 0.5:
+            out[n] = {"hora": horas[k], "l_m2_en_una_hora": round(float(serie[k]), 1)}
+    return out
+
+
+DIAS_CORTOS = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"]
+
+
+def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA HORA A HORA (L/M² EN 1 HORA)",
+                   max_fotogramas: int = 18, seg_por_fotograma: float = 0.5):
+    """Animación de la lluvia hora a hora (como un radar), con el reloj de cada fotograma y la leyenda."""
+    from datetime import datetime as _dt
+    from .especiales import fuente
+    from .video import MAPA_H, MAPA_Y0, TRANSICION
+    from .config import ANCHO
+    # sin horas secas al principio ni al final
+    activas = [k for k in range(len(horas)) if cubo[k].max() >= 0.2]
+    if not activas:
+        return None
+    k0, k1 = activas[0], activas[-1]
+    paso = max(1, -(-(k1 - k0 + 1) // max_fotogramas))
+    idx = list(range(k0, k1 + 1, paso))
+    fotos = []
+    for k in idx:
+        # cada fotograma es la lluvia del intervalo (si se salta horas, se suman)
+        v = cubo[k:k + paso].sum(axis=0) / paso
+        img, caja = _imagen_lluvia_fuerte(lons, lats, v, canaria, ESCALA_HORA, px=PX_GRADO * 0.6)
+        t = _dt.fromisoformat(horas[k])
+        fotos.append((img, caja, f"{DIAS_CORTOS[t.weekday()]} {t.hour:02d}:00"))
+    cache: dict = {}
+    f, fpeq, freloj = fuente("ExtraBold", 26), fuente("Bold", 20), fuente("Black", 54)
+
+    def dibujar(capa, pr, dt):
+        n = int(max(0.0, dt - TRANSICION) / seg_por_fotograma)
+        n = min(n, len(fotos) - 1)
+        img, caja, reloj = fotos[n]
+        _pegar(capa, img, caja, pr, MAPA_Y0, cache, f"h{n}")
+        if len(cache) > 4:
+            for k in list(cache)[:-2]:
+                cache.pop(k, None)
+        d = ImageDraw.Draw(capa)
+        w = freloj.getlength(reloj) + 48
+        d.rounded_rectangle([ANCHO - 40 - w, MAPA_Y0 + 24, ANCHO - 40, MAPA_Y0 + 104], radius=22, fill=(8, 20, 45, 225))
+        d.text((ANCHO - 40 - w / 2, MAPA_Y0 + 64), reloj, font=freloj, fill=(255, 255, 255, 255), anchor="mm")
+        # barra de progreso del tiempo
+        x0, x1 = ANCHO - 40 - w, ANCHO - 40
+        d.rounded_rectangle([x0, MAPA_Y0 + 112, x1, MAPA_Y0 + 120], radius=4, fill=(255, 255, 255, 70))
+        d.rounded_rectangle([x0, MAPA_Y0 + 112, x0 + (x1 - x0) * (n + 1) / len(fotos), MAPA_Y0 + 120], radius=4,
+                            fill=(255, 201, 60, 255))
+        _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq, ESCALA_HORA)
+    dibujar.duracion = len(fotos) * seg_por_fotograma
+    return dibujar
