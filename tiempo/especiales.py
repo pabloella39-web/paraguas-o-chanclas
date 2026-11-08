@@ -1045,6 +1045,8 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
                 arriba, abajo = (x - w / 2, y - h - 14), (x - w / 2, y + 14)
                 cands = ([arriba, abajo] if k % 2 == 0 else [abajo, arriba]) + cands
             for cx0, cy0 in cands:
+                if abs(cx0 - (x - w / 2)) < 1:   # arriba/abajo: se desliza para no salirse por los lados
+                    cx0 = min(max(cx0, 12), ANCHO - 12 - w)
                 caja = (cx0, cy0, cx0 + w, cy0 + h)
                 if caja[0] < 10 or caja[2] > ANCHO - 10:
                     continue
@@ -1165,6 +1167,21 @@ def pintar_avisos(grupos, pr, alfa=120):
             pintadas = []
             for i, c in zip(idx, cuenta):
                 total = (lab == i).sum()
+                nombre_p = nombres[i - 1].lower()
+                if "palmas" in nombre_p or "tenerife" in nombre_p:
+                    # Canarias: se pinta cada ISLA con aviso, no la provincia entera (con Gran Canaria en naranja,
+                    # Lanzarote y Fuerteventura salían en naranja aunque su aviso era amarillo)
+                    from scipy.ndimage import label as _componentes
+                    comp, n = _componentes(lab == i)
+                    algo = False
+                    for k in range(1, n + 1):
+                        isla = comp == k
+                        if (isla & pm).any():
+                            out[isla] = col + (alfa,)
+                            algo = True
+                    if algo:
+                        pintadas.append(i)
+                    continue
                 if c >= 0.25 * dentro.size or c >= 0.15 * total:     # la provincia está afectada de verdad
                     out[lab == i] = col + (alfa,)
                     pintadas.append(i)
@@ -2131,7 +2148,7 @@ def main():
                                             if c not in ya and not any(c in z for z in ya)))
                 if os.environ.get("REHACER"):   # a mano: rehacer el vídeo de hoy (zoom más cerca, etc.)
                     nuevos = nuevos or ["(rehecho)"]
-                if not nuevos or len(previos) >= 3:
+                if not nuevos or (len(previos) >= 3 and not os.environ.get("REHACER")):
                     log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos)", nivel)
                     continue
                 AMPLIACION[:] = [x for x in nuevos if x != "(rehecho)"]
