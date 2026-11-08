@@ -1,0 +1,22 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-11-08",
+ "caption": "Madrid y el suroeste, a remojo desde mañana ☔ ¿Cuál es el peor día? 🌧️\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "SEMANA DE AGUA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 88.07,
+ "guion": {
+  "intro": "Semana empapada: el agua llega mañana. Madrid y el suroeste abren con lluvia fuerte y el miércoles aprieta aún más. Y atento al final: el día que más te va a fastidiar y el mejor para salir.",
+  "avisos_lunes": "Aviso naranja por lluvia, 30 litros en una hora, en el norte de Cáceres, sur de Ávila, Aracena, Andévalo y Condado, litoral de Huelva y sierra norte de Sevilla. Naranja por viento de 100 por hora en Tenerife y La Palma.",
+  "lunes": "Mañana saca el paraguas grande en Madrid, con casi 16 litros y 17 grados, y en Toledo, con 10.",
+  "avisos_martes": "Aviso naranja por lluvia en el sur de Ávila y el norte de Cáceres, con 100 litros en 12 horas.",
+  "martes": "Martes de paraguas en el centro, con Salamanca en 17 litros y solo 15 grados, y Madrid en 15 litros. Posibles tormentas en Galicia.",
+  "miercoles": "El miércoles es el más mojado: en Sevilla podrían caer 53 litros, en Badajoz 35 y en Madrid 14, con solo 15 grados.",
+  "jueves": "El jueves la lluvia se va al Mediterráneo, con posibles chubascos de unos 12 litros en Barcelona, Valencia y Palma. Toledo también.",
+  "viernes": "Viernes 13 sin mala suerte: sol en Valencia, Alicante y Murcia, hasta 25 grados. Madrid, seco con 15.",
+  "general": "El mejor día es el viernes, con sol en el Mediterráneo y Madrid seco.",
+  "cierre": "¿Qué día te toca mojarte? Cuéntamelo y sigue la cuenta para tener el tiempo de cada día."
+ },
+ "voz": "masculina"
+}
