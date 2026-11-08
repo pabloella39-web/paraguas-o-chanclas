@@ -72,6 +72,26 @@ VOZ_USADA = ""   # voz del especial que se está haciendo (para alternar con el 
 
 
 # ================================================================ voz (común)
+def _recortar(guion: dict, bloques: list[str], proporcion: float):
+    """Recorta frases del final de los bloques más largos hasta quedarse en «proporcion» de las palabras. El gancho, el
+    cierre y los bloques de avisos (los sitios con aviso se nombran siempre) no se tocan."""
+    import re
+    segs = guion["segmentos"]
+    # (los de avisos se recortan también, pero siempre conservan su primera frase: ahí van los naranjas y rojos)
+    intocables = {"intro", "cierre", "aviso", "zonas"}
+    total = sum(len(segs[b].split()) for b in bloques)
+    objetivo = total * proporcion
+    frases = {b: re.split(r"(?<=[.!?])\s+", segs[b].strip()) for b in bloques if b not in intocables}
+    while sum(len(segs[b].split()) for b in bloques) > objetivo:
+        cand = [b for b in frases if len(frases[b]) > 1]
+        if not cand:
+            break
+        b = max(cand, key=lambda x: len(segs[x].split()))
+        frases[b].pop()
+        segs[b] = " ".join(frases[b])
+    log.warning("Guion recortado: de %d a %d palabras", total, sum(len(segs[b].split()) for b in bloques))
+
+
 def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     """escribir(factor, plantilla) -> guion con 'segmentos' y 'orden'. Devuelve (guion, plan, total, trozos, motor)."""
     from .main import COLA_ELEVEN, INICIO, VEL_MAX, VEL_MIN, _habla_objetivo, plan_eleven, planificar
@@ -87,6 +107,8 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
                 if abs(largo - meta) / meta <= 0.08 or guion.get("origen") != "claude":
                     break
                 factor *= meta / largo
+            if largo > meta * 1.2:   # el guion sigue largo (el 8/11 salió un semanal de 3 minutos): se recorta
+                _recortar(guion, bloques, meta * 1.1 / largo)
             wav, dur, lim, pal = eleven.sintetizar([guion["segmentos"][s] for s in bloques], tipo_voz, trabajo, "esp")
             plan, total, wav = plan_eleven(bloques, wav, dur, lim, pal)
             return guion, plan, total, [(wav, INICIO)], f"elevenlabs ({eleven.modelo()})"
