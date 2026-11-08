@@ -95,3 +95,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - En semanal y finde, la curva cae a un ritmo constante (~0,4 puntos/s) mientras se cuentan los días: no hay un día que espante. Donde se va la gente es en los últimos ~15 s (mejor/peor día + despedida): se pierde la mitad de lo que quedaba.
 - Por eso: despedida de una frase corta (≤12 palabras) y la promesa del principio se cumple en el bloque «general», no después.
 - El 35-45 % se va en los 3 primeros segundos: el gancho tiene que nombrar ya un sitio o un dato llamativo.
+- Semanal, media semana y finde: si llueve de verdad (≥3 capitales con ≥50 %), el bloque del día más lluvioso funde el mapa de lluvia en colores y el guion le dedica una frase.

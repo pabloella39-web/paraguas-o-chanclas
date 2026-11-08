@@ -322,7 +322,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
-                                                  fiestas=(" ".join(notas_rango(sab, dom)) or "(ninguno)") + _dato_real(),
+                                                  fiestas=(" ".join(notas_rango(sab, dom)) or "(ninguno)") + _dato_real() + NOTA_LLUVIA[0],
                                                   extra=json.dumps(_extra_por_region(), ensure_ascii=False)))
             orden = _sin_bloques_vacios(orden, gg)
             if all(gg["segmentos"].get(s) for s in orden):
@@ -392,6 +392,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
     if not demo:
         PREVS_DIA.clear(); PREVS_DIA.update({"sabado": prev_s, "domingo": prev_d})
         _preparar_avisos({"sabado": sab, "domingo": dom})
+        _preparar_lluvia({"sabado": prev_s, "domingo": prev_d}, {"sabado": sab, "domingo": dom})
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
@@ -409,7 +410,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         "datos_seg": {"sabado": (m_sab := g.prev_para_mapa(prev_s, [guion["segmentos"].get("sabado", "")], EXTRA_SEMANA)),
                       "domingo": g.prev_para_mapa(prev_d, [guion["segmentos"].get("domingo", "")], EXTRA_DOMINGO),
                       "intro": [], "general": m_sab, "cierre": m_sab},   # resumen final también sin huecos
-        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
+        "capas_fondo": _con_lluvia(_capas_dias()), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
         "vistas": _kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["vistas"],
         "sin_marcadores": _kwargs_avisos({"sabado": "", "domingo": ""})["sin"],
         "pills": {**_kwargs_avisos({"sabado": f"SÁBADO {sab.day}", "domingo": f"DOMINGO {dom.day}"})["pills"],
@@ -627,6 +628,38 @@ def _capas_dias() -> dict:
     return out
 
 
+LLUVIA_DIA: dict = {}     # semanal / finde: {día más lluvioso: capa del mapa de lluvia en colores}
+NOTA_LLUVIA = [""]
+
+
+def _preparar_lluvia(prevs: dict, fechas: dict):
+    """El día con más lluvia del semanal / finde lleva el mapa de lluvia en escala de colores (si llueve de verdad)."""
+    LLUVIA_DIA.clear(); NOTA_LLUVIA[0] = ""
+    cuenta = {d: sum(1 for c in prevs[d] if c.get("lluvia", 0) >= 50) for d in prevs}
+    if not cuenta:
+        return
+    dia = max(cuenta, key=cuenta.get)
+    if cuenta[dia] < 3:
+        return
+    try:
+        from . import campos
+        capa = campos.capa_lluvia(fechas[dia])
+    except Exception as e:  # noqa: BLE001
+        log.warning("Sin mapa de lluvia en el semanal: %s", e)
+        return
+    if capa:
+        LLUVIA_DIA[dia] = capa
+        NOTA_LLUVIA[0] = (f" MAPA DE LLUVIA: en el bloque del {_hablado(dia)} se funde el mapa de lluvia acumulada en "
+                          "colores (de celeste a morado: de 1 a más de 120 litros). Dedícale una frase en ese bloque: "
+                          "dónde caerá más («fíjate en las zonas en verde y amarillo: ahí caerán más de 15 litros»).")
+
+
+def _con_lluvia(capas: dict) -> dict:
+    for d, capa in LLUVIA_DIA.items():
+        capas[d] = _capa_despues(capas.get(d), capa, 1.5)
+    return capas
+
+
 def _capas_encima_dias() -> dict:
     out = {}
     for k in set(MAR_NIEVE) | set(AVISOS_DIA) | set(PREVS_DIA):
@@ -709,7 +742,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
                                                    primero=f"{_hablado(_dias()[0])} {fechas[_dias()[0]].day}",
                                                    extra=json.dumps(_extra_por_region(), ensure_ascii=False),
                                                    fiestas=(" ".join(notas_rango(fechas[_dias()[0]], fechas[_dias()[-1]])) or "(ninguno)")
-                                                   + _dato_real(),
+                                                   + _dato_real() + NOTA_LLUVIA[0],
                                                    repetidas=", ".join(g.ciudades_repetidas(fechas[_dias()[0]],
                                                                                             prevs[_dias()[0]]))
                                                    or "(ninguna)"))
@@ -787,6 +820,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     if not demo:
         PREVS_DIA.clear(); PREVS_DIA.update(prevs)
         _preparar_avisos({d: fechas[d] for d in _dias()})
+        _preparar_lluvia(prevs, fechas)
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
@@ -817,7 +851,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
                  for d in _dias()}
     kwargs = {
         "satelite": sat,
-        "capas_fondo": _capas_dias(), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
+        "capas_fondo": _con_lluvia(_capas_dias()), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
         # «mejor y peor día» y despedida: también con las ciudades extra (antes salía el mapa pelado, con huecos)
         "datos_seg": {**mapa_dias, "intro": [], "general": mapa_dias[mejor], "cierre": mapa_dias[mejor]},
         "vistas": _kwargs_avisos({d: "" for d in _dias()})["vistas"],
