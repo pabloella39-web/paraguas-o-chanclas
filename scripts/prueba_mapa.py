@@ -1,11 +1,8 @@
-"""Avisos de AEMET vigentes en Canarias ahora mismo."""
-import logging, os
-from datetime import datetime
-logging.basicConfig(level=logging.INFO)
-from tiempo import especiales as e
-todos = e.descargar_avisos(os.environ.get("AEMET_API_KEY", ""))
-ahora = datetime.now().astimezone()
-for a in todos:
-    if a.get("poligono") and all(la < 30 for _, la in a["poligono"]) and a["nivel"] != "verde":
-        print(a["nivel"], a["fenomeno"], a["zona"], a["inicio"], a["fin"])
-print("relevantes:", [(a["zona"], a["nivel"]) for a in e.avisos_relevantes(todos, ahora)])
+"""IDs de los últimos vídeos de TikTok según Upload-Post."""
+import json
+import requests
+from tiempo import uploadpost
+r = requests.get("https://api.upload-post.com/api/uploadposts/media", headers=uploadpost._cabeceras(),
+                 params={"platform": "tiktok", "user": uploadpost.perfil("tiempo"), "limit": 6}, timeout=40)
+for m in r.json().get("media", []):
+    print(m.get("id"), m.get("timestamp"), (m.get("caption") or "")[:60].replace("\n", " "))
