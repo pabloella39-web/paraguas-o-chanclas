@@ -455,7 +455,9 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         refs += [(p_[0], p_[1], c["nombre"]) for _, _, p_, c in items]
         extremos = {max(items, key=lambda it: it[3]["tmax"])[3]["nombre"] if items else None,
                     min(items, key=lambda it: it[3].get("tmin", 99))[3]["nombre"] if items else None}
-        items.sort(key=lambda it: (it[3]["nombre"] not in extremos, rango.get(it[3]["nombre"], 999)))
+        from .guion import SIEMPRE_EN_MAPA
+        items.sort(key=lambda it: (it[3]["nombre"] not in SIEMPRE_EN_MAPA, it[3]["nombre"] not in extremos,
+                                   rango.get(it[3]["nombre"], 999)))
         # tierra estricta (sin el margen de costa de la máscara): la pastilla entera tiene que caer en tierra
         tierra = mascara_tierra(pr).filter(ImageFilter.MinFilter(15))
 
@@ -473,7 +475,8 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         offs = sorted({(dx, dy) for dx in range(-80, 81, 10) for dy in range(-60, 61, 10)},
                       key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
         # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
-        primeras = [it for it in items if it[3]["nombre"] in extremos or rango.get(it[3]["nombre"], 999) < 25]
+        primeras = [it for it in items if it[3]["nombre"] in extremos or rango.get(it[3]["nombre"], 999) < 25
+                    or it[3]["nombre"] in SIEMPRE_EN_MAPA]
         resto = [it for it in items if it not in primeras]
 
         def siguiente():
@@ -495,26 +498,31 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
             w, h = caja[2], caja[3]
             # las islas (Baleares, Canarias) y Ceuta y Melilla no tienen tierra alrededor: ahí sí vale el mar
             isla_c = c["nombre"] in ISLAS_Y_CIUDADES_AUTONOMAS or c.get("lat", 40) < 30
-            for dx, dy in offs:
-                x0, y0 = px - w / 2 + dx, py - h / 2 + dy
-                # la columna de botones de TikTok empieza más abajo: arriba se puede llegar casi al borde
-                lim_x = 1080 - 15 if y0 + h < 600 else ax1
-                if not (ax0 <= x0 and x0 + w <= lim_x and ay0 <= y0 and y0 + h <= ay1):
-                    continue
-                if any(x0 < b[0] + b[2] + 4 and x0 + w + 4 > b[0] and y0 < b[1] + b[3] + 2 and y0 + h + 2 > b[1]
-                       for b in puestas):
-                    continue
-                cx, cy = x0 + w / 2, y0 + h / 2
-                if not isla_c and not _en_tierra(x0, y0, w, h):
-                    continue   # nada de temperaturas en medio del mar
-                propia = math.hypot(cx - px, cy - py)
-                # que la pastilla quede más cerca de su ciudad que de cualquier otra ciudad conocida
-                if any(n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
-                       for rx, ry, n in refs):   # (las ciudades pegadas a la suya, como L'Hospitalet, no cuentan)
-                    continue
-                puestas.append((x0, y0, w, h))
-                out.append((im, (int(x0), int(y0)), (px, py), c))
-                break
+            for intento in (0, 1):
+              if intento and (c["nombre"] not in SIEMPRE_EN_MAPA or any(o[3] is c for o in out)):
+                  break
+              # 2.º intento solo para las cinco grandes (Bilbao, Barcelona, Valencia están en la costa): sin exigir
+              # que toda la pastilla caiga en tierra, pero sí cerca de su ciudad
+              for dx, dy in offs:
+                  x0, y0 = px - w / 2 + dx, py - h / 2 + dy
+                  # la columna de botones de TikTok empieza más abajo: arriba se puede llegar casi al borde
+                  lim_x = 1080 - 15 if y0 + h < 600 else ax1
+                  if not (ax0 <= x0 and x0 + w <= lim_x and ay0 <= y0 and y0 + h <= ay1):
+                      continue
+                  if any(x0 < b[0] + b[2] + 4 and x0 + w + 4 > b[0] and y0 < b[1] + b[3] + 2 and y0 + h + 2 > b[1]
+                         for b in puestas):
+                      continue
+                  cx, cy = x0 + w / 2, y0 + h / 2
+                  if not isla_c and not intento and not _en_tierra(x0, y0, w, h):
+                      continue   # nada de temperaturas en medio del mar
+                  propia = math.hypot(cx - px, cy - py)
+                  # que la pastilla quede más cerca de su ciudad que de cualquier otra ciudad conocida
+                  if any(n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
+                         for rx, ry, n in refs):   # (las ciudades pegadas a la suya, como L'Hospitalet, no cuentan)
+                      continue
+                  puestas.append((x0, y0, w, h))
+                  out.append((im, (int(x0), int(y0)), (px, py), c))
+                  break
         return out
     cajas = colocar([it[1] for it in items], area)
     return [(im, (int(cj[0]), int(cj[1])), p, c) for (im, _, p, c), cj in zip(items, cajas)]

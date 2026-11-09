@@ -97,3 +97,4 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - El 35-45 % se va en los 3 primeros segundos: el gancho tiene que nombrar ya un sitio o un dato llamativo.
 - Semanal, media semana y finde: si llueve de verdad (≥3 capitales con ≥50 %), el bloque del día más lluvioso funde el mapa de lluvia en colores y el guion le dedica una frase.
 - CONTRASTE DE FUENTES: el prompt trae dónde AEMET y los modelos (europeo, francés, alemán, americano) no se ponen de acuerdo y dónde coinciden todos. Una frase natural sobre el más llamativo, sin tecnicismos; no forzarlo si el parte va lleno. Si se activa Google (secreto GOOGLE_WEATHER_API_KEY), entra solo en la fusión y el contraste, nunca pintado en el mapa.
+- Madrid, Barcelona, Valencia, Zaragoza y Bilbao salen SIEMPRE en el mapa (partes diarios, semanal, media semana y finde), las nombre o no el guion.

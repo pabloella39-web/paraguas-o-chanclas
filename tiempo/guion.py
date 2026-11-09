@@ -611,6 +611,9 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     return {"segmentos": seg, "caption": caption, "orden": orden, "titular": titular[:30]}
 
 
+SIEMPRE_EN_MAPA = ("Madrid", "Barcelona", "Valencia", "Zaragoza", "Bilbao")
+
+
 def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) -> list[dict]:
     """Si el guion nombra una ciudad 'extra' (Vigo en vez de A Coruña), su tarjeta sustituye en el mapa a la ciudad
     habitual más cercana de su región que el guion NO nombra; así lo que se oye y lo que se ve coinciden."""
@@ -636,7 +639,8 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
         base = [dict(c) for c in prev if c["region"] == region]
         exs = [e for e in extras_ok if e["region"] == region and e["nombre"] not in {c["nombre"] for c in base}]
         todos = base + exs
-        sel = [c for c in todos if nombrada(c["nombre"])]
+        # las cinco ciudades más pobladas salen SIEMPRE en el mapa, las nombre o no el guion
+        sel = [c for c in todos if nombrada(c["nombre"]) or c["nombre"] in SIEMPRE_EN_MAPA]
         resto = [c for c in todos if c not in sel and c["nombre"] not in ("Ceuta", "Melilla")]
         tope = MAX.get(region, 6)
         if not sel and base:
