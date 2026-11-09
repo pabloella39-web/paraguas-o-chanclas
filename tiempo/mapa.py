@@ -394,6 +394,9 @@ def _marcador_mini(nombre, tmax, ic, fase=0, lluvia=None) -> Image.Image:
     return out
 
 
+VECINAS_DIFICILES = ("Santander", "Tarragona", "Mérida", "Cádiz")
+VECINA_GRANDE = {"Santander": "Bilbao", "Tarragona": "Barcelona"}   # la grande se aparta el día que le toca a la vecina
+
 NOMBRE_CORTO = {"Santa Cruz de Tenerife": "S.C. Tenerife", "Las Palmas de Gran Canaria": "Las Palmas",
                 "Palma de Mallorca": "Palma", "San Sebastián": "Donostia", "Vitoria-Gasteiz": "Vitoria",
                 "Jerez de la Frontera": "Jerez", "Ciudad Real": "C. Real",
@@ -464,7 +467,7 @@ def marcador(c: dict, estilo: str, fase: int = 0) -> Image.Image:
                              round(racha) if racha else None)
 
 
-def marcadores(prev, pr: Proyeccion, estilo: str, area):
+def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
     """Devuelve [(imagen, (x, y), (px, py), ciudad)] ya colocados sin solaparse."""
     items = []
     for c in prev:
@@ -512,6 +515,14 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
         # (solo las siete fijas y los extremos van siempre delante; el resto rota)
         primeras = [it for it in items if it[3]["nombre"] in extremos or it[3]["nombre"] in SIEMPRE_EN_MAPA]
+        # Santander, Tarragona y Mérida, pegadas a Bilbao, Barcelona y Badajoz, nunca encontraban hueco: si llevan unos
+        # días sin salir, se colocan antes que su vecina grande (que, con su nombre, puede apartarse o asomar al mar)
+        from . import rotacion
+        turno = [it for it in items if it[3]["nombre"] in VECINAS_DIFICILES and it not in primeras
+                 and rotacion.dias_sin_salir(it[3]["nombre"]) >= 3] if _turno else []
+        # primero las grandes (que, si tienen una vecina con turno, se apartan hacia el otro lado) y luego la vecina
+        primeras = primeras + turno
+        repeler = {VECINA_GRANDE[it[3]["nombre"]]: it[2] for it in turno if it[3]["nombre"] in VECINA_GRANDE}
         resto = [it for it in items if it not in primeras]
 
         def siguiente():
@@ -537,13 +548,18 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
             # las grandes de costa (con su nombre escrito) pueden asomar al mar: así dejan sitio en tierra a sus
             # vecinas (Lleida y Tarragona junto a Barcelona, Santander junto a Bilbao…)
             isla_c = c["nombre"] in ISLAS_Y_CIUDADES_AUTONOMAS or c.get("lat", 40) < 30 or \
-                c["nombre"] in ("Barcelona", "Valencia", "Málaga", "Bilbao")
+                c["nombre"] in ("Barcelona", "Valencia", "Málaga", "Bilbao", "Santander", "Tarragona", "Cádiz")
             for intento in (0, 1):
               if intento and (c["nombre"] not in SIEMPRE_EN_MAPA or any(o[3] is c for o in out)):
                   break
               # 2.º intento solo para las cinco grandes (Bilbao, Barcelona, Valencia están en la costa): sin exigir
               # que toda la pastilla caiga en tierra, pero sí cerca de su ciudad
-              for dx, dy in offs:
+              offs_c = offs
+              cerca = [repeler[c["nombre"]]] if c["nombre"] in repeler else []
+              if cerca:   # alejarse de la vecina que hoy tiene turno (Bilbao deja sitio a Santander)
+                  offs_c = sorted(offs, key=lambda o: math.hypot(o[0], o[1] * 1.3)
+                                  - 3 * min(math.hypot(px + o[0] - rx, py + o[1] - ry) for rx, ry in cerca))
+              for dx, dy in offs_c:
                   x0, y0 = px - w / 2 + dx, py - h / 2 + dy
                   # la columna de botones de TikTok empieza más abajo: arriba se puede llegar casi al borde
                   lim_x = 1080 - 15 if y0 + h < 600 else ax1
@@ -565,8 +581,10 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                   puestas.append((x0, y0, w, h))
                   out.append((im, (int(x0), int(y0)), (px, py), c))
                   break
+        puestas_n = {c["nombre"] for *_, c in out}
+        if turno and any(it[3]["nombre"] in SIEMPRE_EN_MAPA and it[3]["nombre"] not in puestas_n for it in items):
+            return marcadores(prev, pr, estilo, area, _turno=False)   # las siete grandes no pueden faltar nunca
         try:
-            from . import rotacion
             rotacion.registrar(c["nombre"] for *_, c in out)
         except Exception:  # noqa: BLE001
             pass

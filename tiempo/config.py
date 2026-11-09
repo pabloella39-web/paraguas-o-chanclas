@@ -74,7 +74,6 @@ CIUDADES_EXTRA = [
     ("Girona", 41.979, 2.821, "mediterraneo"), ("Tarragona", 41.119, 1.245, "mediterraneo"),
     ("Lleida", 41.618, 0.620, "mediterraneo"), ("Castellón", 39.986, -0.051, "mediterraneo"),
     ("Elche", 38.267, -0.698, "mediterraneo"), ("Cartagena", 37.626, -0.996, "mediterraneo"),
-    ("Benidorm", 38.541, -0.123, "mediterraneo"),
     # Sur
     ("Córdoba", 37.888, -4.779, "sur"), ("Jaén", 37.780, -3.785, "sur"), ("Huelva", 37.261, -6.945, "sur"),
     ("Cádiz", 36.527, -6.289, "sur"), ("Jerez de la Frontera", 36.685, -6.126, "sur"), ("Cáceres", 39.475, -6.372, "sur"),
@@ -82,29 +81,8 @@ CIUDADES_EXTRA = [
     # Islas
     ("Ibiza", 38.907, 1.432, "islas"), ("Mahón", 39.889, 4.262, "islas"), ("Arrecife", 28.963, -13.548, "islas"),
     ("Puerto del Rosario", 28.500, -13.862, "islas"), ("Santa Cruz de La Palma", 28.684, -17.765, "islas"),
-    # Más ciudades principales (en general, de más de 50.000 habitantes o la principal de su zona): rotan en el mapa
-    # para que todo el mundo vea la suya de vez en cuando
-    ("Ferrol", 43.484, -8.233, "norte"), ("Ponferrada", 42.546, -6.598, "norte"), ("Avilés", 43.556, -5.925, "norte"),
-    ("Torrelavega", 43.349, -4.048, "norte"), ("Irun", 43.338, -1.789, "norte"),
-    ("Talavera de la Reina", 39.963, -4.830, "interior"), ("Puertollano", 38.687, -4.108, "interior"),
-    ("Aranjuez", 40.032, -3.604, "interior"), ("Alcalá de Henares", 40.482, -3.364, "interior"),
-    ("Reus", 41.155, 1.107, "mediterraneo"), ("Manresa", 41.728, 1.824, "mediterraneo"),
-    ("Terrassa", 41.563, 2.009, "mediterraneo"), ("Mataró", 41.540, 2.444, "mediterraneo"),
-    ("Granollers", 41.608, 2.288, "mediterraneo"), ("Vilanova i la Geltrú", 41.224, 1.725, "mediterraneo"),
-    ("Sagunto", 39.680, -0.278, "mediterraneo"), ("Torrent", 39.437, -0.465, "mediterraneo"),
-    ("Gandia", 38.967, -0.181, "mediterraneo"), ("Alcoy", 38.698, -0.474, "mediterraneo"),
-    ("Elda", 38.478, -0.791, "mediterraneo"), ("Orihuela", 38.085, -0.944, "mediterraneo"),
-    ("Torrevieja", 37.978, -0.683, "mediterraneo"), ("Lorca", 37.677, -1.701, "mediterraneo"),
-    ("Molina de Segura", 38.054, -1.207, "mediterraneo"),
-    ("Mérida", 38.916, -6.344, "sur"), ("Linares", 38.095, -3.636, "sur"), ("Motril", 36.745, -3.518, "sur"),
-    ("El Ejido", 36.776, -2.815, "sur"), ("Roquetas de Mar", 36.764, -2.615, "sur"),
-    ("Vélez-Málaga", 36.781, -4.100, "sur"), ("Fuengirola", 36.540, -4.625, "sur"), ("Estepona", 36.427, -5.146, "sur"),
-    ("Dos Hermanas", 37.283, -5.921, "sur"), ("Utrera", 37.185, -5.781, "sur"),
-    ("Sanlúcar de Barrameda", 36.778, -6.352, "sur"), ("El Puerto de Santa María", 36.594, -6.233, "sur"),
-    ("Chiclana", 36.419, -6.149, "sur"),
-    ("Manacor", 39.570, 3.209, "islas"), ("San Sebastián de La Gomera", 28.092, -17.111, "islas"),
-    ("Valverde", 27.809, -17.915, "islas"), ("La Laguna", 28.487, -16.315, "islas"), ("Telde", 27.994, -15.416, "islas"),
-    ("Arona", 28.100, -16.681, "islas"),
+    # Ciudades grandes que no son capital (más de 100.000 habitantes): rotan en el mapa
+    ("Mérida", 38.916, -6.344, "sur"), ("La Laguna", 28.487, -16.315, "islas"), ("Telde", 27.994, -15.416, "islas"),
 ]
 
 REGIONES = {
