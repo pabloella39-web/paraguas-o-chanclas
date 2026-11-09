@@ -372,7 +372,7 @@ def cta_del_dia(hoy: date) -> str:
 def _guion_precargado(hoy: date, prompt: str) -> dict | None:
     """Guion escrito con el plan de Claude (tarea programada), sin gastar API: ver tiempo/manual.py."""
     from . import manual
-    g = manual.responder(f"parte-{hoy.isoformat()}", prompt, "19:50" if os.environ.get("VISPERA") else "07:05")
+    g = manual.responder(f"parte-{hoy.isoformat()}", prompt, os.environ.get("LIMITE_GUION") or ("19:50" if os.environ.get("VISPERA") else "07:05"))
     if g and set(g.get("segmentos", {})) >= set(SEGMENTOS):
         g["origen"] = "manual"
         return g

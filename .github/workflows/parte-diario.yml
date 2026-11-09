@@ -26,6 +26,10 @@ on:
         description: "Esperar a las 7:30 antes de publicar"
         type: boolean
         default: false
+      vispera:
+        description: "El parte de mañana (víspera); sin «publicar», queda como borrador en la rama pruebas-tiempo"
+        type: boolean
+        default: false
       reloj:
         description: "Lanzado por el reloj (reloj.yml) en lugar del programador de GitHub: la línea cron que toca"
         type: string
@@ -85,6 +89,7 @@ jobs:
           TIKTOK_MODO: ${{ vars.TIKTOK_MODO || 'borrador' }}
           TIKTOK_PRIVACIDAD: ${{ vars.TIKTOK_PRIVACIDAD || 'PUBLIC_TO_EVERYONE' }}
           GH_PUSH_TOKEN: ${{ github.token }}
+          LIMITE_GUION: ${{ inputs.vispera && !inputs.publicar && '22:30' || '' }}
         run: |
           ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ] || [ -n "${{ inputs.reloj }}" ]; then
@@ -99,15 +104,16 @@ jobs:
           else
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
+            [ "${{ inputs.vispera }}" = "true" ] && ARGS="$ARGS --vispera"
           fi
           mkdir -p salida
           set -o pipefail
           python -m tiempo.main $ARGS 2>&1 | tee salida/registro.txt
 
       - name: Guardar la prueba en la rama pruebas-tiempo
-        if: always() && github.event_name == 'push'
+        if: always() && (github.event_name == 'push' || (inputs.vispera && !inputs.publicar))
         run: |
-          grep -qi prueba lanzar.txt || exit 0
+          [ "${{ github.event_name }}" = "push" ] && { grep -qi prueba lanzar.txt || exit 0; }
           mkdir -p /tmp/p && cp salida/*.mp4 salida/meta.json salida/registro.txt /tmp/p/ 2>/dev/null || true
           cd /tmp/p && git init -q -b pruebas-tiempo
           git config user.name "parte-bot"; git config user.email "parte-bot@users.noreply.github.com"

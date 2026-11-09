@@ -8,7 +8,7 @@ on:
         description: "Ejecución de «Especiales del tiempo» con el vídeo"
         required: true
       tipo:
-        description: "semana / resto / finde / aviso"
+        description: "semana / resto / finde / aviso / parte"
         default: "semana"
 permissions:
   contents: write
@@ -23,13 +23,14 @@ jobs:
       - run: pip install -r requirements.txt && sudo apt-get install -y -qq ffmpeg > /dev/null
       - uses: actions/download-artifact@v4
         with:
-          name: especial-${{ inputs.run_id }}
+          name: ${{ inputs.tipo == 'parte' && 'parte' || 'especial' }}-${{ inputs.run_id }}
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
           path: salida
       - env:
           UPLOADPOST_API_KEY: ${{ secrets.UPLOADPOST_API_KEY }}
           UPLOADPOST_PERFIL: ${{ vars.UPLOADPOST_PERFIL }}
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
@@ -44,6 +45,11 @@ jobs:
           from tiempo import especiales as e
           meta = json.loads(Path("salida/meta.json").read_text(encoding="utf-8"))
           meta["video"] = str(next(Path("salida").glob("*.mp4")))
+          if "${{ inputs.tipo }}" == "parte":   # parte diario revisado: su propio camino (historial/FECHA.json)
+              from tiempo import main as m
+              m.publicar_revisado(meta)
+              print("Publicado:", json.dumps({k: str(meta.get(k))[:200] for k in ("tiktok", "youtube", "instagram")}, ensure_ascii=False))
+              raise SystemExit(0)
           hoy = e.ahora().date()
           e._publicar(meta, hoy)
           tipo = "${{ inputs.tipo }}"
@@ -58,6 +64,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add historial_especiales estado 2>/dev/null || true
+          git add historial historial_especiales estado 2>/dev/null || true
           git commit -m "Publicado vídeo revisado (${{ inputs.tipo }})" || exit 0
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done

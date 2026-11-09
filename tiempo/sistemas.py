@@ -121,7 +121,13 @@ def _seguir(serie, salto=4.5):
     return [t for t in tray if len(t["puntos"]) >= 3]
 
 
-def detectar(hoy: date) -> dict | None:
+def nombre_en_texto(texto: str | None) -> str | None:
+    """«borrasca Bruna» en el texto de predicción de AEMET (por si la página de borrascas no lo tiene aún)."""
+    m = re.search(r"[Bb]orrasca\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})", texto or "")
+    return m.group(1) if m else None
+
+
+def detectar(hoy: date, texto_aemet: str | None = None) -> dict | None:
     """El sistema que afecta (o va a afectar) a la península en los próximos 3 días, o None.
     {"tipo": "borrasca"|"dana", "nombre", "horas", "trayectoria": [(hora_iso, lon, lat, valor)], "minimo", "datos"}"""
     try:
@@ -146,7 +152,7 @@ def detectar(hoy: date) -> dict | None:
         return None
     tipo, _, t, vmin, d = min(candidatos, key=lambda c: c[1])
     tray = [(horas[n], lo, la, v) for n, lo, la, v in t["puntos"]]
-    nombre = nombre_aemet(hoy) if tipo == "borrasca" else None
+    nombre = (nombre_en_texto(texto_aemet) or nombre_aemet(hoy)) if tipo == "borrasca" else None
     log.info("Sistema detectado: %s %s (mín. %.0f, a %.1f° de la península), %d pasos", tipo, nombre or "", vmin, d,
              len(tray))
     return {"tipo": tipo, "nombre": nombre, "trayectoria": tray, "minimo": vmin, "distancia": d,

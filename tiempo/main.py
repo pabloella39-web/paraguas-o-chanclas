@@ -348,7 +348,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         SISTEMA[0] = None
         try:   # borrascas (con nombre o no), temporales y DANAs que entran: su evolución por horas
             from . import sistemas
-            s_ = sistemas.detectar(hoy)
+            s_ = sistemas.detectar(hoy, texto_aemet)
             rachas = max((c.get("racha") or 0) for c in prev) if prev else 0
             if s_ and (s_.get("nombre") or s_["distancia"] == 0 or (s_["tipo"] == "borrasca" and s_["minimo"] <= 1000)
                        or rachas >= 70):
@@ -571,10 +571,28 @@ def main():
                     f"**Texto para el post de TikTok** (cópialo al publicar):\n\n```\n{meta['caption']}\n```\n\n"
                     f"Guion: {meta.get('origen_guion')}\n")
     hist = RAIZ / "historial" / f"{hoy.isoformat()}.json"
-    if not a.demo:
+    if not a.demo and a.publicar:   # un borrador sin publicar no cuenta como hecho
         hist.parent.mkdir(exist_ok=True)
         hist.write_text(json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1),
                         encoding="utf-8")
+
+
+def publicar_revisado(meta: dict):
+    """Publica un parte ya generado y revisado (flujo publicar-hecho.yml con tipo «parte»)."""
+    from . import uploadpost
+    from .config import registrar_voz
+    hoy = date.fromisoformat(meta["fecha"])
+    meta["primer_comentario"] = uploadpost.comentario_pueblo(hoy)
+    meta["tiktok"] = uploadpost.publicar_tiktok(Path(meta["video"]), meta["caption"], "tiempo",
+                                                primer_comentario=meta["primer_comentario"])
+    registrar_voz(meta.get("voz", ""), hoy)
+    publicar_youtube(meta, hoy)
+    uploadpost.instagram_seguro(meta)
+    hist = RAIZ / "historial" / f"{hoy.isoformat()}.json"
+    hist.parent.mkdir(exist_ok=True)
+    hist.write_text(json.dumps({k: v for k, v in meta.items() if k != "video"}, ensure_ascii=False, indent=1),
+                    encoding="utf-8")
+    return meta
 
 
 if __name__ == "__main__":
