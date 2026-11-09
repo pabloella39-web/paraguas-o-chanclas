@@ -2363,8 +2363,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                                          _capa_nucleos(nucleos, reservado=_caja_lista(grupos + AMARILLOS))),
                   **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(nucleos))} if lluvia_capa else {}),
                   **({"evolucion": _juntar_capas(evol_capa, _capa_nucleos(nucleos))} if evol_capa else {}),
-                  "consejos": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, consejos=consejos),
-                                            _capa_nucleos(nucleos[:4])),
+                  # en «qué hacer» manda la tarjeta de consejos: sin nombres de pueblos encima
+                  "consejos": _capa_poligonos(grupos + AMARILLOS, consejos=consejos),
                   "cierre": _capa_poligonos(grupos + AMARILLOS)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],
