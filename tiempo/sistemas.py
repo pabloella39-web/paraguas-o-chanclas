@@ -21,10 +21,10 @@ from . import campos
 
 log = logging.getLogger(__name__)
 
-AMPLIA = (-30.0, 10.0, 30.0, 52.0, 1.5)        # rejilla para seguir el centro (Atlántico + península)
+AMPLIA = (-30.0, 10.0, 30.0, 52.0, 2.0)        # rejilla para seguir el centro (Atlántico + península)
 VISTA_SISTEMA = (-21.0, 6.5, 32.5, 48.5)       # lo que se ve en el vídeo durante el tramo
 PENINSULA_BOX = (-9.5, 3.5, 36.0, 43.8)
-VIENTO = (-10.4, 4.6, 35.4, 44.2, 0.4)         # rejilla de las rachas (península y Baleares)
+VIENTO = (-10.4, 4.6, 35.4, 44.2, 0.6)         # rejilla de las rachas (península y Baleares)
 
 ESCALA_VIENTO = [(30, (170, 225, 205)), (40, (110, 205, 160)), (50, (240, 225, 90)), (60, (250, 180, 60)),
                  (70, (245, 120, 50)), (80, (225, 60, 60)), (90, (190, 40, 120)), (100, (140, 50, 170)),
@@ -345,7 +345,7 @@ def preparar(s: dict, hoy: date):
     fin = min(datetime.fromisoformat(tr[-1][0]).date(), ini + _td(days=2))
     trozos, notas = [capa_trayectoria(s)], []
     try:
-        lo, la, horas, cubo = campos.lluvia_horaria(ini, (-10.4, 4.6, 35.4, 44.2, 0.3), fin)
+        lo, la, horas, cubo = campos.lluvia_horaria(ini, (-10.4, 4.6, 35.4, 44.2, 0.45), fin)
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
             trozos.append(ev)
