@@ -2,7 +2,7 @@
 si hay clave. Saca lo que merece una frase en el guion: dónde no se ponen de acuerdo y dónde coinciden todos."""
 from __future__ import annotations
 
-NOMBRE = {"ecmwf_ifs025": "el europeo (ECMWF)", "meteofrance_seamless": "el francés (AROME)",
+NOMBRE = {"ecmwf_ifs025": "el europeo (ECMWF)", "meteofrance_seamless": "el francés (Météo-France)",
           "icon_seamless": "el alemán (ICON)", "gfs_seamless": "el americano (GFS)"}
 
 
@@ -42,7 +42,13 @@ def analizar(prev: list[dict]) -> dict:
             elif dif is not None and abs(dif) >= 4:
                 dudas.append((abs(dif) * 5, f"{n}: AEMET da {t_ae:.0f} grados y los modelos "
                                             f"{'menos' if dif > 0 else 'más'} ({sorted(tx.values())[len(tx) // 2]:.0f})"))
-    dudas.sort(key=lambda x: -x[0]); seguro.sort(key=lambda x: -x[0])
+    # una sola duda por ciudad (la más fuerte)
+    vistas, unicas = set(), []
+    for x in sorted(dudas, key=lambda x: -x[0]):
+        ciudad = x[1].split(":")[0]
+        if ciudad not in vistas:
+            vistas.add(ciudad); unicas.append(x)
+    dudas = unicas; seguro.sort(key=lambda x: -x[0])
     return {"dudas": [t for _, t in dudas[:3]], "seguro": [t for _, t in seguro[:2]]}
 
 
@@ -50,8 +56,8 @@ def texto(prev: list[dict], cuando: str = "hoy") -> str:
     a = analizar(prev)
     if not a["dudas"] and not a["seguro"]:
         return ""
-    t = (f"\n\nCONTRASTE DE FUENTES para {cuando} (AEMET frente a los modelos europeo ECMWF, francés AROME, alemán "
-         "ICON y americano GFS): ")
+    t = (f"\n\nCONTRASTE DE FUENTES para {cuando} (AEMET frente a los modelos europeo ECMWF, francés Météo-France, "
+         "alemán ICON y americano GFS): ")
     if a["dudas"]:
         t += "NO SE PONEN DE ACUERDO en: " + "; ".join(a["dudas"]) + ". "
     if a["seguro"]:
