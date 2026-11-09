@@ -1,7 +1,12 @@
 {
- "fecha": "2026-11-10",
+ "fecha": "2026-11-09",
  "caption": "Aviso rojo en Cáceres y Ávila, sol en Valencia… ¿de qué lado te toca mañana? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #ACoruna",
- "voz": "femenina",
- "duracion": 79.83,
- "extras": []
+ "anterior": true,
+ "extras": [
+  {
+   "titulo": "Aviso rojo",
+   "caption": "⚠️ Aviso rojo por lluvias en Ávila y Cáceres el martes 10\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Tajo y Alagón, Meseta cacereña, Villuercas y Montánchez, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Sierra de Madrid, Serranía de Guadalajara, Sur, Vegas y Oeste\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Ávila",
+   "hora": "20:20"
+  }
+ ]
 }
