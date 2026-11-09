@@ -1263,14 +1263,24 @@ def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> lis
     return am + ref
 
 
-def _capa_nucleos(nucleos, color=(255, 255, 255)):
+def _caja_lista(grupos) -> list:
+    """Hueco que ocupan arriba a la izquierda las etiquetas «AVISO NARANJA · LLUVIAS» (para no poner nombres encima)."""
+    n = min(3, len(grupos))
+    if not n:
+        return []
+    f = fuente("Black", 40)
+    w = max(f.getlength(f"AVISO {g['nivel'].upper()} · {g['fenomeno'].upper()}") + 50 for g in grupos[:3])
+    return [(30, MAPA_Y0 + 20, 50 + w, MAPA_Y0 + 30 + 78 * n)]
+
+
+def _capa_nucleos(nucleos, color=(255, 255, 255), reservado=None):
     """Puntos y nombres de los núcleos afectados, apareciendo uno tras otro tras el zoom."""
     from .video import TRANSICION
     f = fuente("ExtraBold", 27)
 
     def dibujar(capa, pr, dt):
         d = ImageDraw.Draw(capa)
-        puestas = []   # nombres y puntos ya puestos (por orden de importancia: el grande nunca se queda fuera)
+        puestas = list(reservado or [])   # nombres y puntos ya puestos (por orden de importancia)
         for k, c in enumerate(nucleos):
             s = min(1.0, max(0.0, (dt - TRANSICION - 0.15 - k * 0.25) / 0.3))
             col = COLOR_NUCLEO.get(c.get("nivel"), color)
@@ -2302,7 +2312,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
         "capas": {"intro": _capa_poligonos(grupos + AMARILLOS),
-                  "zonas": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, con_lista=True), _capa_nucleos(nucleos)),
+                  "zonas": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, con_lista=True),
+                                         _capa_nucleos(nucleos, reservado=_caja_lista(grupos + AMARILLOS))),
                   **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(nucleos))} if lluvia_capa else {}),
                   **({"evolucion": _juntar_capas(evol_capa, _capa_nucleos(nucleos))} if evol_capa else {}),
                   "consejos": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, consejos=consejos),

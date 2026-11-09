@@ -80,11 +80,14 @@ def _kwargs_aviso(graves) -> dict:
     """Zoom a la zona del aviso, con las provincias pintadas y los núcleos afectados señalados."""
     if not graves:
         return {}
-    from .especiales import (_capa_despues, _capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom,
-                             nucleos_afectados)
+    from .especiales import (_caja_lista, _capa_despues, _capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom,
+                             ciudades_zoom, nucleos_afectados)
     nivel = "rojo" if any(x["nivel"] == "rojo" for x in graves) else "naranja"
-    nucleos = nucleos_afectados(graves)
-    capa = _juntar_capas(_capa_poligonos(graves, con_lista=True), _capa_nucleos(nucleos))
+    # pueblos con aviso y, además, capitales cercanas para situarse (como en los vídeos de aviso)
+    gn, otras = nucleos_afectados(graves, n=10), ciudades_zoom(graves, [])
+    nucleos = gn[:4] + otras + gn[4:]
+    capa = _juntar_capas(_capa_poligonos(graves, con_lista=True),
+                         _capa_nucleos(nucleos, reservado=_caja_lista(graves)))
     if CAMPO_PARTE[0]:   # aviso por lluvia o tormentas: tras las zonas, el mapa de lluvia acumulada en colores
         from . import campos
         lluvia = _juntar_capas(campos.capa_lluvia_fuerte(CAMPO_PARTE[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)"),
