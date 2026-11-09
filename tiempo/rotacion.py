@@ -56,3 +56,18 @@ def registrar(nombres) -> None:
             ARCHIVO.write_text(json.dumps(datos, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8")
         except Exception:  # noqa: BLE001
             pass
+
+
+# Capitales de provincia (y de isla): tienen algo más de preferencia que el resto de ciudades al rellenar el mapa
+CAPITALES = {"A Coruña", "Lugo", "Ourense", "Pontevedra", "Oviedo", "Santander", "Bilbao", "San Sebastián", "Vitoria",
+             "Pamplona", "Logroño", "Huesca", "Zaragoza", "Teruel", "Lleida", "Girona", "Barcelona", "Tarragona",
+             "Castellón", "Valencia", "Alicante", "Murcia", "Albacete", "Cuenca", "Guadalajara", "Toledo", "Ciudad Real",
+             "Madrid", "Segovia", "Ávila", "Salamanca", "Zamora", "Valladolid", "Palencia", "León", "Burgos", "Soria",
+             "Cáceres", "Badajoz", "Huelva", "Sevilla", "Cádiz", "Córdoba", "Jaén", "Granada", "Almería", "Málaga",
+             "Palma", "Las Palmas", "S.C. Tenerife", "Ceuta", "Melilla", "Mérida", "Santiago de Compostela",
+             "Ibiza", "Mahón", "Arrecife", "Puerto del Rosario", "Santa Cruz de La Palma", "San Sebastián de La Gomera",
+             "Valverde"}
+
+
+def es_capital(nombre: str) -> bool:
+    return nombre in CAPITALES

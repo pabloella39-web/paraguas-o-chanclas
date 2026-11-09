@@ -655,7 +655,7 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
             # la más alejada de las elegidas, con preferencia por las que llevan más días sin salir en el mapa (que
             # todo el mundo vea su ciudad de vez en cuando: Huesca, Ourense, Lugo, Teruel…)
             c = max(libres, key=lambda c: min(dist(c, x) for x in sel) + 3.0 * rotacion.bonus(c["nombre"])
-                    + (0.6 if not c.get("extra") else 0))   # capitales habituales, un pequeño plus
+                    + (0.6 if rotacion.es_capital(c["nombre"]) else 0))   # capitales, un pequeño plus
             sel.append(c); resto.remove(c)
         out += sel + [c for c in base if c["nombre"] in ("Ceuta", "Melilla") and c not in sel]
     # Ceuta y Melilla: basta con la tarjeta de una (se alternan por días), salvo que el guion nombre a las dos

@@ -401,7 +401,8 @@ NOMBRE_CORTO = {"Santa Cruz de Tenerife": "S.C. Tenerife", "Las Palmas de Gran C
                 "Puerto del Rosario": "P. del Rosario", "San Sebastián de La Gomera": "La Gomera",
                 "Talavera de la Reina": "Talavera", "Navalmoral de la Mata": "Navalmoral",
                 "Ejea de los Caballeros": "Ejea", "Sanlúcar de Barrameda": "Sanlúcar", "Caravaca de la Cruz": "Caravaca",
-                "Alcázar de San Juan": "Alcázar", "Monforte de Lemos": "Monforte", "La Seu d'Urgell": "La Seu"}
+                "Alcalá de Henares": "Alcalá", "Vilanova i la Geltrú": "Vilanova",
+                "El Puerto de Santa María": "El Puerto", "Molina de Segura": "Molina"}
 
 
 @lru_cache(maxsize=None)
@@ -522,7 +523,7 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                 return resto.pop(0)
             from . import rotacion   # hueco más grande, con preferencia por las que llevan días sin salir
             lejos = max(resto, key=lambda it: min(math.hypot(it[2][0] - o[2][0], it[2][1] - o[2][1]) for o in out)
-                        + 250 * rotacion.bonus(it[3]["nombre"]))
+                        + 250 * rotacion.bonus(it[3]["nombre"]) + (150 if rotacion.es_capital(it[3]["nombre"]) else 0))
             resto.remove(lejos)
             return lejos
 
@@ -533,7 +534,10 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
             im, caja, (px, py), c = it_
             w, h = caja[2], caja[3]
             # las islas (Baleares, Canarias) y Ceuta y Melilla no tienen tierra alrededor: ahí sí vale el mar
-            isla_c = c["nombre"] in ISLAS_Y_CIUDADES_AUTONOMAS or c.get("lat", 40) < 30
+            # las grandes de costa (con su nombre escrito) pueden asomar al mar: así dejan sitio en tierra a sus
+            # vecinas (Lleida y Tarragona junto a Barcelona, Santander junto a Bilbao…)
+            isla_c = c["nombre"] in ISLAS_Y_CIUDADES_AUTONOMAS or c.get("lat", 40) < 30 or \
+                c["nombre"] in ("Barcelona", "Valencia", "Málaga", "Bilbao")
             for intento in (0, 1):
               if intento and (c["nombre"] not in SIEMPRE_EN_MAPA or any(o[3] is c for o in out)):
                   break
