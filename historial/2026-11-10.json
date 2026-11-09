@@ -1,0 +1,128 @@
+{
+ "fecha": "2026-11-10",
+ "duracion": 113.03,
+ "caption": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Madrid",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "AVISO ROJO EN CÁCERES",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Cáceres y Ávila, en alerta roja. Más de 120 litros en 12 horas, y detrás llega otra borrasca. Aguanta, que al final te digo dónde hace más calor.",
+  "aviso": "Rojo el martes, de nueve de la mañana a medianoche, en el norte de Cáceres y el sur de Ávila: casi 200 litros en la Vera, el Jerte y la Sierra de San Vicente. Naranja en Tajo y Alagón, Grazalema, Ronda, Aracena y la sierra norte de Sevilla, y por viento en Tenerife, La Palma, La Gomera y El Hierro. Atentos también en Plasencia, Ávila, Salamanca y Toledo, que lloverá con ganas. Y nada de cruzar arroyos.",
+  "sistema": "Esta es Bruna, y detrás llega Charles: AEMET avisa de un temporal de martes a jueves en el oeste, el sur y Canarias. Lo peor de la lluvia, el martes por la tarde. El jueves la borrasca cruza la península con rachas de más de 100 kilómetros por hora.",
+  "norte": "Mira el satélite: así entra la lluvia por Galicia. Santiago, 21 litros, y olas de casi 5 metros en las Rías Baixas.",
+  "sur": "Gente de Sevilla, paraguas sí o sí: 12 litros, y Cáceres, 17. Málaga, en duda: AEMET ve lluvia y casi ningún modelo, así que mira al cielo.",
+  "interior": "Si eres de Madrid, mañana te mojas: 13 litros. Y Valladolid, lo peor de la meseta, con 24, y aquí todos los modelos coinciden.",
+  "islas": "Canarias, rachas de hasta 110 kilómetros por hora. Baleares, ni caso: Palma, 23 grados y seco.",
+  "mediterraneo": "Y el Mediterráneo, en otra película: Valencia, 26 grados, y Barcelona, 24, sin una gota.",
+  "general": "Lo prometido: Murcia, 27 grados, la capital más calurosa. Salamanca, la más fría, con 10, y Benasque, en Huesca, 3 grados.",
+  "cierre": "Y tú, ¿desde dónde nos ves? Dime en comentarios tu pueblo y te digo si toca paraguas o chanclas. Y sigue a Paraguas o Chanclas."
+ },
+ "primer_comentario": "📍 Escribe tu pueblo y te digo si mañana toca paraguas o chanclas 👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-09T20:32:49.374Z"
+     },
+     "success": true,
+     "platform_post_id": "7706272010279718176",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706272010279718176",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 32263137,
+     "post_title": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Madrid",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 113.034,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7706271885315033120",
+     "first_comment_posted": true,
+     "request_id": "20131b9a630b49dd937ad1c4320faa01",
+     "request_id_logs": "20131b9a630b49dd937ad1c4320faa01",
+     "job_id": "5deb970de5ac4b779d676fd14f8ecf53",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-09T20:32:49.374Z"
+   },
+   "request_id": "20131b9a630b49dd937ad1c4320faa01"
+  }
+ },
+ "youtube": {
+  "id": "G_uUmD1MHNM",
+  "url": "https://youtube.com/shorts/G_uUmD1MHNM",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-09T20:34:07.213Z"
+   },
+   "success": true,
+   "platform_post_id": "17896089984614386",
+   "post_url": "https://www.instagram.com/reel/DfiMuQfDGXm/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 32263137,
+   "post_title": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Madrid #meteorologia",
+   "post_caption": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Madrid #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 113.034,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "3c3a7b36a5714125af14046171907c9d",
+   "request_id_logs": "3c3a7b36a5714125af14046171907c9d",
+   "job_id": "cc3d4858a165453594428b4b024284da",
+   "request_total_platforms": 1
+  }
+ }
+}
