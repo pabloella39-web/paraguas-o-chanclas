@@ -642,7 +642,8 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
         # las cinco ciudades más pobladas salen SIEMPRE en el mapa, las nombre o no el guion
         sel = [c for c in todos if nombrada(c["nombre"]) or c["nombre"] in SIEMPRE_EN_MAPA]
         resto = [c for c in todos if c not in sel and c["nombre"] not in ("Ceuta", "Melilla")]
-        tope = MAX.get(region, 6)
+        # las fijas no restan sitio a la rotación: el tope se amplía con las que no nombra el guion
+        tope = MAX.get(region, 6) + sum(1 for c in sel if c["nombre"] in SIEMPRE_EN_MAPA and not nombrada(c["nombre"]))
         if not sel and base:
             sel = [base[0]]; resto = [c for c in resto if c is not base[0]]
         umbral = 0.5 if region == "islas" else 0.85   # más cerca se pisarían las tarjetas
