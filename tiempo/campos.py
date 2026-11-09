@@ -473,3 +473,106 @@ def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA
         _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq, ESCALA_HORA)
     dibujar.duracion = len(fotos) * seg_por_fotograma
     return dibujar
+
+
+# ------------------------------------------------------------------ temperaturas en colores (como en la tele)
+ESCALA_TEMP = [(-99, (70, 120, 200)), (5, (90, 170, 220)), (10, (60, 190, 150)), (14, (60, 190, 90)),
+               (18, (150, 215, 80)), (22, (235, 230, 90)), (25, (250, 200, 70)), (28, (248, 150, 55)),
+               (31, (235, 85, 50)), (34, (200, 40, 45)), (37, (150, 20, 40)), (40, (95, 10, 30))]
+
+
+def tmax_rejilla(dia: date, caja):
+    """Máxima del día en la rejilla, media de los cuatro modelos."""
+    lons, lats = _rejilla(caja)
+    puntos = [(la, lo) for la in lats for lo in lons]
+    js = _pedir(puntos, {"daily": "temperature_2m_max", "models": ",".join(MODELOS), "start_date": dia.isoformat(),
+                         "end_date": dia.isoformat()})
+    v = np.array([(_media_modelos(j.get("daily") or {}, "temperature_2m_max", 1) or [np.nan])[0] for j in js],
+                 dtype=float)
+    return lons, lats, v.reshape(len(lats), len(lons))
+
+
+def _imagen_temp(lons, lats, v, canaria=False):
+    from scipy.ndimage import zoom
+    from PIL import ImageFilter
+    f = PX_GRADO * (lons[1] - lons[0])
+    fino = zoom(v, f, order=1)
+    h, w = fino.shape
+    rgba = np.zeros((h, w, 4), dtype=np.uint8)
+    for u, col in ESCALA_TEMP:
+        m = fino >= u
+        rgba[m, :3] = col
+        rgba[m, 3] = 235
+    img = Image.fromarray(rgba[::-1], "RGBA").filter(ImageFilter.GaussianBlur(3))
+    lon0, lat0 = lonlat_mapa(float(lons[0]), float(lats[0]), canaria)
+    lon1, lat1 = lonlat_mapa(float(lons[-1]), float(lats[-1]), canaria)
+    return img, (lon0, lon1, lat0, lat1)
+
+
+def capa_temperaturas(dia: date, ciudades: list, titulo: str = "MÁXIMAS (°C)"):
+    """España coloreada por la máxima (solo España: ni Portugal, ni Francia, ni África), límites de provincia y los
+    números grandes en blanco sobre las ciudades (sin recuadros), con la leyenda de colores. Como en la tele."""
+    from .video import MAPA_Y0, MAPA_H
+    from .config import ANCHO
+    from .especiales import fuente
+    from . import mapa as mapa_
+    try:
+        imgs = [_imagen_temp(*tmax_rejilla(dia, PENINSULA_PANTALLA))]
+        lo, la, v = tmax_rejilla(dia, CANARIAS)
+        imgs.append(_imagen_temp(lo, la, v, canaria=True))
+    except Exception as e:  # noqa: BLE001
+        log.warning("Mapa de temperaturas no disponible: %s", e)
+        return None
+    provs = mapa_.provincias()
+    cache: dict = {}
+    fnum, fley = fuente("Black", 44), fuente("ExtraBold", 24)
+
+    def preparar(pr):
+        clave = (round(pr(0, 40)[0], 1), round(pr(0, 40)[1], 1), round(pr(1, 40)[0], 2))
+        if clave in cache:
+            return cache[clave]
+        lienzo = Image.new("RGBA", (ANCHO, MAPA_H), (0, 0, 0, 0))
+        c2: dict = {}
+        for n, (img, caja) in enumerate(imgs):
+            _pegar(lienzo, img, caja, pr, 0, c2, n)
+        mask = Image.new("L", (ANCHO, MAPA_H), 0)
+        dm = ImageDraw.Draw(mask)
+        lineas = Image.new("RGBA", (ANCHO, MAPA_H), (0, 0, 0, 0))
+        dl = ImageDraw.Draw(lineas)
+        for p_ in provs:
+            for an in p_["anillos"]:
+                if not an:
+                    continue
+                q = [pr(*lonlat_mapa(lo_, la_, la_ < 30)) for lo_, la_ in an]
+                dm.polygon(q, fill=255)
+                dl.line(q + [q[0]], fill=(255, 255, 255, 120), width=2)
+        a = np.asarray(lienzo.getchannel("A"), dtype=float) * np.asarray(mask, dtype=float) / 255
+        lienzo.putalpha(Image.fromarray(a.astype(np.uint8)))
+        lienzo.alpha_composite(lineas)
+        # números sobre las ciudades, separados (primero las grandes y las nombradas: vienen ya en ese orden)
+        d = ImageDraw.Draw(lienzo)
+        puestos = []
+        for c in ciudades:
+            x, y = pr(*lonlat_mapa(c["lon"], c["lat"], c["lat"] < 30))
+            if not (30 < x < 930 and 30 < y < MAPA_H - 30):
+                continue
+            if any(((x - a_) ** 2 + (y - b_) ** 2) ** 0.5 < 60 for a_, b_ in puestos):
+                continue
+            puestos.append((x, y))
+            d.text((x, y), f"{round(c['tmax'])}", font=fnum, fill="white", anchor="mm", stroke_width=5,
+                   stroke_fill=(20, 20, 30))
+        # leyenda vertical abajo a la derecha (sobre el mar)
+        esc = [e for e in ESCALA_TEMP if e[0] > -99]
+        x0, y0 = ANCHO - 118, MAPA_H - 40 - 30 * len(esc)
+        d.rounded_rectangle([x0 - 14, y0 - 48, x0 + 92, MAPA_H - 26], radius=16, fill=(8, 20, 45, 215))
+        d.text((x0 + 38, y0 - 26), "°C", font=fley, fill="white", anchor="mm")
+        for k, (u, col) in enumerate(reversed(esc)):
+            y = y0 + 30 * k
+            d.rectangle([x0, y, x0 + 26, y + 26], fill=col + (255,))
+            d.text((x0 + 36, y + 13), str(u), font=fley, fill="white", anchor="lm")
+        cache[clave] = lienzo
+        return lienzo
+
+    def dibujar(capa, pr, dt):
+        capa.alpha_composite(preparar(pr), (0, MAPA_Y0))
+    return dibujar

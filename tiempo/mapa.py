@@ -356,8 +356,46 @@ def _texto(d, xy, txt, f, color, sombra=True, anchor="la"):
     d.text(xy, txt, font=f, fill=color, anchor=anchor)
 
 
+ESTILO_TELE = [True]   # mapa general «como en la tele»: icono animado y la temperatura debajo, sin pastilla
+
+
+@lru_cache(maxsize=None)
+def _marcador_tele(nombre, tmax, ic, fase=0, lluvia=None) -> Image.Image:
+    """Icono animado (los de siempre) flotando sobre el mapa y debajo la temperatura en su chapita de siempre (misma
+    fuente y colores); encima, su nombre (las siete grandes en amarillo); «Lluvia X%» dentro de la chapita si toca."""
+    from .guion import SIEMPRE_EN_MAPA
+    grande = nombre in SIEMPRE_EN_MAPA
+    ti = 46 if grande else 42
+    f = fuente("Black", 27 if grande else 25)
+    txt = f"{tmax}°"
+    fp = fuente("SemiBold", 14)
+    ptxt = f"Lluvia {int(lluvia)}%" if lluvia is not None and lluvia >= 20 else ""
+    fn = fuente("Black" if grande else "ExtraBold", 15 if grande else 13)
+    etiqueta = NOMBRE_CORTO.get(nombre, nombre).upper()
+    ew = int(fn.getlength(etiqueta)) + 12
+    th = 19 if grande else 17
+    cw = max(int(f.getlength(txt)) + 18, int(fp.getlength(ptxt)) + 14 if ptxt else 0)
+    ch = 32 + (15 if ptxt else 0)
+    W = max(ti, cw, ew)
+    H = th + ti - 8 + ch
+    im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([(W - ew) / 2, 0, (W + ew) / 2, th], radius=th // 2,
+                        fill=(255, 201, 60, 235) if grande else (255, 255, 255, 215))
+    d.text((W / 2, th / 2 + 1), etiqueta, font=fn, fill=(8, 20, 45, 255), anchor="mm")
+    y0 = th + ti - 8
+    d.rounded_rectangle([(W - cw) / 2, y0, (W + cw) / 2, y0 + ch], radius=14, fill=(8, 20, 45, 200))
+    im.alpha_composite(icono(ic, ti, fase), ((W - ti) // 2, th - 6))
+    _texto(d, (W / 2, y0 + 16), txt, f, color_temp(tmax), anchor="mm")
+    if ptxt:
+        _texto(d, (W / 2, y0 + 37), ptxt, fp, (150, 205, 255), anchor="mm", sombra=False)
+    return im
+
+
 @lru_cache(maxsize=None)
 def _marcador_mini(nombre, tmax, ic, fase=0, lluvia=None) -> Image.Image:
+    if ESTILO_TELE[0]:
+        return _marcador_tele(nombre, tmax, ic, fase, lluvia)
     # algo más compacta que antes: caben más ciudades y el mapa no se queda con huecos
     # todas llevan su nombre encima (que nadie dude de qué ciudad es); las siete grandes, más grandes y en amarillo,
     # y el resto algo más pequeñas para que quepan muchas y el mapa no tenga huecos

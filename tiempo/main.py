@@ -358,7 +358,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             g.GANCHO_TEXTO += contraste.texto(prev, cuando)
         except Exception as e:  # noqa: BLE001
             log.warning("Contraste de fuentes no disponible: %s", e)
-        g.GANCHO_TEXTO += mapa_extra(prev, avisos, hoy)
+        # el bloque «general» (más calor / más frío) lleva el mapa de temperaturas en colores, como en la tele; la
+        # lluvia en colores sale en los tramos de aviso y de borrasca
+        g.GANCHO_TEXTO += ("\n\nMAPA DE TEMPERATURAS: en el bloque «general» sale España coloreada por la máxima, con "
+                           "las cifras sobre las ciudades. Puedes decir «mira el mapa: el sur, en rojo»…")
         SISTEMA[0] = None
         try:   # borrascas (con nombre o no), temporales y DANAs que entran: su evolución por horas
             from . import sistemas
@@ -461,15 +464,28 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     extremos = EXTREMOS_PUEBLOS[0] or {"calor": max(prev, key=lambda c: c["tmax"]),
                                        "frio": min(prev, key=lambda c: c["tmin"])}
     prev_mapa = g.prev_para_mapa(prev, guion["segmentos"])   # las ciudades que se nombran son las que se ven
+    capa_t = None
+    if not demo:
+        try:   # «general»: temperaturas en colores con las cifras encima (sin pastillas)
+            from . import campos, rotacion
+            from .guion import SIEMPRE_EN_MAPA
+            orden_t = sorted(prev_mapa + [c for c in prev if c not in prev_mapa],
+                             key=lambda c: (c["nombre"] not in SIEMPRE_EN_MAPA, not rotacion.es_capital(c["nombre"])))
+            capa_t = campos.capa_temperaturas(hoy, orden_t)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Sin mapa de temperaturas: %s", e)
     comp = Compositor(prev_mapa, plan, total, g.fecha_larga(hoy).upper(), extremos, guion.get("titular", ""), fecha=hoy,
                       gancho=fen, satelite=sat,
-                      capas_fondo={**(_capas_parte(avisos) or {}), **({"general": MAPA_EXTRA[0][0]} if MAPA_EXTRA[0] else {})},
+                      capas_fondo={**(_capas_parte(avisos) or {}), **({"general": MAPA_EXTRA[0][0]} if MAPA_EXTRA[0] else {}),
+                                   **({"general": capa_t} if capa_t else {})},
                       capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa),
                       **_kwargs_juntos(_kwargs_juntos(
                           _kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None,
                                         guion["segmentos"].get("aviso", "")),
                           {"pills": {"general": MAPA_EXTRA[0][1]}} if MAPA_EXTRA[0] else {}),
-                          _kwargs_sistema() if "sistema" in guion["segmentos"] else {}))
+                          _kwargs_juntos(_kwargs_sistema() if "sistema" in guion["segmentos"] else {},
+                                         {"sin_marcadores": ("general",), "pills": {"general": "MÁXIMAS (°C)"}}
+                                         if capa_t else {})))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)
