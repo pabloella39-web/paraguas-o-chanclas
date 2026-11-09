@@ -240,7 +240,8 @@ def _producir(nombre: str, guion, plan, total, trozos, comp_kwargs: dict, prev, 
     log.info("Renderizando %.2f s…", total)
     renderizar(comp, audio, video, total)
     real = voz.duracion(video)
-    if not DURACION_MIN <= real <= DURACION_MAX:
+    # vale si está en el rango o si dura lo planeado (la locución pudo alargar el vídeo dentro del máximo permitido)
+    if not (DURACION_MIN <= real <= DURACION_MAX or abs(real - total) <= 1.5):
         raise RuntimeError(f"El vídeo dura {real:.2f} s")
     return video
 
@@ -2248,7 +2249,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                         tuple((z.upper()[:30], COLOR_NIVEL.get(gr["nivel"], (255, 205, 40)))
                               for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),
     }
-    with duracion(*DURACION_AVISO):
+    with duracion(*dur_aviso):
         video = _producir(f"aviso_{hoy.isoformat()}" + (f"_{sufijo}" if sufijo else ""), guion, plan, total, trozos, kwargs, [], None,
                           g.fecha_larga(hoy).upper(), salida, trabajo)
     caption = caption_aviso(grupos, guion.get("caption") if guion.get("origen") == "claude" else None)
