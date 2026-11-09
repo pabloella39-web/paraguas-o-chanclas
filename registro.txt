@@ -1,0 +1,3 @@
+núcleos: [('Ávila', 'naranja'), ('Segovia', 'naranja'), ('Cuéllar', 'naranja'), ('Arévalo', 'naranja'), ('Madrid', 'amarillo'), ('Valladolid', 'amarillo'), ('Móstoles', 'amarillo'), ('Alcalá de Henares', 'amarillo'), ('Arenas de San Pedro', 'naranja'), ('San Ildefonso', 'naranja'), ('Candeleda', 'naranja'), ('Las Navas del Marqués', 'naranja'), ('La Cuesta', 'naranja'), ('Sotillo de la Adrada', 'naranja'), ('Salamanca', 'amarillo'), ('Toledo', 'referencia')]
+máximos: {'Ávila': 181, 'Segovia': 34}
+ok
