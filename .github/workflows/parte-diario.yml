@@ -26,6 +26,10 @@ on:
         description: "Esperar a las 7:30 antes de publicar"
         type: boolean
         default: false
+      fecha:
+        description: "Rehacer el parte de esta fecha (AAAA-MM-DD) como borrador, sin publicar"
+        type: string
+        default: ""
       vispera:
         description: "El parte de mañana (víspera); sin «publicar», queda como borrador en la rama pruebas-tiempo"
         type: boolean
@@ -105,13 +109,14 @@ jobs:
             [ "${{ inputs.publicar }}" = "true" ] && ARGS="$ARGS --publicar"
             [ "${{ inputs.esperar }}" = "true" ] && ARGS="$ARGS --esperar"
             [ "${{ inputs.vispera }}" = "true" ] && ARGS="$ARGS --vispera"
+            [ -n "${{ inputs.fecha }}" ] && ARGS="$ARGS --fecha ${{ inputs.fecha }}" && export VISPERA=1
           fi
           mkdir -p salida
           set -o pipefail
           python -m tiempo.main $ARGS 2>&1 | tee salida/registro.txt
 
       - name: Guardar la prueba en la rama pruebas-tiempo
-        if: always() && (github.event_name == 'push' || (inputs.vispera && !inputs.publicar))
+        if: always() && (github.event_name == 'push' || ((inputs.vispera || inputs.fecha != '') && !inputs.publicar))
         run: |
           [ "${{ github.event_name }}" = "push" ] && { grep -qi prueba lanzar.txt || exit 0; }
           mkdir -p /tmp/p && cp salida/*.mp4 salida/meta.json salida/registro.txt /tmp/p/ 2>/dev/null || true
