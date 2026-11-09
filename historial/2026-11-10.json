@@ -1,6 +1,6 @@
 {
  "fecha": "2026-11-10",
- "duracion": 113.03,
+ "duracion": 114.3,
  "caption": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Madrid",
  "portada_ms": 0,
  "origen_guion": "manual",
@@ -33,16 +33,16 @@
      "platform": "tiktok",
      "media_type": "video",
      "upload_timestamp": {
-      "$date": "2026-11-09T20:32:49.374Z"
+      "$date": "2026-11-09T22:50:14.760Z"
      },
      "success": true,
-     "platform_post_id": "7706272010279718176",
-     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706272010279718176",
+     "platform_post_id": "7706307632419671329",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706307632419671329",
      "error_message": null,
      "error_signature": null,
      "error_code": null,
      "failure_stage": null,
-     "media_size_bytes": 32263137,
+     "media_size_bytes": 32069738,
      "post_title": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Madrid",
      "post_caption": "",
      "is_async": true,
@@ -56,30 +56,30 @@
       "width": 1080,
       "height": 1920,
       "fps": 30.0,
-      "duration": 113.034,
+      "duration": 114.3,
       "container": "mov,mp4,m4a,3gp,3g2,mj2",
       "video_codec": "h264",
       "audio_codec": "aac"
      },
      "target_linkedin_page_id": null,
-     "original_publish_id": "v_pub_url~v2.7706271885315033120",
+     "original_publish_id": "v_pub_url~v2.7706307241632139296",
      "first_comment_posted": true,
-     "request_id": "20131b9a630b49dd937ad1c4320faa01",
-     "request_id_logs": "20131b9a630b49dd937ad1c4320faa01",
-     "job_id": "5deb970de5ac4b779d676fd14f8ecf53",
+     "request_id": "caf9d72aa8c54d588c878daea8c78892",
+     "request_id_logs": "caf9d72aa8c54d588c878daea8c78892",
+     "job_id": "90939b1107824df8a041e09e132af41b",
      "request_total_platforms": 1
     }
    ],
    "external_id": null,
    "last_update": {
-    "$date": "2026-11-09T20:32:49.374Z"
+    "$date": "2026-11-09T22:50:14.760Z"
    },
-   "request_id": "20131b9a630b49dd937ad1c4320faa01"
+   "request_id": "caf9d72aa8c54d588c878daea8c78892"
   }
  },
  "youtube": {
-  "id": "G_uUmD1MHNM",
-  "url": "https://youtube.com/shorts/G_uUmD1MHNM",
+  "id": "CHQSdn08Llk",
+  "url": "https://youtube.com/shorts/CHQSdn08Llk",
   "canal": "Paraguas o Chanclas"
  },
  "instagram": {
@@ -90,16 +90,16 @@
    "platform": "instagram",
    "media_type": "video",
    "upload_timestamp": {
-    "$date": "2026-11-09T20:34:07.213Z"
+    "$date": "2026-11-09T22:52:00.582Z"
    },
    "success": true,
-   "platform_post_id": "17896089984614386",
-   "post_url": "https://www.instagram.com/reel/DfiMuQfDGXm/",
+   "platform_post_id": "18415337704090378",
+   "post_url": "https://www.instagram.com/reel/Dficf-KEebZ/",
    "error_message": null,
    "error_signature": null,
    "error_code": null,
    "failure_stage": null,
-   "media_size_bytes": 32263137,
+   "media_size_bytes": 32069738,
    "post_title": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Madrid #meteorologia",
    "post_caption": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴\n\nEl tiempo en España mañana, martes 10 de noviembre 🇪🇸\n🌧️ Lluvia en Madrid y Valladolid\n🔥 Máxima: 27° en Murcia\n🥶 Mínima: 10° en Salamanca\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Madrid #meteorologia",
    "is_async": true,
@@ -113,15 +113,15 @@
     "width": 1080,
     "height": 1920,
     "fps": 30.0,
-    "duration": 113.034,
+    "duration": 114.3,
     "container": "mov,mp4,m4a,3gp,3g2,mj2",
     "video_codec": "h264",
     "audio_codec": "aac"
    },
    "target_linkedin_page_id": null,
-   "request_id": "3c3a7b36a5714125af14046171907c9d",
-   "request_id_logs": "3c3a7b36a5714125af14046171907c9d",
-   "job_id": "cc3d4858a165453594428b4b024284da",
+   "request_id": "42205a4f5e11447983de3678e5d8a1cb",
+   "request_id_logs": "42205a4f5e11447983de3678e5d8a1cb",
+   "job_id": "72445cf5f70a4512b6be14cd0ac3e052",
    "request_total_platforms": 1
   }
  }
