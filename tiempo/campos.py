@@ -21,7 +21,7 @@ URL = "https://api.open-meteo.com/v1/forecast"
 
 # Rejillas (lon0, lon1, lat0, lat1, paso)
 PENINSULA = (-11.2, 5.2, 34.8, 44.8, 0.4)
-PENINSULA_PANTALLA = (-13.8, 5.6, 31.8, 46.3, 0.45)   # todo lo que se ve en el mapa general (sin recuadro)
+PENINSULA_PANTALLA = (-13.8, 5.6, 31.8, 46.3, 0.6)   # todo lo que se ve en el mapa general (sin recuadro)
 
 
 def sin_recuadro_canarias(lons, lats, v):

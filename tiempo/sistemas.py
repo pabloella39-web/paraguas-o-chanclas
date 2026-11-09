@@ -367,7 +367,7 @@ def preparar(s: dict, hoy: date):
     trozos, notas = [capa_trayectoria(s)], []
     try:
         from .especiales import _visible
-        caja = (*_visible(VISTA_SISTEMA, 0.3), 0.6)   # toda la pantalla, sin recuadro (un modelo: menos datos)
+        caja = (*_visible(VISTA_SISTEMA, 0.3), 1.0)   # toda la pantalla, sin recuadro (un modelo: menos datos)
         lo, la, horas, cubo = campos.lluvia_horaria(ini, caja, fin, modelos=False)
         cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
@@ -379,7 +379,7 @@ def preparar(s: dict, hoy: date):
         log.warning("Sin lluvia hora a hora para el sistema: %s", e)
     try:
         from .especiales import _visible
-        lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 0.3), 0.8))
+        lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 0.3), 1.2))
         c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
         cv = capa_viento(lo_v, la_v, h_v, c_v)
         if cv and cv.maximo >= 60:
