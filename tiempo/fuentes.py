@@ -266,6 +266,7 @@ def _ponderada(valores: dict):
 
 def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
     f = {k: v for k, v in fuentes_.items() if v}
+    goo = f.pop("Google", None)   # Google solo para contrastar (sus condiciones no dejan pintarlo en nuestro mapa)
     if not f:
         raise RuntimeError(f"Sin datos para {ciudad['nombre']}")
 
@@ -289,7 +290,7 @@ def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
         "fuentes": list(f),
         # lo que dice cada fuente por separado (para el contraste en el guion)
         "contraste": {"aemet": {k: (f.get("AEMET") or {}).get(k) for k in ("tmax", "tmin", "lluvia")},
-                      "google": {k: (f.get("Google") or {}).get(k) for k in ("tmax", "lluvia")} if "Google" in f else None,
+                      "google": {k: goo.get(k) for k in ("tmax", "lluvia")} if goo else None,
                       "modelos": (f.get("Open-Meteo") or {}).get("por_modelo") or {}},
     }
     if len(tmaxes) >= 2:
