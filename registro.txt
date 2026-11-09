@@ -1,0 +1,6 @@
+INFO:matplotlib.font_manager:Failed to extract font properties from /usr/share/fonts/truetype/noto/NotoColorEmoji.ttf: Non-scalable fonts are not supported
+INFO:matplotlib.font_manager:generated new fontManager
+INFO:__main__:GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor 2026-11-09: 0 % sin datos
+INFO:__main__:GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor 2026-11-08: 0 % sin datos
+INFO:__main__:Satélite 2026-11-09: 0.2 % sin cubrir
+{"dia_satelite": "2026-11-09", "centros": [["A", 1.5, 33.5, 1024], ["B", -19.5, 45.5, 974]]}
