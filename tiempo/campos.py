@@ -72,8 +72,10 @@ def lluvia(dia: date, caja=PENINSULA, hasta: date | None = None) -> tuple[np.nda
     lons, lats = _rejilla(caja)
     puntos = [(la, lo) for la in lats for lo in lons]
     fin = hasta or dia
-    js = _pedir(puntos, {"daily": "precipitation_sum", "start_date": dia.isoformat(), "end_date": fin.isoformat()})
-    v = np.array([sum(x or 0 for x in (j.get("daily") or {}).get("precipitation_sum", [0])) for j in js], dtype=float)
+    js = _pedir(puntos, {"daily": "precipitation_sum", "models": ",".join(MODELOS), "start_date": dia.isoformat(),
+                         "end_date": fin.isoformat()})
+    ndias = (fin - dia).days + 1
+    v = np.array([sum(_media_modelos(j.get("daily") or {}, "precipitation_sum", ndias)) for j in js], dtype=float)
     return lons, lats, v.reshape(len(lats), len(lons))
 
 
@@ -140,6 +142,23 @@ def _leyenda_horizontal(capa, y, titulo, f, fpeq, escala=None):
                    anchor="mm")
 
 
+def _recortado(dibujo):
+    """Dibuja el campo y las costas en un lienzo del tamaño del mapa: así no se sale por encima del título ni por
+    debajo, y se funde arriba igual que el mapa (sin el corte de un recuadro)."""
+    from .config import ANCHO
+    from .video import MAPA_H, MAPA_Y0
+    rampa = np.linspace(0, 1, 110)
+
+    def pegar(capa, pr, dt):
+        lienzo = Image.new("RGBA", (ANCHO, MAPA_H), (0, 0, 0, 0))
+        dibujo(lienzo, pr, dt)
+        a = np.asarray(lienzo.getchannel("A"), dtype=float)
+        a[:110] *= rampa[:, None]
+        lienzo.putalpha(Image.fromarray(a.astype(np.uint8)))
+        capa.alpha_composite(lienzo, (0, MAPA_Y0))
+    return pegar
+
+
 def capa_lluvia_fuerte(campos_: list, titulo: str):
     """Capa con el campo de lluvia «de modelo» (opaco, escala completa) y la leyenda horizontal abajo.
     campos_: lista de (lons, lats, v, canaria)."""
@@ -152,16 +171,19 @@ def capa_lluvia_fuerte(campos_: list, titulo: str):
     from . import mapa as mapa_
     provs = mapa_.provincias()
 
-    def dibujar(capa, pr, dt):
+    def campo(lienzo, pr, dt):
         for n, (img, caja) in enumerate(imgs):
-            _pegar(capa, img, caja, pr, MAPA_Y0, cache, f"f{n}")
+            _pegar(lienzo, img, caja, pr, 0, cache, f"f{n}")
         # costas y límites encima del color, para que se vea dónde cae cada cosa (como en los mapas de modelo)
-        d = ImageDraw.Draw(capa)
+        d = ImageDraw.Draw(lienzo)
         for p in provs:
             for anillo in p["anillos"]:
                 pts = [pr(*lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
-                d.line([(x, y + MAPA_Y0) for x, y in pts] + [(pts[0][0], pts[0][1] + MAPA_Y0)],
-                       fill=(255, 255, 255, 210), width=3)
+                d.line(pts + [pts[0]], fill=(255, 255, 255, 210), width=3)
+    recortado = _recortado(campo)
+
+    def dibujar(capa, pr, dt):
+        recortado(capa, pr, dt)
         _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq)
     return dibujar
 
@@ -332,14 +354,31 @@ ESCALA_HORA = [(0.1, ESCALA_FUERTE[0][1]), (0.3, ESCALA_FUERTE[1][1]), (0.6, ESC
                (50, ESCALA_FUERTE[18][1]), (60, ESCALA_FUERTE[19][1])]
 
 
+# Consenso de modelos para la lluvia: media del europeo, el francés, el alemán y el americano (lo mismo que se usa para
+# las cifras de las ciudades). Un solo modelo puede inventarse o perderse un núcleo de tormenta; la media es más fiable.
+MODELOS = ["ecmwf_ifs025", "meteofrance_seamless", "icon_seamless", "gfs_seamless"]
+
+
+def _media_modelos(bloque: dict, var: str, n: int) -> list[float]:
+    series = [bloque.get(f"{var}_{m}") for m in MODELOS]
+    series = [x for x in series if isinstance(x, list) and any(v is not None for v in x)]
+    if not series:
+        return [0.0] * n
+    out = []
+    for k in range(n):
+        vals = [x[k] for x in series if k < len(x) and x[k] is not None]
+        out.append(sum(vals) / len(vals) if vals else 0.0)
+    return out
+
+
 def lluvia_horaria(ini: date, caja, fin: date | None = None):
-    """Lluvia hora a hora (l/m² en cada hora) en la rejilla: (lons, lats, horas ISO, cubo [hora, lat, lon])."""
+    """Lluvia hora a hora (l/m² en cada hora) en la rejilla, media de los modelos: (lons, lats, horas, cubo)."""
     lons, lats = _rejilla(caja)
     puntos = [(la, lo) for la in lats for lo in lons]
-    js = _pedir(puntos, {"hourly": "precipitation", "start_date": ini.isoformat(),
+    js = _pedir(puntos, {"hourly": "precipitation", "models": ",".join(MODELOS), "start_date": ini.isoformat(),
                          "end_date": (fin or ini).isoformat()})
     horas = (js[0].get("hourly") or {}).get("time") or []
-    cubo = np.array([[x or 0 for x in (j.get("hourly") or {}).get("precipitation", [0] * len(horas))] for j in js],
+    cubo = np.array([_media_modelos(j.get("hourly") or {}, "precipitation", len(horas)) for j in js],
                     dtype=float)   # [punto, hora]
     return lons, lats, horas, cubo.T.reshape(len(horas), len(lats), len(lons))
 
@@ -393,16 +432,19 @@ def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA
         n = int(max(0.0, dt - TRANSICION) / seg_por_fotograma)
         n = min(n, len(fotos) - 1)
         img, caja, reloj = fotos[n]
-        _pegar(capa, img, caja, pr, MAPA_Y0, cache, f"h{n}")
+
+        def campo(lienzo, pr_, dt_):
+            _pegar(lienzo, img, caja, pr_, 0, cache, f"h{n}")
+            d_ = ImageDraw.Draw(lienzo)
+            for p_ in provs:   # costas encima del color
+                for anillo in p_["anillos"]:
+                    pts = [pr_(*lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
+                    d_.line(pts + [pts[0]], fill=(255, 255, 255, 210), width=3)
+        _recortado(campo)(capa, pr, dt)
         if len(cache) > 4:
             for k in list(cache)[:-2]:
                 cache.pop(k, None)
         d = ImageDraw.Draw(capa)
-        for p_ in provs:   # costas encima del color
-            for anillo in p_["anillos"]:
-                pts = [pr(*lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
-                d.line([(x, y + MAPA_Y0) for x, y in pts] + [(pts[0][0], pts[0][1] + MAPA_Y0)],
-                       fill=(255, 255, 255, 210), width=3)
         w = freloj.getlength(reloj) + 48
         d.rounded_rectangle([ANCHO - 40 - w, MAPA_Y0 + 24, ANCHO - 40, MAPA_Y0 + 104], radius=22, fill=(8, 20, 45, 225))
         d.text((ANCHO - 40 - w / 2, MAPA_Y0 + 64), reloj, font=freloj, fill=(255, 255, 255, 255), anchor="mm")

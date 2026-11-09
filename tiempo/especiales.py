@@ -1078,6 +1078,17 @@ def _zona_zoom(grupos):
                      max(p[1] for p in pts), False, margen=(0.9, 0.7), minimo=(3.0, 2.3))
 
 
+def _visible(z, margen=0.35):
+    """Lo que de verdad se ve en pantalla con la vista z (el mapa es casi cuadrado: se ve más que la caja)."""
+    from .mapa import K
+    ancho, alto = ANCHO, MAPA_H
+    dx, dy = (z[1] - z[0]) * K, (z[3] - z[2])
+    s = min((ancho - 80) / dx, (alto - 80) / dy)
+    cx, cy = (z[0] + z[1]) / 2, (z[2] + z[3]) / 2
+    hx, hy = ancho / 2 / (K * s), alto / 2 / s
+    return cx - hx - margen, cx + hx + margen, cy - hy - margen, cy + hy + margen
+
+
 def _campo_aviso(grupos, hoy: date):
     """Lluvia del aviso (si es por lluvia o tormentas), hora a hora en una rejilla fina: el acumulado durante el aviso
     con su máximo por sitio, y la evolución por horas con la hora de más intensidad en cada sitio.
@@ -1097,10 +1108,11 @@ def _campo_aviso(grupos, hoy: date):
             caja, cajas = campos.CANARIAS_FINA, CAJA_ISLA
         else:
             # la rejilla cubre todo lo que se ve en el zoom (zona con aviso y colindantes) y un poco más
-            z = _zona_zoom(grupos)
-            lo0, lo1, la0, la1 = z[0] - 0.4, z[1] + 0.4, z[2] - 0.3, z[3] + 0.3
-            caja = (lo0, lo1, la0, la1, 0.1 if (lo1 - lo0) * (la1 - la0) < 14 else 0.15 if (lo1 - lo0) * (la1 - la0) < 30
-                    else 0.2)
+            # toda la pantalla, sin recuadro: la rejilla cubre lo que se ve con el zoom y un poco más
+            lo0, lo1, la0, la1 = _visible(_zona_zoom(grupos))
+            area = (lo1 - lo0) * (la1 - la0)
+            paso = max(0.1, round(math.sqrt(area / 1500) / 0.05) * 0.05)   # ≤ ~1500 puntos (tiempo de descarga)
+            caja = (lo0, lo1, la0, la1, paso)
             cajas = {}
             for x in grupos:
                 for z, pol in x.get("zona_poligono") or []:
@@ -1217,6 +1229,36 @@ def nucleos_afectados(grupos, n: int = 7) -> list[dict]:
     return out
 
 
+COLOR_NUCLEO = {"naranja": (255, 255, 255), "rojo": (255, 255, 255), "amarillo": (255, 201, 60),
+                "referencia": (150, 165, 185)}
+
+
+def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> list[dict]:
+    """Además de los pueblos con aviso naranja/rojo: las ciudades grandes con aviso amarillo que se ven en el zoom
+    (punto amarillo) y algunas capitales sin aviso para situarse (punto gris)."""
+    try:
+        nucleos = json.loads((RAIZ / "assets" / "nucleos.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    pts = [p for gr in grupos for pol in gr["poligonos"] for p in pol]
+    if not pts or all(la < 30 for _, la in pts):
+        return []   # Canarias: ya salen todas las islas
+    v = _visible(_zona_zoom(grupos), margen=-0.15)
+    graves = [pol for gr in grupos for pol in gr["poligonos"]]
+    amar = [a["poligono"] for a in amarillos if a.get("poligono")]
+    from .config import CIUDADES
+    capitales = {c["nombre"] for c in CIUDADES}
+    am, ref = [], []
+    for nombre, la, lo, pob in nucleos:
+        if not (v[0] < lo < v[1] and v[2] < la < v[3]) or any(_dentro(lo, la, pol) for pol in graves):
+            continue
+        if pob >= 20000 and len(am) < n_amarillo and any(_dentro(lo, la, pol) for pol in amar):
+            am.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": "amarillo"})
+        elif nombre in capitales and len(ref) < n_ref and pob >= 40000:
+            ref.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": "referencia"})
+    return am + ref
+
+
 def _capa_nucleos(nucleos, color=(255, 255, 255)):
     """Puntos y nombres de los núcleos afectados, apareciendo uno tras otro tras el zoom."""
     from .video import TRANSICION
@@ -1226,7 +1268,8 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
         d = ImageDraw.Draw(capa)
         puestas = []   # nombres y puntos ya puestos (por orden de importancia: el grande nunca se queda fuera)
         for k, c in enumerate(nucleos):
-            s = min(1.0, max(0.0, (dt - TRANSICION - 0.15 - k * 0.35) / 0.3))
+            s = min(1.0, max(0.0, (dt - TRANSICION - 0.15 - k * 0.25) / 0.3))
+            col = COLOR_NUCLEO.get(c.get("nivel"), color)
             if s <= 0:
                 continue
             x, y = pr.ciudad(c)
@@ -1260,8 +1303,9 @@ def _capa_nucleos(nucleos, color=(255, 255, 255)):
             a = int(255 * s)
             pulso = 1 + 0.25 * math.sin(dt * 5 + k)
             r = 9 * pulso
-            d.ellipse([x - r - 5, y - r - 5, x + r + 5, y + r + 5], outline=color + (int(a * 0.6),), width=3)
-            d.ellipse([x - 8, y - 8, x + 8, y + 8], fill=color + (a,), outline=(8, 20, 45, a), width=3)
+            if c.get("nivel") != "referencia":   # las de referencia, sin pulso: no tienen aviso
+                d.ellipse([x - r - 5, y - r - 5, x + r + 5, y + r + 5], outline=col + (int(a * 0.6),), width=3)
+            d.ellipse([x - 8, y - 8, x + 8, y + 8], fill=col + (a,), outline=(8, 20, 45, a), width=3)
             d.rounded_rectangle(caja, radius=h / 2, fill=(8, 20, 45, int(225 * s)))
             d.text(((caja[0] + caja[2]) / 2, (caja[1] + caja[3]) / 2), txt, font=f, fill=(255, 255, 255, a),
                    anchor="mm")
@@ -2134,7 +2178,7 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     extra = max(0, sum(len(sitios_aviso(gr)) for gr in grupos[:4]) - 3)
     palabras["zonas"] += 3 * extra   # con muchos sitios, el bloque de zonas puede alargarse
     if datos:
-        datos[0]["nucleos_senalados_en_el_mapa"] = [c["nombre"] for c in nucleos_afectados(grupos)]
+        datos[0]["nucleos_senalados_en_el_mapa"] = [c["nombre"] for c in nucleos_afectados(grupos, n=10)]
     if datos and CAMPO_AVISO[0]:
         datos[0]["lluvia_prevista_max_l_m2"] = CAMPO_AVISO[0][1]
         if COLINDANTES:
@@ -2229,7 +2273,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
     zona = _zona_zoom(grupos)
-    nucleos = nucleos_afectados(grupos)
+    nucleos = nucleos_afectados(grupos, n=10) + ciudades_zoom(grupos, AMARILLOS)
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]
