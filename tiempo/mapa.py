@@ -398,7 +398,10 @@ NOMBRE_CORTO = {"Santa Cruz de Tenerife": "S.C. Tenerife", "Las Palmas de Gran C
                 "Palma de Mallorca": "Palma", "San Sebastián": "Donostia", "Vitoria-Gasteiz": "Vitoria",
                 "Jerez de la Frontera": "Jerez", "Ciudad Real": "C. Real",
                 "Santa Cruz de La Palma": "S.C. La Palma", "Santiago de Compostela": "Santiago",
-                "Puerto del Rosario": "P. del Rosario"}
+                "Puerto del Rosario": "P. del Rosario", "San Sebastián de La Gomera": "La Gomera",
+                "Talavera de la Reina": "Talavera", "Navalmoral de la Mata": "Navalmoral",
+                "Ejea de los Caballeros": "Ejea", "Sanlúcar de Barrameda": "Sanlúcar", "Caravaca de la Cruz": "Caravaca",
+                "Alcázar de San Juan": "Alcázar", "Monforte de Lemos": "Monforte", "La Seu d'Urgell": "La Seu"}
 
 
 @lru_cache(maxsize=None)
@@ -503,7 +506,7 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
             return dentro >= 4 and tierra.getpixel((min(max(int(x0 + w / 2), 0), tierra.width - 1),
                                                                     min(max(int(y0 + h / 2), 0), tierra.height - 1))) > 0
         # todas llevan su nombre y un piquito hacia la ciudad: pueden apartarse algo más para llenar el mapa
-        offs = sorted({(dx, dy) for dx in range(-100, 101, 10) for dy in range(-70, 71, 10)},
+        offs = sorted({(dx, dy) for dx in range(-70, 71, 10) for dy in range(-55, 56, 5)},
                       key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
         # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
         # (solo las siete fijas y los extremos van siempre delante; el resto rota)

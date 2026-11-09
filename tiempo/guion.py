@@ -631,7 +631,7 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
     # del mapa con otras ciudades, aunque no se nombren (Tarragona, Cuenca, Huesca, Ciudad Real…), eligiendo siempre
     # la más alejada de las que ya hay para cubrir toda la región. Así ninguna zona se queda vacía.
     from . import rotacion
-    MAX = {"islas": 8, "interior": 22, "sur": 16, "norte": 16, "mediterraneo": 14}   # todas las de España rotan
+    MAX = {"islas": 14, "interior": 40, "sur": 36, "norte": 26, "mediterraneo": 30}   # todas las de España rotan
     def dist(a, b):
         return math.hypot((a["lat"] - b["lat"]), (a["lon"] - b["lon"]) * math.cos(math.radians(40)))
     extras_ok = [dict(e, extra=True) for e in extra if e.get("lat") and e.get("tmax") is not None]
