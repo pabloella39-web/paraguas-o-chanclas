@@ -596,7 +596,7 @@ class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
                  gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None, capas_encima=None,
-                 barra_dias=None):
+                 barra_dias=None, transiciones=None):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
@@ -612,6 +612,9 @@ class Compositor:
         self.pills = {**PILLS, "satelite": "ASÍ SE MUEVE EL TIEMPO", **(pills or {})}
         self.portada_txt = portada_txt
         self.capas = capas or {}
+        # zoom lento (segundos) al entrar en ciertos bloques (el aviso: de toda España a la zona, con la lluvia ya
+        # pintada mientras se acerca)
+        self.transiciones = transiciones or {}
         self.capas_fondo = capas_fondo or {}
         self.barra_dias = barra_dias or []   # semanal/finde: «L M X J V» con el día que se está contando resaltado
         self.capas_encima = capas_encima or {}   # igual, pero encima de las tarjetas y esquivándolas (olas, nieve)   # {bloque o "*": función(capa, proyección, dt)} debajo de las tarjetas
@@ -777,10 +780,12 @@ class Compositor:
         seg, prev_seg = self.alias.get(seg_real, seg_real), self.alias.get(prev_real, prev_real)
         img = _fondo()
         dt = t - ini
-        en_trans = self.vista_de(prev_seg) != self.vista_de(seg) and dt < TRANSICION
+        T = self.transiciones.get(seg_real, TRANSICION)
+        en_trans = self.vista_de(prev_seg) != self.vista_de(seg) and dt < T
+        vista_t = None
         if en_trans:
-            vista = mapa.interpolar_vista(self.vista_de(prev_seg), self.vista_de(seg), dt / TRANSICION)
-            m = _fundido_bordes(mapa.dibujar_mapa(vista, ANCHO, MAPA_H, foco=foco_de(seg), ss=1))
+            vista_t = mapa.interpolar_vista(self.vista_de(prev_seg), self.vista_de(seg), dt / T)
+            m = _fundido_bordes(mapa.dibujar_mapa(vista_t, ANCHO, MAPA_H, foco=foco_de(seg), ss=1))
         else:
             m = self.mapa_estatico(seg)
         img.paste(m, (0, MAPA_Y0))
@@ -793,7 +798,7 @@ class Compositor:
 
         # Marcadores con animación de entrada escalonada (en el gancho no: solo el titular sobre el mapa)
         if not en_trans and seg_real != "intro":
-            t_marc = dt - (TRANSICION if self.vista_de(prev_seg) != self.vista_de(seg) else 0.1)
+            t_marc = dt - (T if self.vista_de(prev_seg) != self.vista_de(seg) else 0.1)
             estilo, items = self.marcadores(seg)
             for k, (_, (x, y), (px, py), ciudad) in enumerate(items):
                 s = _ease_back((t_marc - k * (0.06 if estilo == "mini" else 0.15)) / 0.35)
@@ -831,7 +836,12 @@ class Compositor:
             f_encima(capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt, cajas)
         # Capas propias de un bloque (p. ej. zonas con aviso)
         if not en_trans and seg_real in self.capas:
-            self.capas[seg_real](capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt)
+            # tras un zoom lento, la capa sigue donde iba (sin volver a aparecer de cero)
+            self.capas[seg_real](capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H),
+                                 dt - (T - TRANSICION) + (0.6 if T > TRANSICION else 0))
+        elif en_trans and seg_real in self.capas and seg_real in self.transiciones:
+            # durante el zoom lento la capa (zonas pintadas, lluvia) acompaña al mapa; los nombres, al final
+            self.capas[seg_real](capa, mapa.Proyeccion(vista_t, ANCHO, MAPA_H), min(dt, TRANSICION * 0.99))
         # Extremos del día en el bloque general
         if seg_real == "general" and not en_trans:
             self._chips_extremos(capa, d, dt)

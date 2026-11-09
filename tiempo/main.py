@@ -112,7 +112,7 @@ def _kwargs_aviso(graves, texto: str = "") -> dict:
         lluvia = _juntar_capas(campos.capa_lluvia_fuerte(CAMPO_PARTE[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)"),
                                _capa_nucleos(nucleos))
         capa = _capa_despues(capa, lluvia, 4.5)
-    return {"vistas": {"aviso": _zona_zoom(graves)}, "sin_marcadores": ("aviso",),
+    return {"vistas": {"aviso": _zona_zoom(graves)}, "sin_marcadores": ("aviso",), "transiciones": {"aviso": 2.4},
             "capas": {"aviso": capa}, "pills": {"aviso": f"AVISO {nivel.upper()}"}}
 
 

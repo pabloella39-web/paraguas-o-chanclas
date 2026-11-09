@@ -74,15 +74,17 @@ class Proyeccion:
         return self.vista[0] < -10
 
 
-def interpolar_vista(a, b, t):
-    """Interpolación suave entre dos vistas (centro lineal, zoom geométrico)."""
+def interpolar_vista(a, b, t, ancho=1080, alto=1040):
+    """Interpolación suave entre dos vistas: centro lineal y ESCALA geométrica (la que de verdad se ve en pantalla),
+    para que el zoom vaya siempre en el mismo sentido (antes, si cambiaba la forma de la caja, a mitad de camino
+    se acercaba más que al final y luego «rebotaba»)."""
     t = t * t * (3 - 2 * t)
-    ca = ((a[0] + a[1]) / 2, (a[2] + a[3]) / 2)
-    cb = ((b[0] + b[1]) / 2, (b[2] + b[3]) / 2)
-    sa, sb = (a[1] - a[0], a[3] - a[2]), (b[1] - b[0], b[3] - b[2])
-    c = (ca[0] + (cb[0] - ca[0]) * t, ca[1] + (cb[1] - ca[1]) * t)
-    s = (sa[0] * (sb[0] / sa[0]) ** t, sa[1] * (sb[1] / sa[1]) ** t)
-    return (c[0] - s[0] / 2, c[0] + s[0] / 2, c[1] - s[1] / 2, c[1] + s[1] / 2)
+    pa, pb = Proyeccion(a, ancho, alto), Proyeccion(b, ancho, alto)
+    s = pa.s * (pb.s / pa.s) ** t
+    cx = pa.cx + (pb.cx - pa.cx) * t
+    cy = pa.cy + (pb.cy - pa.cy) * t
+    hx, hy = (ancho - 80) / (2 * K * s), (alto - 80) / (2 * s)
+    return (cx - hx, cx + hx, cy - hy, cy + hy)
 
 
 _TIERRA = {}

@@ -2441,6 +2441,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "evolucion": zona, "lluvia": zona, "consejos": zona,
                    "cierre": zona},
         "sin_marcadores": ("intro", "zonas", "evolucion", "lluvia", "consejos", "cierre"),
+        "transiciones": {"zonas": 2.4},   # zoom lento de toda España a la zona del aviso
         "pills": {"zonas": "ZONAS Y HORAS", "evolucion": "¿CUÁNDO LLOVERÁ MÁS?", "lluvia": "¿CUÁNTO VA A LLOVER?",
                   "consejos": "QUÉ HACER",
                   "cierre": "COMPÁRTELO",
