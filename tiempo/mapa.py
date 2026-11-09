@@ -368,6 +368,18 @@ def _marcador_mini(nombre, tmax, ic, fase=0) -> Image.Image:
     d.rounded_rectangle([0, 5, w - 1, h - 5], radius=24, fill=(8, 20, 45, 190))
     im.alpha_composite(icono(ic, 52, fase), (3, 3))
     _texto(d, (54, h / 2), txt, f, color_temp(tmax), anchor="lm")
+    from .guion import SIEMPRE_EN_MAPA
+    if nombre in SIEMPRE_EN_MAPA:   # las siete grandes llevan su nombre encima: que nadie dude de qué ciudad es
+        fn = fuente("ExtraBold", 21)
+        etiqueta = nombre.upper()
+        ew = int(fn.getlength(etiqueta)) + 20
+        W = max(w, ew)
+        out = Image.new("RGBA", (W, h + 26), (0, 0, 0, 0))
+        d2 = ImageDraw.Draw(out)
+        d2.rounded_rectangle([(W - ew) / 2, 0, (W + ew) / 2, 29], radius=13, fill=(255, 201, 60, 235))
+        d2.text((W / 2, 15), etiqueta, font=fn, fill=(8, 20, 45, 255), anchor="mm")
+        out.alpha_composite(im, ((W - w) // 2, 26))
+        return out
     return im
 
 
@@ -517,8 +529,10 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                       continue   # nada de temperaturas en medio del mar
                   propia = math.hypot(cx - px, cy - py)
                   # que la pastilla quede más cerca de su ciudad que de cualquier otra ciudad conocida
-                  if any(n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
-                         for rx, ry, n in refs):   # (las ciudades pegadas a la suya, como L'Hospitalet, no cuentan)
+                  # (las siete grandes llevan su nombre escrito y un piquito: ahí no hace falta esta regla)
+                  if c["nombre"] not in SIEMPRE_EN_MAPA and any(
+                          n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
+                          for rx, ry, n in refs):   # (las ciudades pegadas a la suya, como L'Hospitalet, no cuentan)
                       continue
                   puestas.append((x0, y0, w, h))
                   out.append((im, (int(x0), int(y0)), (px, py), c))

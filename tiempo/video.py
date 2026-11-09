@@ -778,6 +778,19 @@ class Compositor:
                     d.line([(cx, MAPA_Y0 + cy), (px, MAPA_Y0 + py)], fill=(255, 255, 255, int(200 * min(s, 1))), width=3)
                     d.ellipse([px - 9, MAPA_Y0 + py - 9, px + 9, MAPA_Y0 + py + 9], fill=(255, 255, 255),
                               outline=(8, 20, 45), width=3)
+                elif s >= 0.9:
+                    # pastilla apartada de su ciudad: un piquito que apunta a ella (sin puntos de «varicela»)
+                    cx, cy = x + im.width / 2, y + im.height / 2
+                    dist = math.hypot(px - cx, py - cy)
+                    if dist > 30:
+                        ux, uy = (px - cx) / dist, (py - cy) / dist
+                        bx = cx + ux * min(im.width / 2 - 6, abs((im.height / 2 - 4) / uy) if uy else 1e9)
+                        by = cy + uy * min(im.height / 2 - 4, abs((im.width / 2 - 6) / ux) if ux else 1e9)
+                        tx, ty = px - ux * 6, py - uy * 6
+                        nx, ny = -uy * 9, ux * 9
+                        if math.hypot(tx - bx, ty - by) > 4:
+                            d.polygon([(bx + nx, MAPA_Y0 + by + ny), (bx - nx, MAPA_Y0 + by - ny), (tx, MAPA_Y0 + ty)],
+                                      fill=(8, 20, 45, 190))
                 w, h = max(1, int(im.width * s)), max(1, int(im.height * s))
                 imr = im.resize((w, h), Image.BILINEAR) if (w, h) != im.size else im
                 capa.alpha_composite(imr, (int(x + (im.width - w) / 2), int(MAPA_Y0 + y + (im.height - h) / 2)))
