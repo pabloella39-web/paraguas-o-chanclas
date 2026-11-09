@@ -1248,10 +1248,14 @@ def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> lis
     amar = [pol for a in amarillos for pol in (a.get("poligonos") or ([a["poligono"]] if a.get("poligono") else []))]
     from .config import CIUDADES
     capitales = {c["nombre"] for c in CIUDADES}
-    am, ref = [], []
+    am, ref, vistos = [], [], []
     for nombre, la, lo, pob in nucleos:
-        if not (v[0] < lo < v[1] and v[2] < la < v[3]) or any(_dentro(lo, la, pol) for pol in graves):
+        if not (v[0] < lo < v[1] and v[2] < la < v[3]):
             continue
+        cerca = any(math.hypot(la - a, (lo - b) * 0.77) < 0.12 for a, b in vistos)
+        vistos.append((la, lo))
+        if cerca or any(_dentro(lo, la, pol) for pol in graves):
+            continue   # barrios de una ciudad ya puesta («Ciudad Lineal» en Madrid) o ya en la zona naranja
         if pob >= 20000 and len(am) < n_amarillo and any(_dentro(lo, la, pol) for pol in amar):
             am.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": "amarillo"})
         elif nombre in capitales and len(ref) < n_ref and pob >= 40000:
@@ -2273,7 +2277,11 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
     zona = _zona_zoom(grupos)
-    nucleos = nucleos_afectados(grupos, n=10) + ciudades_zoom(grupos, AMARILLOS)
+    graves_n, otras = nucleos_afectados(grupos, n=10), ciudades_zoom(grupos, AMARILLOS)
+    # orden de prioridad (el primero nunca se queda sin sitio): los 4 mayores con aviso, las ciudades grandes con
+    # amarillo (Madrid no puede faltar), el resto con aviso y, al final, las de referencia
+    grandes = [c for c in otras if c["poblacion"] >= 150000 and c["nivel"] == "amarillo"]
+    nucleos = graves_n[:4] + grandes + graves_n[4:] + [c for c in otras if c not in grandes]
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]

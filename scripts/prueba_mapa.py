@@ -21,7 +21,9 @@ amar = [{"fenomeno": "Lluvias", "nivel": "amarillo", "poligonos": [P[n][0]], "zo
 grupos = [naranja]
 e.AMARILLOS[:] = amar
 zona = e._zona_zoom(grupos)
-nuc = e.nucleos_afectados(grupos, n=10) + e.ciudades_zoom(grupos, amar)
+gn, ot = e.nucleos_afectados(grupos, n=10), e.ciudades_zoom(grupos, amar)
+gr_ = [c for c in ot if c["poblacion"] >= 150000 and c["nivel"] == "amarillo"]
+nuc = gn[:4] + gr_ + gn[4:] + [c for c in ot if c not in gr_]
 print("núcleos:", [(c["nombre"], c.get("nivel", "naranja")) for c in nuc])
 campo = e._campo_aviso(grupos, date.today())
 pr = mapa.Proyeccion(zona, ANCHO, MAPA_H)
