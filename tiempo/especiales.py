@@ -1968,7 +1968,7 @@ def texto_avisos(por_dia: dict) -> str:
 
 
 PROMPT_AVISO = """Eres el guionista de "Paraguas o Chanclas", canal de TikTok del tiempo en España. Es un vídeo
-FLASH de 25 segundos por avisos de AEMET: solo para llamar la atención sobre lo urgente. Sin humor, tono directo y
+FLASH de 25 segundos por avisos de AEMET (si los datos traen MODO_ROJO, NO: es un vídeo completo, síguelo). Sin humor, tono directo y
 claro, con urgencia pero sin sensacionalismo. Usa SOLO estos datos oficiales de AEMET (no inventes cifras, zonas, horas
 ni daños). Lo lee {presenta} con voz sintética.
 
@@ -2194,6 +2194,13 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         if len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos"):
             orden.insert(2, "evolucion")
             base["evolucion"] = 24
+    rojo = any(gr["nivel"] == "rojo" for gr in grupos)
+    if rojo:   # aviso ROJO: vídeo completo, con toda la información (no un flash)
+        base.update({"intro": 26, "zonas": 42, "consejos": 26, "cierre": 8})
+        if "lluvia" in base:
+            base["lluvia"] = 38
+        if "evolucion" in base:
+            base["evolucion"] = 50
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     datos = [{"nivel": gr["nivel"], "fenomeno": gr["fenomeno"], "zonas": gr["zonas"][:12],
               "grandes_ciudades_afectadas": gr.get("ciudades", [])[:8],
@@ -2227,6 +2234,15 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                 for k, v in sorted(CAMPO_AVISO[0][2]["picos"].items(), key=lambda t: t[1]["hora"])}
     if not plantilla:
         try:
+            if rojo:
+                datos[0]["MODO_ROJO"] = (
+                    "AVISO ROJO: NO es un vídeo flash. Es un vídeo completo de hasta minuto y medio para que la gente "
+                    "esté bien informada: da la MÁXIMA información útil con los datos que hay. En «zonas», cada sitio "
+                    "afectado con nombre (y los núcleos señalados), desde cuándo y hasta cuándo. En «evolucion», hora a "
+                    "hora y en orden: cuándo empieza a llover fuerte, la HORA PUNTA en cada zona con los LITROS EN UNA "
+                    "HORA, y cuándo afloja. En «lluvia», el total acumulado por zona (de mayor a menor) y las provincias "
+                    "vecinas con cantidades altas. Explica qué significa (riesgo de crecidas, arroyos, carreteras) solo "
+                    "si lo dice AEMET en la descripción o la instrucción. Frases claras, sin relleno.")
             gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_avisos(
                                   [c for gr in grupos for c in gr.get("ciudades", [])], grupos[0]["nivel"]) or "CIUDAD", presenta=presenta, fecha=g.fecha_larga(hoy),
                                                   avisos=json.dumps(datos, ensure_ascii=False, indent=1),
@@ -2303,6 +2319,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     CAMPO_AVISO[0] = None if demo else _campo_aviso(grupos, hoy)
     dur_aviso = ((36.0, 56.0, 44.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
                  else (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO)
+    if any(gr["nivel"] == "rojo" for gr in grupos):   # rojo: vídeo completo, hasta minuto y medio
+        dur_aviso = (55.0, 95.0, 80.0) if CAMPO_AVISO[0] else (40.0, 70.0, 55.0)
     with duracion(*dur_aviso):  # vídeo flash (algo más largo si lleva el mapa de lluvia)
         guion, plan, total, trozos, motor = locutar(
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
