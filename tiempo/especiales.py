@@ -1258,6 +1258,30 @@ COLOR_NUCLEO = {"naranja": (255, 255, 255), "rojo": (255, 255, 255), "amarillo":
                 "referencia": (150, 165, 185)}
 
 
+def nucleos_nombrados(texto: str, grupos) -> list[dict]:
+    """Pueblos y ciudades que nombra el guion y se ven en el zoom: todos señalados en el mapa, con su nivel."""
+    try:
+        nucleos = json.loads((RAIZ / "assets" / "nucleos.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    t = " " + _norm_txt(texto) + " "
+    v = _visible(_zona_zoom(grupos), margen=-0.1)
+    graves = [pol for gr in grupos for pol in gr["poligonos"]]
+    amar = [pol for a in AMARILLOS for pol in (a.get("poligonos") or ([a["poligono"]] if a.get("poligono") else []))]
+    out, vistos = [], set()
+    for nombre, la, lo, pob in sorted(nucleos, key=lambda n: -n[3]):
+        if nombre in vistos or not (v[0] < lo < v[1] and v[2] < la < v[3]):
+            continue
+        n = _norm_txt(nombre)
+        if len(n) < 4 or not re.search(r"(?<![a-z])" + re.escape(n) + r"(?![a-z])", t):
+            continue
+        vistos.add(nombre)
+        nivel = "naranja" if any(_dentro(lo, la, p) for p in graves) else \
+            "amarillo" if any(_dentro(lo, la, p) for p in amar) else "referencia"
+        out.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": nivel})
+    return out
+
+
 def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> list[dict]:
     """Además de los pueblos con aviso naranja/rojo: las ciudades grandes con aviso amarillo que se ven en el zoom
     (punto amarillo) y algunas capitales sin aviso para situarse (punto gris)."""
@@ -2216,6 +2240,20 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     for d_, gr in zip(datos, grupos[:4]):
         d_["sitios_afectados"] = sitios_aviso(gr)
+    if datos:
+        # los núcleos dentro de las zonas (se señalan en el mapa) y las ciudades cercanas, por si se desvía
+        datos[0]["nucleos_en_la_zona_del_aviso"] = [c["nombre"] for c in nucleos_afectados(grupos, n=10)]
+        cerca = ciudades_zoom(grupos, AMARILLOS, n_amarillo=6, n_ref=5)
+        if cerca:
+            datos[0]["ciudades_cercanas_atentas"] = [
+                f"{c['nombre']} ({'aviso amarillo' if c['nivel'] == 'amarillo' else 'sin aviso'})" for c in cerca]
+            datos[0]["REGLA_SITIOS"] = (
+                "En «zonas»: nombra TODAS las zonas de sitios_afectados y los principales núcleos de "
+                "nucleos_en_la_zona_del_aviso (son los que se señalan en el mapa). Después, en una frase, las ciudades "
+                "de ciudades_cercanas_atentas con su nivel, para que estén atentas por si el temporal se desvía "
+                "(«Y atentos en Ávila, Cáceres, Salamanca y Toledo, con aviso amarillo: también lloverá con fuerza»). "
+                "Cada sitio con SU nivel: no digas que una ciudad está en rojo si no lo está. No nombres sitios que no "
+                "estén en estas listas.")
     if datos and AMARILLOS:
         datos[0]["ADEMAS_AVISO_AMARILLO"] = [f"{nombre_fen(g['fenomeno'])} en " + ", ".join(sitios_aviso(g))
                                              for g in AMARILLOS]
@@ -2339,6 +2377,10 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     # amarillo (Madrid no puede faltar), el resto con aviso y, al final, las de referencia
     grandes = [c for c in otras if c["poblacion"] >= 150000 and c["nivel"] == "amarillo"]
     nucleos = graves_n[:4] + grandes + graves_n[4:] + [c for c in otras if c not in grandes]
+    # si el guion nombra un pueblo o ciudad, se señala en el mapa (por delante de los que no se nombran)
+    nombrados = nucleos_nombrados(" ".join(guion["segmentos"].values()), grupos)
+    vistos = {c["nombre"] for c in nombrados}
+    nucleos = nombrados + [c for c in nucleos if c["nombre"] not in vistos]
     consejos = [c.upper()[:28] for c in (guion.get("consejos_pantalla") or [])][:3] or \
         CONSEJOS_BASE.get(grupos[0]["fenomeno"], ["SIGUE A AEMET", "PRECAUCIÓN", "LLAMA AL 112"])
     gr = grupos[0]

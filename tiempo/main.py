@@ -81,16 +81,18 @@ def mapa_extra(prev, avisos, hoy) -> str:
     return ""   # avisos naranja/rojo del día (para el tramo «aviso» con zoom)
 
 
-def _kwargs_aviso(graves) -> dict:
+def _kwargs_aviso(graves, texto: str = "") -> dict:
     """Zoom a la zona del aviso, con las provincias pintadas y los núcleos afectados señalados."""
     if not graves:
         return {}
     from .especiales import (_caja_lista, _capa_despues, _capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom,
-                             ciudades_zoom, nucleos_afectados)
+                             ciudades_zoom, nucleos_afectados, nucleos_nombrados)
     nivel = "rojo" if any(x["nivel"] == "rojo" for x in graves) else "naranja"
     # pueblos con aviso y, además, capitales cercanas para situarse (como en los vídeos de aviso)
     gn, otras = nucleos_afectados(graves, n=10), ciudades_zoom(graves, [])
     nucleos = gn[:4] + otras + gn[4:]
+    nombrados = nucleos_nombrados(texto, graves) if texto else []   # lo que se nombra, se señala
+    nucleos = nombrados + [c for c in nucleos if c["nombre"] not in {n["nombre"] for n in nombrados}]
     capa = _juntar_capas(_capa_poligonos(graves, con_lista=True),
                          _capa_nucleos(nucleos, reservado=_caja_lista(graves)))
     if CAMPO_PARTE[0]:   # aviso por lluvia o tormentas: tras las zonas, el mapa de lluvia acumulada en colores
@@ -367,7 +369,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                               "aviso." if graves else "No te alargues: si sobra algo, recorta lo menos importante."))
         HAY_AVISOS_GRAVES[0] = bool(graves)
         if graves:   # tramo «aviso»: zoom a la zona con los núcleos afectados señalados
-            from .especiales import nucleos_afectados, sitios_aviso
+            from .especiales import ciudades_zoom, nucleos_afectados, sitios_aviso
             AVISO_GRAVE[0] = graves
             nombres = [c["nombre"] for c in nucleos_afectados(graves)]
             from .especiales import _campo_aviso
@@ -380,7 +382,9 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             g.GANCHO_TEXTO += (
                 "\n\nTRAMO DE AVISO: añade a \"segmentos\" la clave \"aviso\" (unas " + ("34" if CAMPO_PARTE[0] else "22") + " palabras), que va justo después "
                 "del gancho: en pantalla se hace zoom a la zona con aviso " + "/".join(dict.fromkeys(x["nivel"] for x in graves))
-                + " y se señalan estos núcleos: " + ", ".join(nombres) + ". Di qué aviso es, dónde (nombra TODAS las zonas "
+                + " y se señalan estos núcleos: " + ", ".join(nombres) + ". Atentas también, por si se desvía: "
+                + ", ".join(c["nombre"] for c in ciudades_zoom(graves, [], n_amarillo=0, n_ref=5))
+                + " (nómbralas con su nivel; todo lo que nombres se señala en el mapa). Di qué aviso es, dónde (nombra TODAS las zonas "
                 "afectadas: " + "; ".join(", ".join(sitios_aviso(x)) for x in graves) + "), cuándo y lo más grave que "
                 "se espera, con un consejo corto. El gancho puede anunciarlo en "
                 "pocas palabras, pero el detalle va en \"aviso\".")
@@ -450,7 +454,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                       capas_fondo={**(_capas_parte(avisos) or {}), **({"general": MAPA_EXTRA[0][0]} if MAPA_EXTRA[0] else {})},
                       capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa),
                       **_kwargs_juntos(_kwargs_juntos(
-                          _kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None),
+                          _kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None,
+                                        guion["segmentos"].get("aviso", "")),
                           {"pills": {"general": MAPA_EXTRA[0][1]}} if MAPA_EXTRA[0] else {}),
                           _kwargs_sistema() if "sistema" in guion["segmentos"] else {}))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
