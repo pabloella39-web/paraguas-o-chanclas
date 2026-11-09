@@ -40,7 +40,12 @@ MAPA_EXTRA: list = [None]   # (capa, pastilla) para el bloque «general»: lluvi
 def _kwargs_juntos(a: dict, b: dict) -> dict:
     out = dict(a)
     for k, v in b.items():
-        out[k] = {**(out.get(k) or {}), **v} if isinstance(v, dict) else v
+        if isinstance(v, dict):
+            out[k] = {**(out.get(k) or {}), **v}
+        elif isinstance(v, (tuple, list)) and isinstance(out.get(k), (tuple, list)):
+            out[k] = tuple(out[k]) + tuple(v)   # sin_marcadores de los dos
+        else:
+            out[k] = v
     return out
 
 
@@ -97,13 +102,25 @@ def _kwargs_aviso(graves) -> dict:
             "capas": {"aviso": capa}, "pills": {"aviso": f"AVISO {nivel.upper()}"}}
 
 
+SISTEMA: list = [None]   # (capa, etiqueta) del tramo «sistema»: borrasca/DANA hora a hora
+
+
+def _kwargs_sistema() -> dict:
+    if not SISTEMA[0]:
+        return {}
+    from .sistemas import VISTA_SISTEMA
+    capa, etiqueta = SISTEMA[0]
+    return {"vistas": {"sistema": VISTA_SISTEMA}, "sin_marcadores": ("sistema",), "capas": {"sistema": capa},
+            "pills": {"sistema": etiqueta}}
+
+
 EXTREMOS_PUEBLOS: list = [None]   # {calor, frio} con el pueblo si es más extremo que la capital
 
 def secuencia(guion: dict) -> list[str]:
     """Gancho, regiones de más a menos relevantes, la 'recompensa' (más calor y más frío) y la despedida."""
     orden = guion.get("orden") or [s for s in SEGMENTOS if s not in ("intro", "general", "cierre")]
     # «aviso» (solo si hay naranja o rojo): justo tras el gancho, con zoom a la zona y sus pueblos señalados
-    return [s for s in ("intro", "aviso", *orden, "general", "cierre")
+    return [s for s in ("intro", "aviso", "sistema", *orden, "general", "cierre")
             if str(guion["segmentos"].get(s, "")).strip()]
 
 
@@ -328,6 +345,21 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         except Exception as e:  # noqa: BLE001
             log.warning("Contraste de fuentes no disponible: %s", e)
         g.GANCHO_TEXTO += mapa_extra(prev, avisos, hoy)
+        SISTEMA[0] = None
+        try:   # borrascas (con nombre o no), temporales y DANAs que entran: su evolución por horas
+            from . import sistemas
+            s_ = sistemas.detectar(hoy)
+            rachas = max((c.get("racha") or 0) for c in prev) if prev else 0
+            if s_ and (s_.get("nombre") or s_["distancia"] == 0 or (s_["tipo"] == "borrasca" and s_["minimo"] <= 1000)
+                       or rachas >= 70):
+                capa_s, notas = sistemas.preparar(s_, hoy)
+                etiqueta = ((f"BORRASCA {s_['nombre'].upper()}" if s_.get("nombre") else "LA BORRASCA")
+                            if s_["tipo"] == "borrasca" else "LA DANA") + ", HORA A HORA"
+                SISTEMA[0] = (capa_s, etiqueta)
+                g.GANCHO_TEXTO += sistemas.texto_guion(s_, cuando) + (
+                    " Datos del tramo: " + "; ".join(notas) + "." if notas else "")
+        except Exception as e:  # noqa: BLE001
+            log.warning("Seguimiento de borrascas/DANAs no disponible: %s", e)
         graves = [x for x in avisos if x["nivel"] in ("naranja", "rojo") and x.get("poligonos")]
         # Duración: lo que mejor funciona ronda los 70 s; solo se alarga cuando de verdad hay mucho que contar
         g.GANCHO_TEXTO += ("\n\nDURACIÓN: el vídeo debe rondar los 70 segundos: respeta las palabras de cada bloque. "
@@ -417,8 +449,10 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                       gancho=fen, satelite=sat,
                       capas_fondo={**(_capas_parte(avisos) or {}), **({"general": MAPA_EXTRA[0][0]} if MAPA_EXTRA[0] else {})},
                       capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa),
-                      **_kwargs_juntos(_kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None),
-                                       {"pills": {"general": MAPA_EXTRA[0][1]}} if MAPA_EXTRA[0] else {}))
+                      **_kwargs_juntos(_kwargs_juntos(
+                          _kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None),
+                          {"pills": {"general": MAPA_EXTRA[0][1]}} if MAPA_EXTRA[0] else {}),
+                          _kwargs_sistema() if "sistema" in guion["segmentos"] else {}))
     video = salida / f"tiempo_{hoy.isoformat()}.mp4"
     log.info("Renderizando %.2f s de vídeo…", total)
     renderizar(comp, audio, video, total)
