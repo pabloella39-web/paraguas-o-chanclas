@@ -1,0 +1,143 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-09",
+ "caption": "⚠️ Aviso rojo por lluvias en Ávila y Cáceres el martes 10\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Tajo y Alagón, Meseta cacereña, Villuercas y Montánchez, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Sierra de Madrid, Serranía de Guadalajara, Sur, Vegas y Oeste\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Ávila",
+ "titular": "ÁVILA Y CÁCERES: ROJO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 87.27,
+ "firma": "rojo:lluvias:2",
+ "guion": {
+  "intro": "Aviso rojo por lluvias en Ávila y Cáceres. AEMET prevé 120 litros acumulados en 12 horas y advierte de posibles daños muy graves o catastróficos.",
+  "zonas": "El aviso rojo va desde el martes a las nueve de la mañana hasta casi la medianoche. Afecta al sur de Ávila, con El Tiemblo, Cebreros y El Hoyo de Pinares. Y al norte de Cáceres, con Jaraíz de la Vera, Hervás, Losar de la Vera, Valverde del Fresno, Aldeanueva de la Vera, Cabezuela del Valle y Villanueva de la Vera. Incluye las ciudades de Ávila y Cáceres. Además, aviso amarillo por lluvia en Salamanca, Toledo, Madrid, Guadalajara y el resto de Ávila y Cáceres.",
+  "evolucion": "El aviso empieza a las nueve de la mañana del martes. Lo más fuerte llega por la tarde. Hacia las cuatro, en el norte de Cáceres: 13,6 litros en una hora. Hacia las cinco, en el sur de Ávila: 7,5 litros en una hora. El aviso rojo sigue activo hasta casi la medianoche.",
+  "lluvia": "En el norte de Cáceres se pueden superar los 110 litros por metro cuadrado. En el sur de Ávila, unos 60. Y ojo: en Salamanca y Toledo también pueden caer unos 115 litros, en Madrid unos 60 y en Segovia unos 40.",
+  "consejos": "No viajes salvo que sea estrictamente necesario y sigue las indicaciones de las autoridades. Y si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva allí."
+ },
+ "nivel_max": 3,
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "rojo",
+   "zonas": [
+    "Sur de Ávila",
+    "Norte de Cáceres"
+   ],
+   "ciudades": [
+    "Ávila",
+    "Cáceres"
+   ],
+   "inicio": "2026-11-10T09:00:00+01:00",
+   "fin": "2026-11-10T23:59:59+01:00",
+   "descripcion": "Precipitación acumulada en 12 horas: 120 mm."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-09T19:22:04.585Z"
+     },
+     "success": true,
+     "platform_post_id": "7706253869633899809",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706253869633899809",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 18221237,
+     "post_title": "⚠️ Aviso rojo por lluvias en Ávila y Cáceres el martes 10\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Tajo y Alagón, Meseta cacereña, Villuercas y Montánchez, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Sierra de Madrid, Serranía de Guadalajara, Sur, Vegas y Oeste\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Ávila",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 87.267,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7706253668538058785",
+     "request_id": "0b8925c0bcd649bcacebb730c7bacbf6",
+     "request_id_logs": "0b8925c0bcd649bcacebb730c7bacbf6",
+     "job_id": "6189281e173848bda42d33af894689bb",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-09T19:22:04.585Z"
+   },
+   "request_id": "0b8925c0bcd649bcacebb730c7bacbf6"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "mNqRKrJ0pWQ",
+  "url": "https://youtube.com/shorts/mNqRKrJ0pWQ",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-09T19:23:27.019Z"
+   },
+   "success": true,
+   "platform_post_id": "18120259267779730",
+   "post_url": "https://www.instagram.com/reel/DfiEoTkjWAE/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 18221237,
+   "post_title": "⚠️ Aviso rojo por lluvias en Ávila y Cáceres el martes 10\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Tajo y Alagón, Meseta cacereña, Villuercas y Montánchez, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Sierra de Madrid, Serranía de Guadalajara, Sur, Vegas y Oeste\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Ávila",
+   "post_caption": "⚠️ Aviso rojo por lluvias en Ávila y Cáceres el martes 10\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Tajo y Alagón, Meseta cacereña, Villuercas y Montánchez, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Sierra de Madrid, Serranía de Guadalajara, Sur, Vegas y Oeste\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Ávila",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 87.267,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "d13ce21d1fb743fc8cb5652c956d45b5",
+   "request_id_logs": "d13ce21d1fb743fc8cb5652c956d45b5",
+   "job_id": "0c92c9da05964fd5bba19038f16dd843",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
