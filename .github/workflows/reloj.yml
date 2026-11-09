@@ -1,0 +1,34 @@
+name: Reloj (lanza las tareas programadas)
+
+# GitHub a veces deja de lanzar las tareas programadas (el 9/11/2026 no arrancó ninguna en todo el día). Este reloj
+# se queda encendido ~5 h 30 min, lanza cada tarea cuando su línea «cron» coincide (en UTC, igual que GitHub) y, antes
+# de apagarse, se vuelve a lanzar a sí mismo. Si el programador de GitHub funciona, no pasa nada: el parte y los
+# especiales comprueban si ya están hechos y no se repiten.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 */4 * * *"   # por si la cadena se rompe y el programador de GitHub vuelve a funcionar
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: reloj
+  cancel-in-progress: true   # el nuevo releva al anterior
+
+jobs:
+  reloj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dar la hora
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/reloj.py 325
+      - name: Relevo (vuelve a lanzar el reloj)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run reloj.yml -R ${{ github.repository }} --ref main

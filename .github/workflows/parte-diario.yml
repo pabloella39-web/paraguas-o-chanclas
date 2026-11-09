@@ -26,6 +26,10 @@ on:
         description: "Esperar a las 7:30 antes de publicar"
         type: boolean
         default: false
+      reloj:
+        description: "Lanzado por el reloj (reloj.yml) en lugar del programador de GitHub: la línea cron que toca"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -45,7 +49,7 @@ jobs:
 
       - name: Comprobar horario de Madrid
         id: horario
-        run: python3 -m tiempo.horario "${{ github.event_name }}" "${{ github.event.schedule }}"
+        run: python3 -m tiempo.horario "${{ inputs.reloj && 'schedule' || github.event_name }}" "${{ github.event.schedule || inputs.reloj }}"
 
       - uses: actions/setup-python@v5
         if: steps.horario.outputs.ejecutar == 'true'
@@ -83,7 +87,7 @@ jobs:
           GH_PUSH_TOKEN: ${{ github.token }}
         run: |
           ARGS=""
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ -n "${{ inputs.reloj }}" ]; then
             ARGS="--publicar --vispera --esperar"
           elif [ "${{ github.event_name }}" = "push" ]; then
             ARGS="--publicar"

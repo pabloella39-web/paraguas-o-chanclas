@@ -23,6 +23,12 @@ on:
     # Lanzar a mano: escribir "finde" o "avisos" en lanzar_especial.txt (con "publicar" para subirlo)
     branches: [main]
     paths: ["lanzar_especial.txt"]
+  workflow_dispatch:
+    inputs:
+      reloj:
+        description: "Lanzado por el reloj (reloj.yml) en lugar del programador de GitHub: la línea cron que toca"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -52,7 +58,7 @@ jobs:
             grep -qi rehacer lanzar_especial.txt && echo "REHACER=1" >> $GITHUB_ENV
           else
             # Viernes entre las 15:00 y las 18:30 (Madrid) → fin de semana; si no, revisión de avisos
-            T=$(python3 -c "from datetime import datetime;from zoneinfo import ZoneInfo as Z;t=datetime.now(Z('Europe/Madrid'));c='${{ github.event.schedule }}'!='23 6-20/2 * * *';hm=(t.hour,t.minute);print('finde' if c and t.weekday()==4 and (17,30)<=hm<=(20,10) else 'semana' if c and t.weekday()==6 and (17,30)<=hm<=(20,10) else 'resto' if c and t.weekday()==2 and (17,30)<=hm<=(20,10) else 'avisos')")
+            T=$(python3 -c "from datetime import datetime;from zoneinfo import ZoneInfo as Z;t=datetime.now(Z('Europe/Madrid'));c='${{ github.event.schedule || inputs.reloj }}'!='23 6-20/2 * * *';hm=(t.hour,t.minute);print('finde' if c and t.weekday()==4 and (17,30)<=hm<=(20,10) else 'semana' if c and t.weekday()==6 and (17,30)<=hm<=(20,10) else 'resto' if c and t.weekday()==2 and (17,30)<=hm<=(20,10) else 'avisos')")
             P="--publicar --esperar"
           fi
           echo "tipo=$T" >> $GITHUB_OUTPUT
