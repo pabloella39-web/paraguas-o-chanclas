@@ -102,3 +102,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - AVISOS ROJOS: vídeo SIEMPRE (haya o no ciudades grandes) y NUNCA flash: vídeo completo (hasta ~1:35) bien desarrollado: todas las zonas y núcleos, desde/hasta cuándo, evolución hora a hora con la hora punta y los litros en una hora en cada zona, acumulados por zona y provincias vecinas, qué implica (según AEMET) y consejos + 112.
 - AVISOS NARANJA/ROJO: nombrar TODAS las zonas afectadas y sus principales núcleos, y además las ciudades y núcleos principales colindantes con su nivel (amarillo / sin aviso), para que estén atentos por si el temporal se desvía. Cada sitio con su nivel. TODO pueblo o ciudad que se nombre se señala en el mapa.
 - MAPAS COMO EN LA TELE: mapa general con los iconos animados de siempre flotando y la temperatura debajo en su chapita (nombre encima; las siete grandes en amarillo); bloque «general» con España coloreada por la máxima y las cifras sobre las ciudades.
+
+- Avisos en zonas distantes (p. ej. Extremadura y Canarias): un bloque por zona («aviso», «aviso2»… en el parte;
+  «zonas», «zonas2»… en el vídeo de aviso). En pantalla, zoom a la primera; entre una y otra se aleja a toda España y
+  vuelve a acercarse a la que toca cuando se habla de ella.

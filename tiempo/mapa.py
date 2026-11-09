@@ -87,6 +87,19 @@ def interpolar_vista(a, b, t, ancho=1080, alto=1040):
     return (cx - hx, cx + hx, cy - hy, cy + hy)
 
 
+def vista_paso(a, b, t, ancho=1080, alto=1040, lejos: float = 5.0):
+    """Como interpolar_vista, pero si las dos vistas están lejos (p. ej. un aviso en Extremadura y otro en Canarias)
+    se aleja primero a una vista que abarca las dos (y toda España) y luego se acerca a la nueva zona."""
+    from .config import VISTA_GENERAL
+    ca, cb = ((a[0] + a[1]) / 2, (a[2] + a[3]) / 2), ((b[0] + b[1]) / 2, (b[2] + b[3]) / 2)
+    if math.hypot((ca[0] - cb[0]) * 0.77, ca[1] - cb[1]) <= lejos:
+        return interpolar_vista(a, b, t, ancho, alto)
+    m = 0.6
+    env = (min(a[0], b[0], VISTA_GENERAL[0]) - m, max(a[1], b[1], VISTA_GENERAL[1]) + m,
+           min(a[2], b[2], VISTA_GENERAL[2]) - m, max(a[3], b[3], VISTA_GENERAL[3]) + m)
+    return interpolar_vista(a, env, t * 2, ancho, alto) if t < 0.5 else interpolar_vista(env, b, t * 2 - 1, ancho, alto)
+
+
 _TIERRA = {}
 
 

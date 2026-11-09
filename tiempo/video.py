@@ -784,7 +784,7 @@ class Compositor:
         en_trans = self.vista_de(prev_seg) != self.vista_de(seg) and dt < T
         vista_t = None
         if en_trans:
-            vista_t = mapa.interpolar_vista(self.vista_de(prev_seg), self.vista_de(seg), dt / T)
+            vista_t = mapa.vista_paso(self.vista_de(prev_seg), self.vista_de(seg), dt / T)
             m = _fundido_bordes(mapa.dibujar_mapa(vista_t, ANCHO, MAPA_H, foco=foco_de(seg), ss=1))
         else:
             m = self.mapa_estatico(seg)

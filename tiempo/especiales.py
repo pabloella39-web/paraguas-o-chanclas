@@ -102,7 +102,7 @@ def _recortar(guion: dict, bloques: list[str], proporcion: float):
     import re
     segs = guion["segmentos"]
     # (los de avisos se recortan también, pero siempre conservan su primera frase: ahí van los naranjas y rojos)
-    intocables = {"intro", "cierre", "aviso", "zonas"}
+    intocables = {"intro", "cierre", "aviso", "aviso2", "aviso3", "zonas", "zonas2", "zonas3"}
     total = sum(len(segs[b].split()) for b in bloques)
     objetivo = total * proporcion
     frases = {b: re.split(r"(?<=[.!?])\s+", segs[b].strip()) for b in bloques if b not in intocables}
@@ -1082,6 +1082,55 @@ def _encuadre(lo0, lo1, la0, la1, canaria, margen=(0.18, 0.14), minimo=(1.1, 0.8
     clon, clat = (lo0 + lo1) / 2, (la0 + la1) / 2
     dlon, dlat = max(lo1 - lo0 + 2 * margen[0], minimo[0]), max(la1 - la0 + 2 * margen[1], minimo[1])
     return (clon - dlon / 2, clon + dlon / 2, clat - dlat / 2, clat + dlat / 2)
+
+
+RACIMOS_AVISO: list = [[]]   # zonas distantes del aviso (cada una con su zoom: «zonas», «zonas2», «zonas3»)
+
+
+def agrupar_lejanos(grupos, dist: float = 3.5, maximo: int = 3) -> list[list[dict]]:
+    """Separa los avisos en zonas distantes (la península y Canarias, Galicia y Murcia…): cada una tendrá su propio
+    zoom cuando se hable de ella. Devuelve grupos de avisos (con sus zonas y polígonos), lo más grave primero."""
+    piezas = []
+    for gr in grupos:
+        zp = gr.get("zona_poligono") or [(z, p) for z, p in zip(gr.get("zonas") or [], gr["poligonos"])]
+        if not zp:
+            zp = [(", ".join(gr.get("zonas") or []), p) for p in gr["poligonos"]]
+        for z, pol in zp:
+            if not pol:
+                continue
+            lo = sum(p[0] for p in pol) / len(pol)
+            la = sum(p[1] for p in pol) / len(pol)
+            piezas.append((gr, z, pol, lo, la))
+    racimos: list[list] = []
+    for pz in piezas:
+        cerca = [r for r in racimos if any(math.hypot((pz[3] - o[3]) * 0.77, pz[4] - o[4]) <= dist for o in r)]
+        if cerca:
+            base = cerca[0]
+            for r in cerca[1:]:
+                base += r
+                racimos.remove(r)
+            base.append(pz)
+        else:
+            racimos.append([pz])
+    out = []
+    for r in racimos:
+        por = {}
+        for gr, z, pol, _, _ in r:
+            k = (gr["fenomeno"], gr["nivel"])
+            if k not in por:
+                por[k] = {**gr, "zonas": [], "poligonos": [], "zona_poligono": [], "ciudades": []}
+            if z and z not in por[k]["zonas"]:
+                por[k]["zonas"].append(z)
+            por[k]["poligonos"].append(pol)
+            por[k]["zona_poligono"].append((z, pol))
+        for k, g_ in por.items():   # ciudades del grupo original que caen en este racimo
+            orig = next(gr for gr, *_ in r if (gr["fenomeno"], gr["nivel"]) == k)
+            g_["ciudades"] = [c for c in (orig.get("ciudades") or [])
+                              if any(c.lower() in z.lower() for z in g_["zonas"])] or \
+                ([] if len(racimos) > 1 else list(orig.get("ciudades") or []))
+        out.append(list(por.values()))
+    out.sort(key=lambda r: (-max(NIVELES.get(g_["nivel"], 0) for g_ in r), -sum(len(g_["zonas"]) for g_ in r)))
+    return out[:maximo]
 
 
 def _zona_zoom(grupos):
@@ -2254,6 +2303,10 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             base["lluvia"] = 38
         if "evolucion" in base:
             base["evolucion"] = 50
+    lejanas = RACIMOS_AVISO[0][1:]
+    for n, _r in enumerate(lejanas, 2):   # zonas distantes: un bloque propio, justo antes de los consejos
+        orden.insert(orden.index("consejos"), f"zonas{n}")
+        base[f"zonas{n}"] = 30 if rojo else 22
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     datos = [{"nivel": gr["nivel"], "fenomeno": gr["fenomeno"], "zonas": gr["zonas"][:12],
               "grandes_ciudades_afectadas": [c for c in gr.get("ciudades", []) if c not in PROV_SIN_CIUDAD][:8],
@@ -2300,6 +2353,19 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         datos[0]["nota_amarillo"] = ("Al final de «zonas» añade una frase corta con los avisos amarillos de "
                                      "ADEMAS_AVISO_AMARILLO («En Lanzarote y Fuerteventura, aviso amarillo por lluvias y "
                                      "tormentas»), para que nadie de esas zonas crea que se ha librado.")
+    if datos and lejanas:
+        datos[0]["ZONAS_DISTANTES"] = {
+            "zonas": "solo " + "; ".join(f"{x['nivel']} por {nombre_fen(x['fenomeno'])} en " + ", ".join(sitios_aviso(x))
+                                         for x in RACIMOS_AVISO[0][0]),
+            **{f"zonas{n}": "; ".join(f"{x['nivel']} por {nombre_fen(x['fenomeno'])} en " + ", ".join(sitios_aviso(x))
+                                      for x in r)
+               + ". Núcleos señalados: " + ", ".join(c["nombre"] for c in nucleos_afectados(r, n=6))
+               for n, r in enumerate(lejanas, 2)}}
+        datos[0]["nota_zonas_distantes"] = (
+            "Hay avisos en zonas LEJANAS entre sí. En pantalla se hace zoom a cada una cuando se habla de ella (y se "
+            "aleja y vuelve a acercarse entre una y otra). Escribe «zonas» SOLO sobre la primera y cada «zonasN» sobre "
+            "la suya (todas sus zonas y núcleos, desde cuándo y hasta cuándo, lo más grave), empezando con un enlace "
+            "claro («Y nos vamos a Canarias: …»). La evolución y la lluvia acumulada son de la primera zona.")
     if datos and AMPLIACION:
         datos[0]["NOVEDAD"] = ("AEMET AMPLÍA el aviso a: " + ", ".join(AMPLIACION) + ". Empieza el vídeo con eso "
                                "(«AEMET amplía el aviso naranja a Gran Canaria») y luego nombra TODOS los sitios.")
@@ -2352,6 +2418,10 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         "consejos": "Extrema la precaución y, si hay una emergencia, llama al 112.",
         "cierre": "Compártelo con quien viva allí.",
     }
+    for n, r in enumerate(RACIMOS_AVISO[0][1:], 2):   # zonas lejanas, cada una con su zoom
+        if f"zonas{n}" in orden:
+            seg[f"zonas{n}"] = "Y además, " + "; ".join(
+                f"aviso {x['nivel']} por {nombre_fenomeno(x['fenomeno'])} en " + ", ".join(sitios_aviso(x)) for x in r) + "."
     if CAMPO_AVISO[0] and "evolucion" in orden:
         pic = sorted(CAMPO_AVISO[0][2]["picos"].items(), key=lambda t: t[1]["hora"])[:3]
         seg["evolucion"] = "Lo más fuerte: " + "; ".join(f"en {n}, el {_hora_legible(v['hora'])}" for n, v in pic) + "."
@@ -2402,7 +2472,12 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
     MODO_AVISO[0] = True
-    CAMPO_AVISO[0] = None if demo or os.environ.get("SIN_CAMPO_AVISO") else _campo_aviso(grupos, hoy)
+    RACIMOS_AVISO[0] = agrupar_lejanos(grupos + NARANJAS_CONTEXTO)
+    if len(RACIMOS_AVISO[0]) < 2:
+        RACIMOS_AVISO[0] = [grupos]
+    principal = [x for x in RACIMOS_AVISO[0][0] if x["nivel"] == grupos[0]["nivel"]] or RACIMOS_AVISO[0][0]
+    CAMPO_AVISO[0] = None if demo or os.environ.get("SIN_CAMPO_AVISO") else _campo_aviso(
+        principal if len(RACIMOS_AVISO[0]) > 1 else grupos, hoy)
     dur_aviso = ((36.0, 56.0, 44.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
                  else (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO)
     if any(gr["nivel"] == "rojo" for gr in grupos):   # rojo: vídeo completo, hasta minuto y medio
@@ -2411,8 +2486,12 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         guion, plan, total, trozos, motor = locutar(
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
-    zona = _zona_zoom(grupos)
+    lejanas = RACIMOS_AVISO[0][1:]
+    zona = _zona_zoom(RACIMOS_AVISO[0][0] if lejanas else grupos)
     graves_n, otras = nucleos_afectados(grupos, n=10), ciudades_zoom(grupos, AMARILLOS)
+    if lejanas:   # los núcleos de la primera zona (las demás tienen su propio tramo)
+        graves_n = nucleos_afectados(RACIMOS_AVISO[0][0], n=10)
+        otras = ciudades_zoom(RACIMOS_AVISO[0][0], AMARILLOS)
     # orden de prioridad (el primero nunca se queda sin sitio): los 4 mayores con aviso, las ciudades grandes con
     # amarillo (Madrid no puede faltar), el resto con aviso y, al final, las de referencia
     # primero las ciudades principales que se ven (capitales y de más de 50.000), luego los núcleos de la zona
@@ -2469,6 +2548,25 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                         tuple((z.upper()[:30], COLOR_NIVEL.get(gr["nivel"], (255, 205, 40)))
                               for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),
     }
+    if lejanas:   # zoom out y zoom in a cada zona lejana cuando se habla de ella; los consejos, con toda España
+        todos = grupos + NARANJAS_CONTEXTO + AMARILLOS
+        for n, r in enumerate(lejanas, 2):
+            k = f"zonas{n}"
+            if k not in guion["segmentos"]:
+                continue
+            nn = nucleos_afectados(r, n=10)
+            nn = [c for c in nn if c["poblacion"] >= 20000] + ciudades_zoom(r, AMARILLOS, n_amarillo=4, n_ref=5) + \
+                [c for c in nn if c["poblacion"] < 20000]
+            nom = nucleos_nombrados(guion["segmentos"][k], r)
+            nn = nom + [c for c in nn if c["nombre"] not in {x["nombre"] for x in nom}]
+            kwargs["vistas"][k] = _zona_zoom(r)
+            kwargs["sin_marcadores"] += (k,)
+            kwargs["transiciones"][k] = 3.4
+            kwargs["pills"][k] = f"AVISO {max(r, key=lambda x: NIVELES[x['nivel']])['nivel'].upper()}"
+            kwargs["capas"][k] = _juntar_capas(_capa_poligonos(todos, con_lista=True),
+                                              _capa_nucleos(nn, reservado=_caja_lista(r)))
+        kwargs["vistas"]["consejos"] = kwargs["vistas"]["cierre"] = VISTA_GENERAL
+        kwargs["transiciones"]["consejos"] = 2.4
     with duracion(*dur_aviso):
         video = _producir(f"aviso_{hoy.isoformat()}" + (f"_{sufijo}" if sufijo else ""), guion, plan, total, trozos, kwargs, [], None,
                           g.fecha_larga(hoy).upper(), salida, trabajo)

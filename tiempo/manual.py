@@ -117,7 +117,7 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
     if m and isinstance(g.get("segmentos"), dict):
         objetivo = int(m.group(1))
         # «aviso» y «sistema» son tramos extra (se alargan aparte): no cuentan para el total de los bloques
-        n = sum(len(str(v).split()) for k, v in g["segmentos"].items() if k not in ("aviso", "sistema"))
+        n = sum(len(str(v).split()) for k, v in g["segmentos"].items() if k not in ("aviso", "aviso2", "aviso3", "sistema"))
         if not 0.92 * objetivo <= n <= 1.10 * objetivo:
             errores.append(f"{n} palabras en total (pide ≈ {objetivo}; entre {round(0.92 * objetivo)} y "
                            f"{round(1.10 * objetivo)})")

@@ -81,39 +81,38 @@ def mapa_extra(prev, avisos, hoy) -> str:
     return ""   # avisos naranja/rojo del día (para el tramo «aviso» con zoom)
 
 
-def _kwargs_aviso(graves, texto: str = "") -> dict:
-    """Zoom a la zona del aviso, con las provincias pintadas y los núcleos afectados señalados."""
-    if not graves:
+def _kwargs_aviso(racimos, segmentos: dict | None = None) -> dict:
+    """Un tramo con zoom por cada zona distante con aviso («aviso», «aviso2», «aviso3»): zonas pintadas, núcleos y
+    ciudades señalados y, en la primera, la lluvia acumulada en colores. Entre zonas lejanas, zoom out y zoom in."""
+    if not racimos:
         return {}
     from .especiales import (_caja_lista, _capa_despues, _capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom,
                              ciudades_zoom, nucleos_afectados, nucleos_nombrados)
-    nivel = "rojo" if any(x["nivel"] == "rojo" for x in graves) else "naranja"
-    # el zoom va a lo más grave: si hay rojo, a las zonas en rojo (con Canarias y la península a la vez, el zoom
-    # abarcaba toda España y no servía de nada); el guion sigue nombrando todas las zonas
-    rojos = [x for x in graves if x["nivel"] == "rojo"]
-    if rojos:
-        graves = rojos
-    else:
-        pen = [x for x in graves if any(la > 33 for pol in x["poligonos"] for _, la in pol)]
-        can = [x for x in graves if x not in pen]
-        if pen and can:
-            graves = pen if len(pen) >= len(can) else can
-    # pueblos con aviso y, además, capitales cercanas para situarse (como en los vídeos de aviso)
-    gn, otras = nucleos_afectados(graves, n=10), ciudades_zoom(graves, [])
-    # ciudades principales primero (capitales y de más de 50.000), luego los núcleos de la zona del aviso
-    dentro = [c for c in gn if c["poblacion"] >= 20000]
-    nucleos = dentro + otras + [c for c in gn if c not in dentro]
-    nombrados = nucleos_nombrados(texto, graves) if texto else []   # lo que se nombra, se señala
-    nucleos = nombrados + [c for c in nucleos if c["nombre"] not in {n["nombre"] for n in nombrados}]
-    capa = _juntar_capas(_capa_poligonos(graves, con_lista=True),
-                         _capa_nucleos(nucleos, reservado=_caja_lista(graves)))
-    if CAMPO_PARTE[0]:   # aviso por lluvia o tormentas: tras las zonas, el mapa de lluvia acumulada en colores
-        from . import campos
-        lluvia = _juntar_capas(campos.capa_lluvia_fuerte(CAMPO_PARTE[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)"),
-                               _capa_nucleos(nucleos))
-        capa = _capa_despues(capa, lluvia, 4.5)
-    return {"vistas": {"aviso": _zona_zoom(graves)}, "sin_marcadores": ("aviso",), "transiciones": {"aviso": 2.4},
-            "capas": {"aviso": capa}, "pills": {"aviso": f"AVISO {nivel.upper()}"}}
+    segmentos = segmentos or {}
+    todos = [g_ for _, r in racimos for g_ in r]
+    out = {"vistas": {}, "sin_marcadores": (), "transiciones": {}, "capas": {}, "pills": {}}
+    for n, (clave, graves) in enumerate(racimos):
+        if clave not in segmentos:
+            continue
+        nivel = "rojo" if any(x["nivel"] == "rojo" for x in graves) else "naranja"
+        gn, otras = nucleos_afectados(graves, n=10), ciudades_zoom(graves, [])
+        dentro = [c for c in gn if c["poblacion"] >= 20000]
+        nucleos = dentro + otras + [c for c in gn if c not in dentro]
+        nombrados = nucleos_nombrados(segmentos.get(clave, ""), graves)   # lo que se nombra, se señala
+        nucleos = nombrados + [c for c in nucleos if c["nombre"] not in {x["nombre"] for x in nombrados}]
+        capa = _juntar_capas(_capa_poligonos(todos, con_lista=True),
+                             _capa_nucleos(nucleos, reservado=_caja_lista(graves)))
+        if n == 0 and CAMPO_PARTE[0]:   # lluvia acumulada en colores (la de la zona principal)
+            from . import campos
+            lluvia = _juntar_capas(campos.capa_lluvia_fuerte(CAMPO_PARTE[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)"),
+                                   _capa_nucleos(nucleos))
+            capa = _capa_despues(capa, lluvia, 4.5)
+        out["vistas"][clave] = _zona_zoom(graves)
+        out["sin_marcadores"] += (clave,)
+        out["transiciones"][clave] = 2.4 if n == 0 else 3.4   # entre zonas lejanas: alejarse y volver a acercarse
+        out["capas"][clave] = capa
+        out["pills"][clave] = f"AVISO {nivel.upper()}"
+    return out
 
 
 SISTEMA: list = [None]   # (capa, etiqueta) del tramo «sistema»: borrasca/DANA hora a hora
@@ -134,7 +133,7 @@ def secuencia(guion: dict) -> list[str]:
     """Gancho, regiones de más a menos relevantes, la 'recompensa' (más calor y más frío) y la despedida."""
     orden = guion.get("orden") or [s for s in SEGMENTOS if s not in ("intro", "general", "cierre")]
     # «aviso» (solo si hay naranja o rojo): justo tras el gancho, con zoom a la zona y sus pueblos señalados
-    return [s for s in ("intro", "aviso", "sistema", *orden, "general", "cierre")
+    return [s for s in ("intro", "aviso", "aviso2", "aviso3", "sistema", *orden, "general", "cierre")
             if str(guion["segmentos"].get(s, "")).strip()]
 
 
@@ -383,26 +382,30 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                            + ("Hoy hay aviso naranja o rojo: puedes alargar un poco (hasta un 20 % más) para el tramo de "
                               "aviso." if graves else "No te alargues: si sobra algo, recorta lo menos importante."))
         HAY_AVISOS_GRAVES[0] = bool(graves)
-        if graves:   # tramo «aviso»: zoom a la zona con los núcleos afectados señalados
-            from .especiales import ciudades_zoom, nucleos_afectados, sitios_aviso
-            AVISO_GRAVE[0] = graves
-            nombres = [c["nombre"] for c in nucleos_afectados(graves)]
-            from .especiales import _campo_aviso
-            CAMPO_PARTE[0] = _campo_aviso(graves, hoy)
+        if graves:   # tramo «aviso»: un zoom por cada zona distante, con sus núcleos señalados
+            from .especiales import agrupar_lejanos, ciudades_zoom, nucleos_afectados, sitios_aviso, _campo_aviso
+            racimos = list(zip(("aviso", "aviso2", "aviso3"), agrupar_lejanos(graves)))
+            AVISO_GRAVE[0] = racimos
+            CAMPO_PARTE[0] = _campo_aviso(racimos[0][1], hoy)
             if CAMPO_PARTE[0]:
                 top = sorted(CAMPO_PARTE[0][1].items(), key=lambda t: -t[1])[:5]
                 g.GANCHO_TEXTO += ("\n\nEn el tramo «aviso», tras las zonas sale el mapa de lluvia acumulada en colores; "
                                    "lluvia máxima prevista por zona (l/m²): " + ", ".join(f"{n} {v}" for n, v in top)
                                    + ". Di cuánta lluvia y dónde más (cifras redondas).")
-            g.GANCHO_TEXTO += (
-                "\n\nTRAMO DE AVISO: añade a \"segmentos\" la clave \"aviso\" (unas " + ("34" if CAMPO_PARTE[0] else "22") + " palabras), que va justo después "
-                "del gancho: en pantalla se hace zoom a la zona con aviso " + "/".join(dict.fromkeys(x["nivel"] for x in graves))
-                + " y se señalan estos núcleos: " + ", ".join(nombres) + ". Atentas también, por si se desvía: "
-                + ", ".join(c["nombre"] for c in ciudades_zoom(graves, [], n_amarillo=0, n_ref=5))
-                + " (nómbralas con su nivel; todo lo que nombres se señala en el mapa). Di qué aviso es, dónde (nombra TODAS las zonas "
-                "afectadas: " + "; ".join(", ".join(sitios_aviso(x)) for x in graves) + "), cuándo y lo más grave que "
-                "se espera, con un consejo corto. El gancho puede anunciarlo en "
-                "pocas palabras, pero el detalle va en \"aviso\".")
+            g.GANCHO_TEXTO += ("\n\nTRAMO DE AVISO (va justo después del gancho). " + (
+                "Hay avisos en zonas DISTANTES: escribe un bloque por zona, en este orden; en pantalla se hace zoom a "
+                "cada una cuando se habla de ella (y se aleja y vuelve a acercarse entre una y otra). "
+                if len(racimos) > 1 else "") + "Todo lo que nombres se señala en el mapa.")
+            for clave, r in racimos:
+                g.GANCHO_TEXTO += (
+                    f"\n- \"{clave}\" (unas {34 if clave == 'aviso' and CAMPO_PARTE[0] else 26} palabras): aviso "
+                    + "/".join(dict.fromkeys(x["nivel"] for x in r)) + " por "
+                    + "/".join(dict.fromkeys(x["fenomeno"].lower() for x in r))
+                    + ". Nombra TODAS las zonas: " + "; ".join(", ".join(sitios_aviso(x)) for x in r)
+                    + ". Núcleos señalados: " + ", ".join(c["nombre"] for c in nucleos_afectados(r)[:8])
+                    + ". Atentas también, por si se desvía: "
+                    + ", ".join(c["nombre"] for c in ciudades_zoom(r, [], n_amarillo=0, n_ref=5))
+                    + " (con su nivel). Cuándo y lo más grave que se espera, con un consejo corto.")
         gra = [c["nombre"] for c in prev if c.get("granizo")][:3]
         if gra:
             g.GANCHO_TEXTO += (f" POSIBLE GRANIZO en {', '.join(gra)} (sale en el mapa): menciónalo con prudencia "
@@ -481,7 +484,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                       capas_encima=_capas_encima(MAR_NIEVE_HOY, avisos, prev_mapa),
                       **_kwargs_juntos(_kwargs_juntos(
                           _kwargs_aviso(AVISO_GRAVE[0] if "aviso" in guion["segmentos"] else None,
-                                        guion["segmentos"].get("aviso", "")),
+                                        guion["segmentos"]),
                           {"pills": {"general": MAPA_EXTRA[0][1]}} if MAPA_EXTRA[0] else {}),
                           _kwargs_juntos(_kwargs_sistema() if "sistema" in guion["segmentos"] else {},
                                          {"sin_marcadores": ("general",), "pills": {"general": "MÁXIMAS (°C)"}}
