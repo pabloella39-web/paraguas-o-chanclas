@@ -88,6 +88,16 @@ def _kwargs_aviso(graves, texto: str = "") -> dict:
     from .especiales import (_caja_lista, _capa_despues, _capa_nucleos, _capa_poligonos, _juntar_capas, _zona_zoom,
                              ciudades_zoom, nucleos_afectados, nucleos_nombrados)
     nivel = "rojo" if any(x["nivel"] == "rojo" for x in graves) else "naranja"
+    # el zoom va a lo más grave: si hay rojo, a las zonas en rojo (con Canarias y la península a la vez, el zoom
+    # abarcaba toda España y no servía de nada); el guion sigue nombrando todas las zonas
+    rojos = [x for x in graves if x["nivel"] == "rojo"]
+    if rojos:
+        graves = rojos
+    else:
+        pen = [x for x in graves if any(la > 33 for pol in x["poligonos"] for _, la in pol)]
+        can = [x for x in graves if x not in pen]
+        if pen and can:
+            graves = pen if len(pen) >= len(can) else can
     # pueblos con aviso y, además, capitales cercanas para situarse (como en los vídeos de aviso)
     gn, otras = nucleos_afectados(graves, n=10), ciudades_zoom(graves, [])
     nucleos = gn[:4] + otras + gn[4:]

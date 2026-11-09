@@ -155,8 +155,8 @@ def detectar(hoy: date, texto_aemet: str | None = None) -> dict | None:
     for t in _seguir([_minimos(lons, lats, p, 1004, (-28, 8, 31, 51)) for p in ps]):
         d = min(_distancia_peninsula(lo, la) for _, lo, la, _ in t["puntos"])
         pmin = min(v for *_, v in t["puntos"])
-        if d <= 3.5:
-            candidatos.append(("borrasca", pmin - 10 * (3.5 - d), t, pmin, d))
+        if d <= 3.5 or (pmin <= 990 and d <= 10):   # una borrasca profunda en el Atlántico (Bruna) también
+            candidatos.append(("borrasca", pmin + 2 * d, t, pmin, d))
     # DANAs: mínimo cerrado a 500 hPa (≤ 5640 m) encima o muy cerca de la península
     for t in _seguir([_minimos(lons, lats, z, 5640, (-20, 8, 32, 48), tam=5) for z in zs]):
         d = min(_distancia_peninsula(lo, la) for _, lo, la, _ in t["puntos"])
@@ -361,11 +361,15 @@ def preparar(s: dict, hoy: date):
     """Capa del tramo «sistema» (trayectoria → lluvia hora a hora → rachas) y datos para el guion."""
     from datetime import timedelta as _td
     tr = s["trayectoria"]
-    ini = datetime.fromisoformat(tr[0][0]).date()
-    fin = min(datetime.fromisoformat(tr[-1][0]).date(), ini + _td(days=2))
+    # la animación empieza el día del parte (no cuando el centro de la borrasca se acerca, que puede ser el jueves)
+    ini = hoy
+    fin = min(max(datetime.fromisoformat(tr[-1][0]).date(), hoy), hoy + _td(days=2))
     trozos, notas = [capa_trayectoria(s)], []
     try:
-        lo, la, horas, cubo = campos.lluvia_horaria(ini, (-10.4, 4.6, 35.4, 44.2, 0.45), fin)
+        from .especiales import _visible
+        caja = (*_visible(VISTA_SISTEMA, 0.3), 0.6)   # toda la pantalla, sin recuadro (un modelo: menos datos)
+        lo, la, horas, cubo = campos.lluvia_horaria(ini, caja, fin, modelos=False)
+        cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
             trozos.append(ev)
@@ -374,7 +378,10 @@ def preparar(s: dict, hoy: date):
     except Exception as e:  # noqa: BLE001
         log.warning("Sin lluvia hora a hora para el sistema: %s", e)
     try:
-        cv = capa_viento(*viento_horario(ini, fin))
+        from .especiales import _visible
+        lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 0.3), 0.8))
+        c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
+        cv = capa_viento(lo_v, la_v, h_v, c_v)
         if cv and cv.maximo >= 60:
             trozos.append(cv)
             notas.append(f"rachas de hasta {cv.maximo:.0f} km/h")

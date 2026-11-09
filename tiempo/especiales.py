@@ -1265,6 +1265,13 @@ def nucleos_nombrados(texto: str, grupos) -> list[dict]:
     except Exception:  # noqa: BLE001
         return []
     t = " " + _norm_txt(texto) + " "
+    # fuera los nombres de zona de AEMET: «Tajo y Alagón» no es el pueblo de Alagón (Zaragoza) ni «la Vera» es Vera
+    # (Almería)
+    for gr in list(grupos) + list(AMARILLOS):
+        for z in list(gr.get("zonas") or []) + sitios_aviso(gr) if gr.get("zonas") else []:
+            t = t.replace(_norm_txt(z), " ")
+    for z in ("la vera", "tajo y alagon", "valle del jerte", "sierra de gata", "valle del ambroz", "sierra de gredos"):
+        t = t.replace(z, " ")
     v = _visible(_zona_zoom(grupos), margen=-0.1)
     graves = [pol for gr in grupos for pol in gr["poligonos"]]
     amar = [pol for a in AMARILLOS for pol in (a.get("poligonos") or ([a["poligono"]] if a.get("poligono") else []))]
@@ -1278,6 +1285,8 @@ def nucleos_nombrados(texto: str, grupos) -> list[dict]:
         vistos.add(nombre)
         nivel = "naranja" if any(_dentro(lo, la, p) for p in graves) else \
             "amarillo" if any(_dentro(lo, la, p) for p in amar) else "referencia"
+        if nivel != "naranja" and pob < 20000:
+            continue   # un pueblo pequeño homónimo fuera de la zona: casi seguro que no es el que se nombra
         out.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": nivel})
     return out
 

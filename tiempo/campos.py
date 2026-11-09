@@ -21,6 +21,17 @@ URL = "https://api.open-meteo.com/v1/forecast"
 
 # Rejillas (lon0, lon1, lat0, lat1, paso)
 PENINSULA = (-11.2, 5.2, 34.8, 44.8, 0.4)
+PENINSULA_PANTALLA = (-13.8, 5.6, 31.8, 46.3, 0.45)   # todo lo que se ve en el mapa general (sin recuadro)
+
+
+def sin_recuadro_canarias(lons, lats, v):
+    """Lluvia de la península a cero dentro del recuadro de Canarias (ahí van las islas, con su propia rejilla)."""
+    from .config import RECUADRO_CANARIAS
+    v = v.copy()
+    mlon = (lons >= RECUADRO_CANARIAS[0] - 0.3) & (lons <= RECUADRO_CANARIAS[1] + 0.3)
+    mlat = (lats >= RECUADRO_CANARIAS[2] - 0.3) & (lats <= RECUADRO_CANARIAS[3] + 0.3)
+    v[np.ix_(mlat, mlon)] = 0
+    return v
 CANARIAS = (-18.6, -13.0, 27.3, 29.7, 0.25)
 ISOBARAS = (-30.0, 12.0, 28.0, 55.0, 1.0)   # más amplia: las borrascas vienen de lejos
 
@@ -286,7 +297,8 @@ def capa_lluvia(dia: date, con_canarias: bool = True):
     from .especiales import fuente
     imgs = []
     try:
-        imgs.append(_imagen_lluvia(*lluvia(dia, PENINSULA)))
+        lo_, la_, v_ = lluvia(dia, PENINSULA_PANTALLA)
+        imgs.append(_imagen_lluvia(lo_, la_, sin_recuadro_canarias(lo_, la_, v_)))
         if con_canarias:
             lo, la, v = lluvia(dia, CANARIAS)
             imgs.append(_imagen_lluvia(lo, la, v, canaria=True))
@@ -296,9 +308,13 @@ def capa_lluvia(dia: date, con_canarias: bool = True):
     cache: dict = {}
     f = fuente("ExtraBold", 22)
 
-    def dibujar(capa, pr, dt):
+    def campo(lienzo, pr, dt):
         for n, (img, caja) in enumerate(imgs):
-            _pegar(capa, img, caja, pr, MAPA_Y0, cache, n)
+            _pegar(lienzo, img, caja, pr, 0, cache, n)
+    recortado = _recortado(campo)
+
+    def dibujar(capa, pr, dt):
+        recortado(capa, pr, dt)   # a pantalla completa, sin recuadro y sin salirse del mapa
         # leyenda: abajo a la derecha
         d = ImageDraw.Draw(capa)
         x, y = ANCHO - 150, MAPA_Y0 + MAPA_H - 30 - 34 * len(ESCALA)
@@ -371,14 +387,15 @@ def _media_modelos(bloque: dict, var: str, n: int) -> list[float]:
     return out
 
 
-def lluvia_horaria(ini: date, caja, fin: date | None = None):
+def lluvia_horaria(ini: date, caja, fin: date | None = None, modelos: bool = True):
     """Lluvia hora a hora (l/m² en cada hora) en la rejilla, media de los modelos: (lons, lats, horas, cubo)."""
     lons, lats = _rejilla(caja)
     puntos = [(la, lo) for la in lats for lo in lons]
-    js = _pedir(puntos, {"hourly": "precipitation", "models": ",".join(MODELOS), "start_date": ini.isoformat(),
-                         "end_date": (fin or ini).isoformat()})
+    js = _pedir(puntos, {"hourly": "precipitation", **({"models": ",".join(MODELOS)} if modelos else {}),
+                         "start_date": ini.isoformat(), "end_date": (fin or ini).isoformat()})
     horas = (js[0].get("hourly") or {}).get("time") or []
-    cubo = np.array([_media_modelos(j.get("hourly") or {}, "precipitation", len(horas)) for j in js],
+    cubo = np.array([_media_modelos(j.get("hourly") or {}, "precipitation", len(horas)) if modelos else
+                     [x or 0 for x in ((j.get("hourly") or {}).get("precipitation") or [0] * len(horas))] for j in js],
                     dtype=float)   # [punto, hora]
     return lons, lats, horas, cubo.T.reshape(len(horas), len(lats), len(lons))
 

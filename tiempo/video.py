@@ -711,11 +711,38 @@ class Compositor:
             elif seg in ("general", "cierre"):
                 lista, estilo = self.prev, "mini"
             elif seg in REGIONES:
-                lista, estilo = [c for c in self.prev if c["region"] == seg], "tarjeta"
+                lista, estilo = self._tarjetas_de(seg), "tarjeta"
             else:
                 lista, estilo = [], "mini"
-            self._cache_marc[seg] = (estilo, mapa.marcadores(lista, pr, estilo, AREA_MARCADORES))
+            area = AREA_MARCADORES
+            if estilo == "tarjeta":   # abajo a la derecha va la leyenda de avisos: las tarjetas no la tapan
+                area = (area[0], area[1], area[2], min(area[3], MAPA_H - 205))
+            self._cache_marc[seg] = (estilo, mapa.marcadores(lista, pr, estilo, area))
         return self._cache_marc[seg]
+
+    TARJETAS_MAX = {"interior": 9, "sur": 8, "norte": 8, "mediterraneo": 7, "islas": 6}
+
+    def _tarjetas_de(self, seg):
+        """Tarjetas grandes de una región: pocas y separadas (las que nombra el bloque primero, luego las grandes).
+        El mapa general rota muchas ciudades; aquí, con tarjetas, más de ~9 se pisan."""
+        import unicodedata
+
+        def norm(t):
+            return "".join(c for c in unicodedata.normalize("NFD", t.lower()) if unicodedata.category(c) != "Mn")
+        texto = norm(" ".join(p.get("texto", "") for p in self.plan if p.get("seg") == seg))
+        todas = [c for c in self.prev if c["region"] == seg]
+        from .guion import SIEMPRE_EN_MAPA
+        from . import rotacion
+        prio = sorted(todas, key=lambda c: (norm(c["nombre"].split(" de ")[0]) not in texto,
+                                            c["nombre"] not in SIEMPRE_EN_MAPA, not rotacion.es_capital(c["nombre"]),
+                                            bool(c.get("extra"))))
+        out = []
+        for c in prio:
+            if len(out) >= self.TARJETAS_MAX.get(seg, 8):
+                break
+            if all(((c["lat"] - o["lat"]) ** 2 + ((c["lon"] - o["lon"]) * 0.77) ** 2) ** 0.5 >= 0.75 for o in out):
+                out.append(c)
+        return out
 
     # ------------------------------------------------ fotograma
     def ventana(self, t):

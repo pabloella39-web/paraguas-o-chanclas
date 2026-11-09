@@ -117,6 +117,9 @@ def centros(lons, lats, p, z=None, radio: int = 3):
                 borde = np.concatenate([vz_ven[0], vz_ven[-1], vz_ven[:, 0], vz_ven[:, -1]])
                 if vz == vz_ven.min() and borde.min() - vz >= 25 and vz < 5750:
                     out.append(("DANA", lons[j], lats[i], vz))
+    # una DANA justo encima de una borrasca no es una DANA: es la propia borrasca (Bruna, 9/11/2026)
+    bs = [c for c in out if c[0] == "B"]
+    out = [c for c in out if c[0] != "DANA" or all(math.hypot(c[1] - b[1], c[2] - b[2]) > 6 for b in bs)]
     return _sin_repetir(out)
 
 
