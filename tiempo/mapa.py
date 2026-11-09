@@ -367,18 +367,19 @@ def _marcador_mini(nombre, tmax, ic, fase=0, lluvia=None) -> Image.Image:
     txt = f"{tmax}°"
     tw = int(f.getlength(txt))
     ti = 40 if grande else 38
-    # probabilidad de lluvia (o tormenta) cuando es relevante: «70%» en azul, a la derecha de la temperatura
-    fp = fuente("ExtraBold", 21 if grande else 19)
-    ptxt = f"{int(round(lluvia / 5) * 5)}%" if lluvia is not None and lluvia >= 40 else ""
-    pw = int(fp.getlength(ptxt)) + 8 if ptxt else 0
-    w, h = ti + 3 + tw + pw + 12, ti + 6
+    # probabilidad de lluvia como siempre en las tarjetas: «Lluvia 70%» en azul, debajo de la temperatura (≥20 %)
+    fp = fuente("SemiBold", 17 if grande else 16)
+    ptxt = f"Lluvia {int(lluvia)}%" if lluvia is not None and lluvia >= 20 else ""
+    w = max(ti + 3 + tw + 12, int(fp.getlength(ptxt)) + 26 if ptxt else 0)
+    h = ti + 6 + (18 if ptxt else 0)
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 3, w - 1, h - 3], radius=(h - 6) // 2, fill=(8, 20, 45, 190))
-    im.alpha_composite(icono(ic, ti, fase), (3, 3))
-    _texto(d, (ti + 3, h / 2), txt, f, color_temp(tmax), anchor="lm")
+    d.rounded_rectangle([0, 3, w - 1, h - 3], radius=min(22, (h - 6) // 2), fill=(8, 20, 45, 190))
+    x0 = (w - (ti + 3 + tw + 12)) // 2
+    im.alpha_composite(icono(ic, ti, fase), (x0 + 3, 3))
+    _texto(d, (x0 + ti + 3, (ti + 6) / 2), txt, f, color_temp(tmax), anchor="lm")
     if ptxt:
-        _texto(d, (ti + 3 + tw + 6, h / 2 + 2), ptxt, fp, (150, 205, 255), anchor="lm")
+        _texto(d, (w / 2, ti + 13), ptxt, fp, (150, 205, 255), anchor="mm")
     fn = fuente("Black" if grande else "ExtraBold", 17 if grande else 15)
     etiqueta = NOMBRE_CORTO.get(nombre, nombre).upper()
     ew = int(fn.getlength(etiqueta)) + (14 if grande else 12)
