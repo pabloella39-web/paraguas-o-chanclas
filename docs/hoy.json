@@ -1,43 +1,12 @@
 {
- "fecha": "2026-11-08",
+ "fecha": "2026-11-09",
  "caption": "Paraguas en Cádiz y manga corta en Canarias… ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, domingo 8 de noviembre 🇪🇸\n🌧️ Lluvia en S.C. Tenerife y A Coruña\n🔥 Máxima: 28° en Las Palmas\n🥶 Mínima: 5° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Tenerife",
- "voz": "masculina",
- "duracion": 74.3,
+ "anterior": true,
  "extras": [
   {
    "titulo": "Aviso naranja",
-   "caption": "⚠️ Aviso naranja por lluvias en Tenerife, La Palma, La Gomera y El Hierro\n\n🟠 Aviso naranja por lluvia: Tenerife, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
-   "hora": "00:46"
-  },
-  {
-   "titulo": "Aviso naranja",
-   "caption": "⚠️ Aviso naranja por lluvias en cinco islas de Canarias.\n\n🟠 Aviso naranja por lluvia: Tenerife, Gran Canaria, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna, Telde\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
-   "hora": "10:19"
-  },
-  {
-   "titulo": "Aviso naranja",
-   "caption": "⚠️ Aviso naranja por lluvias en Canarias hasta el lunes por la mañana.\n\n🟠 Aviso naranja por lluvia: Tenerife, Gran Canaria, La Palma, La Gomera, El Hierro, Santa Cruz de Tenerife, San Cristóbal de La Laguna, Telde\n🟡 Aviso amarillo por lluvia: Lanzarote, Fuerteventura\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Santa",
-   "hora": "10:40"
-  },
-  {
-   "titulo": "La semana que viene",
-   "caption": "Llueve en media España y el miércoles pinta fatal ☔ ¿Cuál es el mejor día? 🩴\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
-   "hora": "19:58"
-  },
-  {
-   "titulo": "La semana que viene",
-   "caption": "Esta semana se moja media España, y el miércoles es el peor ☔ ¿Y el mejor día?\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
-   "hora": "20:16"
-  },
-  {
-   "titulo": "La semana que viene",
-   "caption": "Madrid y el suroeste, a remojo desde mañana ☔ ¿Cuál es el peor día? 🌧️\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
-   "hora": "20:31"
-  },
-  {
-   "titulo": "La semana que viene",
-   "caption": "Llueve en media España y el miércoles es el peor día ☔ ¿Cuál es el tuyo?\n\nEl tiempo de la semana que viene en España 🇪🇸\n🌧️ Lunes 9: máx. 26° · lluvia en Madrid, Sevilla\n☁️ Martes 10: máx. 26° · lluvia en A Coruña, Madrid\n🌧️ Miércoles 11: máx. 28° · lluvia en Badajoz, Madrid\n🌧️ Jueves 12: máx. 26° · lluvia en Málaga, Ceuta\n🌧️ Viernes 13: máx. 25° · lluvia en A Coruña, Ceuta\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
-   "hora": "20:57"
+   "caption": "⚠️ Aviso naranja por lluvias en Huelva, Sevilla, Cáceres y Ávila hasta el martes\n\n🟠 Aviso naranja por lluvia: Litoral de Huelva, Sur de Ávila, Norte de Cáceres, Aracena, Andévalo y Condado, Sierra norte de Sevilla, Huelva\n🟡 Aviso amarillo por lluvia: Cuenca del Genil, Antequera, Sol y Guadalhorce, Axarquía, Tajo y Alagón, Meseta cacereña, Sistema Central de Ávila, Sierra de San Vicente, Meseta de Salamanca, Sistema Central de Salamanca, Sur de Salamanca, Vegas del Guadiana, La Siberia extremeña, Barros y Serena\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Huelva",
+   "hora": "09:32"
   }
  ]
 }
