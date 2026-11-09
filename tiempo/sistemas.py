@@ -150,7 +150,9 @@ def detectar(hoy: date, texto_aemet: str | None = None) -> dict | None:
             candidatos.append(("dana", 900 + (zmin - 5640) / 10 - 10 * (2 - d), t, zmin, d))
     if not candidatos:
         return None
-    tipo, _, t, vmin, d = min(candidatos, key=lambda c: c[1])
+    # una borrasca en superficie manda (Bruna, aunque lleve aire frío en altura); la DANA, solo si no hay borrasca
+    bor = [c for c in candidatos if c[0] == "borrasca"]
+    tipo, _, t, vmin, d = min(bor or candidatos, key=lambda c: c[1])
     tray = [(horas[n], lo, la, v) for n, lo, la, v in t["puntos"]]
     nombre = (nombre_en_texto(texto_aemet) or nombre_aemet(hoy)) if tipo == "borrasca" else None
     log.info("Sistema detectado: %s %s (mín. %.0f, a %.1f° de la península), %d pasos", tipo, nombre or "", vmin, d,
