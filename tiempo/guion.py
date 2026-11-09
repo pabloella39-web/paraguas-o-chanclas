@@ -630,7 +630,8 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
     # Cada región: primero TODAS las ciudades que nombra el guion (habituales o extra); después se rellenan los huecos
     # del mapa con otras ciudades, aunque no se nombren (Tarragona, Cuenca, Huesca, Ciudad Real…), eligiendo siempre
     # la más alejada de las que ya hay para cubrir toda la región. Así ninguna zona se queda vacía.
-    MAX = {"islas": 6, "interior": 13, "sur": 11, "norte": 10, "mediterraneo": 10}   # mapa bien lleno
+    from . import rotacion
+    MAX = {"islas": 8, "interior": 22, "sur": 16, "norte": 16, "mediterraneo": 14}   # todas las de España rotan
     def dist(a, b):
         return math.hypot((a["lat"] - b["lat"]), (a["lon"] - b["lon"]) * math.cos(math.radians(40)))
     extras_ok = [dict(e, extra=True) for e in extra if e.get("lat") and e.get("tmax") is not None]
@@ -646,13 +647,15 @@ def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) ->
         tope = MAX.get(region, 6) + sum(1 for c in sel if c["nombre"] in SIEMPRE_EN_MAPA and not nombrada(c["nombre"]))
         if not sel and base:
             sel = [base[0]]; resto = [c for c in resto if c is not base[0]]
-        umbral = 0.5 if region == "islas" else 0.7   # más cerca se pisarían las tarjetas
+        umbral = 0.3   # casi todas entran como candidatas: la colocación (con la rotación) decide cuáles caben hoy
         while len(sel) < tope:
             libres = [c for c in resto if min(dist(c, x) for x in sel) >= umbral]
             if not libres:
                 break
-            # la más alejada de las elegidas; las habituales (más vistas) tienen un pequeño plus
-            c = max(libres, key=lambda c: min(dist(c, x) for x in sel) + (0.6 if not c.get("extra") else 0))
+            # la más alejada de las elegidas, con preferencia por las que llevan más días sin salir en el mapa (que
+            # todo el mundo vea su ciudad de vez en cuando: Huesca, Ourense, Lugo, Teruel…)
+            c = max(libres, key=lambda c: min(dist(c, x) for x in sel) + 3.0 * rotacion.bonus(c["nombre"])
+                    + (0.6 if not c.get("extra") else 0))   # capitales habituales, un pequeño plus
             sel.append(c); resto.remove(c)
         out += sel + [c for c in base if c["nombre"] in ("Ceuta", "Melilla") and c not in sel]
     # Ceuta y Melilla: basta con la tarjeta de una (se alternan por días), salvo que el guion nombre a las dos

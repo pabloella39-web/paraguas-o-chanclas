@@ -499,8 +499,8 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         offs = sorted({(dx, dy) for dx in range(-100, 101, 10) for dy in range(-70, 71, 10)},
                       key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
         # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
-        primeras = [it for it in items if it[3]["nombre"] in extremos or rango.get(it[3]["nombre"], 999) < 25
-                    or it[3]["nombre"] in SIEMPRE_EN_MAPA]
+        # (solo las siete fijas y los extremos van siempre delante; el resto rota)
+        primeras = [it for it in items if it[3]["nombre"] in extremos or it[3]["nombre"] in SIEMPRE_EN_MAPA]
         resto = [it for it in items if it not in primeras]
 
         def siguiente():
@@ -510,7 +510,9 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                 return None
             if not out:
                 return resto.pop(0)
-            lejos = max(resto, key=lambda it: min(math.hypot(it[2][0] - o[2][0], it[2][1] - o[2][1]) for o in out))
+            from . import rotacion   # hueco más grande, con preferencia por las que llevan días sin salir
+            lejos = max(resto, key=lambda it: min(math.hypot(it[2][0] - o[2][0], it[2][1] - o[2][1]) for o in out)
+                        + 250 * rotacion.bonus(it[3]["nombre"]))
             resto.remove(lejos)
             return lejos
 
@@ -549,6 +551,11 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                   puestas.append((x0, y0, w, h))
                   out.append((im, (int(x0), int(y0)), (px, py), c))
                   break
+        try:
+            from . import rotacion
+            rotacion.registrar(c["nombre"] for *_, c in out)
+        except Exception:  # noqa: BLE001
+            pass
         return out
     cajas = colocar([it[1] for it in items], area)
     return [(im, (int(cj[0]), int(cj[1])), p, c) for (im, _, p, c), cj in zip(items, cajas)]
