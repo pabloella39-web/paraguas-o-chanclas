@@ -983,7 +983,8 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
             ini, fin = datetime.fromisoformat(a["inicio"]), datetime.fromisoformat(a["fin"])
         except (TypeError, ValueError):
             continue
-        if not (fin > momento and ini < momento + timedelta(hours=horas)):
+        # los rojos, con más antelación (36 h): el de Ávila y Cáceres del martes empezaba de madrugada/mañana
+        if not (fin > momento and ini < momento + timedelta(hours=36 if a["nivel"] == "rojo" else horas)):
             continue
         ciudades = afectadas([a.get("poligono") or []], a.get("zona", ""))
         if not ciudades and a["nivel"] == "rojo":
@@ -2456,6 +2457,10 @@ def main():
             AMARILLOS[:] = amarillos_cerca(todos, grupos, datetime.now().astimezone())
         if not grupos:
             log.info("No hay avisos naranjas ni rojos en poblaciones de más de 100.000 habitantes")
+            for x in ([] if a.demo else todos):
+                if NIVELES.get(x["nivel"], 0) >= 2:
+                    log.info("  (descartado) %s %s %s → %s %s", x["nivel"], x["fenomeno"], x.get("zona"), x.get("inicio"),
+                             x.get("fin"))
             return
         # Un vídeo por nivel y día: uno con todos los rojos y otro con todos los naranjas
         for nivel in ("rojo", "naranja"):
