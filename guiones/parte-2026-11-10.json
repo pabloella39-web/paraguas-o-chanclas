@@ -1,0 +1,23 @@
+{
+ "segmentos": {
+  "intro": "Cáceres y Ávila, en alerta roja. Más de 120 litros en 12 horas, y detrás llega otra borrasca. Aguanta, que al final te digo dónde hace más calor.",
+  "aviso": "Rojo el martes, de nueve de la mañana a medianoche, en el norte de Cáceres y el sur de Ávila: casi 200 litros en la Vera, el Jerte y la Sierra de San Vicente. Naranja en Tajo y Alagón, Grazalema, Ronda, Aracena y la sierra norte de Sevilla, y por viento en Tenerife, La Palma, La Gomera y El Hierro. Atentos también en Plasencia, Ávila, Salamanca y Toledo, que lloverá con ganas. Y nada de cruzar arroyos.",
+  "sistema": "Esta es Bruna, y detrás llega Charles: AEMET avisa de un temporal de martes a jueves en el oeste, el sur y Canarias. Lo peor de la lluvia, el martes por la tarde. El jueves la borrasca cruza la península con rachas de más de 100 kilómetros por hora.",
+  "norte": "Mira el satélite: así entra la lluvia por Galicia. Santiago, 21 litros, y olas de casi 5 metros en las Rías Baixas.",
+  "sur": "Gente de Sevilla, paraguas sí o sí: 12 litros, y Cáceres, 17. Málaga, en duda: AEMET ve lluvia y casi ningún modelo, así que mira al cielo.",
+  "interior": "Si eres de Madrid, mañana te mojas: 13 litros. Y Valladolid, lo peor de la meseta, con 24, y aquí todos los modelos coinciden.",
+  "islas": "Canarias, rachas de hasta 110 kilómetros por hora. Baleares, ni caso: Palma, 23 grados y seco.",
+  "mediterraneo": "Y el Mediterráneo, en otra película: Valencia, 26 grados, y Barcelona, 24, sin una gota.",
+  "general": "Lo prometido: Murcia, 27 grados, la capital más calurosa. Salamanca, la más fría, con 10, y Benasque, en Huesca, 3 grados.",
+  "cierre": "Y tú, ¿desde dónde nos ves? Dime en comentarios tu pueblo y te digo si toca paraguas o chanclas. Y sigue a Paraguas o Chanclas."
+ },
+ "orden": [
+  "norte",
+  "sur",
+  "interior",
+  "islas",
+  "mediterraneo"
+ ],
+ "titular": "AVISO ROJO EN CÁCERES",
+ "caption": "Aviso rojo en Cáceres y Ávila y Bruna con Charles detrás… ¿de qué lado te toca? ☔🩴"
+}
