@@ -611,7 +611,7 @@ def guion_plantilla(prev: list[dict], hoy: date, factor: float = 1.0, texto_aeme
     return {"segmentos": seg, "caption": caption, "orden": orden, "titular": titular[:30]}
 
 
-SIEMPRE_EN_MAPA = ("Madrid", "Barcelona", "Valencia", "Zaragoza", "Bilbao")
+SIEMPRE_EN_MAPA = ("Madrid", "Barcelona", "Valencia", "Sevilla", "Zaragoza", "Málaga", "Bilbao")
 
 
 def prev_para_mapa(prev: list[dict], textos, extra: list[dict] | None = None) -> list[dict]:
