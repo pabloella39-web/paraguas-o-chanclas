@@ -955,9 +955,25 @@ def _parsear_cap(raiz) -> list[dict]:
     return out
 
 
+def _provincia_de(a: dict) -> str:
+    """Provincia en la que cae (el centro de) la zona del aviso; si no se sabe, el nombre de la zona."""
+    pol = a.get("poligono") or []
+    if pol:
+        lo = sum(p[0] for p in pol) / len(pol)
+        la = sum(p[1] for p in pol) / len(pol)
+        try:
+            from . import mapa as mapa_
+            for pr_ in mapa_.provincias():
+                if any(_dentro(lo, la, anillo) for anillo in pr_["anillos"] if anillo):
+                    return pr_["nombre"]
+        except Exception:  # noqa: BLE001
+            pass
+    return a.get("zona", "")
+
+
 def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) -> list[dict]:
     """Avisos NARANJAS y ROJOS vigentes o que empiezan en las próximas `horas` y que afectan a alguna población de más
-    de 100.000 habitantes (su ubicación cae dentro del polígono oficial de la zona)."""
+    de 100.000 habitantes (su ubicación cae dentro del polígono oficial de la zona). Los ROJOS, siempre."""
     from .poblaciones import afectadas
     out = []
     for a in avisos:
@@ -970,6 +986,10 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
         if not (fin > momento and ini < momento + timedelta(hours=horas)):
             continue
         ciudades = afectadas([a.get("poligono") or []], a.get("zona", ""))
+        if not ciudades and a["nivel"] == "rojo":
+            # aviso ROJO: vídeo siempre, aunque no haya ciudades grandes (9/11: sur de Ávila y norte de Cáceres);
+            # se nombra la provincia donde cae la zona
+            ciudades = [_provincia_de(a)]
         if ciudades:
             out.append({**a, "ciudades": ciudades})
     # El mismo aviso (fenómeno y nivel) en otras zonas sin ciudades grandes también entra: si el naranja por lluvias
