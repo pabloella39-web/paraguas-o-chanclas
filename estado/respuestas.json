@@ -760,7 +760,10 @@
   "7705993550673478422",
   "7706180822017016598",
   "7706177111208624918",
-  "7706118484120060704"
+  "7706118484120060704",
+  "7706092638231544579",
+  "7706061169978606358",
+  "7706048146032542486"
  ],
  "hechas": [
   {
@@ -1223,6 +1226,39 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Granada: 22°/16°, 65 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-09",
+   "clave": "ponferrada|2026-11-10",
+   "lugar": "Ponferrada",
+   "usuarios": [
+    "vivoparadios8"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Ponferrada: 17°/11°, 48 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-09",
+   "clave": "murcia|2026-11-10",
+   "lugar": "Murcia",
+   "usuarios": [
+    "celesterodriguez337"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Murcia: 27°/12°, 0 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-09",
+   "clave": "navarra|2026-11-10",
+   "lugar": "Pamplona",
+   "usuarios": [
+    "dimishe"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Pamplona: 19°/14°, 60 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
