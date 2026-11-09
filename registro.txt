@@ -1,0 +1,44 @@
+2026-11-09 21:28:37,226 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-09 21:29:24,704 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-09 21:29:48,141 INFO AEMET pide esperar (límite de peticiones); reintento en 40 s
+2026-11-09 21:30:58,861 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-09 21:31:32,245 INFO Fuentes usadas: AEMET, Open-Meteo
+2026-11-09 21:31:35,763 INFO Avisos de hoy: [('rojo', 'lluvias', 2), ('naranja', 'vientos', 7), ('naranja', 'lluvias', 8), ('amarillo', 'lluvias', 25), ('amarillo', 'costeros', 5), ('amarillo', 'vientos', 4), ('amarillo', 'tormentas', 4)]
+2026-11-09 21:31:44,331 INFO AEMET pide esperar (límite de peticiones); reintento en 20 s
+2026-11-09 21:33:12,088 WARNING Previsión de pueblos (calor) no disponible: HTTPSConnectionPool(host='api.open-meteo.com', port=443): Read timed out. (read timeout=60)
+2026-11-09 21:38:07,304 INFO Sistema detectado: borrasca  (mín. 983, a 0.4° de la península), 21 pasos
+2026-11-09 21:38:07,609 INFO Failed to extract font properties from /usr/share/fonts/truetype/noto/NotoColorEmoji.ttf: Non-scalable fonts are not supported
+2026-11-09 21:38:07,688 INFO generated new fontManager
+2026-11-09 22:23:01,112 INFO Gancho: AVISO ROJO · LLUVIA · ÁVILA Y 1 ZONA MÁS · []
+2026-11-09 22:24:31,255 WARNING GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor: HTTPSConnectionPool(host='gibs.earthdata.nasa.gov', port=443): Read timed out. (read timeout=90)
+2026-11-09 22:24:58,838 INFO GIBS VIIRS_NOAA21_CorrectedReflectance_TrueColor 2026-11-09: 20 % sin datos
+2026-11-09 22:25:14,490 INFO GIBS VIIRS_SNPP_CorrectedReflectance_TrueColor 2026-11-09: 100 % sin datos
+2026-11-09 22:25:18,324 INFO GIBS MODIS_Terra_CorrectedReflectance_TrueColor 2026-11-09: 1 % sin datos
+2026-11-09 22:26:10,317 INFO GIBS VIIRS_NOAA20_CorrectedReflectance_TrueColor 2026-11-08: 0 % sin datos
+2026-11-09 22:26:10,327 INFO Satélite 2026-11-09: 0.1 % sin cubrir
+2026-11-09 22:26:12,925 INFO Satélite en el vídeo (aviso rojo): {'dia_satelite': '2026-11-09', 'centros': [('A', np.float64(1.5), np.float64(33.5), 1024), ('B', np.float64(-19.5), np.float64(45.5), 974)]}
+2026-11-09 22:26:12,925 INFO Voz del día: femenina (es-ES-ElviraNeural)
+2026-11-09 22:26:12,929 INFO Orden de regiones hoy: norte (25.6), sur (23.9), interior (15.0), islas (10.5), mediterraneo (2.1)
+2026-11-09 22:26:15,757 INFO Usando el guion escrito con el plan de Claude: guiones/parte-2026-11-10.json
+2026-11-09 22:26:16,132 INFO Guion 1 (manual): 1720 caracteres hablados (objetivo ≈ 997)
+2026-11-09 22:26:41,721 INFO ElevenLabs (BXtvkfRgOYGPQKVRgufE, eleven_v4): 1720 caracteres, 112.9 s
+2026-11-09 22:26:41,723 WARNING Locución larga (112.9 s): el vídeo se alarga a 115.1 s
+2026-11-09 22:26:41,723 INFO Voz: elevenlabs (eleven_v4) · orden: intro → aviso → sistema → norte → sur → interior → islas → mediterraneo → general → cierre
+2026-11-09 22:26:44,132 INFO Música: otono_2026-10-25.mp3
+2026-11-09 22:43:39,202 INFO Renderizando 114.30 s de vídeo…
+2026-11-09 22:43:39,718 INFO Render 0/3429
+2026-11-09 22:43:56,046 INFO Render 300/3429
+2026-11-09 22:44:15,502 INFO Render 600/3429
+2026-11-09 22:44:37,317 INFO Render 900/3429
+2026-11-09 22:44:57,711 INFO Render 1200/3429
+2026-11-09 22:45:11,903 INFO Render 1500/3429
+2026-11-09 22:45:33,899 INFO Render 1800/3429
+2026-11-09 22:45:47,128 INFO Render 2100/3429
+2026-11-09 22:46:06,757 INFO Render 2400/3429
+2026-11-09 22:46:29,120 INFO Render 2700/3429
+2026-11-09 22:46:40,766 INFO Render 3000/3429
+2026-11-09 22:46:51,601 INFO Render 3300/3429
+2026-11-09 22:46:56,222 INFO Vídeo listo: /home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida/tiempo_2026-11-10.mp4 (114.30 s)
+Created autostash: f2acc12
+Applied autostash.
+2026-11-09 22:46:59,919 INFO Texto del post publicado en la web (Texto del parte del 2026-11-10)
