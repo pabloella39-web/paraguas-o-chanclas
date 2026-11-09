@@ -955,6 +955,9 @@ def _parsear_cap(raiz) -> list[dict]:
     return out
 
 
+PROV_SIN_CIUDAD: set = set()   # provincias usadas como nombre de un aviso rojo sin ciudades grandes
+
+
 def _provincia_de(a: dict) -> str:
     """Provincia en la que cae (el centro de) la zona del aviso; si no se sabe, el nombre de la zona."""
     pol = a.get("poligono") or []
@@ -991,6 +994,7 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
             # aviso ROJO: vídeo siempre, aunque no haya ciudades grandes (9/11: sur de Ávila y norte de Cáceres);
             # se nombra la provincia donde cae la zona
             ciudades = [_provincia_de(a)]
+            PROV_SIN_CIUDAD.add(ciudades[0])   # OJO: es la provincia, no su capital (la capital NO está en la zona)
         if ciudades:
             out.append({**a, "ciudades": ciudades})
     # El mismo aviso (fenómeno y nivel) en otras zonas sin ciudades grandes también entra: si el naranja por lluvias
@@ -2203,7 +2207,11 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             base["evolucion"] = 50
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     datos = [{"nivel": gr["nivel"], "fenomeno": gr["fenomeno"], "zonas": gr["zonas"][:12],
-              "grandes_ciudades_afectadas": gr.get("ciudades", [])[:8],
+              "grandes_ciudades_afectadas": [c for c in gr.get("ciudades", []) if c not in PROV_SIN_CIUDAD][:8],
+              **({"provincias": [c for c in gr.get("ciudades", []) if c in PROV_SIN_CIUDAD],
+                  "OJO_CAPITALES": "Las capitales de estas provincias NO están dentro de la zona del aviso: no digas "
+                                   "que el aviso incluye la ciudad; di «el sur de Ávila», «el norte de Cáceres»…"}
+                 if any(c in PROV_SIN_CIUDAD for c in gr.get("ciudades", [])) else {}),
               "desde": _hora_txt(gr["inicio"]), "hasta": _hora_txt(gr["fin"]), "descripcion": gr["descripcion"],
               "instruccion": gr["instruccion"]} for gr in grupos[:4]]
     for d_, gr in zip(datos, grupos[:4]):
