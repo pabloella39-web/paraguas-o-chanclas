@@ -357,7 +357,7 @@ def _texto(d, xy, txt, f, color, sombra=True, anchor="la"):
 
 
 @lru_cache(maxsize=None)
-def _marcador_mini(nombre, tmax, ic, fase=0) -> Image.Image:
+def _marcador_mini(nombre, tmax, ic, fase=0, lluvia=None) -> Image.Image:
     # algo más compacta que antes: caben más ciudades y el mapa no se queda con huecos
     # todas llevan su nombre encima (que nadie dude de qué ciudad es); las siete grandes, más grandes y en amarillo,
     # y el resto algo más pequeñas para que quepan muchas y el mapa no tenga huecos
@@ -367,12 +367,18 @@ def _marcador_mini(nombre, tmax, ic, fase=0) -> Image.Image:
     txt = f"{tmax}°"
     tw = int(f.getlength(txt))
     ti = 40 if grande else 38
-    w, h = ti + 3 + tw + 12, ti + 6
+    # probabilidad de lluvia (o tormenta) cuando es relevante: «70%» en azul, a la derecha de la temperatura
+    fp = fuente("ExtraBold", 21 if grande else 19)
+    ptxt = f"{int(round(lluvia / 5) * 5)}%" if lluvia is not None and lluvia >= 40 else ""
+    pw = int(fp.getlength(ptxt)) + 8 if ptxt else 0
+    w, h = ti + 3 + tw + pw + 12, ti + 6
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     d.rounded_rectangle([0, 3, w - 1, h - 3], radius=(h - 6) // 2, fill=(8, 20, 45, 190))
     im.alpha_composite(icono(ic, ti, fase), (3, 3))
     _texto(d, (ti + 3, h / 2), txt, f, color_temp(tmax), anchor="lm")
+    if ptxt:
+        _texto(d, (ti + 3 + tw + 6, h / 2 + 2), ptxt, fp, (150, 205, 255), anchor="lm")
     fn = fuente("Black" if grande else "ExtraBold", 17 if grande else 15)
     etiqueta = NOMBRE_CORTO.get(nombre, nombre).upper()
     ew = int(fn.getlength(etiqueta)) + (14 if grande else 12)
@@ -447,7 +453,7 @@ def colocar(cajas, area, iter_=300):
 
 def marcador(c: dict, estilo: str, fase: int = 0) -> Image.Image:
     if estilo == "mini":
-        return _marcador_mini(c["nombre"], c["tmax"], c["icono"], fase)
+        return _marcador_mini(c["nombre"], c["tmax"], c["icono"], fase, c.get("lluvia"))
     racha = c.get("racha")
     return _marcador_tarjeta(c["nombre"], c["tmax"], c["tmin"], c["lluvia"], c["icono"], fase,
                              round(racha) if racha else None)
