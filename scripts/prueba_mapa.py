@@ -1,8 +1,11 @@
-"""Últimas publicaciones en TikTok e Instagram según Upload-Post."""
-import requests
-from tiempo import uploadpost
-for plat, perfil in (("tiktok", uploadpost.perfil("tiempo")), ("instagram", uploadpost.perfil_instagram())):
-    r = requests.get("https://api.upload-post.com/api/uploadposts/media", headers=uploadpost._cabeceras(),
-                     params={"platform": plat, "user": perfil, "limit": 3}, timeout=40)
-    for m in r.json().get("media", []):
-        print(plat, m.get("id"), m.get("timestamp"), (m.get("caption") or "")[:70].replace("\n", " "))
+"""Prueba del contraste de fuentes: AEMET frente a ECMWF, AROME, ICON y GFS, para mañana."""
+import logging
+from datetime import date, timedelta
+from tiempo import contraste, fuentes
+logging.basicConfig(level=logging.INFO)
+for dia in (date.today() + timedelta(days=1), date.today() + timedelta(days=3)):
+    prev, _ = fuentes.obtener_previsiones(dia)
+    print("====", dia)
+    for c in prev[:6]:
+        print(c["nombre"], c["contraste"])
+    print(contraste.texto(prev, str(dia)))

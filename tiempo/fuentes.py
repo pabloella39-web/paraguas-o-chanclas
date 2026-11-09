@@ -242,6 +242,9 @@ def _openmeteo_todas(ciudades: list[dict], hoy: date) -> dict[str, dict]:
             "racha": _mediana(serie("wind_gusts_10m_max")),
             "icono": icono,
             "modelos": len(serie("temperature_2m_max")),
+            # cada modelo por separado, para contrastar con AEMET (tiempo.contraste)
+            "por_modelo": {m: {"tmax": (dia.get(f"temperature_2m_max_{m}") or [None])[0],
+                               "mm": (dia.get(f"precipitation_sum_{m}") or [None])[0]} for m in MODELOS},
             # granizo posible: tormenta con granizo (WMO 96/99) en al menos un tercio de los modelos
             "granizo": bool(codigos) and sum(1 for c_ in codigos if int(c_) in (96, 99)) * 3 >= len(codigos),
         }
@@ -284,6 +287,10 @@ def fusionar(ciudad: dict, fuentes_: dict[str, dict | None]) -> dict:
         "granizo": bool((f.get("Open-Meteo") or {}).get("granizo")),
         "cielo": next((f[k].get("cielo") for k in ("AEMET", "Google") if k in f and f[k].get("cielo")), None),
         "fuentes": list(f),
+        # lo que dice cada fuente por separado (para el contraste en el guion)
+        "contraste": {"aemet": {k: (f.get("AEMET") or {}).get(k) for k in ("tmax", "tmin", "lluvia")},
+                      "google": {k: (f.get("Google") or {}).get(k) for k in ("tmax", "lluvia")} if "Google" in f else None,
+                      "modelos": (f.get("Open-Meteo") or {}).get("por_modelo") or {}},
     }
     if len(tmaxes) >= 2:
         res["discrepancia_tmax"] = round(max(tmaxes) - min(tmaxes))

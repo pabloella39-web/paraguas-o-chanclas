@@ -319,6 +319,11 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             g.EXTREMOS = EXTREMOS_PUEBLOS[0]
         except Exception as e:  # noqa: BLE001
             log.warning("Extremos en pueblos no disponibles: %s", e)
+        try:   # AEMET frente a los modelos: dónde dudan y dónde coinciden todos
+            from . import contraste
+            g.GANCHO_TEXTO += contraste.texto(prev, cuando)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Contraste de fuentes no disponible: %s", e)
         g.GANCHO_TEXTO += mapa_extra(prev, avisos, hoy)
         graves = [x for x in avisos if x["nivel"] in ("naranja", "rojo") and x.get("poligonos")]
         # Duración: lo que mejor funciona ronda los 70 s; solo se alarga cuando de verdad hay mucho que contar

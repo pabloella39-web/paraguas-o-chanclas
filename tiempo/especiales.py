@@ -394,6 +394,7 @@ def fin_de_semana(viernes: date, salida: Path, demo: bool = False) -> dict:
         PREVS_DIA.clear(); PREVS_DIA.update({"sabado": prev_s, "domingo": prev_d})
         _preparar_avisos({"sabado": sab, "domingo": dom})
         _preparar_lluvia({"sabado": prev_s, "domingo": prev_d}, {"sabado": sab, "domingo": dom})
+        _contraste_dias({"sabado": prev_s, "domingo": prev_d})
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
@@ -655,6 +656,25 @@ def _preparar_lluvia(prevs: dict, fechas: dict):
                           "dónde caerá más («fíjate en las zonas en verde y amarillo: ahí caerán más de 15 litros»).")
 
 
+def _contraste_dias(prevs: dict):
+    """Semanal / finde: dónde AEMET y los modelos no se ponen de acuerdo (o coinciden todos), día a día."""
+    try:
+        from . import contraste
+    except Exception:  # noqa: BLE001
+        return
+    dudas, seguro = [], []
+    for d, prev in prevs.items():
+        a = contraste.analizar(prev)
+        dudas += [f"{_hablado(d)}, {x}" for x in a["dudas"][:2]]
+        seguro += [f"{_hablado(d)}, {x}" for x in a["seguro"][:1]]
+    if dudas or seguro:
+        NOTA_LLUVIA[0] += (" CONTRASTE DE FUENTES (AEMET frente a los modelos europeo, francés, alemán y americano): "
+                           + ("NO SE PONEN DE ACUERDO en: " + "; ".join(dudas[:4]) + ". " if dudas else "")
+                           + ("COINCIDEN TODOS en: " + "; ".join(seguro[:2]) + ". " if seguro else "")
+                           + "Si encaja, UNA frase natural en el bloque de ese día («ojo el jueves en Huelva: los "
+                             "modelos no se ponen de acuerdo») o para reforzar («aquí no hay duda»). Sin tecnicismos.")
+
+
 def _con_lluvia(capas: dict) -> dict:
     for d, capa in LLUVIA_DIA.items():
         capas[d] = _capa_despues(capas.get(d), capa, 1.5)
@@ -822,6 +842,7 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
         PREVS_DIA.clear(); PREVS_DIA.update(prevs)
         _preparar_avisos({d: fechas[d] for d in _dias()})
         _preparar_lluvia(prevs, fechas)
+        _contraste_dias(prevs)
     tipo_voz = os.environ.get("VOZ_TIPO") or "masculina"   # vídeos importantes: voz masculina
     global VOZ_USADA
     VOZ_USADA = tipo_voz
