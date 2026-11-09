@@ -16,8 +16,8 @@ P = {p["nombre"]: [a for a in p["anillos"] if a] for p in mapa.provincias()}
 naranja = {"fenomeno": "Lluvias", "nivel": "naranja", "zonas": ["Ávila", "Segovia"], "inicio": ini, "fin": fin,
            "poligonos": P["Ávila"] + P["Segovia"],
            "zona_poligono": [("Ávila", P["Ávila"][0]), ("Segovia", P["Segovia"][0])]}
-amar = [{"fenomeno": "Lluvias", "nivel": "amarillo", "poligono": P[n][0], "zona": n, "inicio": ini, "fin": fin}
-        for n in ("Madrid", "Salamanca", "Toledo", "Valladolid")]
+amar = [{"fenomeno": "Lluvias", "nivel": "amarillo", "poligonos": [P[n][0]], "zonas": [n], "inicio": ini, "fin": fin,
+         "ciudades": []} for n in ("Madrid", "Salamanca", "Toledo", "Valladolid")]
 grupos = [naranja]
 e.AMARILLOS[:] = amar
 zona = e._zona_zoom(grupos)

@@ -1245,7 +1245,7 @@ def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> lis
         return []   # Canarias: ya salen todas las islas
     v = _visible(_zona_zoom(grupos), margen=-0.15)
     graves = [pol for gr in grupos for pol in gr["poligonos"]]
-    amar = [a["poligono"] for a in amarillos if a.get("poligono")]
+    amar = [pol for a in amarillos for pol in (a.get("poligonos") or ([a["poligono"]] if a.get("poligono") else []))]
     from .config import CIUDADES
     capitales = {c["nombre"] for c in CIUDADES}
     am, ref = [], []
