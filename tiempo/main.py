@@ -100,7 +100,9 @@ def _kwargs_aviso(graves, texto: str = "") -> dict:
             graves = pen if len(pen) >= len(can) else can
     # pueblos con aviso y, además, capitales cercanas para situarse (como en los vídeos de aviso)
     gn, otras = nucleos_afectados(graves, n=10), ciudades_zoom(graves, [])
-    nucleos = gn[:4] + otras + gn[4:]
+    # ciudades principales primero (capitales y de más de 50.000), luego los núcleos de la zona del aviso
+    dentro = [c for c in gn if c["poblacion"] >= 20000]
+    nucleos = dentro + otras + [c for c in gn if c not in dentro]
     nombrados = nucleos_nombrados(texto, graves) if texto else []   # lo que se nombra, se señala
     nucleos = nombrados + [c for c in nucleos if c["nombre"] not in {n["nombre"] for n in nombrados}]
     capa = _juntar_capas(_capa_poligonos(graves, con_lista=True),

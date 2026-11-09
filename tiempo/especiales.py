@@ -1291,7 +1291,7 @@ def nucleos_nombrados(texto: str, grupos) -> list[dict]:
     return out
 
 
-def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> list[dict]:
+def ciudades_zoom(grupos, amarillos, n_amarillo: int = 8, n_ref: int = 8) -> list[dict]:
     """Además de los pueblos con aviso naranja/rojo: las ciudades grandes con aviso amarillo que se ven en el zoom
     (punto amarillo) y algunas capitales sin aviso para situarse (punto gris)."""
     try:
@@ -1316,9 +1316,17 @@ def ciudades_zoom(grupos, amarillos, n_amarillo: int = 5, n_ref: int = 4) -> lis
             continue   # barrios de una ciudad ya puesta («Ciudad Lineal» en Madrid) o ya en la zona naranja
         if pob >= 20000 and len(am) < n_amarillo and any(_dentro(lo, la, pol) for pol in amar):
             am.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": "amarillo"})
-        elif nombre in capitales and len(ref) < n_ref and pob >= 40000:
+        elif nombre in capitales or pob >= 50000:   # capitales y ciudades principales
             ref.append({"nombre": nombre, "lat": la, "lon": lo, "poblacion": pob, "nivel": "referencia"})
-    return am + ref
+    # de referencia: primero las capitales; las demás, solo si no están pegadas a otra ya puesta (nada de Móstoles y
+    # Las Rozas junto a Madrid)
+    elegidas = []
+    for c in sorted(ref, key=lambda c: (c["nombre"] not in capitales, -c["poblacion"])):
+        if len(elegidas) >= n_ref:
+            break
+        if all(math.hypot(c["lat"] - o["lat"], (c["lon"] - o["lon"]) * 0.77) >= 0.45 for o in elegidas + am):
+            elegidas.append(c)
+    return am + elegidas
 
 
 def _caja_lista(grupos) -> list:
@@ -2394,8 +2402,14 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     graves_n, otras = nucleos_afectados(grupos, n=10), ciudades_zoom(grupos, AMARILLOS)
     # orden de prioridad (el primero nunca se queda sin sitio): los 4 mayores con aviso, las ciudades grandes con
     # amarillo (Madrid no puede faltar), el resto con aviso y, al final, las de referencia
-    grandes = [c for c in otras if c["poblacion"] >= 150000 and c["nivel"] == "amarillo"]
-    nucleos = graves_n[:4] + grandes + graves_n[4:] + [c for c in otras if c not in grandes]
+    # primero las ciudades principales que se ven (capitales y de más de 50.000), luego los núcleos de la zona
+    # del aviso de mayor a menor, y el resto: nunca un mapa con solo cuatro pueblos pequeños
+    from .config import CIUDADES as _CIU
+    _caps = {c["nombre"] for c in _CIU}
+    grandes = [c for c in otras if c["poblacion"] >= 50000 or c["nombre"] in _caps]
+    principales_dentro = [c for c in graves_n if c["poblacion"] >= 20000]
+    nucleos = principales_dentro + grandes + [c for c in graves_n if c not in principales_dentro] + \
+        [c for c in otras if c not in grandes]
     # si el guion nombra un pueblo o ciudad, se señala en el mapa (por delante de los que no se nombran)
     nombrados = nucleos_nombrados(" ".join(guion["segmentos"].values()), grupos)
     vistos = {c["nombre"] for c in nombrados}
