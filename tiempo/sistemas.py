@@ -121,6 +121,21 @@ def _seguir(serie, salto=4.5):
     return [t for t in tray if len(t["puntos"]) >= 3]
 
 
+def nombres_borrascas(texto: str | None, hoy: date) -> list[str]:
+    """Todas las borrascas con nombre que cita AEMET ahora: en el texto dado (predicción, avisos) y en su página de
+    borrascas de gran impacto (las de los últimos 5 días). En orden de aparición, sin repetir."""
+    nombres = re.findall(r"[Bb]orrascas?\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})(?:\s+y\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,}))?",
+                         texto or "")
+    out = [n for par in nombres for n in par if n]
+    try:
+        n = nombre_aemet(hoy)
+        if n:
+            out.append(n)
+    except Exception:  # noqa: BLE001
+        pass
+    return list(dict.fromkeys(out))
+
+
 def nombre_en_texto(texto: str | None) -> str | None:
     """«borrasca Bruna» en el texto de predicción de AEMET (por si la página de borrascas no lo tiene aún)."""
     m = re.search(r"[Bb]orrasca\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,})", texto or "")
@@ -154,10 +169,11 @@ def detectar(hoy: date, texto_aemet: str | None = None) -> dict | None:
     bor = [c for c in candidatos if c[0] == "borrasca"]
     tipo, _, t, vmin, d = min(bor or candidatos, key=lambda c: c[1])
     tray = [(horas[n], lo, la, v) for n, lo, la, v in t["puntos"]]
-    nombre = (nombre_en_texto(texto_aemet) or nombre_aemet(hoy)) if tipo == "borrasca" else None
+    nombres = nombres_borrascas(texto_aemet, hoy) if tipo == "borrasca" else []
+    nombre = nombres[0] if nombres else None
     log.info("Sistema detectado: %s %s (mín. %.0f, a %.1f° de la península), %d pasos", tipo, nombre or "", vmin, d,
              len(tray))
-    return {"tipo": tipo, "nombre": nombre, "trayectoria": tray, "minimo": vmin, "distancia": d,
+    return {"tipo": tipo, "nombre": nombre, "nombres": nombres, "trayectoria": tray, "minimo": vmin, "distancia": d,
             "datos": (lons, lats, horas, ps, zs)}
 
 
@@ -185,7 +201,9 @@ def texto_guion(s: dict, cuando: str) -> str:
             f"primero {('la borrasca' if s['tipo'] == 'borrasca' else 'la DANA')} moviéndose con su trayectoria, luego "
             "la lluvia hora a hora y, si sopla fuerte, las rachas de viento hora a hora. Cuenta por dónde entra, cuándo "
             "llega lo peor (lluvia y viento) y cuándo se va" + (f"; llámala por su nombre, {s['nombre']}" if s.get("nombre")
-                                                            else "; no le inventes nombre: solo AEMET los pone") + ".")
+                                                            else "; no le inventes nombre: solo AEMET los pone") + "."
+            + (f" AEMET cita también: {', '.join(s['nombres'][1:])} (detrás o a la vez): nómbrala(s)."
+               if len(s.get("nombres") or []) > 1 else ""))
 
 
 # ------------------------------------------------------------------ capas del vídeo

@@ -350,7 +350,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         SISTEMA[0] = None
         try:   # borrascas (con nombre o no), temporales y DANAs que entran: su evolución por horas
             from . import sistemas
-            s_ = sistemas.detectar(hoy, texto_aemet)
+            s_ = sistemas.detectar(hoy, " ".join([texto_aemet or ""] + [f"{x.get('descripcion', '')}" for x in avisos]))
             rachas = max((c.get("racha") or 0) for c in prev) if prev else 0
             if s_ and (s_.get("nombre") or s_["distancia"] == 0 or (s_["tipo"] == "borrasca" and s_["minimo"] <= 1000)
                        or rachas >= 70):

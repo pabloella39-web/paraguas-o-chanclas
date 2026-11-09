@@ -2241,6 +2241,16 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     for d_, gr in zip(datos, grupos[:4]):
         d_["sitios_afectados"] = sitios_aviso(gr)
     if datos:
+        try:   # borrascas/temporales con nombre (AEMET: texto de los avisos y página de borrascas)
+            from .sistemas import nombres_borrascas
+            nb = nombres_borrascas(" ".join(f"{gr.get('descripcion', '')} {gr.get('instruccion', '')}"
+                                            for gr in grupos), hoy)
+            if nb:
+                datos[0]["borrascas_con_nombre"] = nb
+                datos[0]["nota_borrascas"] = ("Nombra la borrasca o borrascas que lo provocan (son los nombres "
+                                              "oficiales de AEMET) en la intro o en zonas.")
+        except Exception as e:  # noqa: BLE001
+            log.info("Sin nombres de borrascas: %s", e)
         # los núcleos dentro de las zonas (se señalan en el mapa) y las ciudades cercanas, por si se desvía
         datos[0]["nucleos_en_la_zona_del_aviso"] = [c["nombre"] for c in nucleos_afectados(grupos, n=10)]
         cerca = ciudades_zoom(grupos, AMARILLOS, n_amarillo=6, n_ref=5)
@@ -2362,7 +2372,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     VOZ_USADA = tipo_voz
     voz.elegir_voz(VOCES[tipo_voz])
     MODO_AVISO[0] = True
-    CAMPO_AVISO[0] = None if demo else _campo_aviso(grupos, hoy)
+    CAMPO_AVISO[0] = None if demo or os.environ.get("SIN_CAMPO_AVISO") else _campo_aviso(grupos, hoy)
     dur_aviso = ((36.0, 56.0, 44.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
                  else (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO)
     if any(gr["nivel"] == "rojo" for gr in grupos):   # rojo: vídeo completo, hasta minuto y medio
@@ -2558,7 +2568,21 @@ def main():
             if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
                 log.info("Aviso %s ya contado ayer (mismo fenómeno y zona): no se repite el vídeo", nivel)
                 continue
-            meta = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
+            # Un aviso naranja o rojo SALE SÍ O SÍ: si algo falla, se reintenta cada vez con menos adornos
+            meta = None
+            for ajuste in ("completo", "sin mapa de lluvia", "guion de respaldo"):
+                try:
+                    if ajuste == "sin mapa de lluvia":
+                        os.environ["SIN_CAMPO_AVISO"] = "1"
+                    if ajuste == "guion de respaldo":
+                        os.environ["PERMITIR_PLANTILLA"] = "1"
+                    meta = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
+                    break
+                except Exception as e:  # noqa: BLE001
+                    log.error("Vídeo del aviso %s falló (%s): %s → se reintenta", nivel, ajuste, e)
+            if meta is None:
+                (RAIZ / "aviso_fallo.txt").write_text(f"El vídeo del aviso {nivel} falló tres veces", encoding="utf-8")
+                raise RuntimeError(f"El vídeo del aviso {nivel} falló tres veces")
             _cerrar(meta, f"Aviso {nivel}", hist_n, a, hoy)
         return
 
