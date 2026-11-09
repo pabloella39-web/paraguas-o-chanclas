@@ -116,7 +116,8 @@ def comprobar(clave: str, g: dict, prompt: str = "") -> list[str]:
     m = re.search(r"Total ≈ (\d+) palabras", prompt)
     if m and isinstance(g.get("segmentos"), dict):
         objetivo = int(m.group(1))
-        n = sum(len(str(v).split()) for v in g["segmentos"].values())
+        # «aviso» y «sistema» son tramos extra (se alargan aparte): no cuentan para el total de los bloques
+        n = sum(len(str(v).split()) for k, v in g["segmentos"].items() if k not in ("aviso", "sistema"))
         if not 0.92 * objetivo <= n <= 1.10 * objetivo:
             errores.append(f"{n} palabras en total (pide ≈ {objetivo}; entre {round(0.92 * objetivo)} y "
                            f"{round(1.10 * objetivo)})")
