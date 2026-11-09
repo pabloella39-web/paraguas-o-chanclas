@@ -340,7 +340,16 @@ def secuencia(capas: list, fundido: float = 0.5):
         inicios.append(t)
         t += getattr(c, "duracion", 5.0) + 0.6
 
+    ritmo = [1.0]   # >1: más deprisa (el tramo dura menos que las animaciones); <1: más despacio
+
+    def ajustar(dur_tramo: float):
+        """Reparte TODO el tramo entre las animaciones (trayectoria, lluvia, viento), cada una con su parte
+        proporcional: que la última no se quede en un segundo si la locución es más corta."""
+        util = max(2.0, dur_tramo - TRANSICION - 0.3)
+        ritmo[0] = min(3.0, max(0.6, t / util))
+
     def dibujar(capa, pr, dt):
+        dt = TRANSICION + max(0.0, dt - TRANSICION) * ritmo[0] if dt > TRANSICION else dt
         n = max([i for i, t0 in enumerate(inicios) if dt - TRANSICION >= t0] or [0])
         c, t0 = capas[n], inicios[n]
         local = dt - t0
@@ -354,6 +363,7 @@ def secuencia(capas: list, fundido: float = 0.5):
             return
         c(capa, pr, local)
     dibujar.duracion = t
+    dibujar.ajustar = ajustar
     return dibujar
 
 

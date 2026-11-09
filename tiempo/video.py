@@ -836,6 +836,8 @@ class Compositor:
             f_encima(capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H), dt, cajas)
         # Capas propias de un bloque (p. ej. zonas con aviso)
         if not en_trans and seg_real in self.capas:
+            if hasattr(self.capas[seg_real], "ajustar"):   # varias animaciones: se reparten todo el tramo
+                self.capas[seg_real].ajustar(self.ventanas[i][1] - ini)
             # tras un zoom lento, la capa sigue donde iba (sin volver a aparecer de cero)
             self.capas[seg_real](capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H),
                                  dt - (T - TRANSICION) + (0.6 if T > TRANSICION else 0))
