@@ -1016,6 +1016,7 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
     return out
 
 
+NARANJAS_CONTEXTO: list = []   # en el vídeo del ROJO: los naranjas del mismo fenómeno también se pintan y se nombran
 AMARILLOS: list = []    # avisos amarillos del mismo fenómeno en la misma zona (Lanzarote y Fuerteventura, 8/11)
 AMPLIACION: list = []   # sitios nuevos cuando AEMET amplía un aviso ya publicado hoy
 ISLAS = ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma", "La Gomera", "El Hierro"]
@@ -1457,7 +1458,7 @@ def _capa_poligonos(grupos, con_lista=False, consejos=None):
 def pintar_avisos(grupos, pr, alfa=120):
     """Capa (ANCHO × MAPA_H) con los avisos pintados como se ven en la tele:
     - oleaje / fenómenos costeros: se subraya la LÍNEA DE COSTA de la zona afectada con el color del nivel;
-    - el resto: se pinta ENTERA la provincia (o provincias) del aviso con el color del nivel."""
+    - el resto: se pinta la ZONA del aviso (su polígono oficial de AEMET, dentro de tierra) con el color del nivel."""
     import numpy as np
     from .mapa import es_canaria, etiquetas_provincias, lonlat_mapa
     lab, nombres, costa = etiquetas_provincias(pr)
@@ -1523,8 +1524,11 @@ def pintar_avisos(grupos, pr, alfa=120):
                     if algo:
                         pintadas.append(i)
                     continue
-                if c >= 0.25 * dentro.size or c >= 0.15 * total:     # la provincia está afectada de verdad
-                    out[lab == i] = col + (alfa,)
+                if c > 0:
+                    # se pinta SOLO la zona del aviso (como en el mapa de AEMET), no la provincia entera: con el rojo
+                    # del norte de Cáceres salía toda Extremadura en rojo (9/11/2026)
+                    zona_p = pm & (lab == i)
+                    out[zona_p] = col + (alfa,)
                     pintadas.append(i)
             if pintadas:
                 vistos.append(gr)
@@ -2108,6 +2112,10 @@ def _ciudades_portada(gr) -> list[str]:
 def _ciudades_portada_todos(grupos) -> list[str]:
     """Rojo: el sitio concreto. Naranja con varias comunidades: todas (hasta 3) en grande y sus ciudades debajo."""
     gr = grupos[0]
+    if gr["nivel"] == "rojo" and all(c in PROV_SIN_CIUDAD for x in grupos for c in (x.get("ciudades") or [])):
+        # rojo en zonas sin ciudades grandes: las zonas tal cual («NORTE DE CÁCERES · SUR DE ÁVILA»)
+        zs = list(dict.fromkeys(z.split(" - ")[-1] for x in grupos for z in x["zonas"]))
+        return [" · ".join(zs[:2])] + ([" · ".join(zs[2:4])] if len(zs) > 2 else [])
     if gr["nivel"] == "rojo":   # rojo: el sitio concreto, en grande
         cs = list(dict.fromkeys(c for x in grupos for c in (x.get("ciudades") or []))) or \
             [z.split(" - ")[-1] for z in gr["zonas"]]
@@ -2281,6 +2289,11 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                 "(«Y atentos en Ávila, Cáceres, Salamanca y Toledo, con aviso amarillo: también lloverá con fuerza»). "
                 "Cada sitio con SU nivel: no digas que una ciudad está en rojo si no lo está. No nombres sitios que no "
                 "estén en estas listas.")
+    if datos and NARANJAS_CONTEXTO:
+        datos[0]["ADEMAS_AVISO_NARANJA"] = [f"{nombre_fen(g['fenomeno'])} en " + ", ".join(sitios_aviso(g))
+                                            for g in NARANJAS_CONTEXTO]
+        datos[0]["nota_naranja"] = ("En «zonas», tras el rojo, nombra también las zonas en NARANJA de ADEMAS_AVISO_NARANJA "
+                                    "(salen pintadas en el mapa).")
     if datos and AMARILLOS:
         datos[0]["ADEMAS_AVISO_AMARILLO"] = [f"{nombre_fen(g['fenomeno'])} en " + ", ".join(sitios_aviso(g))
                                              for g in AMARILLOS]
@@ -2433,14 +2446,14 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                   "cierre": "COMPÁRTELO",
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
-        "capas": {"intro": _capa_poligonos(grupos + AMARILLOS),
-                  "zonas": _juntar_capas(_capa_poligonos(grupos + AMARILLOS, con_lista=True),
-                                         _capa_nucleos(nucleos, reservado=_caja_lista(grupos + AMARILLOS))),
+        "capas": {"intro": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS),
+                  "zonas": _juntar_capas(_capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS, con_lista=True),
+                                         _capa_nucleos(nucleos, reservado=_caja_lista(grupos + NARANJAS_CONTEXTO + AMARILLOS))),
                   **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(nucleos))} if lluvia_capa else {}),
                   **({"evolucion": _juntar_capas(evol_capa, _capa_nucleos(nucleos))} if evol_capa else {}),
                   # en «qué hacer» manda la tarjeta de consejos: sin nombres de pueblos encima
-                  "consejos": _capa_poligonos(grupos + AMARILLOS, consejos=consejos),
-                  "cierre": _capa_poligonos(grupos + AMARILLOS)},
+                  "consejos": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS, consejos=consejos),
+                  "cierre": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],
                           "fenomeno": " y ".join(dict.fromkeys("oleaje" if "costeros" in x["fenomeno"] else x["fenomeno"]
@@ -2591,6 +2604,8 @@ def main():
             if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
                 log.info("Aviso %s ya contado ayer (mismo fenómeno y zona): no se repite el vídeo", nivel)
                 continue
+            NARANJAS_CONTEXTO[:] = [x for x in grupos if nivel == "rojo" and x["nivel"] == "naranja"
+                                    and x["fenomeno"] in {r["fenomeno"] for r in del_nivel}]
             # Un aviso naranja o rojo SALE SÍ O SÍ: si algo falla, se reintenta cada vez con menos adornos
             meta = None
             for ajuste in ("completo", "sin mapa de lluvia", "guion de respaldo"):
