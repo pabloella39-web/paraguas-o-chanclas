@@ -359,28 +359,39 @@ def _texto(d, xy, txt, f, color, sombra=True, anchor="la"):
 @lru_cache(maxsize=None)
 def _marcador_mini(nombre, tmax, ic, fase=0) -> Image.Image:
     # algo más compacta que antes: caben más ciudades y el mapa no se queda con huecos
-    f = fuente("Black", 35)
+    # todas llevan su nombre encima (que nadie dude de qué ciudad es); las siete grandes, más grandes y en amarillo,
+    # y el resto algo más pequeñas para que quepan muchas y el mapa no tenga huecos
+    from .guion import SIEMPRE_EN_MAPA
+    grande = nombre in SIEMPRE_EN_MAPA
+    f = fuente("Black", 28 if grande else 27)
     txt = f"{tmax}°"
     tw = int(f.getlength(txt))
-    w, h = 54 + tw + 18, 58
+    ti = 40 if grande else 38
+    w, h = ti + 3 + tw + 12, ti + 6
     im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 5, w - 1, h - 5], radius=24, fill=(8, 20, 45, 190))
-    im.alpha_composite(icono(ic, 52, fase), (3, 3))
-    _texto(d, (54, h / 2), txt, f, color_temp(tmax), anchor="lm")
-    from .guion import SIEMPRE_EN_MAPA
-    if nombre in SIEMPRE_EN_MAPA:   # las siete grandes llevan su nombre encima: que nadie dude de qué ciudad es
-        fn = fuente("ExtraBold", 21)
-        etiqueta = nombre.upper()
-        ew = int(fn.getlength(etiqueta)) + 20
-        W = max(w, ew)
-        out = Image.new("RGBA", (W, h + 26), (0, 0, 0, 0))
-        d2 = ImageDraw.Draw(out)
-        d2.rounded_rectangle([(W - ew) / 2, 0, (W + ew) / 2, 29], radius=13, fill=(255, 201, 60, 235))
-        d2.text((W / 2, 15), etiqueta, font=fn, fill=(8, 20, 45, 255), anchor="mm")
-        out.alpha_composite(im, ((W - w) // 2, 26))
-        return out
-    return im
+    d.rounded_rectangle([0, 3, w - 1, h - 3], radius=(h - 6) // 2, fill=(8, 20, 45, 190))
+    im.alpha_composite(icono(ic, ti, fase), (3, 3))
+    _texto(d, (ti + 3, h / 2), txt, f, color_temp(tmax), anchor="lm")
+    fn = fuente("Black" if grande else "ExtraBold", 17 if grande else 15)
+    etiqueta = NOMBRE_CORTO.get(nombre, nombre).upper()
+    ew = int(fn.getlength(etiqueta)) + (14 if grande else 12)
+    th = 22 if grande else 20
+    W = max(w, ew)
+    out = Image.new("RGBA", (W, h + th - 3), (0, 0, 0, 0))
+    d2 = ImageDraw.Draw(out)
+    d2.rounded_rectangle([(W - ew) / 2, 0, (W + ew) / 2, th], radius=th // 2,
+                         fill=(255, 201, 60, 235) if grande else (255, 255, 255, 225))
+    d2.text((W / 2, th / 2 + 1), etiqueta, font=fn, fill=(8, 20, 45, 255), anchor="mm")
+    out.alpha_composite(im, ((W - w) // 2, th - 3))
+    return out
+
+
+NOMBRE_CORTO = {"Santa Cruz de Tenerife": "S.C. Tenerife", "Las Palmas de Gran Canaria": "Las Palmas",
+                "Palma de Mallorca": "Palma", "San Sebastián": "Donostia", "Vitoria-Gasteiz": "Vitoria",
+                "Jerez de la Frontera": "Jerez", "Ciudad Real": "C. Real",
+                "Santa Cruz de La Palma": "S.C. La Palma", "Santiago de Compostela": "Santiago",
+                "Puerto del Rosario": "P. del Rosario"}
 
 
 @lru_cache(maxsize=None)
@@ -471,7 +482,7 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
         items.sort(key=lambda it: (it[3]["nombre"] not in SIEMPRE_EN_MAPA, it[3]["nombre"] not in extremos,
                                    rango.get(it[3]["nombre"], 999)))
         # tierra estricta (sin el margen de costa de la máscara): la pastilla entera tiene que caer en tierra
-        tierra = mascara_tierra(pr).filter(ImageFilter.MinFilter(15))
+        tierra = mascara_tierra(pr).filter(ImageFilter.MinFilter(9))
 
         def _en_tierra(x0, y0, w, h):
             """La mayor parte de la pastilla (centro y 4 puntos interiores) sobre tierra."""
@@ -482,9 +493,10 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                 xi, yi = int(x), int(y)
                 if 0 <= xi < tierra.width and 0 <= yi < tierra.height and tierra.getpixel((xi, yi)) > 0:
                     dentro += 1
-            return dentro >= 5 and tierra.getpixel((min(max(int(x0 + w / 2), 0), tierra.width - 1),
+            return dentro >= 4 and tierra.getpixel((min(max(int(x0 + w / 2), 0), tierra.width - 1),
                                                                     min(max(int(y0 + h / 2), 0), tierra.height - 1))) > 0
-        offs = sorted({(dx, dy) for dx in range(-80, 81, 10) for dy in range(-60, 61, 10)},
+        # todas llevan su nombre y un piquito hacia la ciudad: pueden apartarse algo más para llenar el mapa
+        offs = sorted({(dx, dy) for dx in range(-100, 101, 10) for dy in range(-70, 71, 10)},
                       key=lambda o: o[0] ** 2 + (o[1] * 1.3) ** 2)
         # orden: extremos y ciudades grandes primero; después, las que rellenan los huecos más grandes
         primeras = [it for it in items if it[3]["nombre"] in extremos or rango.get(it[3]["nombre"], 999) < 25
@@ -530,7 +542,7 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area):
                   propia = math.hypot(cx - px, cy - py)
                   # que la pastilla quede más cerca de su ciudad que de cualquier otra ciudad conocida
                   # (las siete grandes llevan su nombre escrito y un piquito: ahí no hace falta esta regla)
-                  if c["nombre"] not in SIEMPRE_EN_MAPA and any(
+                  if math.hypot(dx, dy) > 60 and any(
                           n != c["nombre"] and math.hypot(rx - px, ry - py) > 40 and math.hypot(cx - rx, cy - ry) < propia
                           for rx, ry, n in refs):   # (las ciudades pegadas a la suya, como L'Hospitalet, no cuentan)
                       continue

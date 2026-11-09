@@ -787,7 +787,7 @@ class Compositor:
                         bx = cx + ux * min(im.width / 2 - 6, abs((im.height / 2 - 4) / uy) if uy else 1e9)
                         by = cy + uy * min(im.height / 2 - 4, abs((im.width / 2 - 6) / ux) if ux else 1e9)
                         tx, ty = px - ux * 6, py - uy * 6
-                        nx, ny = -uy * 9, ux * 9
+                        nx, ny = -uy * 6, ux * 6
                         if math.hypot(tx - bx, ty - by) > 4:
                             d.polygon([(bx + nx, MAPA_Y0 + by + ny), (bx - nx, MAPA_Y0 + by - ny), (tx, MAPA_Y0 + ty)],
                                       fill=(8, 20, 45, 190))
