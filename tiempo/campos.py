@@ -474,6 +474,7 @@ def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA
                             fill=(255, 201, 60, 255))
         _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq, ESCALA_HORA)
     dibujar.duracion = len(fotos) * seg_por_fotograma
+    dibujar.horas_fotos, dibujar.seg = [horas[k] for k in idx], seg_por_fotograma
     return dibujar
 
 

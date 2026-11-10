@@ -299,6 +299,7 @@ def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotog
     k0, k1 = activas[0], activas[-1]
     paso = max(1, -(-(k1 - k0 + 1) // max_fotogramas))
     fotos = []
+    horas_fotos = [horas[k] for k in range(k0, k1 + 1, paso)]
     for k in range(k0, k1 + 1, paso):
         img, caja = _imagen_campo(lons, lats, cubo[k:k + paso].max(axis=0), ESCALA_VIENTO, campos.PX_GRADO * 0.6)
         t = datetime.fromisoformat(horas[k])
@@ -329,6 +330,52 @@ def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotog
         campos._leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, "RACHAS DE VIENTO (KM/H)", f, fpeq, ESCALA_VIENTO)
     dibujar.duracion = len(fotos) * seg_por_fotograma
     dibujar.maximo = float(cubo.max())
+    dibujar.horas_fotos, dibujar.seg = horas_fotos, seg_por_fotograma
+    return dibujar
+
+
+def con_centro(capa_fn, s: dict):
+    """Sobre la lluvia o el viento hora a hora: el centro del temporal (B o D) moviéndose, con su nombre, para que
+    se vea de qué borrasca es todo lo que hay en pantalla. Si el centro queda fuera, el nombre va en el borde."""
+    from .especiales import fuente
+    from .video import MAPA_H, MAPA_Y0, TRANSICION
+    from .config import ANCHO
+    if not capa_fn or not s or not s.get("trayectoria") or not getattr(capa_fn, "horas_fotos", None):
+        return capa_fn
+    tr = [(datetime.fromisoformat(h), lo, la) for h, lo, la, _ in s["trayectoria"]]
+    f, f2 = fuente("Black", 54), fuente("Black", 30)
+    borr = s["tipo"] == "borrasca"
+    etiqueta = (f"BORRASCA {s['nombre'].upper()}" if s.get("nombre") else "BORRASCA") if borr else \
+        (f"DANA {s['nombre'].upper()}" if s.get("nombre") else "DANA")
+    col = (235, 60, 60) if borr else (150, 70, 200)
+
+    def centro(t):
+        if t <= tr[0][0]:
+            return tr[0][1:]
+        for (ta, xa, ya), (tb, xb, yb) in zip(tr, tr[1:]):
+            if ta <= t <= tb:
+                u = (t - ta).total_seconds() / max(1.0, (tb - ta).total_seconds())
+                return xa + (xb - xa) * u, ya + (yb - ya) * u
+        return tr[-1][1:]
+
+    def dibujar(capa, pr, dt):
+        capa_fn(capa, pr, dt)
+        n = min(len(capa_fn.horas_fotos) - 1, int(max(0.0, dt - TRANSICION) / capa_fn.seg))
+        lo, la = centro(datetime.fromisoformat(capa_fn.horas_fotos[n]))
+        x, y = pr(lo, la)
+        y += MAPA_Y0
+        x = min(max(x, 70), ANCHO - 70)
+        y = min(max(y, MAPA_Y0 + 160), MAPA_Y0 + MAPA_H - 210)
+        d = ImageDraw.Draw(capa)
+        d.ellipse([x - 40, y - 40, x + 40, y + 40], fill=(255, 255, 255, 240), outline=col + (255,), width=7)
+        d.text((x, y - 2), "B" if borr else "D", font=f, fill=col + (255,), anchor="mm")
+        w = f2.getlength(etiqueta) + 30
+        xx = min(max(x, w / 2 + 20), ANCHO - w / 2 - 20)
+        d.rounded_rectangle([xx - w / 2, y + 48, xx + w / 2, y + 96], radius=20, fill=col + (240,))
+        d.text((xx, y + 72), etiqueta, font=f2, fill=(255, 255, 255, 255), anchor="mm")
+    for k in ("duracion", "peso", "maximo", "horas_fotos", "seg"):
+        if hasattr(capa_fn, k):
+            setattr(dibujar, k, getattr(capa_fn, k))
     return dibujar
 
 
@@ -389,9 +436,9 @@ def preparar(s: dict, hoy: date):
         cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
-            trozos.append(ev)
             acum = cubo.sum(axis=0)
             ev.peso = 1.3 if acum.max() >= 80 else 1.15 if acum.max() >= 40 else 1.0   # más lluvia, más tiempo
+            trozos.append(con_centro(ev, s))
             notas.append(f"lluvia máxima acumulada en el periodo ≈ {acum.max():.0f} l/m²")
     except Exception as e:  # noqa: BLE001
         log.warning("Sin lluvia hora a hora para el sistema: %s", e)
@@ -402,7 +449,7 @@ def preparar(s: dict, hoy: date):
         cv = capa_viento(lo_v, la_v, h_v, c_v)
         if cv and cv.maximo >= 60:
             cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0   # más viento, más tiempo
-            trozos.append(cv)
+            trozos.append(con_centro(cv, s))
             notas.append(f"rachas de hasta {cv.maximo:.0f} km/h")
     except Exception as e:  # noqa: BLE001
         log.warning("Sin rachas hora a hora para el sistema: %s", e)
@@ -444,14 +491,17 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
     from datetime import timedelta as _td
     from .especiales import _visible
     fin = min(max(fin, hoy), hoy + _td(days=2))
-    trozos, datos, etiqueta = [], {}, "EL TEMPORAL, HORA A HORA"
+    trozos, datos, etiqueta, s = [], {}, "EL TEMPORAL, HORA A HORA", None
     try:
         s = detectar(hoy, texto)
         if s and (s.get("nombre") or s["distancia"] == 0 or (s["tipo"] == "borrasca" and s["minimo"] <= 1000)):
             trozos.append(capa_trayectoria(s))
             etiqueta = ((f"BORRASCA {s['nombre'].upper()}" if s.get("nombre") else "LA BORRASCA")
                         if s["tipo"] == "borrasca" else "LA DANA") + ", HORA A HORA"
-            datos["sistema"] = s.get("datos") or s["tipo"]
+            datos["sistema"] = (f"{s['tipo']}" + (f" {s['nombre']}" if s.get("nombre") else "")
+                                + (f", mínimo de {s['minimo']:.0f} hPa" if s["tipo"] == "borrasca" else ""))
+        else:
+            s = None
     except Exception as e:  # noqa: BLE001
         log.warning("Aviso: sin trayectoria del sistema: %s", e)
     try:
@@ -460,7 +510,7 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
             ev.peso = 1.3 if cubo.sum(axis=0).max() >= 80 else 1.0
-            trozos.append(ev)
+            trozos.append(con_centro(ev, s))
             datos["lluvia_por_donde_pasa_l_m2_en_1_hora"] = _por_provincias(lo, la, horas, cubo, 1.0)
     except Exception as e:  # noqa: BLE001
         log.warning("Aviso: sin lluvia hora a hora del temporal: %s", e)
@@ -470,7 +520,7 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
         cv = capa_viento(lo_v, la_v, h_v, c_v)
         if cv and cv.maximo >= 45:
             cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0
-            trozos.append(cv)
+            trozos.append(con_centro(cv, s))
             datos["rachas_por_donde_pasa_km_h"] = _por_provincias(lo_v, la_v, h_v, c_v, 45.0)
     except Exception as e:  # noqa: BLE001
         log.warning("Aviso: sin rachas hora a hora del temporal: %s", e)
