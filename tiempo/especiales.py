@@ -1041,6 +1041,36 @@ def _partir_ampliacion(grupos, ya: set):
     return (nuevos, viejos) if nuevos else (grupos, [])
 
 
+CAMBIOS_YA_AVISADO: list = []   # qué ha cambiado (o no) en lo ya contado, comparando con lo publicado
+
+
+def _comparar_ya_avisado(viejos, previos_json: list) -> list[str]:
+    """Compara lo que sigue en vigor con lo que se publicó (nivel, horas y cifras de AEMET). Devuelve una línea por
+    aviso: «sin cambios (…)» o «HA CAMBIADO: …», para que el guion lo resuma o cuente la novedad."""
+    out = []
+    for gr in viejos:
+        zonas = ", ".join(sitios_aviso(gr))
+        antes = next((x for x in reversed(previos_json)
+                      if x.get("fenomeno", "").lower() == gr["fenomeno"].lower()
+                      and set(x.get("zonas") or []) & {z.split(" - ")[-1] for z in gr["zonas"]} | (
+                          set(x.get("zonas") or []) & set(gr["zonas"]))), None)
+        cifra = (gr.get("descripcion") or "").strip()
+        if antes is None:
+            out.append(f"{gr['nivel']} en {zonas}: {cifra}")
+            continue
+        cambios = []
+        if antes.get("nivel") != gr["nivel"]:
+            cambios.append(f"el nivel pasa de {antes.get('nivel')} a {gr['nivel']}")
+        if (antes.get("descripcion") or "").strip() != cifra and cifra:
+            cambios.append(f"la cifra de AEMET cambia de «{(antes.get('descripcion') or '').strip()}» a «{cifra}»")
+        if (antes.get("fin") or "")[:16] != (gr.get("fin") or "")[:16]:
+            cambios.append(f"ahora dura hasta {_hora_legible(gr['fin']) if gr.get('fin') else '?'} "
+                           f"(antes, hasta {_hora_legible(antes['fin']) if antes.get('fin') else '?'})")
+        out.append(f"{gr['nivel']} en {zonas}: " + ("HA CAMBIADO: " + "; ".join(cambios) if cambios
+                                                     else f"sin cambios ({cifra or 'mismas cifras'}; mismas horas)"))
+    return out
+
+
 def _centro(gr):
     pts = [p for pol in gr["poligonos"] for p in pol]
     return sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts)
@@ -2459,7 +2489,12 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                 "Este vídeo es SOLO de las zonas NUEVAS: todo el detalle (zonas, comarcas, pueblos, horas, lluvia, "
                 "evolución) es de ellas. Lo de SIGUE_EN_VIGOR_YA_CONTADO ya tiene su vídeo: menciónalo por encima, en "
                 "UNA sola frase al final de «zonas» («y sigue el aviso rojo en el norte de Cáceres y el sur de "
-                "Ávila»), sin pueblos, cifras ni horas.")
+                "Ávila, con las mismas previsiones»), sin pueblos ni detalle. Sus cifras se han COMPROBADO contra lo "
+                "publicado (YA_CONTADO_COMPROBADO): si pone «sin cambios», resume en media frase («se mantiene, hasta "
+                "120 litros en 12 horas»); si pone «HA CAMBIADO», di el cambio claramente en una frase (nuevo nivel, "
+                "nueva cifra o nueva hora de fin).")
+            if CAMBIOS_YA_AVISADO:
+                datos[0]["YA_CONTADO_COMPROBADO"] = list(CAMBIOS_YA_AVISADO)
     extra = max(0, sum(len(sitios_aviso(gr)) for gr in grupos[:4]) - 3)
     palabras["zonas"] += 3 * extra   # con muchos sitios, el bloque de zonas puede alargarse
     if datos:
@@ -2787,6 +2822,7 @@ def main():
             hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}.json"
             AMPLIACION[:] = []
             YA_AVISADO[:] = []
+            CAMBIOS_YA_AVISADO[:] = []
             if hist_n.exists() and not a.demo:
                 # Ya salió el de hoy: solo se hace otro si AEMET ha AMPLIADO el aviso a sitios nuevos (Gran Canaria
                 # el 8/11/2026). Nunca más de tres vídeos del mismo nivel en un día.
@@ -2807,6 +2843,13 @@ def main():
                 AMPLIACION[:] = [x for x in nuevos if x != "(rehecho)"]
                 if AMPLIACION:   # el vídeo, solo de las zonas nuevas; lo ya contado, por encima
                     del_nivel, YA_AVISADO[:] = _partir_ampliacion(del_nivel, ya)
+                    try:
+                        CAMBIOS_YA_AVISADO[:] = _comparar_ya_avisado(YA_AVISADO, [
+                            x for f in previos for x in json.loads(f.read_text(encoding="utf-8")).get("avisos") or []])
+                    except Exception as e:  # noqa: BLE001
+                        log.warning("No se pudo comparar lo ya avisado: %s", e)
+                        CAMBIOS_YA_AVISADO[:] = []
+                    log.info("Ya contado, comprobado: %s", " | ".join(CAMBIOS_YA_AVISADO))
                 log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)
                 hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}-{len(previos) + 1}.json"
             if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
