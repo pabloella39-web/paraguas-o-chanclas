@@ -2760,8 +2760,10 @@ def main():
                                             if c not in ya and not any(c in z for z in ya)))
                 if os.environ.get("REHACER"):   # a mano: rehacer el vídeo de hoy (zoom más cerca, etc.)
                     nuevos = nuevos or ["(rehecho)"]
-                if not nuevos or (len(previos) >= 3 and not os.environ.get("REHACER")):
-                    log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos)", nivel)
+                # Tope de tres vídeos al día solo para los naranjas: un ROJO en una zona nueva sale siempre
+                if not nuevos or (nivel != "rojo" and len(previos) >= 3 and not os.environ.get("REHACER")):
+                    log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos). En vigor: %s", nivel,
+                             "; ".join(", ".join(sitios_aviso(x)) for x in del_nivel))
                     continue
                 AMPLIACION[:] = [x for x in nuevos if x != "(rehecho)"]
                 log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)

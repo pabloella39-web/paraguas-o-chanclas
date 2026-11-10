@@ -3,7 +3,7 @@ name: Especiales del tiempo
 on:
   schedule:
     # Avisos de AEMET: se comprueban cada 2 horas (si hay naranjas o rojos nuevos, vídeo especial)
-    - cron: "23 6-20/2 * * *"
+    - cron: "23 5-21 * * *"
     # Fin de semana: viernes por la noche, a las 20:30 de Madrid (hace también de parte del sábado)
     - cron: "41 17 * * 5"
     - cron: "11 18 * * 5"
