@@ -238,7 +238,7 @@ def _imagen_lluvia(lons, lats, v, canaria=False) -> tuple[Image.Image, tuple]:
     return img, (lon0, lon1, lat0, lat1)
 
 
-def _imagen_isobaras(lons, lats, v) -> tuple[Image.Image, tuple]:
+def _imagen_isobaras(lons, lats, v, fondo: bool = True) -> tuple[Image.Image, tuple]:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -253,9 +253,12 @@ def _imagen_isobaras(lons, lats, v) -> tuple[Image.Image, tuple]:
     ax.axis("off")
     niveles = np.arange(math.floor(v.min() / 4) * 4, v.max() + 4, 4)
     # fondo suave: azul donde la presión es baja, rojo donde es alta (como en los mapas de la tele)
-    ax.contourf(lons, lats, v, levels=np.arange(960, 1050, 2), cmap="RdBu_r", alpha=0.32, vmin=990, vmax=1035)
-    cs = ax.contour(lons, lats, v, levels=niveles, colors="white", linewidths=4.5, alpha=0.95)
-    ax.clabel(cs, fmt="%d", fontsize=24, colors="white", inline=True, inline_spacing=12)
+    if fondo:
+        ax.contourf(lons, lats, v, levels=np.arange(960, 1050, 2), cmap="RdBu_r", alpha=0.32, vmin=990, vmax=1035)
+        cs = ax.contour(lons, lats, v, levels=niveles, colors="white", linewidths=4.5, alpha=0.95)
+        ax.clabel(cs, fmt="%d", fontsize=24, colors="white", inline=True, inline_spacing=12)
+    else:   # solo las líneas, finas, para ponerlas encima de otro campo (viento)
+        ax.contour(lons, lats, v, levels=niveles, colors="white", linewidths=2.6, alpha=0.8)
     fig.patch.set_alpha(0)
     fig.canvas.draw()
     img = Image.frombuffer("RGBA", fig.canvas.get_width_height(), fig.canvas.buffer_rgba()).copy()

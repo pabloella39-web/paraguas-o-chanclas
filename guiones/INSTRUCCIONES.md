@@ -133,3 +133,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   se cuenta con lo concreto del fenómeno (crecidas, árboles caídos, olas…), como posibilidad, y cada vídeo de una
   forma: cambia el arranque, los verbos, los consejos y la despedida (se pasan al guion las fórmulas de los últimos
   vídeos para no repetirlas, y un enfoque distinto en cada uno).
+
+- BORRASCAS: se siguen varias a la vez (Bruna y, detrás, Charles). Cada una sale en el mapa con su B y su nombre, y el
+  guion cuenta las dos en el orden en que llegan. Los nombres son los de AEMET, en el orden en que los cita (la que
+  llega antes recibe el primero); si no hay nombre, «borrasca» a secas. El viento hora a hora lleva las isobaras encima.

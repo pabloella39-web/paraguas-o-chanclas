@@ -370,8 +370,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
             if s_ and (s_.get("nombre") or s_["distancia"] == 0 or (s_["tipo"] == "borrasca" and s_["minimo"] <= 1000)
                        or rachas >= 70):
                 capa_s, notas = sistemas.preparar(s_, hoy)
-                etiqueta = ((f"BORRASCA {s_['nombre'].upper()}" if s_.get("nombre") else "LA BORRASCA")
-                            if s_["tipo"] == "borrasca" else "LA DANA") + ", HORA A HORA"
+                etiqueta = sistemas.titulo_sistemas(s_)
                 SISTEMA[0] = (capa_s, etiqueta)
                 g.GANCHO_TEXTO += sistemas.texto_guion(s_, cuando, capa_s.duracion + 0.8) + (
                     " Datos del tramo: " + "; ".join(notas) + "." if notas else "")

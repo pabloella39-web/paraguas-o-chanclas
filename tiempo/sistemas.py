@@ -170,11 +170,45 @@ def detectar(hoy: date, texto_aemet: str | None = None) -> dict | None:
     tipo, _, t, vmin, d = min(bor or candidatos, key=lambda c: c[1])
     tray = [(horas[n], lo, la, v) for n, lo, la, v in t["puntos"]]
     nombres = nombres_borrascas(texto_aemet, hoy) if tipo == "borrasca" else []
-    nombre = nombres[0] if nombres else None
-    log.info("Sistema detectado: %s %s (mín. %.0f, a %.1f° de la península), %d pasos", tipo, nombre or "", vmin, d,
-             len(tray))
-    return {"tipo": tipo, "nombre": nombre, "nombres": nombres, "trayectoria": tray, "minimo": vmin, "distancia": d,
-            "datos": (lons, lats, horas, ps, zs)}
+    # Las demás borrascas que también afectan (Bruna y, detrás, Charles): hasta dos más, las de mayor impacto
+    otros = []
+
+    def _la_misma(a, b) -> bool:
+        """Dos trazas que en realidad son la misma borrasca (el seguimiento se cortó o se duplicó)."""
+        pa, pb = {q[0]: q[1:3] for q in a["puntos"]}, {q[0]: q[1:3] for q in b["puntos"]}
+        comunes = set(pa) & set(pb)
+        if comunes:
+            return min(math.hypot(pa[n][0] - pb[n][0], pa[n][1] - pb[n][1]) for n in comunes) < 5.0
+        primero, segundo = (a, b) if a["puntos"][-1][0] < b["puntos"][0][0] else (b, a)
+        fin, ini = primero["puntos"][-1], segundo["puntos"][0]
+        return ini[0] - fin[0] <= 2 and math.hypot(ini[1] - fin[1], ini[2] - fin[2]) <= 6.0
+
+    if tipo == "borrasca":
+        distintas = []
+        for c in sorted([c for c in bor if c[2] is not t], key=lambda c: c[1]):
+            if not _la_misma(c[2], t) and not any(_la_misma(c[2], x[2]) for x in distintas):
+                distintas.append(c)
+        for c in distintas[:2]:
+            otros.append({"tipo": "borrasca", "nombre": None, "minimo": c[3], "distancia": c[4],
+                          "trayectoria": [(horas[n], lo, la, v) for n, lo, la, v in c[2]["puntos"]]})
+    principal = {"tipo": tipo, "nombre": None, "nombres": nombres, "trayectoria": tray, "minimo": vmin,
+                 "distancia": d, "datos": (lons, lats, horas, ps, zs), "otros": otros}
+    # Nombres de AEMET, en el orden en que los cita (el de la que llega antes, primero): la borrasca que antes se
+    # acerca a la península recibe el primero. Si hay más borrascas que nombres, las últimas se quedan sin nombre.
+    def _llegada(x):
+        return min(x["trayectoria"], key=lambda q: _distancia_peninsula(q[1], q[2]))[0]
+    for x, n_ in zip(sorted([principal, *otros], key=_llegada), nombres):
+        x["nombre"] = n_
+    for x in [principal, *otros]:   # trayectoria suavizada (la rejilla es de 2°: sin esto va a saltos)
+        tr_ = x["trayectoria"]
+        x["trayectoria"] = [tr_[0]] + [
+            (b[0], (a[1] + 2 * b[1] + c[1]) / 4, (a[2] + 2 * b[2] + c[2]) / 4, b[3])
+            for a, b, c in zip(tr_, tr_[1:], tr_[2:])] + [tr_[-1]]
+    log.info("Sistema detectado: %s %s (mín. %.0f, a %.1f° de la península), %d pasos%s", tipo,
+             principal["nombre"] or "", vmin, d, len(tray),
+             "".join(f"; además borrasca {o['nombre'] or 'sin nombre'} (mín. {o['minimo']:.0f}, a {o['distancia']:.1f}°)"
+                     for o in otros))
+    return principal
 
 
 def texto_guion(s: dict, cuando: str, segundos: float = 14.0) -> str:
@@ -203,7 +237,13 @@ def texto_guion(s: dict, cuando: str, segundos: float = 14.0) -> str:
             "la lluvia hora a hora y, si sopla fuerte, las rachas de viento hora a hora. Cuenta por dónde entra, cuándo "
             "llega lo peor (lluvia y viento) y cuándo se va" + (f"; llámala por su nombre, {s['nombre']}" if s.get("nombre")
                                                             else "; no le inventes nombre: solo AEMET los pone") + "."
-            + (f" AEMET cita también: {', '.join(s['nombres'][1:])} (detrás o a la vez): nómbrala(s)."
+            + "".join(
+                f" ADEMÁS hay otra borrasca en pantalla, {('la borrasca ' + o['nombre']) if o.get('nombre') else 'sin nombre'} "
+                f"(centro de {o['minimo']:.0f} hPa): pasa de {donde(*o['trayectoria'][0][1:3])} "
+                f"({dias[datetime.fromisoformat(o['trayectoria'][0][0]).weekday()]}) a {donde(*o['trayectoria'][-1][1:3])} "
+                f"({dias[datetime.fromisoformat(o['trayectoria'][-1][0]).weekday()]}). Cuenta las dos, en el orden en que "
+                "llegan, y qué trae cada una." for o in (s.get("otros") or []))
+            + (f" AEMET cita: {', '.join(s['nombres'])}."
                if len(s.get("nombres") or []) > 1 else ""))
 
 
@@ -269,6 +309,9 @@ def capa_trayectoria(s: dict, seg_por_fotograma: float = 0.32):
             d.rounded_rectangle([xx - w / 2, y + 52, xx + w / 2, y + 100], radius=20, fill=col + (235,))
             d.text((xx, y + 76), txt, font=f2, fill=(255, 255, 255, 255), anchor="mm")
         t = datetime.fromisoformat(horas[k])
+        if s.get("otros"):   # las demás borrascas que hay en el mapa, con su nombre
+            _marcar_centros(capa, pr, s["otros"], t, siempre_el_primero=False)
+            d = ImageDraw.Draw(capa)
         reloj = f"{campos.DIAS_CORTOS[t.weekday()]} {t.hour:02d}:00"
         w = freloj.getlength(reloj) + 48
         d.rounded_rectangle([ANCHO - 40 - w, MAPA_Y0 + 24, ANCHO - 40, MAPA_Y0 + 104], radius=22, fill=(8, 20, 45, 225))
@@ -287,8 +330,10 @@ def viento_horario(ini: date, fin: date, caja=VIENTO):
     return lons, lats, horas, cubo.T.reshape(len(horas), len(lats), len(lons))
 
 
-def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotograma: float = 0.42):
-    """Rachas de viento hora a hora (km/h) en colores, con reloj y leyenda. None si no sopla fuerte."""
+def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotograma: float = 0.42,
+                isobaras=None):
+    """Rachas de viento hora a hora (km/h) en colores, con reloj y leyenda. None si no sopla fuerte.
+    «isobaras» = (lons, lats, horas, presiones cada 3 h): se dibujan encima, como en los mapas de isobaras y viento."""
     from .especiales import fuente
     from .video import MAPA_H, MAPA_Y0, TRANSICION
     from .config import ANCHO
@@ -307,6 +352,20 @@ def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotog
     cache: dict = {}
     provs = mapa_.provincias()
     f, fpeq, freloj = fuente("ExtraBold", 26), fuente("Bold", 20), fuente("Black", 54)
+    # isobaras: la de la hora más cercana (hay una cada 3 horas)
+    iso_de, iso_img = [], {}
+    if isobaras:
+        try:
+            ilo, ila, ih, ips = isobaras[:4]
+            tiempos = [datetime.fromisoformat(h) for h in ih]
+            for h in horas_fotos:
+                t = datetime.fromisoformat(h)
+                iso_de.append(min(range(len(tiempos)), key=lambda q: abs((tiempos[q] - t).total_seconds())))
+            for q in sorted(set(iso_de)):
+                iso_img[q] = campos._imagen_isobaras(ilo, ila, ips[q], fondo=False)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Sin isobaras sobre el viento: %s", e)
+            iso_de, iso_img = [], {}
 
     def dibujar(capa, pr, dt):
         n = min(len(fotos) - 1, int(max(0.0, dt - TRANSICION) / seg_por_fotograma))
@@ -314,65 +373,104 @@ def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotog
 
         def campo(lienzo, pr_, dt_):
             campos._pegar(lienzo, img, caja, pr_, 0, cache, f"v{n}")
+            if iso_de and iso_de[n] in iso_img:
+                campos._pegar(lienzo, *iso_img[iso_de[n]], pr_, 0, cache, f"i{iso_de[n]}")
             d_ = ImageDraw.Draw(lienzo)
             for p_ in provs:
                 for anillo in p_["anillos"]:
                     pts = [pr_(*campos.lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
                     d_.line(pts + [pts[0]], fill=(255, 255, 255, 200), width=3)
         campos._recortado(campo)(capa, pr, dt)
-        if len(cache) > 4:
-            for kk in list(cache)[:-2]:
+        if len(cache) > 6:
+            for kk in list(cache)[:-4]:
                 cache.pop(kk, None)
         d = ImageDraw.Draw(capa)
         w = freloj.getlength(reloj) + 48
         d.rounded_rectangle([ANCHO - 40 - w, MAPA_Y0 + 24, ANCHO - 40, MAPA_Y0 + 104], radius=22, fill=(8, 20, 45, 225))
         d.text((ANCHO - 40 - w / 2, MAPA_Y0 + 64), reloj, font=freloj, fill=(255, 255, 255, 255), anchor="mm")
-        campos._leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, "RACHAS DE VIENTO (KM/H)", f, fpeq, ESCALA_VIENTO)
+        campos._leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86,
+                                   "ISOBARAS Y RACHAS DE VIENTO (KM/H)" if iso_img else "RACHAS DE VIENTO (KM/H)",
+                                   f, fpeq, ESCALA_VIENTO)
     dibujar.duracion = len(fotos) * seg_por_fotograma
     dibujar.maximo = float(cubo.max())
     dibujar.horas_fotos, dibujar.seg = horas_fotos, seg_por_fotograma
     return dibujar
 
 
-def con_centro(capa_fn, s: dict):
-    """Sobre la lluvia o el viento hora a hora: el centro del temporal (B o D) moviéndose, con su nombre, para que
-    se vea de qué borrasca es todo lo que hay en pantalla. Si el centro queda fuera, el nombre va en el borde."""
+def _etiqueta(x: dict) -> str:
+    if x["tipo"] == "borrasca":
+        return f"BORRASCA {x['nombre'].upper()}" if x.get("nombre") else "BORRASCA"
+    return f"DANA {x['nombre'].upper()}" if x.get("nombre") else "DANA"
+
+
+def titulo_sistemas(s: dict) -> str:
+    """Rótulo del tramo: «BORRASCA BRUNA, HORA A HORA» o «BRUNA Y CHARLES, HORA A HORA» si hay dos con nombre."""
+    orden = sorted([s, *(s.get("otros") or [])],   # en el orden en que llegan
+                   key=lambda x: min(x["trayectoria"], key=lambda q: _distancia_peninsula(q[1], q[2]))[0])
+    con_nombre = [x["nombre"].upper() for x in orden if x.get("nombre")]
+    if len(con_nombre) > 1:
+        return " Y ".join(con_nombre[:2]) + ", HORA A HORA"
+    if s["tipo"] == "borrasca":
+        return (_etiqueta(s) if s.get("nombre") else "LA BORRASCA") + ", HORA A HORA"
+    return "LA DANA, HORA A HORA"
+
+
+def _centro_en(x: dict, t: datetime, margen_h: float = 3.0):
+    """Posición del centro en el instante t (interpolada); None si ese sistema aún no existe o ya se ha ido."""
+    tr = [(datetime.fromisoformat(h), lo, la) for h, lo, la, _ in x["trayectoria"]]
+    if t < tr[0][0] - timedelta(hours=margen_h) or t > tr[-1][0] + timedelta(hours=margen_h):
+        return None
+    if t <= tr[0][0]:
+        return tr[0][1:]
+    for (ta, xa, ya), (tb, xb, yb) in zip(tr, tr[1:]):
+        if ta <= t <= tb:
+            u = (t - ta).total_seconds() / max(1.0, (tb - ta).total_seconds())
+            return xa + (xb - xa) * u, ya + (yb - ya) * u
+    return tr[-1][1:]
+
+
+def _marcar_centros(capa, pr, sistemas: list, t: datetime, siempre_el_primero: bool = True):
+    """La B (o D) de cada borrasca/DANA con su nombre, en su sitio a esa hora. Si queda fuera, pegada al borde."""
     from .especiales import fuente
-    from .video import MAPA_H, MAPA_Y0, TRANSICION
+    from .video import MAPA_H, MAPA_Y0
     from .config import ANCHO
+    f, f2 = fuente("Black", 54), fuente("Black", 30)
+    d = ImageDraw.Draw(capa)
+    puestos = []
+    for n, x in enumerate(sistemas):
+        pos = _centro_en(x, t, 1e6 if (n == 0 and siempre_el_primero) else 3.0)
+        if pos is None:
+            continue
+        px, py = pr(*pos)
+        py += MAPA_Y0
+        px = min(max(px, 70), ANCHO - 70)
+        py = min(max(py, MAPA_Y0 + 160), MAPA_Y0 + MAPA_H - 210)
+        while any(abs(px - a) < 230 and abs(py - b) < 120 for a, b in puestos) and py < MAPA_Y0 + MAPA_H - 330:
+            py += 125   # dos centros muy juntos: que no se pisen los rótulos
+        puestos.append((px, py))
+        borr = x["tipo"] == "borrasca"
+        col = (235, 60, 60) if borr else (150, 70, 200)
+        d.ellipse([px - 40, py - 40, px + 40, py + 40], fill=(255, 255, 255, 240), outline=col + (255,), width=7)
+        d.text((px, py - 2), "B" if borr else "D", font=f, fill=col + (255,), anchor="mm")
+        txt = _etiqueta(x)
+        w = f2.getlength(txt) + 30
+        xx = min(max(px, w / 2 + 20), ANCHO - w / 2 - 20)
+        d.rounded_rectangle([xx - w / 2, py + 48, xx + w / 2, py + 96], radius=20, fill=col + (240,))
+        d.text((xx, py + 72), txt, font=f2, fill=(255, 255, 255, 255), anchor="mm")
+
+
+def con_centro(capa_fn, s: dict):
+    """Sobre la lluvia o el viento hora a hora: el centro de cada borrasca o DANA moviéndose, con su nombre, para
+    que se vea de quién es todo lo que hay en pantalla (Bruna, y detrás Charles)."""
+    from .video import TRANSICION
     if not capa_fn or not s or not s.get("trayectoria") or not getattr(capa_fn, "horas_fotos", None):
         return capa_fn
-    tr = [(datetime.fromisoformat(h), lo, la) for h, lo, la, _ in s["trayectoria"]]
-    f, f2 = fuente("Black", 54), fuente("Black", 30)
-    borr = s["tipo"] == "borrasca"
-    etiqueta = (f"BORRASCA {s['nombre'].upper()}" if s.get("nombre") else "BORRASCA") if borr else \
-        (f"DANA {s['nombre'].upper()}" if s.get("nombre") else "DANA")
-    col = (235, 60, 60) if borr else (150, 70, 200)
-
-    def centro(t):
-        if t <= tr[0][0]:
-            return tr[0][1:]
-        for (ta, xa, ya), (tb, xb, yb) in zip(tr, tr[1:]):
-            if ta <= t <= tb:
-                u = (t - ta).total_seconds() / max(1.0, (tb - ta).total_seconds())
-                return xa + (xb - xa) * u, ya + (yb - ya) * u
-        return tr[-1][1:]
+    sistemas = [s, *(s.get("otros") or [])]
 
     def dibujar(capa, pr, dt):
         capa_fn(capa, pr, dt)
         n = min(len(capa_fn.horas_fotos) - 1, int(max(0.0, dt - TRANSICION) / capa_fn.seg))
-        lo, la = centro(datetime.fromisoformat(capa_fn.horas_fotos[n]))
-        x, y = pr(lo, la)
-        y += MAPA_Y0
-        x = min(max(x, 70), ANCHO - 70)
-        y = min(max(y, MAPA_Y0 + 160), MAPA_Y0 + MAPA_H - 210)
-        d = ImageDraw.Draw(capa)
-        d.ellipse([x - 40, y - 40, x + 40, y + 40], fill=(255, 255, 255, 240), outline=col + (255,), width=7)
-        d.text((x, y - 2), "B" if borr else "D", font=f, fill=col + (255,), anchor="mm")
-        w = f2.getlength(etiqueta) + 30
-        xx = min(max(x, w / 2 + 20), ANCHO - w / 2 - 20)
-        d.rounded_rectangle([xx - w / 2, y + 48, xx + w / 2, y + 96], radius=20, fill=col + (240,))
-        d.text((xx, y + 72), etiqueta, font=f2, fill=(255, 255, 255, 255), anchor="mm")
+        _marcar_centros(capa, pr, sistemas, datetime.fromisoformat(capa_fn.horas_fotos[n]))
     for k in ("duracion", "peso", "maximo", "horas_fotos", "seg"):
         if hasattr(capa_fn, k):
             setattr(dibujar, k, getattr(capa_fn, k))
@@ -446,7 +544,7 @@ def preparar(s: dict, hoy: date):
         from .especiales import _visible
         lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 0.3), 1.2))
         c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
-        cv = capa_viento(lo_v, la_v, h_v, c_v)
+        cv = capa_viento(lo_v, la_v, h_v, c_v, isobaras=s.get("datos"))
         if cv and cv.maximo >= 60:
             cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0   # más viento, más tiempo
             trozos.append(con_centro(cv, s))
@@ -496,10 +594,11 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
         s = detectar(hoy, texto)
         if s and (s.get("nombre") or s["distancia"] == 0 or (s["tipo"] == "borrasca" and s["minimo"] <= 1000)):
             trozos.append(capa_trayectoria(s))
-            etiqueta = ((f"BORRASCA {s['nombre'].upper()}" if s.get("nombre") else "LA BORRASCA")
-                        if s["tipo"] == "borrasca" else "LA DANA") + ", HORA A HORA"
+            etiqueta = titulo_sistemas(s)
             datos["sistema"] = (f"{s['tipo']}" + (f" {s['nombre']}" if s.get("nombre") else "")
-                                + (f", mínimo de {s['minimo']:.0f} hPa" if s["tipo"] == "borrasca" else ""))
+                                + (f", mínimo de {s['minimo']:.0f} hPa" if s["tipo"] == "borrasca" else "")
+                                + "".join(f"; y detrás la borrasca {o['nombre'] or 'sin nombre'} ({o['minimo']:.0f} hPa)"
+                                          for o in s.get("otros") or []))
         else:
             s = None
     except Exception as e:  # noqa: BLE001
@@ -517,7 +616,7 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
     try:
         lo_v, la_v, h_v, c_v = viento_horario(hoy, fin, (*_visible(VISTA_SISTEMA, 0.3), 1.2))
         c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
-        cv = capa_viento(lo_v, la_v, h_v, c_v)
+        cv = capa_viento(lo_v, la_v, h_v, c_v, isobaras=(s or {}).get("datos"))
         if cv and cv.maximo >= 45:
             cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0
             trozos.append(con_centro(cv, s))
