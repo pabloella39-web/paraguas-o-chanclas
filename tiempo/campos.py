@@ -103,11 +103,13 @@ def maximos(lons, lats, v, cajas: dict) -> dict:
 
 
 # Escala «de mapa de modelo» (como Meteologix/ECMWF): del azul al morado pasando por verde, amarillo y rojo
-ESCALA_FUERTE = [(0.1, (198, 225, 245)), (1, (150, 200, 240)), (2, (100, 170, 235)), (3, (60, 135, 225)),
-                 (5, (35, 100, 210)), (7, (25, 150, 140)), (10, (40, 170, 80)), (15, (100, 200, 50)),
-                 (20, (170, 220, 40)), (25, (235, 230, 40)), (30, (250, 200, 30)), (40, (250, 160, 20)),
-                 (50, (245, 115, 20)), (60, (235, 70, 25)), (70, (215, 30, 30)), (80, (185, 15, 50)),
-                 (100, (200, 40, 140)), (125, (210, 80, 210)), (150, (175, 120, 235)), (200, (230, 190, 245))]
+# Tonos oscuros y saturados: cuanto más llueve, más oscuro (rojo sangre, granate y casi negro en lo extremo), para
+# que lo peligroso se vea peligroso.
+ESCALA_FUERTE = [(0.1, (150, 190, 225)), (1, (105, 160, 215)), (2, (65, 130, 205)), (3, (35, 100, 190)),
+                 (5, (20, 70, 165)), (7, (15, 115, 110)), (10, (25, 135, 60)), (15, (75, 160, 35)),
+                 (20, (140, 180, 25)), (25, (205, 195, 25)), (30, (225, 165, 15)), (40, (225, 125, 10)),
+                 (50, (215, 85, 10)), (60, (200, 45, 15)), (70, (175, 15, 20)), (80, (140, 5, 30)),
+                 (100, (110, 0, 60)), (125, (85, 0, 85)), (150, (55, 0, 70)), (200, (25, 0, 30))]
 
 
 def _imagen_lluvia_fuerte(lons, lats, v, canaria=False, escala=None, px=None) -> tuple[Image.Image, tuple]:
@@ -481,7 +483,8 @@ def color_fuerte(v: float):
     for u, col in ESCALA_FUERTE:
         if v >= u:
             c = col
-    return tuple(int(x + (255 - x) * 0.35) for x in c) + (255,)
+    k = 0.35 if sum(c) > 300 else 0.6   # los tonos más oscuros se aclaran más
+    return tuple(int(x + (255 - x) * k) for x in c) + (255,)
 
 
 def acumulado_por_zona(lons, lats, horas, cubo, cajas: dict, cortes: int = 4) -> dict:
