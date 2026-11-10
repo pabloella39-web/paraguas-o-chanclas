@@ -104,9 +104,18 @@ def _kwargs_aviso(racimos, segmentos: dict | None = None) -> dict:
                              _capa_nucleos(nucleos, reservado=_caja_lista(graves)))
         if n == 0 and CAMPO_PARTE[0]:   # lluvia acumulada en colores (la de la zona principal)
             from . import campos
-            lluvia = _juntar_capas(campos.capa_lluvia_fuerte(CAMPO_PARTE[0][0], "LLUVIA ACUMULADA PREVISTA (L/M²)"),
-                                   _capa_nucleos(nucleos))
-            capa = _capa_despues(capa, lluvia, 4.5)
+            campo_ = CAMPO_PARTE[0]
+            h_ = campo_[2] if len(campo_) > 2 else {}
+            anim = None
+            if h_.get("cajas"):   # el acumulado creciendo hora a hora, con los litros de cada zona (no una imagen fija)
+                anim = campos.capa_acumulado(h_["lons"], h_["lats"], h_["horas"], h_["cubo"], h_["canaria"],
+                                             h_["cajas"], titulo="LLUVIA ACUMULADA PREVISTA (L/M²)")
+            base = anim or campos.capa_lluvia_fuerte(campo_[0], "LLUVIA ACUMULADA PREVISTA (L/M²)")
+            partes = [base, _capa_nucleos(nucleos, reservado=getattr(base, "reservado", None))]
+            if getattr(base, "encima", None):
+                partes.append(base.encima)   # al final, la cifra total sobre el mapa donde más cae
+            lluvia = _juntar_capas(*partes)
+            capa = _capa_despues(capa, lluvia, 4.5, sustituye=True)
         out["vistas"][clave] = _zona_zoom(graves)
         out["sin_marcadores"] += (clave,)
         out["transiciones"][clave] = 2.4 if n == 0 else 3.4   # entre zonas lejanas: alejarse y volver a acercarse

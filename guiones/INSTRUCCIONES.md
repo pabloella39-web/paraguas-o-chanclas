@@ -147,3 +147,5 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Plano de las borrascas (parte «sistema» y avisos «temporal»): Canarias va en su sitio real del mapa, sin recuadro,
   con la lluvia y el viento encima como en el resto. El guion puede contar cómo le afecta.
 - Baleares en el plano del Mediterráneo: una de las islas (la que nombre el texto o van rotando), no siempre Palma.
+
+- Tramo «aviso» del parte: tras las zonas, el mapa de lluvia NO es una imagen fija: sale el acumulado creciendo hora a hora, con el reloj, los litros que lleva cada zona y la cifra total al final (igual que en los vídeos de aviso).

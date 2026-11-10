@@ -1504,20 +1504,33 @@ def _capa_nucleos(nucleos, color=(255, 255, 255), reservado=None):
     return dibujar
 
 
-def _capa_despues(a, b, t_cambio: float, fundido: float = 0.8):
-    """Dibuja «a» y, a partir de t_cambio (segundos dentro del bloque), funde «b» encima."""
+def _capa_despues(a, b, t_cambio: float, fundido: float = 0.8, sustituye: bool = False):
+    """Dibuja «a» y, a partir de t_cambio (segundos dentro del bloque), funde «b» encima. Con sustituye=True, «a» se
+    va al entrar «b», y «b» empieza su propio reloj en ese momento (si es una animación, arranca ahí y se acomoda a
+    lo que queda de tramo)."""
+    from .video import TRANSICION
+
     def dibujar(capa, pr, dt):
-        if a:
-            a(capa, pr, dt)
-        if b and dt > t_cambio:
-            s = min(1.0, (dt - t_cambio) / fundido)
+        s = min(1.0, (dt - t_cambio) / fundido) if b and dt > t_cambio else 0.0
+        if a and (s < 1 or not sustituye):
+            if s <= 0 or not sustituye:
+                a(capa, pr, dt)
+            else:   # «a» se va mientras entra «b»: no quedan sus rótulos debajo
+                tmp = Image.new("RGBA", capa.size, (0, 0, 0, 0))
+                a(tmp, pr, dt)
+                tmp.putalpha(tmp.getchannel("A").point(lambda v: int(v * (1 - s))))
+                capa.alpha_composite(tmp)
+        if s > 0:
+            dtb = dt - t_cambio + TRANSICION if sustituye else dt
             if s >= 1:
-                b(capa, pr, dt)
+                b(capa, pr, dtb)
                 return
             tmp = Image.new("RGBA", capa.size, (0, 0, 0, 0))
-            b(tmp, pr, dt)
+            b(tmp, pr, dtb)
             tmp.putalpha(tmp.getchannel("A").point(lambda v: int(v * s)))
             capa.alpha_composite(tmp)
+    if sustituye and hasattr(b, "ajustar"):
+        dibujar.ajustar = lambda dur: b.ajustar(max(3.0, dur - t_cambio + TRANSICION))
     return dibujar
 
 
