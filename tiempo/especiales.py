@@ -2131,7 +2131,7 @@ def texto_avisos(por_dia: dict) -> str:
 
 
 PROMPT_AVISO = """Eres el guionista de "Paraguas o Chanclas", canal de TikTok del tiempo en España. Es un vídeo
-de algo más de UN MINUTO por avisos de AEMET (sigue MODO_COMPLETO o MODO_ROJO, que vienen en los datos). Sin humor, tono directo y
+FLASH de 25 segundos por avisos de AEMET (si los datos traen MODO_ROJO, NO: es un vídeo completo, síguelo). Sin humor, tono directo y
 claro, con urgencia pero sin sensacionalismo. Usa SOLO estos datos oficiales de AEMET (no inventes cifras, zonas, horas
 ni daños). Lo lee {presenta} con voz sintética.
 
@@ -2168,7 +2168,7 @@ Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "evoluc
 PALABRAS_AVISO = {"intro": 20, "zonas": 20, "consejos": 18, "cierre": 6}
 CAMPO_AVISO: list = [None]
 COLINDANTES: list = []   # provincias del zoom (con o sin aviso) donde también lloverá bastante   # (campos para el mapa, máximos por sitio) cuando el aviso es por lluvia
-DURACION_AVISO = (66.0, 86.0, 71.0)   # mínimo 1:05 (antes era un flash de 25 s)
+DURACION_AVISO = (20.0, 30.0, 25.0)
 CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAMA AL 112"],
                  "tormentas": ["RESGUÁRDATE BAJO TECHO", "LEJOS DE ÁRBOLES", "LLAMA AL 112"],
                  "vientos": ["CUIDADO CON OBJETOS", "EVITA PARQUES", "LLAMA AL 112"],
@@ -2407,13 +2407,6 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             orden.insert(2, "evolucion")
             base["evolucion"] = 24
     rojo = any(gr["nivel"] == "rojo" for gr in grupos)
-    # Naranja: vídeo completo de algo más de un minuto (mínimo 1:05: más información y así puede monetizar)
-    base.update({"intro": 24, "zonas": 40, "consejos": 26, "cierre": 8} if "lluvia" in base
-                else {"intro": 28, "zonas": 78, "consejos": 52, "cierre": 10})
-    if "lluvia" in base:
-        base["lluvia"] = 34
-    if "evolucion" in base:
-        base["evolucion"] = 40
     if rojo:   # aviso ROJO: vídeo completo, con toda la información (no un flash)
         base.update({"intro": 26, "zonas": 42, "consejos": 26, "cierre": 8})
         if "lluvia" in base:
@@ -2424,9 +2417,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     for n, _r in enumerate(lejanas, 2):   # zonas distantes: un bloque propio, justo antes de los consejos
         orden.insert(orden.index("consejos"), f"zonas{n}")
         base[f"zonas{n}"] = 30 if rojo else 22
-    # que el guion dé para la duración objetivo (≈2,55 palabras por segundo): nunca por debajo del minuto y cinco
+    # rojos: que el guion dé para la duración objetivo (≈2,55 palabras por segundo), nunca por debajo de 1:05
     minimo = globals().get("DURACION_OBJETIVO", 71.0) * 2.55
-    if sum(base.values()) < minimo:
+    if rojo and sum(base.values()) < minimo:
         k_ = minimo / sum(base.values())
         base = {k: round(v * k_) if k not in ("cierre",) else v for k, v in base.items()}
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
@@ -2540,15 +2533,6 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                     "HORA, y cuándo afloja. En «lluvia», el total acumulado por zona (de mayor a menor) y las provincias "
                     "vecinas con cantidades altas. Explica qué significa (riesgo de crecidas, arroyos, carreteras) solo "
                     "si lo dice AEMET en la descripción o la instrucción. Frases claras, sin relleno.")
-            else:
-                datos[0]["MODO_COMPLETO"] = (
-                    "NO es un vídeo flash: dura algo más de un minuto (mínimo 1:05) y tiene que aprovecharlos con "
-                    "información útil, sin relleno ni repetir. En «zonas»: todas las zonas con sus comarcas enteras, los "
-                    "núcleos señalados, desde cuándo y hasta cuándo, qué se espera exactamente (las cifras de AEMET: "
-                    "litros, rachas, olas) y las ciudades cercanas que deben estar atentas. Si hay «evolucion» y "
-                    "«lluvia»: cuándo es lo más fuerte en cada zona y cuánto se acumula. En «consejos»: los de la "
-                    "instrucción de AEMET, concretos para ese fenómeno, y qué evitar en las horas del aviso. Respeta "
-                    "las palabras de cada bloque: no lo acortes.")
             gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_avisos(
                                   [c for gr in grupos for c in gr.get("ciudades", [])], grupos[0]["nivel"]) or "CIUDAD", presenta=presenta, fecha=g.fecha_larga(hoy),
                                                   avisos=json.dumps(datos, ensure_ascii=False, indent=1),
@@ -2633,10 +2617,10 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     principal = [x for x in RACIMOS_AVISO[0][0] if x["nivel"] == grupos[0]["nivel"]] or RACIMOS_AVISO[0][0]
     CAMPO_AVISO[0] = None if demo or os.environ.get("SIN_CAMPO_AVISO") else _campo_aviso(
         principal if len(RACIMOS_AVISO[0]) > 1 else grupos, hoy)
-    # Todos los avisos duran como mínimo 1:05 (más información, y TikTok solo paga los vídeos de más de un minuto)
-    dur_aviso = ((66.0, 92.0, 76.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
-                 else (66.0, 88.0, 72.0) if CAMPO_AVISO[0] else DURACION_AVISO)
-    if any(gr["nivel"] == "rojo" for gr in grupos):   # rojo: vídeo completo, hasta algo más de minuto y medio
+    # Naranjas: vídeo corto (flash). Rojos: completos y siempre de más de 1:05 (más información, y pueden monetizar)
+    dur_aviso = ((36.0, 56.0, 44.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
+                 else (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO)
+    if any(gr["nivel"] == "rojo" for gr in grupos):
         dur_aviso = (66.0, 100.0, 82.0) if CAMPO_AVISO[0] else (66.0, 88.0, 72.0)
     if len(RACIMOS_AVISO[0]) > 1:   # zonas lejanas: un bloque más por zona
         dur_aviso = (dur_aviso[0], dur_aviso[1] + 22.0 * (len(RACIMOS_AVISO[0]) - 1),

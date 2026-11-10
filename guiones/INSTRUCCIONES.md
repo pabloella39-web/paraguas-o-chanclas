@@ -119,8 +119,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Avisos por lluvia, tramo «lluvia»: el mapa del acumulado crece hora a hora con un marcador de litros por zona. El
   texto cuenta esa evolución en l/m² por zonas (cuánto a media tarde, cuánto por la noche, total al final).
 
-- TODOS LOS AVISOS duran como mínimo 1:05 (naranjas ~1:10-1:25; rojos hasta ~1:40): ya no hay vídeos flash de 25 s.
-  Más información útil (comarcas, núcleos, horas, cifras, evolución, consejos concretos), sin relleno; y así pueden
-  monetizar (TikTok solo paga vídeos de más de un minuto).
+- DURACIÓN DE LOS AVISOS: los naranjas siguen siendo cortos (flash de ~25-55 s). Los ROJOS duran siempre más de 1:05
+  (hasta ~1:40): vídeo completo y, además, así pueden monetizar (TikTok solo paga vídeos de más de un minuto).
 - Ampliación de un aviso ya publicado: el vídeo va SOLO de las zonas nuevas; lo ya contado, en una frase, con sus
   cifras comprobadas contra lo publicado (si no cambian, resumen; si cambian, se dice el cambio).
