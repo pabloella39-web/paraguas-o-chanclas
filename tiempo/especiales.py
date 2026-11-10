@@ -2555,7 +2555,12 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 _completar_sitios(gg, grupos)
-                gg["segmentos"]["zonas"] = asegurar_zona_entera(gg["segmentos"]["zonas"], grupos)
+                # cada bloque de zonas, con las comarcas de SU zona (no las de la otra punta de España)
+                rac = RACIMOS_AVISO[0] if len(RACIMOS_AVISO[0]) > 1 else [grupos]
+                for n_, r_ in enumerate(rac, 1):
+                    k_ = "zonas" if n_ == 1 else f"zonas{n_}"
+                    if gg["segmentos"].get(k_):
+                        gg["segmentos"][k_] = asegurar_zona_entera(gg["segmentos"][k_], r_)
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del aviso con Claude falló: %s", e)
