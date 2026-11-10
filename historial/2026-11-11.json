@@ -1,0 +1,129 @@
+{
+ "fecha": "2026-11-11",
+ "duracion": 141.33,
+ "caption": "Bruna llega con dos avisos rojos… ¿tú mañana sales con botas o con paraguas? ☔🥾\n\nEl tiempo en España mañana, miércoles 11 de noviembre 🇪🇸\n🌧️ Lluvia en Oviedo y Pamplona\n🔥 Máxima: 29° en S.C. Tenerife\n🥶 Mínima: 9° en Salamanca\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Oviedo",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "BRUNA: DOS AVISOS ROJOS",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Bruna trae dos avisos rojos y empapa Madrid. Lo anticipé el domingo y se cumple. Al final, dónde sobra la chaqueta y dónde hace falta abrigo.",
+  "aviso": "Aviso rojo por lluvias en todo el Norte de Cáceres, La Vera, el Jerte, el Ambroz, Las Hurdes y Gata, y en todo el Sur de Ávila, Tiétar, Alberche y la cara sur de Gredos: hasta 150 litros, también en los pueblos que no nombro. Hay más avisos en Extremadura, Salamanca y el oeste andaluz. Madrid, Valencia, Zaragoza, Murcia y Alicante, sin aviso. Nada de cruzar vados. El aviso es para comarcas enteras: también las Villuercas, la Sierra de Montánchez, Los Ibores, la Paramera, la Sierra de Béjar, la Sierra de Francia, la Sierra de Béjar, la Sierra de Francia y la Sierra de Grazalema, con todos sus pueblos.",
+  "aviso2": "Aviso rojo por viento en toda La Palma, cumbres, este y oeste, con rachas de 130. Naranja por viento en las siete islas, y olas de 6 metros en Tenerife, Gran Canaria y La Palma. El aviso es para toda la zona, también para los pueblos que no nombramos.",
+  "sistema": "Bruna entra por el suroeste y la lluvia barre de Huelva y Cádiz a Extremadura, el Sistema Central y la meseta, con lo peor de la mañana a la tarde. El viento aprieta en Canarias y el sur, con rachas de hasta 130.",
+  "sur": "Mira el satélite: así entra Bruna. Huelva, 43 litros y rachas de 100; Badajoz 42 y Sevilla 39.",
+  "interior": "Madrid, día de botas: lluvia todo el día, 36 litros y 16 grados. Zamora y Valladolid rozan los 30, y Toledo, rachas de 83.",
+  "islas": "Canarias, viento y calor: Santa Cruz de Tenerife, 29 grados. AEMET ve lluvia en Las Palmas, pero casi ningún modelo. Palma, nubes y 23.",
+  "norte": "En el norte, el agua llega por la tarde. Gente de Oviedo, lluvia sí o sí tras comer, y Bilbao, paraguas desde la tarde con 21 grados.",
+  "mediterraneo": "Lo más tranquilo, el Mediterráneo: Valencia y Alicante, cuatro gotas por la tarde con 24 grados, y Barcelona, seca hasta la noche.",
+  "general": "Lo prometido: la chaqueta sobra en Santa Cruz de Tenerife, con 29. ¿El abrigo?",
+  "cierre": "¿Botas o paraguas mañana? Te leo. Sigue a Paraguas o Chanclas: paraguas en casi toda España."
+ },
+ "primer_comentario": "¿Desde qué pueblo nos ves? Te contesto con tu previsión de mañana 🌦️👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-10T19:28:43.464Z"
+     },
+     "success": true,
+     "platform_post_id": "7706626577072672033",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706626577072672033",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 35109166,
+     "post_title": "Bruna llega con dos avisos rojos… ¿tú mañana sales con botas o con paraguas? ☔🥾\n\nEl tiempo en España mañana, miércoles 11 de noviembre 🇪🇸\n🌧️ Lluvia en Oviedo y Pamplona\n🔥 Máxima: 29° en S.C. Tenerife\n🥶 Mínima: 9° en Salamanca\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Oviedo",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 141.334,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7706626330544179232",
+     "first_comment_posted": true,
+     "request_id": "dfd8fc70c382413f999d9fa23af8a3e5",
+     "request_id_logs": "dfd8fc70c382413f999d9fa23af8a3e5",
+     "job_id": "0c86aa334d64410f88710cb64cc04bbd",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-10T19:28:43.464Z"
+   },
+   "request_id": "dfd8fc70c382413f999d9fa23af8a3e5"
+  }
+ },
+ "youtube": {
+  "id": "XEgryp4ZssU",
+  "url": "https://youtube.com/shorts/XEgryp4ZssU",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-10T19:30:30.535Z"
+   },
+   "success": true,
+   "platform_post_id": "17886296343627843",
+   "post_url": "https://www.instagram.com/reel/DfkqMwPjskt/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 35109166,
+   "post_title": "Bruna llega con dos avisos rojos… ¿tú mañana sales con botas o con paraguas? ☔🥾\n\nEl tiempo en España mañana, miércoles 11 de noviembre 🇪🇸\n🌧️ Lluvia en Oviedo y Pamplona\n🔥 Máxima: 29° en S.C. Tenerife\n🥶 Mínima: 9° en Salamanca\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Oviedo #meteorologia",
+   "post_caption": "Bruna llega con dos avisos rojos… ¿tú mañana sales con botas o con paraguas? ☔🥾\n\nEl tiempo en España mañana, miércoles 11 de noviembre 🇪🇸\n🌧️ Lluvia en Oviedo y Pamplona\n🔥 Máxima: 29° en S.C. Tenerife\n🥶 Mínima: 9° en Salamanca\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Oviedo #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 141.334,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "25197ea77476444c9205bc087ce68538",
+   "request_id_logs": "25197ea77476444c9205bc087ce68538",
+   "job_id": "ba3093ff60844fc1a82d1dd7a18adb77",
+   "request_total_platforms": 1
+  }
+ }
+}
