@@ -102,7 +102,7 @@ def _recortar(guion: dict, bloques: list[str], proporcion: float):
     import re
     segs = guion["segmentos"]
     # (los de avisos se recortan también, pero siempre conservan su primera frase: ahí van los naranjas y rojos)
-    intocables = {"intro", "cierre", "aviso", "aviso2", "aviso3", "zonas", "zonas2", "zonas3"}
+    intocables = {"intro", "cierre", "aviso", "aviso2", "aviso3", "zonas", "zonas2", "zonas3", "sigue"}
     total = sum(len(segs[b].split()) for b in bloques)
     objetivo = total * proporcion
     frases = {b: re.split(r"(?<=[.!?])\s+", segs[b].strip()) for b in bloques if b not in intocables}
@@ -2413,6 +2413,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             base["lluvia"] = 38
         if "evolucion" in base:
             base["evolucion"] = 50
+    if YA_AVISADO:   # ampliación: lo ya contado, en un tramo corto propio (con su zoom), justo antes de los consejos
+        orden.insert(orden.index("consejos"), "sigue")
+        base["sigue"] = 28 if any("HA CAMBIADO" in c for c in CAMBIOS_YA_AVISADO) else 20
     lejanas = RACIMOS_AVISO[0][1:]
     for n, _r in enumerate(lejanas, 2):   # zonas distantes: un bloque propio, justo antes de los consejos
         orden.insert(orden.index("consejos"), f"zonas{n}")
@@ -2492,12 +2495,12 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                 f"{x['nivel']} por {nombre_fen(x['fenomeno'])} en " + ", ".join(sitios_aviso(x)) for x in YA_AVISADO)
             datos[0]["nota_ya_contado"] = (
                 "Este vídeo es SOLO de las zonas NUEVAS: todo el detalle (zonas, comarcas, pueblos, horas, lluvia, "
-                "evolución) es de ellas. Lo de SIGUE_EN_VIGOR_YA_CONTADO ya tiene su vídeo: menciónalo por encima, en "
-                "UNA sola frase al final de «zonas» («y sigue el aviso rojo en el norte de Cáceres y el sur de "
-                "Ávila, con las mismas previsiones»), sin pueblos ni detalle. Sus cifras se han COMPROBADO contra lo "
-                "publicado (YA_CONTADO_COMPROBADO): si pone «sin cambios», resume en media frase («se mantiene, hasta "
-                "120 litros en 12 horas»); si pone «HA CAMBIADO», di el cambio claramente en una frase (nuevo nivel, "
-                "nueva cifra o nueva hora de fin).")
+                "evolución) es de ellas. Lo de SIGUE_EN_VIGOR_YA_CONTADO ya tiene su vídeo: va en el tramo «sigue», "
+                "corto, y solo ahí (en pantalla el mapa se aleja y hace zoom a esa zona mientras se dice). Empieza con "
+                "un enlace claro («Y recuerda: sigue el aviso rojo en el norte de Cáceres y el sur de Ávila»), sin "
+                "lista de pueblos. Sus cifras se han COMPROBADO contra lo publicado (YA_CONTADO_COMPROBADO): si pone "
+                "«sin cambios», resúmelo en media frase («se mantiene, hasta 120 litros en 12 horas»); si pone «HA "
+                "CAMBIADO», di el cambio claramente (nuevo nivel, nueva cifra o nueva hora de fin).")
             if CAMBIOS_YA_AVISADO:
                 datos[0]["YA_CONTADO_COMPROBADO"] = list(CAMBIOS_YA_AVISADO)
     extra = max(0, sum(len(sitios_aviso(gr)) for gr in grupos[:4]) - 3)
@@ -2557,6 +2560,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         "consejos": "Extrema la precaución y, si hay una emergencia, llama al 112.",
         "cierre": "Compártelo con quien viva allí.",
     }
+    if "sigue" in orden:
+        seg["sigue"] = "Y recuerda: sigue el " + "; ".join(
+            f"aviso {x['nivel']} por {nombre_fenomeno(x['fenomeno'])} en " + ", ".join(sitios_aviso(x)) for x in YA_AVISADO) + "."
     for n, r in enumerate(RACIMOS_AVISO[0][1:], 2):   # zonas lejanas, cada una con su zoom
         if f"zonas{n}" in orden:
             seg[f"zonas{n}"] = "Y además, " + "; ".join(
@@ -2625,6 +2631,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     if len(RACIMOS_AVISO[0]) > 1:   # zonas lejanas: un bloque más por zona
         dur_aviso = (dur_aviso[0], dur_aviso[1] + 22.0 * (len(RACIMOS_AVISO[0]) - 1),
                      dur_aviso[2] + 14.0 * (len(RACIMOS_AVISO[0]) - 1))
+    if YA_AVISADO:   # ampliación: tramo corto con lo ya contado
+        dur_aviso = (dur_aviso[0], dur_aviso[1] + 12.0, dur_aviso[2] + 8.0)
     with duracion(*dur_aviso):  # vídeo flash (algo más largo si lleva el mapa de lluvia)
         guion, plan, total, trozos, motor = locutar(
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
@@ -2713,6 +2721,19 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
             kwargs["pills"][k] = f"AVISO {max(r, key=lambda x: NIVELES[x['nivel']])['nivel'].upper()}"
             kwargs["capas"][k] = _juntar_capas(_capa_poligonos(todos, con_lista=True),
                                               _capa_nucleos(nn, reservado=_caja_lista(r)))
+        kwargs["vistas"]["consejos"] = kwargs["vistas"]["cierre"] = VISTA_GENERAL
+        kwargs["transiciones"]["consejos"] = 2.4
+    if YA_AVISADO and "sigue" in guion["segmentos"]:   # lo ya contado: zoom out de la zona nueva y zoom in a esa
+        todos = grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS
+        nn = nucleos_afectados(YA_AVISADO, n=6)
+        nn = [c for c in nn if c["poblacion"] >= 20000] + ciudades_zoom(YA_AVISADO, AMARILLOS, n_amarillo=3, n_ref=5) + \
+            [c for c in nn if c["poblacion"] < 20000][:3]
+        kwargs["vistas"]["sigue"] = _zona_zoom(YA_AVISADO)
+        kwargs["sin_marcadores"] += ("sigue",)
+        kwargs["transiciones"]["sigue"] = 3.4
+        kwargs["pills"]["sigue"] = "SIGUE EN VIGOR"
+        kwargs["capas"]["sigue"] = _juntar_capas(_capa_poligonos(todos, con_lista=True),
+                                                _capa_nucleos(nn, reservado=_caja_lista(YA_AVISADO)))
         kwargs["vistas"]["consejos"] = kwargs["vistas"]["cierre"] = VISTA_GENERAL
         kwargs["transiciones"]["consejos"] = 2.4
     with duracion(*dur_aviso):
