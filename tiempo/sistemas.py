@@ -22,7 +22,7 @@ from . import campos
 log = logging.getLogger(__name__)
 
 AMPLIA = (-30.0, 10.0, 30.0, 52.0, 2.0)        # rejilla para seguir el centro (Atlántico + península)
-VISTA_SISTEMA = (-21.0, 6.5, 32.5, 48.5)       # lo que se ve en el vídeo durante el tramo
+VISTA_SISTEMA = (-28.0, 5.5, 31.0, 50.0)       # lo que se ve: el Atlántico entero hasta la península, para ver cómo entra
 PENINSULA_BOX = (-9.5, 3.5, 36.0, 43.8)
 VIENTO = (-10.4, 4.6, 35.4, 44.2, 0.6)         # rejilla de las rachas (península y Baleares)
 
