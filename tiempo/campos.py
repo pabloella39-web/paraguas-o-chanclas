@@ -475,6 +475,113 @@ def capa_evolucion(lons, lats, horas, cubo, canaria: bool, titulo: str = "LLUVIA
     return dibujar
 
 
+def color_fuerte(v: float):
+    """Color de la escala de lluvia para una cifra (aclarado para leerse sobre fondo oscuro)."""
+    c = ESCALA_FUERTE[0][1]
+    for u, col in ESCALA_FUERTE:
+        if v >= u:
+            c = col
+    return tuple(int(x + (255 - x) * 0.35) for x in c) + (255,)
+
+
+def acumulado_por_zona(lons, lats, horas, cubo, cajas: dict, cortes: int = 4) -> dict:
+    """Cómo va creciendo el acumulado (máximo de cada zona) según pasan las horas: {zona: {"MAR 15:00": 22, …}}."""
+    from datetime import datetime as _dt
+    activas = [k for k in range(len(horas)) if cubo[k].max() >= 0.2]
+    if not activas or not cajas:
+        return {}
+    k0, k1 = activas[0], activas[-1]
+    ks = sorted({k0 + round((k1 - k0) * (i + 1) / cortes) for i in range(cortes)})
+    acum = np.cumsum(cubo, axis=0)
+    out: dict = {}
+    for k in ks:
+        t = _dt.fromisoformat(horas[k])
+        for z, v in maximos(lons, lats, acum[k], cajas).items():   # acumulado hasta el final de esa hora
+            out.setdefault(z, {})[f"{DIAS_CORTOS[t.weekday()]} {(t.hour + 1) % 24:02d}:00"] = v
+    return out
+
+
+def capa_acumulado(lons, lats, horas, cubo, canaria: bool, cajas: dict,
+                   titulo: str = "LLUVIA ACUMULADA (L/M²)", max_fotogramas: int = 14, seg_por_fotograma: float = 0.5):
+    """La lluvia acumulada creciendo hora a hora: el mapa se va llenando de color y un marcador dice cuántos litros
+    lleva ya cada zona. El último fotograma (el total) se queda fijo."""
+    from datetime import datetime as _dt
+    from .especiales import fuente
+    from .video import MAPA_H, MAPA_Y0, TRANSICION
+    from .config import ANCHO
+    activas = [k for k in range(len(horas)) if cubo[k].max() >= 0.2]
+    if not activas:
+        return None
+    k0, k1 = activas[0], activas[-1]
+    paso = max(1, -(-(k1 - k0 + 1) // max_fotogramas))
+    idx = list(range(k0 + paso - 1, k1 + 1, paso))
+    if idx[-1] != k1:
+        idx.append(k1)
+    acum = np.cumsum(cubo, axis=0)
+    total = maximos(lons, lats, acum[k1], cajas)
+    zonas = [z for z, v in sorted(total.items(), key=lambda t: -t[1]) if v >= 1][:4]
+    fotos = []
+    for k in idx:
+        img, caja = _imagen_lluvia_fuerte(lons, lats, acum[k], canaria)
+        t = _dt.fromisoformat(horas[k])
+        m = maximos(lons, lats, acum[k], cajas)
+        fotos.append((img, caja, f"{DIAS_CORTOS[t.weekday()]} {(t.hour + 1) % 24:02d}:00", [(z, m.get(z, 0)) for z in zonas]))
+    cache: dict = {}
+    from . import mapa as mapa_
+    provs = mapa_.provincias()
+    f, fpeq, freloj = fuente("ExtraBold", 26), fuente("Bold", 20), fuente("Black", 54)
+    fz, fn, ft = fuente("Bold", 28), fuente("Black", 34), fuente("ExtraBold", 21)
+
+    ritmo = [seg_por_fotograma]
+
+    def ajustar(dur_tramo: float):   # que quepa entero en el tramo y el total se quede al menos 1,5 s
+        ritmo[0] = min(0.7, max(0.22, (dur_tramo - TRANSICION - 1.5) / len(fotos)))
+
+    def dibujar(capa, pr, dt):
+        n = min(int(max(0.0, dt - TRANSICION) / ritmo[0]), len(fotos) - 1)
+        img, caja, reloj, filas = fotos[n]
+
+        def campo(lienzo, pr_, dt_):
+            _pegar(lienzo, img, caja, pr_, 0, cache, f"a{n}")
+            d_ = ImageDraw.Draw(lienzo)
+            for p_ in provs:
+                for anillo in p_["anillos"]:
+                    pts = [pr_(*lonlat_mapa(lo, la, la < 30)) for lo, la in anillo]
+                    d_.line(pts + [pts[0]], fill=(255, 255, 255, 210), width=3)
+        _recortado(campo)(capa, pr, dt)
+        if len(cache) > 4:
+            for k in list(cache)[:-2]:
+                cache.pop(k, None)
+        d = ImageDraw.Draw(capa)
+        # reloj: hasta qué hora va el acumulado
+        w = freloj.getlength(reloj) + 48
+        x0, x1 = ANCHO - 40 - w, ANCHO - 40
+        d.rounded_rectangle([x0, MAPA_Y0 + 24, x1, MAPA_Y0 + 104], radius=22, fill=(8, 20, 45, 225))
+        d.text((ANCHO - 40 - w / 2, MAPA_Y0 + 64), reloj, font=freloj, fill=(255, 255, 255, 255), anchor="mm")
+        d.rounded_rectangle([x0, MAPA_Y0 + 112, x1, MAPA_Y0 + 120], radius=4, fill=(255, 255, 255, 70))
+        d.rounded_rectangle([x0, MAPA_Y0 + 112, x0 + (x1 - x0) * (n + 1) / len(fotos), MAPA_Y0 + 120], radius=4,
+                            fill=(255, 201, 60, 255))
+        # marcador por zonas: litros que lleva cada una hasta esa hora
+        if filas:
+            ancho = max(300.0, max(fz.getlength(z) for z, _ in filas) + 150)
+            alto = 46 + 44 * len(filas) + 10
+            px, py = 40, MAPA_Y0 + 24
+            d.rounded_rectangle([px, py, px + ancho, py + alto], radius=20, fill=(8, 20, 45, 232))
+            d.text((px + 18, py + 12), "ACUMULADO POR ZONAS (L/M²)" if ancho >= 360 else "ACUMULADO (L/M²)",
+                   font=ft, fill=(255, 201, 60, 255))
+            for i, (z, v) in enumerate(filas):
+                y = py + 46 + 44 * i
+                d.text((px + 18, y + 20), z, font=fz, fill=(255, 255, 255, 255), anchor="lm")
+                d.text((px + ancho - 18, y + 20), str(v), font=fn, fill=color_fuerte(v), anchor="rm")
+        _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq)
+    dibujar.duracion = len(fotos) * seg_por_fotograma + 1.5
+    dibujar.ajustar = ajustar
+    if zonas:   # sitio del marcador, para que los nombres de los pueblos no se pongan encima
+        dibujar.reservado = [(40, MAPA_Y0 + 24, 40 + max(300.0, max(fz.getlength(z) for z in zonas) + 150),
+                              MAPA_Y0 + 24 + 56 + 44 * len(zonas))]
+    return dibujar
+
+
 # ------------------------------------------------------------------ temperaturas en colores (como en la tele)
 ESCALA_TEMP = [(-99, (70, 120, 200)), (5, (90, 170, 220)), (10, (60, 190, 150)), (14, (60, 190, 90)),
                (18, (150, 215, 80)), (22, (235, 230, 90)), (25, (250, 200, 70)), (28, (248, 150, 55)),

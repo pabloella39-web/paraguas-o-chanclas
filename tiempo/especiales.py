@@ -1218,7 +1218,9 @@ def _campo_aviso(grupos, hoy: date):
             vec = campos.maximos(lons, lats, acum, vecinas)
             COLINDANTES[:] = [(k, v) for k, v in sorted(vec.items(), key=lambda t: -t[1]) if v >= 15][:6]
         pic = campos.picos(lons, lats, horas, cubo, {k: cajas[k] for k in stats if k in cajas})
-        horario = {"lons": lons, "lats": lats, "horas": horas, "cubo": cubo, "canaria": canaria, "picos": pic}
+        cajas_z = {k: cajas[k] for k in stats if k in cajas}
+        horario = {"lons": lons, "lats": lats, "horas": horas, "cubo": cubo, "canaria": canaria, "picos": pic,
+                   "cajas": cajas_z, "acumulado": campos.acumulado_por_zona(lons, lats, horas, cubo, cajas_z)}
         return [(lons, lats, acum, canaria)], stats, horario
     except Exception as e:  # noqa: BLE001
         log.warning("Mapa de lluvia del aviso no disponible: %s", e)
@@ -1463,6 +1465,9 @@ def _juntar_capas(*fs):
     def dibujar(capa, pr, dt):
         for f_ in fs:
             f_(capa, pr, dt)
+    con_ritmo = [f_ for f_ in fs if hasattr(f_, "ajustar")]
+    if con_ritmo:   # animaciones que se acomodan a lo que dura el tramo
+        dibujar.ajustar = lambda dur: [f_.ajustar(dur) for f_ in con_ritmo]
     return dibujar
 
 
@@ -2432,6 +2437,13 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             datos[0]["lluvia_hora_a_hora"] = {
                 k: f"lo más fuerte el {_hora_legible(v['hora'])}: {v['l_m2_en_una_hora']} l/m² en una hora"
                 for k, v in sorted(CAMPO_AVISO[0][2]["picos"].items(), key=lambda t: t[1]["hora"])}
+    if datos and CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("acumulado"):
+        datos[0]["lluvia_acumulada_segun_avanza_l_m2"] = CAMPO_AVISO[0][2]["acumulado"]
+        datos[0]["nota_acumulado"] = (
+            "En «lluvia» el mapa va sumando la lluvia hora a hora, con un marcador de litros por zona. Cuenta esa "
+            "evolución en l/m² por zonas: cuánto se lleva a media tarde, cuánto por la noche y el total al final "
+            "(«a las seis de la tarde ya se rondan los 60 litros en el norte de Cáceres; al acabar el día, más de "
+            "100»). Cifras redondas, de estos datos.")
     if not plantilla:
         try:
             if rojo:
@@ -2565,6 +2577,10 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         if "evolucion" in guion["segmentos"] and len(CAMPO_AVISO[0]) > 2:
             h_ = CAMPO_AVISO[0][2]
             evol_capa = campos.capa_evolucion(h_["lons"], h_["lats"], h_["horas"], h_["cubo"], h_["canaria"])
+        if len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("cajas"):   # el acumulado creciendo, zona a zona
+            h_ = CAMPO_AVISO[0][2]
+            lluvia_capa = campos.capa_acumulado(h_["lons"], h_["lats"], h_["horas"], h_["cubo"], h_["canaria"],
+                                                h_["cajas"]) or lluvia_capa
     kwargs = {
         "vistas": {"intro": VISTA_GENERAL, "zonas": zona, "evolucion": zona, "lluvia": zona, "consejos": zona,
                    "cierre": zona},
@@ -2578,7 +2594,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         "capas": {"intro": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS),
                   "zonas": _juntar_capas(_capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS, con_lista=True),
                                          _capa_nucleos(nucleos, reservado=_caja_lista(grupos + NARANJAS_CONTEXTO + AMARILLOS))),
-                  **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(nucleos))} if lluvia_capa else {}),
+                  **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(
+                      nucleos, reservado=getattr(lluvia_capa, "reservado", None)))} if lluvia_capa else {}),
                   **({"evolucion": _juntar_capas(evol_capa, _capa_nucleos(nucleos))} if evol_capa else {}),
                   # en «qué hacer» manda la tarjeta de consejos: sin nombres de pueblos encima
                   "consejos": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS, consejos=consejos),

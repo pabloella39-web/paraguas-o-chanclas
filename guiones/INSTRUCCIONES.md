@@ -115,3 +115,6 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   y valles enteros («todo el Valle del Jerte, toda La Vera…»); los pueblos, después y solo como ejemplo («con pueblos
   como…, entre otros»). Nunca un pueblo en lugar de su valle. Decir al menos una vez que el aviso es para toda la zona,
   también para los pueblos que no se nombran. (Tabla COMARCAS_ZONA en especiales.py; se comprueba tras escribir el guion.)
+
+- Avisos por lluvia, tramo «lluvia»: el mapa del acumulado crece hora a hora con un marcador de litros por zona. El
+  texto cuenta esa evolución en l/m² por zonas (cuánto a media tarde, cuánto por la noche, total al final).
