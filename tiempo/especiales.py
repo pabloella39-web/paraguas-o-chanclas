@@ -2715,8 +2715,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     CAMPO_AVISO[0] = None if demo or os.environ.get("SIN_CAMPO_AVISO") else _campo_aviso(
         principal if len(RACIMOS_AVISO[0]) > 1 else grupos, hoy)
     TEMPORAL_AVISO[0] = None
-    if not demo and not os.environ.get("SIN_CAMPO_AVISO") and \
-            not all(p_[1] < 30 for x in grupos for pol in x["poligonos"] for p_ in pol):
+    if not demo and not os.environ.get("SIN_CAMPO_AVISO"):
         try:   # el temporal en mapa amplio: lluvia y viento hora a hora (en naranjas y en rojos)
             from . import sistemas
             fin_t = max(datetime.fromisoformat(x["fin"]) for x in grupos).date()
@@ -2831,6 +2830,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         from .sistemas import VISTA_SISTEMA
         kwargs["vistas"]["temporal"] = VISTA_SISTEMA
         kwargs["sin_marcadores"] += ("temporal",)
+        kwargs["canarias_real"] = ("temporal",)   # Canarias en su sitio, sin recuadro: se ve cómo le afecta
         kwargs["transiciones"]["temporal"] = 2.0
         kwargs["pills"]["temporal"] = TEMPORAL_AVISO[0][2]
         kwargs["capas"]["temporal"] = TEMPORAL_AVISO[0][0]

@@ -143,3 +143,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   ambiguas o cojas como «con lo peor de la mañana a la tarde».
 - Comarcas: cada comarca se nombra UNA sola vez por vídeo; nada de listas largas de comarcas pegadas al final.
 - Plano del Mediterráneo: si se ven las Baleares, llevan su tarjeta (Palma y, si cabe, otra isla).
+
+- Plano de las borrascas (parte «sistema» y avisos «temporal»): Canarias va en su sitio real del mapa, sin recuadro,
+  con la lluvia y el viento encima como en el resto. El guion puede contar cómo le afecta.
+- Baleares en el plano del Mediterráneo: una de las islas (la que nombre el texto o van rotando), no siempre Palma.

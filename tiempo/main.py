@@ -123,7 +123,8 @@ def _kwargs_sistema() -> dict:
         return {}
     from .sistemas import VISTA_SISTEMA
     capa, etiqueta = SISTEMA[0]
-    return {"vistas": {"sistema": VISTA_SISTEMA}, "sin_marcadores": ("sistema",), "capas": {"sistema": capa},
+    return {"vistas": {"sistema": VISTA_SISTEMA}, "sin_marcadores": ("sistema",), "canarias_real": ("sistema",),
+            "capas": {"sistema": capa},
             "pills": {"sistema": etiqueta}}
 
 

@@ -22,7 +22,7 @@ from . import campos
 log = logging.getLogger(__name__)
 
 AMPLIA = (-36.0, 14.0, 24.0, 58.0, 2.0)        # rejilla de presión: cubre TODA la pantalla del tramo (y algo más)
-VISTA_SISTEMA = (-28.0, 5.5, 31.0, 50.0)       # lo que se ve: el Atlántico entero hasta la península, para ver cómo entra
+VISTA_SISTEMA = (-28.0, 5.5, 25.3, 47.3)       # el Atlántico hasta la península, con Canarias en su sitio real (sin recuadro)
 PENINSULA_BOX = (-9.5, 3.5, 36.0, 43.8)
 VIENTO = (-10.4, 4.6, 35.4, 44.2, 0.6)         # rejilla de las rachas (península y Baleares)
 
@@ -549,7 +549,6 @@ def preparar(s: dict, hoy: date):
         from .especiales import _visible
         caja = (*_visible(VISTA_SISTEMA, 1.6), 1.0)   # toda la pantalla, sin recuadro (un modelo: menos datos)
         lo, la, horas, cubo = campos.lluvia_horaria(ini, caja, fin, modelos=False)
-        cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
             acum = cubo.sum(axis=0)
@@ -566,7 +565,6 @@ def preparar(s: dict, hoy: date):
     try:
         from .especiales import _visible
         lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 1.9), 1.2))
-        c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
         cv = capa_viento(lo_v, la_v, h_v, c_v, isobaras=s.get("datos"))
         if cv and cv.maximo >= 60:
             cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0   # más viento, más tiempo
@@ -588,7 +586,7 @@ def _por_provincias(lo, la, horas, cubo, umbral: float, cortes: int = 4, n: int 
     ks = sorted({k0 + round((k1 - k0) * i / max(1, cortes - 1)) for i in range(cortes)})
     centros = []
     for p in mapa_.provincias():
-        anillos = [a for a in p["anillos"] if a and a[0][1] >= 35.5]
+        anillos = [a for a in p["anillos"] if a]   # también Canarias (en el plano de las borrascas van en su sitio)
         if anillos:
             a = max(anillos, key=len)
             centros.append((p["nombre"].split("/")[-1], sum(q[0] for q in a) / len(a), sum(q[1] for q in a) / len(a)))
@@ -628,7 +626,6 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
         log.warning("Aviso: sin trayectoria del sistema: %s", e)
     try:
         lo, la, horas, cubo = campos.lluvia_horaria(hoy, (*_visible(VISTA_SISTEMA, 1.6), 1.0), fin, modelos=False)
-        cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
             ev.peso = 1.3 if cubo.sum(axis=0).max() >= 80 else 1.0
@@ -638,7 +635,6 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
         log.warning("Aviso: sin lluvia hora a hora del temporal: %s", e)
     try:
         lo_v, la_v, h_v, c_v = viento_horario(hoy, fin, (*_visible(VISTA_SISTEMA, 1.9), 1.2))
-        c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
         cv = capa_viento(lo_v, la_v, h_v, c_v, isobaras=(s or {}).get("datos"))
         if cv and cv.maximo >= 45:
             cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0

@@ -596,7 +596,7 @@ class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
                  pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
                  gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None, capas_encima=None,
-                 barra_dias=None, transiciones=None):
+                 barra_dias=None, transiciones=None, canarias_real=()):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
         datos_seg: {bloque: lista de ciudades} para los marcadores de ese bloque (en vez de self.prev).
         vistas: {bloque: (lon0, lon1, lat0, lat1)}. pills: {bloque: texto de la etiqueta}.
@@ -619,6 +619,7 @@ class Compositor:
         self.barra_dias = barra_dias or []   # semanal/finde: «L M X J V» con el día que se está contando resaltado
         self.capas_encima = capas_encima or {}   # igual, pero encima de las tarjetas y esquivándolas (olas, nieve)   # {bloque o "*": función(capa, proyección, dt)} debajo de las tarjetas
         self.sin_marcadores = set(sin_marcadores)
+        self.canarias_real = set(canarias_real)   # bloques con Canarias en su sitio real (plano de las borrascas)
         from .estacion import estacion
         self.particulas = Particulas(estacion_override or estacion(fecha or __import__("datetime").date.today()),
                                      fecha=fecha, modo=Particulas.modo_del_dia(
@@ -698,7 +699,7 @@ class Compositor:
         return self.vistas.get(seg) or vista_de(seg)
 
     def mapa_estatico(self, seg):
-        clave = (self.vista_de(seg), foco_de(seg))
+        clave = (self.vista_de(seg), foco_de(seg), mapa.CANARIAS_REAL[0])
         if clave not in self._cache_mapa:
             self._cache_mapa[clave] = _fundido_bordes(mapa.dibujar_mapa(clave[0], ANCHO, MAPA_H, foco=clave[1]))
         return self._cache_mapa[clave]
@@ -745,16 +746,23 @@ class Compositor:
                 break
             if all(((c["lat"] - o["lat"]) ** 2 + ((c["lon"] - o["lon"]) * 0.77) ** 2) ** 0.5 >= 0.75 for o in out):
                 out.append(c)
-        # Si en el plano se ven las Baleares (Mediterráneo), que no se queden sin tarjeta: Palma y, si cabe, otra isla
+        # Si en el plano se ven las Baleares (Mediterráneo), que no se queden sin tarjeta: una de las islas, la que
+        # nombre el texto o, si no, van rotando cada día (Mallorca, Ibiza, Menorca); no tiene por qué ser Palma.
         try:
             from .especiales import _visible
             lo0, lo1, la0, la1 = _visible(self.vista_de(seg), -0.4)
             islas = [c for c in self.prev if c["region"] == "islas" and c["lat"] > 35 and c not in out
                      and lo0 <= c["lon"] <= lo1 and la0 <= c["lat"] <= la1]
-            islas.sort(key=lambda c: (c["nombre"] != "Palma" and not c["nombre"].startswith("Palma"), bool(c.get("extra"))))
-            for c in islas[:2]:
-                if all(((c["lat"] - o["lat"]) ** 2 + ((c["lon"] - o["lon"]) * 0.77) ** 2) ** 0.5 >= 1.0 for o in out):
-                    out.append(c)
+            if islas:
+                dia = self.fecha.toordinal() if getattr(self, "fecha", None) else 0
+                islas.sort(key=lambda c: c["nombre"])
+                islas = islas[dia % len(islas):] + islas[:dia % len(islas)]
+                islas.sort(key=lambda c: norm(c["nombre"].split(" de ")[0]) not in texto)   # la nombrada, primero
+                for c in islas:
+                    if all(((c["lat"] - o["lat"]) ** 2 + ((c["lon"] - o["lon"]) * 0.77) ** 2) ** 0.5 >= 1.0
+                           for o in out):
+                        out.append(c)
+                        break
         except Exception:  # noqa: BLE001
             pass
         return out
@@ -785,6 +793,15 @@ class Compositor:
         return img.convert("RGB")
 
     def fotograma(self, t) -> Image.Image:
+        """En los bloques de «canarias_real» (borrascas), Canarias va en su sitio de verdad en vez de en el recuadro."""
+        antes = mapa.CANARIAS_REAL[0]
+        mapa.CANARIAS_REAL[0] = self.ventana(t)[2] in self.canarias_real
+        try:
+            return self._fotograma(t)
+        finally:
+            mapa.CANARIAS_REAL[0] = antes
+
+    def _fotograma(self, t) -> Image.Image:
         if self.satelite is not None and self.sat_ini <= t < self.sat_ini + self.sat_dur:
             return self._fotograma_satelite(t)
         i, ini, seg_real = self.ventana(t)

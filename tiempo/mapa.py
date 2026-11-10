@@ -42,9 +42,12 @@ def provincias():
     return json.loads((ASSETS / "espana.json").read_text(encoding="utf-8"))
 
 
+CANARIAS_REAL: list = [False]   # en el plano de las borrascas: Canarias en su sitio de verdad, sin recuadro
+
+
 def lonlat_mapa(lon, lat, provincia_canaria=False):
-    """Las Canarias se desplazan al recuadro inferior izquierdo."""
-    if provincia_canaria:
+    """Las Canarias se desplazan al recuadro inferior izquierdo (salvo en el plano amplio de las borrascas)."""
+    if provincia_canaria and not CANARIAS_REAL[0]:
         return lon + DESPLAZAMIENTO_CANARIAS[0], lat + DESPLAZAMIENTO_CANARIAS[1]
     return lon, lat
 
@@ -161,10 +164,10 @@ def dibujar_mapa(vista, ancho, alto, foco: str | None = None, ss: int = 2) -> Im
     img = Image.composite(Image.new("RGB", (W, H), MAR_ABAJO), Image.new("RGB", (W, H), MAR_ARRIBA), grad)
     d = ImageDraw.Draw(img, "RGBA")
     # Rejilla de meridianos y paralelos
-    for lon in range(-20, 8, 2):
+    for lon in range(-40, 18, 2):
         x, _ = pr(lon, 0)
         d.line([(x, 0), (x, H)], fill=(255, 255, 255, 14), width=ss)
-    for lat in range(26, 48, 2):
+    for lat in range(20, 62, 2):
         _, y = pr(0, lat)
         d.line([(0, y), (W, y)], fill=(255, 255, 255, 14), width=ss)
 
@@ -179,7 +182,7 @@ def dibujar_mapa(vista, ancho, alto, foco: str | None = None, ss: int = 2) -> Im
     poligonos = []
     for p in provincias():
         canaria = p["nombre"] in PROVINCIAS_CANARIAS
-        if canaria and not pr.muestra_canarias:
+        if canaria and not pr.muestra_canarias and not CANARIAS_REAL[0]:
             continue
         for anillo in p["anillos"]:
             pts = [pr(*lonlat_mapa(x, y, canaria)) for x, y in anillo]
@@ -194,7 +197,7 @@ def dibujar_mapa(vista, ancho, alto, foco: str | None = None, ss: int = 2) -> Im
     img.paste((3, 10, 25), (0, 0), sombra)
 
     # Recuadro de Canarias
-    if pr.muestra_canarias:
+    if pr.muestra_canarias and not CANARIAS_REAL[0]:
         x0, y1 = pr(RECUADRO_CANARIAS[0], RECUADRO_CANARIAS[2])
         x1, y0 = pr(RECUADRO_CANARIAS[1], RECUADRO_CANARIAS[3])
         d.rounded_rectangle([x0, y0, x1, y1], radius=18 * ss, fill=(255, 255, 255, 18),
