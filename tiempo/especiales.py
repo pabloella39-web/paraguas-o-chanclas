@@ -102,7 +102,7 @@ def _recortar(guion: dict, bloques: list[str], proporcion: float):
     import re
     segs = guion["segmentos"]
     # (los de avisos se recortan también, pero siempre conservan su primera frase: ahí van los naranjas y rojos)
-    intocables = {"intro", "cierre", "aviso", "aviso2", "aviso3", "zonas", "zonas2", "zonas3", "sigue"}
+    intocables = {"intro", "cierre", "aviso", "aviso2", "aviso3", "zonas", "zonas2", "zonas3", "sigue", "temporal"}
     total = sum(len(segs[b].split()) for b in bloques)
     objetivo = total * proporcion
     frases = {b: re.split(r"(?<=[.!?])\s+", segs[b].strip()) for b in bloques if b not in intocables}
@@ -2167,6 +2167,7 @@ Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "zonas": "...", "evoluc
 "consejos": "...", "cierre": "..."}}, "titular": "...", "consejos_pantalla": ["...", "...", "..."], "caption": "..."}}"""
 PALABRAS_AVISO = {"intro": 20, "zonas": 20, "consejos": 18, "cierre": 6}
 CAMPO_AVISO: list = [None]
+TEMPORAL_AVISO: list = [None]   # (capa, datos, etiqueta): el temporal hora a hora en mapa amplio (lluvia y viento)
 COLINDANTES: list = []   # provincias del zoom (con o sin aviso) donde también lloverá bastante   # (campos para el mapa, máximos por sitio) cuando el aviso es por lluvia
 DURACION_AVISO = (20.0, 30.0, 25.0)
 CONSEJOS_BASE = {"lluvias": ["EVITA ZONAS INUNDABLES", "NO CRUCES CAUCES", "LLAMA AL 112"],
@@ -2406,6 +2407,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         if len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos"):
             orden.insert(2, "evolucion")
             base["evolucion"] = 24
+    if TEMPORAL_AVISO[0]:   # el temporal hora a hora (mapa amplio): cómo avanza y a qué zonas va tocando
+        orden.insert(orden.index("zonas") + 1, "temporal")
+        base["temporal"] = round((TEMPORAL_AVISO[0][0].duracion + 0.8) * 2.5)
     rojo = any(gr["nivel"] == "rojo" for gr in grupos)
     if rojo:   # aviso ROJO: vídeo completo, con toda la información (no un flash)
         base.update({"intro": 26, "zonas": 42, "consejos": 26, "cierre": 8})
@@ -2487,6 +2491,14 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             "aleja y vuelve a acercarse entre una y otra). Escribe «zonas» SOLO sobre la primera y cada «zonasN» sobre "
             "la suya (todas sus zonas y núcleos, desde cuándo y hasta cuándo, lo más grave), empezando con un enlace "
             "claro («Y nos vamos a Canarias: …»). La evolución y la lluvia acumulada son de la primera zona.")
+    if datos and TEMPORAL_AVISO[0]:
+        datos[0]["TEMPORAL_HORA_A_HORA"] = TEMPORAL_AVISO[0][1]
+        datos[0]["nota_temporal"] = (
+            "Tramo «temporal»: en pantalla sale el mapa amplio con la lluvia avanzando hora a hora y después las rachas "
+            "de viento hora a hora. Cuenta cómo evoluciona: por dónde entra, hacia dónde avanza, a qué zonas va tocando "
+            "y a qué horas, primero la lluvia y luego el viento (con las rachas), usando TEMPORAL_HORA_A_HORA (provincias "
+            "con más lluvia o más racha en cada momento). No repitas lo de «zonas». Respeta sus palabras: el mapa "
+            "necesita ese tiempo para verse entero.")
     if datos and AMPLIACION:
         datos[0]["NOVEDAD"] = ("AEMET AMPLÍA el aviso a: " + ", ".join(AMPLIACION) + ". Empieza el vídeo con eso "
                                "(«AEMET amplía el aviso naranja a Gran Canaria») y luego nombra TODOS los sitios.")
@@ -2560,6 +2572,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
         "consejos": "Extrema la precaución y, si hay una emergencia, llama al 112.",
         "cierre": "Compártelo con quien viva allí.",
     }
+    if "temporal" in orden:
+        seg["temporal"] = ("Así avanza el temporal, hora a hora. Primero, la lluvia, que va cruzando de oeste a este. "
+                           "Y después, las rachas de viento, hora a hora.")
     if "sigue" in orden:
         seg["sigue"] = "Y recuerda: sigue el " + "; ".join(
             f"aviso {x['nivel']} por {nombre_fenomeno(x['fenomeno'])} en " + ", ".join(sitios_aviso(x)) for x in YA_AVISADO) + "."
@@ -2623,6 +2638,16 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     principal = [x for x in RACIMOS_AVISO[0][0] if x["nivel"] == grupos[0]["nivel"]] or RACIMOS_AVISO[0][0]
     CAMPO_AVISO[0] = None if demo or os.environ.get("SIN_CAMPO_AVISO") else _campo_aviso(
         principal if len(RACIMOS_AVISO[0]) > 1 else grupos, hoy)
+    TEMPORAL_AVISO[0] = None
+    if not demo and not os.environ.get("SIN_CAMPO_AVISO") and \
+            not all(p_[1] < 30 for x in grupos for pol in x["poligonos"] for p_ in pol):
+        try:   # el temporal en mapa amplio: lluvia y viento hora a hora (en naranjas y en rojos)
+            from . import sistemas
+            fin_t = max(datetime.fromisoformat(x["fin"]) for x in grupos).date()
+            TEMPORAL_AVISO[0] = sistemas.preparar_aviso(
+                hoy, fin_t, " ".join(f"{x.get('descripcion', '')} {x.get('instruccion', '')}" for x in grupos))
+        except Exception as e:  # noqa: BLE001
+            log.warning("Aviso sin el tramo del temporal hora a hora: %s", e)
     # Naranjas: vídeo corto (flash). Rojos: completos y siempre de más de 1:05 (más información, y pueden monetizar)
     dur_aviso = ((36.0, 56.0, 44.0) if CAMPO_AVISO[0] and len(CAMPO_AVISO[0]) > 2 and CAMPO_AVISO[0][2].get("picos")
                  else (28.0, 44.0, 35.0) if CAMPO_AVISO[0] else DURACION_AVISO)
@@ -2631,6 +2656,9 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     if len(RACIMOS_AVISO[0]) > 1:   # zonas lejanas: un bloque más por zona
         dur_aviso = (dur_aviso[0], dur_aviso[1] + 22.0 * (len(RACIMOS_AVISO[0]) - 1),
                      dur_aviso[2] + 14.0 * (len(RACIMOS_AVISO[0]) - 1))
+    if TEMPORAL_AVISO[0]:   # el temporal hora a hora: lo que duran sus animaciones
+        t_ = TEMPORAL_AVISO[0][0].duracion + 0.8
+        dur_aviso = (dur_aviso[0] + t_ * 0.7, dur_aviso[1] + t_ * 1.3, dur_aviso[2] + t_)
     if YA_AVISADO:   # ampliación: tramo corto con lo ya contado
         dur_aviso = (dur_aviso[0], dur_aviso[1] + 12.0, dur_aviso[2] + 8.0)
     with duracion(*dur_aviso):  # vídeo flash (algo más largo si lleva el mapa de lluvia)
@@ -2723,6 +2751,16 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                                               _capa_nucleos(nn, reservado=_caja_lista(r)))
         kwargs["vistas"]["consejos"] = kwargs["vistas"]["cierre"] = VISTA_GENERAL
         kwargs["transiciones"]["consejos"] = 2.4
+    if TEMPORAL_AVISO[0] and "temporal" in guion["segmentos"]:   # mapa amplio y vuelta a la zona, con zoom lento
+        from .sistemas import VISTA_SISTEMA
+        kwargs["vistas"]["temporal"] = VISTA_SISTEMA
+        kwargs["sin_marcadores"] += ("temporal",)
+        kwargs["transiciones"]["temporal"] = 2.0
+        kwargs["pills"]["temporal"] = TEMPORAL_AVISO[0][2]
+        kwargs["capas"]["temporal"] = TEMPORAL_AVISO[0][0]
+        orden_ = [k for k in guion["orden"] if k in guion["segmentos"]]
+        if "temporal" in orden_ and orden_.index("temporal") + 1 < len(orden_):
+            kwargs["transiciones"].setdefault(orden_[orden_.index("temporal") + 1], 2.0)
     if YA_AVISADO and "sigue" in guion["segmentos"]:   # lo ya contado: zoom out de la zona nueva y zoom in a esa
         todos = grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS
         nn = nucleos_afectados(YA_AVISADO, n=6)

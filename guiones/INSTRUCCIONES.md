@@ -123,3 +123,8 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   (hasta ~1:40): vídeo completo y, además, así pueden monetizar (TikTok solo paga vídeos de más de un minuto).
 - Ampliación de un aviso ya publicado: el vídeo va SOLO de las zonas nuevas; lo ya contado, en una frase, con sus
   cifras comprobadas contra lo publicado (si no cambian, resumen; si cambian, se dice el cambio).
+
+- AVISOS (naranjas y rojos): llevan siempre el tramo «temporal», tras «zonas»: mapa amplio con la lluvia hora a hora y
+  las rachas de viento hora a hora (y la trayectoria si hay borrasca o DANA identificada). El texto cuenta por dónde
+  entra, cómo avanza y a qué zonas va tocando y cuándo. (De momento no en avisos solo de Canarias.)
+- Ampliaciones: lo ya contado va en el tramo «sigue», con zoom out de la zona nueva y zoom in a la anterior.

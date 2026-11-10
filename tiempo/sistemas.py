@@ -407,3 +407,74 @@ def preparar(s: dict, hoy: date):
     except Exception as e:  # noqa: BLE001
         log.warning("Sin rachas hora a hora para el sistema: %s", e)
     return secuencia(trozos), notas
+
+
+# ------------------------------------------------------------------ el temporal, hora a hora, en los vídeos de aviso
+def _por_provincias(lo, la, horas, cubo, umbral: float, cortes: int = 4, n: int = 3) -> dict:
+    """Por dónde va pasando: en varios momentos, las provincias peninsulares con más lluvia o viento en esa hora."""
+    from . import mapa as mapa_
+    activas = [k for k in range(len(horas)) if np.nanmax(cubo[k]) >= umbral]
+    if not activas:
+        return {}
+    k0, k1 = activas[0], activas[-1]
+    ks = sorted({k0 + round((k1 - k0) * i / max(1, cortes - 1)) for i in range(cortes)})
+    centros = []
+    for p in mapa_.provincias():
+        anillos = [a for a in p["anillos"] if a and a[0][1] >= 35.5]
+        if anillos:
+            a = max(anillos, key=len)
+            centros.append((p["nombre"].split("/")[-1], sum(q[0] for q in a) / len(a), sum(q[1] for q in a) / len(a)))
+    out = {}
+    for k in ks:
+        t = datetime.fromisoformat(horas[k])
+        vals = []
+        for nombre, x, y in centros:
+            i, j = int(np.abs(lo - x).argmin()), int(np.abs(la - y).argmin())
+            v = float(np.nanmax(cubo[k][max(0, j - 1):j + 2, max(0, i - 1):i + 2]))
+            if v >= umbral:
+                vals.append((v, nombre))
+        if vals:
+            out[f"{campos.DIAS_CORTOS[t.weekday()]} {t.hour:02d}:00"] = [f"{nm} ({v:.0f})" for v, nm in sorted(vals, reverse=True)[:n]]
+    return out
+
+
+def preparar_aviso(hoy: date, fin: date, texto: str = ""):
+    """Tramo «temporal» de los vídeos de aviso: mapa amplio con la lluvia hora a hora y las rachas hora a hora (y la
+    trayectoria si hay una borrasca o DANA identificada). Devuelve (capa, datos para el guion, etiqueta) o None."""
+    from datetime import timedelta as _td
+    from .especiales import _visible
+    fin = min(max(fin, hoy), hoy + _td(days=2))
+    trozos, datos, etiqueta = [], {}, "EL TEMPORAL, HORA A HORA"
+    try:
+        s = detectar(hoy, texto)
+        if s and (s.get("nombre") or s["distancia"] == 0 or (s["tipo"] == "borrasca" and s["minimo"] <= 1000)):
+            trozos.append(capa_trayectoria(s))
+            etiqueta = ((f"BORRASCA {s['nombre'].upper()}" if s.get("nombre") else "LA BORRASCA")
+                        if s["tipo"] == "borrasca" else "LA DANA") + ", HORA A HORA"
+            datos["sistema"] = s.get("datos") or s["tipo"]
+    except Exception as e:  # noqa: BLE001
+        log.warning("Aviso: sin trayectoria del sistema: %s", e)
+    try:
+        lo, la, horas, cubo = campos.lluvia_horaria(hoy, (*_visible(VISTA_SISTEMA, 0.3), 1.0), fin, modelos=False)
+        cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
+        ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
+        if ev:
+            ev.peso = 1.3 if cubo.sum(axis=0).max() >= 80 else 1.0
+            trozos.append(ev)
+            datos["lluvia_por_donde_pasa_l_m2_en_1_hora"] = _por_provincias(lo, la, horas, cubo, 1.0)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Aviso: sin lluvia hora a hora del temporal: %s", e)
+    try:
+        lo_v, la_v, h_v, c_v = viento_horario(hoy, fin, (*_visible(VISTA_SISTEMA, 0.3), 1.2))
+        c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
+        cv = capa_viento(lo_v, la_v, h_v, c_v)
+        if cv and cv.maximo >= 45:
+            cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0
+            trozos.append(cv)
+            datos["rachas_por_donde_pasa_km_h"] = _por_provincias(lo_v, la_v, h_v, c_v, 45.0)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Aviso: sin rachas hora a hora del temporal: %s", e)
+    if not [t for t in trozos if t]:
+        return None
+    return secuencia(trozos), datos, etiqueta
+
