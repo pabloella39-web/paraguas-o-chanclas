@@ -21,12 +21,13 @@ from . import campos
 
 log = logging.getLogger(__name__)
 
-AMPLIA = (-30.0, 10.0, 30.0, 52.0, 2.0)        # rejilla para seguir el centro (Atlántico + península)
+AMPLIA = (-36.0, 14.0, 24.0, 58.0, 2.0)        # rejilla de presión: cubre TODA la pantalla del tramo (y algo más)
 VISTA_SISTEMA = (-28.0, 5.5, 31.0, 50.0)       # lo que se ve: el Atlántico entero hasta la península, para ver cómo entra
 PENINSULA_BOX = (-9.5, 3.5, 36.0, 43.8)
 VIENTO = (-10.4, 4.6, 35.4, 44.2, 0.6)         # rejilla de las rachas (península y Baleares)
 
-ESCALA_VIENTO = [(30, (110, 215, 190)), (40, (30, 190, 115)), (50, (245, 220, 20)), (60, (255, 160, 10)),
+# Las dos primeras clases (viento flojo) van más transparentes: el color llena TODA la pantalla, sin huecos ni bordes
+ESCALA_VIENTO = [(0, (70, 130, 175)), (15, (80, 170, 195)), (30, (110, 215, 190)), (40, (30, 190, 115)), (50, (245, 220, 20)), (60, (255, 160, 10)),
                  (70, (250, 95, 10)), (80, (225, 25, 35)), (90, (185, 5, 105)), (100, (130, 15, 170)),
                  (120, (70, 5, 120))]
 
@@ -256,9 +257,9 @@ def _imagen_campo(lons, lats, v, escala, px):
     h, w = vv.shape
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
     for u, col in escala:
-        m = vv >= u
+        m = vv >= max(u, 0.5)   # 0 exacto = sin dato (el recuadro de Canarias): transparente
         rgba[m, :3] = col
-        rgba[m, 3] = 238
+        rgba[m, 3] = 238 if u >= 30 or escala[0][0] >= 30 else 150
     img = Image.fromarray(rgba[::-1], "RGBA")
     return img, (float(lons[0]), float(lons[-1]), float(lats[0]), float(lats[-1]))
 
@@ -284,7 +285,9 @@ def capa_trayectoria(s: dict, seg_por_fotograma: float = 0.32):
     def dibujar(capa, pr, dt):
         n = min(len(fotos) - 1, int(max(0.0, dt - TRANSICION) / seg_por_fotograma))
         k, img, caja = fotos[n]
-        campos._pegar(capa, img, caja, pr, MAPA_Y0, cache, f"p{n % 3}")
+        # recortado al mapa: la rejilla de presión es más grande que la pantalla y no debe pisar el título
+        campos._recortado(lambda lienzo, pr_, dt_: campos._pegar(lienzo, img, caja, pr_, 0, cache, f"p{n % 3}"))(
+            capa, pr, dt)
         if len(cache) > 3:
             cache.clear()
         d = ImageDraw.Draw(capa)
@@ -519,6 +522,21 @@ def secuencia(capas: list, fundido: float = 0.5):
     return dibujar
 
 
+def _ventana_pico(lo, la, horas, cubo) -> str | None:
+    """Entre qué horas llueve con más fuerza sobre la península (las horas con al menos el 60 % del máximo)."""
+    mi = (lo >= PENINSULA_BOX[0]) & (lo <= PENINSULA_BOX[1])
+    mj = (la >= PENINSULA_BOX[2]) & (la <= PENINSULA_BOX[3])
+    if not mi.any() or not mj.any():
+        return None
+    serie = np.array([float(c[np.ix_(mj, mi)].mean()) for c in cubo])
+    if serie.max() < 0.15:
+        return None
+    k = np.nonzero(serie >= 0.6 * serie.max())[0]
+    a, b = datetime.fromisoformat(horas[int(k[0])]), datetime.fromisoformat(horas[int(k[-1])]) + timedelta(hours=1)
+    dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    return f"de las {a.hour}:00 del {dias[a.weekday()]} a las {b.hour}:00 del {dias[b.weekday()]}"
+
+
 def preparar(s: dict, hoy: date):
     """Capa del tramo «sistema» (trayectoria → lluvia hora a hora → rachas) y datos para el guion."""
     from datetime import timedelta as _td
@@ -529,7 +547,7 @@ def preparar(s: dict, hoy: date):
     trozos, notas = [capa_trayectoria(s)], []
     try:
         from .especiales import _visible
-        caja = (*_visible(VISTA_SISTEMA, 0.3), 1.0)   # toda la pantalla, sin recuadro (un modelo: menos datos)
+        caja = (*_visible(VISTA_SISTEMA, 1.6), 1.0)   # toda la pantalla, sin recuadro (un modelo: menos datos)
         lo, la, horas, cubo = campos.lluvia_horaria(ini, caja, fin, modelos=False)
         cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
@@ -538,11 +556,16 @@ def preparar(s: dict, hoy: date):
             ev.peso = 1.3 if acum.max() >= 80 else 1.15 if acum.max() >= 40 else 1.0   # más lluvia, más tiempo
             trozos.append(con_centro(ev, s))
             notas.append(f"lluvia máxima acumulada en el periodo ≈ {acum.max():.0f} l/m²")
+            pico = _ventana_pico(lo, la, horas, cubo)
+            if pico:
+                notas.append(f"lo más intenso de la lluvia sobre la península: {pico} (dilo así, con las horas: "
+                             "«lo más fuerte, entre las diez de la mañana y las seis de la tarde»; nunca frases "
+                             "ambiguas como «con lo peor de la mañana a la tarde»)")
     except Exception as e:  # noqa: BLE001
         log.warning("Sin lluvia hora a hora para el sistema: %s", e)
     try:
         from .especiales import _visible
-        lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 0.3), 1.2))
+        lo_v, la_v, h_v, c_v = viento_horario(ini, fin, (*_visible(VISTA_SISTEMA, 1.9), 1.2))
         c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
         cv = capa_viento(lo_v, la_v, h_v, c_v, isobaras=s.get("datos"))
         if cv and cv.maximo >= 60:
@@ -604,7 +627,7 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
     except Exception as e:  # noqa: BLE001
         log.warning("Aviso: sin trayectoria del sistema: %s", e)
     try:
-        lo, la, horas, cubo = campos.lluvia_horaria(hoy, (*_visible(VISTA_SISTEMA, 0.3), 1.0), fin, modelos=False)
+        lo, la, horas, cubo = campos.lluvia_horaria(hoy, (*_visible(VISTA_SISTEMA, 1.6), 1.0), fin, modelos=False)
         cubo = np.stack([campos.sin_recuadro_canarias(lo, la, c) for c in cubo])
         ev = campos.capa_evolucion(lo, la, horas, cubo, False, max_fotogramas=14, seg_por_fotograma=0.42)
         if ev:
@@ -614,7 +637,7 @@ def preparar_aviso(hoy: date, fin: date, texto: str = ""):
     except Exception as e:  # noqa: BLE001
         log.warning("Aviso: sin lluvia hora a hora del temporal: %s", e)
     try:
-        lo_v, la_v, h_v, c_v = viento_horario(hoy, fin, (*_visible(VISTA_SISTEMA, 0.3), 1.2))
+        lo_v, la_v, h_v, c_v = viento_horario(hoy, fin, (*_visible(VISTA_SISTEMA, 1.9), 1.2))
         c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
         cv = capa_viento(lo_v, la_v, h_v, c_v, isobaras=(s or {}).get("datos"))
         if cv and cv.maximo >= 45:

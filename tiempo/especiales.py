@@ -2351,14 +2351,19 @@ def comarcas_de(grupos) -> dict:
 
 
 def asegurar_zona_entera(texto: str, grupos) -> str:
-    """Red de seguridad: si el texto se dejó comarcas o no deja claro que es toda la zona, se añade una frase."""
+    """Red de seguridad: si el texto se dejó comarcas o no deja claro que es toda la zona, se añade una frase corta.
+    Solo se exigen las comarcas de los avisos más graves del bloque (las del rojo, no las de cada naranja de
+    alrededor), cada una una sola vez y como mucho cuatro."""
     t = _norm_txt(texto)
-    faltan = [c for lista in comarcas_de(grupos).values() for c in lista if _norm_txt(c).split()[-1] not in t]
+    tope = max((NIVELES.get(x["nivel"], 0) for x in grupos), default=0)
+    graves = [x for x in grupos if NIVELES.get(x["nivel"], 0) == tope]
+    faltan = list(dict.fromkeys(c for lista in comarcas_de(graves).values() for c in lista
+                                if _norm_txt(c).split()[-1] not in t))[:4]
     if faltan:
         lista = ", ".join(faltan[:-1]) + " y " + faltan[-1] if len(faltan) > 1 else faltan[0]
-        return texto.rstrip() + f" El aviso es para comarcas enteras: también {lista}, con todos sus pueblos."
+        return texto.rstrip() + f" También {lista}, con todos sus pueblos."
     if not any(w in t for w in ("toda la zona", "no solo", "todos sus pueblos", "todos los pueblos", "comarcas enteras",
-                                "valle entero", "zona entera", "que no nombramos")):
+                                "valle entero", "zona entera", "que no nombr", "que no se nombr", "donde no se nombr")):
         return texto.rstrip() + " El aviso es para toda la zona, también para los pueblos que no nombramos."
     return texto
 

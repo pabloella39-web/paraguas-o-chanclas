@@ -291,8 +291,13 @@ def _pegar(capa: Image.Image, img: Image.Image, caja, pr, y0: int, cache: dict, 
         if len(cache) > 6:
             cache.clear()
         cache[k] = img.resize((w, h), Image.BILINEAR)
-    capa.alpha_composite(cache[k], (int(round(x0)), int(round(ya)) + y0)) if x0 >= 0 and ya + y0 >= 0 else \
-        capa.paste(cache[k], (int(round(x0)), int(round(ya)) + y0), cache[k])
+    # Composición alfa de verdad también cuando la imagen empieza fuera del lienzo (se recorta lo que no se ve):
+    # con paste() los tonos semitransparentes salían más oscuros y con la mitad de opacidad.
+    px, py = int(round(x0)), int(round(ya)) + y0
+    cx, cy = max(0, -px), max(0, -py)
+    if cx >= w or cy >= h:
+        return
+    capa.alpha_composite(cache[k], (max(0, px), max(0, py)), (cx, cy))
 
 
 def capa_lluvia(dia: date, con_canarias: bool = True):

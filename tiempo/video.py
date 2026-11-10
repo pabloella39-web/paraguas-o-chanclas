@@ -745,6 +745,18 @@ class Compositor:
                 break
             if all(((c["lat"] - o["lat"]) ** 2 + ((c["lon"] - o["lon"]) * 0.77) ** 2) ** 0.5 >= 0.75 for o in out):
                 out.append(c)
+        # Si en el plano se ven las Baleares (Mediterráneo), que no se queden sin tarjeta: Palma y, si cabe, otra isla
+        try:
+            from .especiales import _visible
+            lo0, lo1, la0, la1 = _visible(self.vista_de(seg), -0.4)
+            islas = [c for c in self.prev if c["region"] == "islas" and c["lat"] > 35 and c not in out
+                     and lo0 <= c["lon"] <= lo1 and la0 <= c["lat"] <= la1]
+            islas.sort(key=lambda c: (c["nombre"] != "Palma" and not c["nombre"].startswith("Palma"), bool(c.get("extra"))))
+            for c in islas[:2]:
+                if all(((c["lat"] - o["lat"]) ** 2 + ((c["lon"] - o["lon"]) * 0.77) ** 2) ** 0.5 >= 1.0 for o in out):
+                    out.append(c)
+        except Exception:  # noqa: BLE001
+            pass
         return out
 
     # ------------------------------------------------ fotograma

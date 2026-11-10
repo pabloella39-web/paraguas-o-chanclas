@@ -137,3 +137,9 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - BORRASCAS: se siguen varias a la vez (Bruna y, detrás, Charles). Cada una sale en el mapa con su B y su nombre, y el
   guion cuenta las dos en el orden en que llegan. Los nombres son los de AEMET, en el orden en que los cita (la que
   llega antes recibe el primero); si no hay nombre, «borrasca» a secas. El viento hora a hora lleva las isobaras encima.
+
+- HORAS, CLARAS: cuando se diga cuándo es lo más fuerte, con horas o tramos concretos y una frase natural («lo más
+  fuerte, entre las diez de la mañana y las seis de la tarde»; «lo peor llega por la tarde»). Prohibidas las frases
+  ambiguas o cojas como «con lo peor de la mañana a la tarde».
+- Comarcas: cada comarca se nombra UNA sola vez por vídeo; nada de listas largas de comarcas pegadas al final.
+- Plano del Mediterráneo: si se ven las Baleares, llevan su tarjeta (Palma y, si cabe, otra isla).
