@@ -26,9 +26,9 @@ VISTA_SISTEMA = (-21.0, 6.5, 32.5, 48.5)       # lo que se ve en el vídeo duran
 PENINSULA_BOX = (-9.5, 3.5, 36.0, 43.8)
 VIENTO = (-10.4, 4.6, 35.4, 44.2, 0.6)         # rejilla de las rachas (península y Baleares)
 
-ESCALA_VIENTO = [(30, (170, 225, 205)), (40, (110, 205, 160)), (50, (240, 225, 90)), (60, (250, 180, 60)),
-                 (70, (245, 120, 50)), (80, (225, 60, 60)), (90, (190, 40, 120)), (100, (140, 50, 170)),
-                 (120, (90, 40, 140))]
+ESCALA_VIENTO = [(30, (110, 215, 190)), (40, (30, 190, 115)), (50, (245, 220, 20)), (60, (255, 160, 10)),
+                 (70, (250, 95, 10)), (80, (225, 25, 35)), (90, (185, 5, 105)), (100, (130, 15, 170)),
+                 (120, (70, 5, 120))]
 
 
 # ------------------------------------------------------------------ nombre de AEMET
@@ -218,7 +218,7 @@ def _imagen_campo(lons, lats, v, escala, px):
     for u, col in escala:
         m = vv >= u
         rgba[m, :3] = col
-        rgba[m, 3] = 205
+        rgba[m, 3] = 238
     img = Image.fromarray(rgba[::-1], "RGBA")
     return img, (float(lons[0]), float(lons[-1]), float(lats[0]), float(lats[-1]))
 

@@ -105,11 +105,11 @@ def maximos(lons, lats, v, cajas: dict) -> dict:
 # Escala «de mapa de modelo» (como Meteologix/ECMWF): del azul al morado pasando por verde, amarillo y rojo
 # Tonos oscuros y saturados: cuanto más llueve, más oscuro (rojo sangre, granate y casi negro en lo extremo), para
 # que lo peligroso se vea peligroso.
-ESCALA_FUERTE = [(0.1, (150, 190, 225)), (1, (105, 160, 215)), (2, (65, 130, 205)), (3, (35, 100, 190)),
-                 (5, (20, 70, 165)), (7, (15, 115, 110)), (10, (25, 135, 60)), (15, (75, 160, 35)),
-                 (20, (140, 180, 25)), (25, (205, 195, 25)), (30, (225, 165, 15)), (40, (225, 125, 10)),
-                 (50, (215, 85, 10)), (60, (200, 45, 15)), (70, (175, 15, 20)), (80, (140, 5, 30)),
-                 (100, (110, 0, 60)), (125, (85, 0, 85)), (150, (55, 0, 70)), (200, (25, 0, 30))]
+ESCALA_FUERTE = [(0.1, (130, 185, 235)), (1, (85, 150, 230)), (2, (45, 115, 225)), (3, (20, 85, 210)),
+                 (5, (10, 55, 180)), (7, (0, 125, 115)), (10, (10, 150, 50)), (15, (70, 180, 15)),
+                 (20, (150, 200, 0)), (25, (230, 215, 0)), (30, (250, 175, 0)), (40, (250, 125, 0)),
+                 (50, (240, 75, 0)), (60, (220, 30, 10)), (70, (190, 0, 20)), (80, (150, 0, 35)),
+                 (100, (120, 0, 75)), (125, (95, 0, 105)), (150, (60, 0, 80)), (200, (25, 0, 30))]
 
 
 def _imagen_lluvia_fuerte(lons, lats, v, canaria=False, escala=None, px=None) -> tuple[Image.Image, tuple]:
@@ -125,7 +125,7 @@ def _imagen_lluvia_fuerte(lons, lats, v, canaria=False, escala=None, px=None) ->
     sig = np.clip(idx + 1, 0, len(umbrales) - 1)
     t = np.clip((fino - umbrales[idx]) / np.maximum(umbrales[sig] - umbrales[idx], 1e-6), 0, 1)[..., None]
     rgb = cols[idx] * (1 - t) + cols[sig] * t
-    alfa = np.where(fino >= umbrales[0], 225, 0).astype(float)
+    alfa = np.where(fino >= umbrales[0], 245, 0).astype(float)
     h, w = fino.shape
     borde = max(8, int(0.6 * (px or PX_GRADO) * (lons[1] - lons[0])))
     yy, xx = np.mgrid[0:h, 0:w]
