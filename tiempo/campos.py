@@ -502,7 +502,7 @@ def acumulado_por_zona(lons, lats, horas, cubo, cajas: dict, cortes: int = 4) ->
 
 
 def capa_acumulado(lons, lats, horas, cubo, canaria: bool, cajas: dict,
-                   titulo: str = "LLUVIA ACUMULADA (L/M²)", max_fotogramas: int = 14, seg_por_fotograma: float = 0.5):
+                   titulo: str = "LLUVIA ACUMULADA (L/M²)", max_fotogramas: int = 16, seg_por_fotograma: float = 0.5):
     """La lluvia acumulada creciendo hora a hora: el mapa se va llenando de color y un marcador dice cuántos litros
     lleva ya cada zona. El último fotograma (el total) se queda fijo."""
     from datetime import datetime as _dt
@@ -531,11 +531,21 @@ def capa_acumulado(lons, lats, horas, cubo, canaria: bool, cajas: dict,
     provs = mapa_.provincias()
     f, fpeq, freloj = fuente("ExtraBold", 26), fuente("Bold", 20), fuente("Black", 54)
     fz, fn, ft = fuente("Bold", 28), fuente("Black", 34), fuente("ExtraBold", 21)
+    # dónde cae el máximo de cada zona: al final se rotula sobre el mapa («90 l/m²»)
+    puntos = []
+    for z in zonas:
+        a, b, c_, d_ = cajas[z]
+        mi, mj = (lons >= a - 0.05) & (lons <= b + 0.05), (lats >= c_ - 0.05) & (lats <= d_ + 0.05)
+        sub = acum[k1][np.ix_(mj, mi)]
+        if sub.size:
+            j, i = np.unravel_index(int(sub.argmax()), sub.shape)
+            puntos.append((float(lons[mi][i]), float(lats[mj][j]), int(round(float(sub.max())))))
+    fchip = fuente("Black", 32)
 
     ritmo = [seg_por_fotograma]
 
     def ajustar(dur_tramo: float):   # que quepa entero en el tramo y el total se quede al menos 1,5 s
-        ritmo[0] = min(0.7, max(0.22, (dur_tramo - TRANSICION - 1.5) / len(fotos)))
+        ritmo[0] = min(0.9, max(0.22, (dur_tramo - TRANSICION - 2.0) / len(fotos)))
 
     def dibujar(capa, pr, dt):
         n = min(int(max(0.0, dt - TRANSICION) / ritmo[0]), len(fotos) - 1)
@@ -574,8 +584,27 @@ def capa_acumulado(lons, lats, horas, cubo, canaria: bool, cajas: dict,
                 d.text((px + 18, y + 20), z, font=fz, fill=(255, 255, 255, 255), anchor="lm")
                 d.text((px + ancho - 18, y + 20), str(v), font=fn, fill=color_fuerte(v), anchor="rm")
         _leyenda_horizontal(capa, MAPA_Y0 + MAPA_H - 86, titulo, f, fpeq)
+    def encima(capa, pr, dt):
+        """Total final: la cifra sobre el mapa, donde más cae en cada zona (se pinta lo último, sobre los nombres)."""
+        if min(int(max(0.0, dt - TRANSICION) / ritmo[0]), len(fotos) - 1) == len(fotos) - 1:
+            d = ImageDraw.Draw(capa)
+            puestos = []
+            for lo, la, v in puntos:
+                x, y = pr(*lonlat_mapa(lo, la, la < 30))
+                y += MAPA_Y0
+                txt = f"{v} l/m²"
+                w_ = fchip.getlength(txt) + 28
+                if any(abs(x - px_) < 170 and abs(y - py_) < 54 for px_, py_ in puestos):
+                    continue
+                puestos.append((x, y))
+                x = min(max(x, 30 + w_ / 2), ANCHO - 30 - w_ / 2)
+                d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(255, 255, 255, 255), outline=(8, 20, 45, 255), width=3)
+                d.rounded_rectangle([x - w_ / 2, y + 12, x + w_ / 2, y + 58], radius=16, fill=(255, 201, 60, 255),
+                                    outline=(8, 20, 45, 255), width=3)
+                d.text((x, y + 35), txt, font=fchip, fill=(8, 20, 45, 255), anchor="mm")
     dibujar.duracion = len(fotos) * seg_por_fotograma + 1.5
     dibujar.ajustar = ajustar
+    dibujar.encima = encima
     if zonas:   # sitio del marcador, para que los nombres de los pueblos no se pongan encima
         dibujar.reservado = [(40, MAPA_Y0 + 24, 40 + max(300.0, max(fz.getlength(z) for z in zonas) + 150),
                               MAPA_Y0 + 24 + 56 + 44 * len(zonas))]
