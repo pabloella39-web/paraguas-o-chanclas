@@ -372,7 +372,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                 etiqueta = ((f"BORRASCA {s_['nombre'].upper()}" if s_.get("nombre") else "LA BORRASCA")
                             if s_["tipo"] == "borrasca" else "LA DANA") + ", HORA A HORA"
                 SISTEMA[0] = (capa_s, etiqueta)
-                g.GANCHO_TEXTO += sistemas.texto_guion(s_, cuando) + (
+                g.GANCHO_TEXTO += sistemas.texto_guion(s_, cuando, capa_s.duracion + 0.8) + (
                     " Datos del tramo: " + "; ".join(notas) + "." if notas else "")
         except Exception as e:  # noqa: BLE001
             log.warning("Seguimiento de borrascas/DANAs no disponible: %s", e)

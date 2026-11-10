@@ -106,3 +106,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Avisos en zonas distantes (p. ej. Extremadura y Canarias): un bloque por zona («aviso», «aviso2»… en el parte;
   «zonas», «zonas2»… en el vídeo de aviso). En pantalla, zoom a la primera; entre una y otra se aleja a toda España y
   vuelve a acercarse a la que toca cuando se habla de ella.
+
+- Tramo «sistema» (borrasca/DANA hora a hora): trayectoria, lluvia y viento se reparten el tramo a partes parecidas
+  (unos 5 s cada una; algo más la que tiene más incidencia) y cada una se ve entera. El texto del tramo tiene que
+  durar lo que piden los datos (no acortarlo), para que dé tiempo a ver los tres mapas.

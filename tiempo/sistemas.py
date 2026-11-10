@@ -177,7 +177,7 @@ def detectar(hoy: date, texto_aemet: str | None = None) -> dict | None:
             "datos": (lons, lats, horas, ps, zs)}
 
 
-def texto_guion(s: dict, cuando: str) -> str:
+def texto_guion(s: dict, cuando: str, segundos: float = 14.0) -> str:
     if not s:
         return ""
     tr = s["trayectoria"]
@@ -197,7 +197,8 @@ def texto_guion(s: dict, cuando: str) -> str:
     dato = f"centro de {s['minimo']:.0f} hPa" if s["tipo"] == "borrasca" else "aire muy frío en altura"
     return (f"\n\nSISTEMA DEL DÍA: {quien} ({dato}). Su centro pasa de estar {donde(*tr[0][1:3])} ({dias[t0.weekday()]} "
             f"{t0.hour}:00) a {donde(*tr[-1][1:3])} ({dias[t1.weekday()]} {t1.hour}:00). Añade a \"segmentos\" la clave "
-            "\"sistema\" (unas 40 palabras), justo después del gancho (y del aviso, si lo hay): en pantalla se ve "
+            f"\"sistema\" (unas {round(segundos * 2.7 / 2) * 2} palabras: en pantalla van {round(segundos)} segundos de mapas y tienen "
+            "que verse enteros, no lo acortes), justo después del gancho (y del aviso, si lo hay): en pantalla se ve "
             f"primero {('la borrasca' if s['tipo'] == 'borrasca' else 'la DANA')} moviéndose con su trayectoria, luego "
             "la lluvia hora a hora y, si sopla fuerte, las rachas de viento hora a hora. Cuenta por dónde entra, cuándo "
             "llega lo peor (lluvia y viento) y cuándo se va" + (f"; llámala por su nombre, {s['nombre']}" if s.get("nombre")
@@ -331,39 +332,45 @@ def capa_viento(lons, lats, horas, cubo, max_fotogramas: int = 14, seg_por_fotog
     return dibujar
 
 
+COMODO = 5.0   # segundos que necesita cada animación (trayectoria, lluvia, viento) para verse entera con calma
+
+
 def secuencia(capas: list, fundido: float = 0.5):
-    """Varias animaciones una detrás de otra dentro del mismo tramo (cada una arranca desde su primer fotograma)."""
+    """Varias animaciones una detrás de otra dentro del mismo tramo. Se reparten TODO el tramo a partes parecidas
+    (algo más la que tiene más incidencia: atributo «peso»), y cada una se reproduce entera, a su propio ritmo
+    uniforme, dentro de su parte: ninguna va a toda prisa ni se queda a medias."""
     from .video import TRANSICION
     capas = [c for c in capas if c]
-    inicios, t = [], 0.0
-    for c in capas:
-        inicios.append(t)
-        t += getattr(c, "duracion", 5.0) + 0.6
-
-    ritmo = [1.0]   # >1: más deprisa (el tramo dura menos que las animaciones); <1: más despacio
+    nat = [getattr(c, "duracion", 5.0) for c in capas]
+    pesos = [getattr(c, "peso", 1.0) for c in capas]
+    partes = [COMODO * w for w in pesos]
+    est = {"ini": [sum(partes[:k]) for k in range(len(capas))], "parte": partes}
 
     def ajustar(dur_tramo: float):
-        """Reparte TODO el tramo entre las animaciones (trayectoria, lluvia, viento), cada una con su parte
-        proporcional: que la última no se quede en un segundo si la locución es más corta."""
-        util = max(2.0, dur_tramo - TRANSICION - 0.3)
-        ritmo[0] = min(3.0, max(0.6, t / util))
+        util = max(2.0, dur_tramo - TRANSICION - 0.2)
+        est["parte"] = [util * w / sum(pesos) for w in pesos]
+        est["ini"] = [sum(est["parte"][:k]) for k in range(len(capas))]
+
+    def _local(n, tt):
+        """Tiempo «natural» de la animación n: recorre todos sus fotogramas en su parte (el último se queda 0,7 s)."""
+        parte = max(0.5, est["parte"][n] - 0.7)
+        return TRANSICION + min(nat[n] - 0.01, max(0.0, tt - est["ini"][n]) * nat[n] / parte)
 
     def dibujar(capa, pr, dt):
-        dt = TRANSICION + max(0.0, dt - TRANSICION) * ritmo[0] if dt > TRANSICION else dt
-        n = max([i for i, t0 in enumerate(inicios) if dt - TRANSICION >= t0] or [0])
-        c, t0 = capas[n], inicios[n]
-        local = dt - t0
-        if n and local - TRANSICION < fundido:   # fundido corto con la anterior
-            capas[n - 1](capa, pr, dt - inicios[n - 1])
+        tt = dt - TRANSICION
+        n = max([k for k, t0 in enumerate(est["ini"]) if tt >= t0] or [0])
+        if n and tt - est["ini"][n] < fundido:   # fundido corto con la anterior
+            capas[n - 1](capa, pr, _local(n - 1, tt))
             tmp = Image.new("RGBA", capa.size, (0, 0, 0, 0))
-            c(tmp, pr, local)
-            s = max(0.0, (local - TRANSICION) / fundido)
+            capas[n](tmp, pr, _local(n, tt))
+            s = max(0.0, (tt - est["ini"][n]) / fundido)
             tmp.putalpha(tmp.getchannel("A").point(lambda v: int(v * s)))
             capa.alpha_composite(tmp)
             return
-        c(capa, pr, local)
-    dibujar.duracion = t
+        capas[n](capa, pr, _local(n, tt) if tt >= 0 else dt)
+    dibujar.duracion = sum(partes)
     dibujar.ajustar = ajustar
+    dibujar.n = len(capas)
     return dibujar
 
 
@@ -384,6 +391,7 @@ def preparar(s: dict, hoy: date):
         if ev:
             trozos.append(ev)
             acum = cubo.sum(axis=0)
+            ev.peso = 1.3 if acum.max() >= 80 else 1.15 if acum.max() >= 40 else 1.0   # más lluvia, más tiempo
             notas.append(f"lluvia máxima acumulada en el periodo ≈ {acum.max():.0f} l/m²")
     except Exception as e:  # noqa: BLE001
         log.warning("Sin lluvia hora a hora para el sistema: %s", e)
@@ -393,6 +401,7 @@ def preparar(s: dict, hoy: date):
         c_v = np.stack([campos.sin_recuadro_canarias(lo_v, la_v, c) for c in c_v])
         cv = capa_viento(lo_v, la_v, h_v, c_v)
         if cv and cv.maximo >= 60:
+            cv.peso = 1.3 if cv.maximo >= 100 else 1.15 if cv.maximo >= 80 else 1.0   # más viento, más tiempo
             trozos.append(cv)
             notas.append(f"rachas de hasta {cv.maximo:.0f} km/h")
     except Exception as e:  # noqa: BLE001
