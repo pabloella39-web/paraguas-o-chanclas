@@ -110,3 +110,8 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Tramo «sistema» (borrasca/DANA hora a hora): trayectoria, lluvia y viento se reparten el tramo a partes parecidas
   (unos 5 s cada una; algo más la que tiene más incidencia) y cada una se ve entera. El texto del tramo tiene que
   durar lo que piden los datos (no acortarlo), para que dé tiempo a ver los tres mapas.
+
+- AVISOS: ZONA ENTERA. Un aviso es para toda la zona de AEMET, no para pueblos sueltos. Primero la zona y sus comarcas
+  y valles enteros («todo el Valle del Jerte, toda La Vera…»); los pueblos, después y solo como ejemplo («con pueblos
+  como…, entre otros»). Nunca un pueblo en lugar de su valle. Decir al menos una vez que el aviso es para toda la zona,
+  también para los pueblos que no se nombran. (Tabla COMARCAS_ZONA en especiales.py; se comprueba tras escribir el guion.)

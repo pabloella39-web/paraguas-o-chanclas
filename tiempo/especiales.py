@@ -2252,6 +2252,51 @@ def amarillos_cerca(todos, grupos, momento) -> list[dict]:
     return [g for g in gs if g["zonas"]]
 
 
+# Comarcas y valles enteros que cubre cada zona de AEMET (lo que la gente reconoce como «su» sitio). El aviso es para
+# toda la zona: si solo se nombran pueblos sueltos, quien vive en el de al lado cree que no va con él.
+COMARCAS_ZONA = {
+    "norte de caceres": ["La Vera", "el Valle del Jerte", "el Valle del Ambroz", "Las Hurdes", "la Sierra de Gata"],
+    "sur de avila": ["el Valle del Tiétar", "el Valle del Alberche", "la cara sur de Gredos"],
+    "sistema central de avila": ["la Sierra de Gredos", "la Sierra de Ávila", "la Paramera"],
+    "sur de salamanca": ["la Sierra de Béjar", "la Sierra de Francia"],
+    "sistema central de salamanca": ["la Sierra de Béjar", "la Sierra de Francia"],
+    "villuercas y montanchez": ["las Villuercas", "la Sierra de Montánchez", "Los Ibores"],
+    "grazalema": ["la Sierra de Grazalema"],
+    "sierra de madrid": ["la Sierra de Guadarrama", "Somosierra"],
+}
+REGLA_ZONA_ENTERA = (
+    "ZONA ENTERA (imprescindible): un aviso de AEMET es para TODA la zona, no para pueblos sueltos. Di primero la zona "
+    "y sus comarcas y valles ENTEROS, con «todo/toda» («todo el Valle del Jerte, toda La Vera, el Ambroz, Las Hurdes y "
+    "la Sierra de Gata»): usa comarcas_de_la_zona si viene; si no, solo las comarcas que conozcas CON SEGURIDAD de esa "
+    "zona (si dudas, di «toda la zona de …»). Los pueblos van DESPUÉS y solo como ejemplo: «con pueblos como X, Y y Z, "
+    "entre otros». NUNCA una lista de pueblos como si fueran los únicos afectados, y nunca un pueblo en lugar de su "
+    "valle. Dilo claro al menos una vez: el aviso es para toda la zona, también para los pueblos que no se nombran.")
+
+
+def comarcas_de(grupos) -> dict:
+    out = {}
+    for gr in grupos:
+        for z in gr.get("zonas", []):
+            k = _norm_txt(z.split(" - ")[-1])
+            for clave, lista in COMARCAS_ZONA.items():
+                if clave in k:
+                    out[z.split(" - ")[-1]] = lista
+    return out
+
+
+def asegurar_zona_entera(texto: str, grupos) -> str:
+    """Red de seguridad: si el texto se dejó comarcas o no deja claro que es toda la zona, se añade una frase."""
+    t = _norm_txt(texto)
+    faltan = [c for lista in comarcas_de(grupos).values() for c in lista if _norm_txt(c).split()[-1] not in t]
+    if faltan:
+        lista = ", ".join(faltan[:-1]) + " y " + faltan[-1] if len(faltan) > 1 else faltan[0]
+        return texto.rstrip() + f" El aviso es para comarcas enteras: también {lista}, con todos sus pueblos."
+    if not any(w in t for w in ("toda la zona", "no solo", "todos sus pueblos", "todos los pueblos", "comarcas enteras",
+                                "valle entero", "zona entera", "que no nombramos")):
+        return texto.rstrip() + " El aviso es para toda la zona, también para los pueblos que no nombramos."
+    return texto
+
+
 def sitios_aviso(gr) -> list[str]:
     """Los sitios que hay que nombrar: en Canarias, las islas; si no, las zonas de AEMET (todas en rojo, hasta 6 en
     naranja), sin repetir."""
@@ -2331,6 +2376,9 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             log.info("Sin nombres de borrascas: %s", e)
         # los núcleos dentro de las zonas (se señalan en el mapa) y las ciudades cercanas, por si se desvía
         datos[0]["nucleos_en_la_zona_del_aviso"] = [c["nombre"] for c in nucleos_afectados(grupos, n=10)]
+        if comarcas_de(grupos + NARANJAS_CONTEXTO):
+            datos[0]["comarcas_de_la_zona"] = comarcas_de(grupos + NARANJAS_CONTEXTO)
+        datos[0]["REGLA_ZONA_ENTERA"] = REGLA_ZONA_ENTERA
         cerca = ciudades_zoom(grupos, AMARILLOS, n_amarillo=6, n_ref=5)
         if cerca:
             datos[0]["ciudades_cercanas_atentas"] = [
@@ -2402,6 +2450,7 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
                 _completar_sitios(gg, grupos)
+                gg["segmentos"]["zonas"] = asegurar_zona_entera(gg["segmentos"]["zonas"], grupos)
                 return gg
         except Exception as e:  # noqa: BLE001
             log.warning("Guion del aviso con Claude falló: %s", e)

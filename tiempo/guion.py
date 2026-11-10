@@ -379,7 +379,20 @@ def _guion_precargado(hoy: date, prompt: str) -> dict | None:
     return None
 
 
-def escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: float = 1.0,
+POST_GUION: list = []   # repasos que main.py aplica al guion ya escrito (p. ej. que un aviso deje claro que es toda la zona)
+
+
+def escribir_guion(*a, **kw) -> dict:
+    guion = _escribir_guion(*a, **kw)
+    for repaso in POST_GUION:
+        try:
+            repaso(guion)
+        except Exception as e:  # noqa: BLE001
+            log.warning("Repaso del guion: %s", e)
+    return guion
+
+
+def _escribir_guion(prev: list[dict], hoy: date, texto_aemet: str = "", factor: float = 1.0,
                    presenta: str = "un presentador") -> dict:
     """factor < 1 pide un guion más corto; > 1 más largo (para ajustar la duración)."""
     palabras = {k: max(6, round(v * factor)) for k, v in PALABRAS.items()}

@@ -362,6 +362,7 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
         g.GANCHO_TEXTO += ("\n\nMAPA DE TEMPERATURAS: en el bloque «general» sale España coloreada por la máxima, con "
                            "las cifras sobre las ciudades. Puedes decir «mira el mapa: el sur, en rojo»…")
         SISTEMA[0] = None
+        g.POST_GUION[:] = []
         try:   # borrascas (con nombre o no), temporales y DANAs que entran: su evolución por horas
             from . import sistemas
             s_ = sistemas.detectar(hoy, " ".join([texto_aemet or ""] + [f"{x.get('descripcion', '')}" for x in avisos]))
@@ -396,6 +397,16 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                 "Hay avisos en zonas DISTANTES: escribe un bloque por zona, en este orden; en pantalla se hace zoom a "
                 "cada una cuando se habla de ella (y se aleja y vuelve a acercarse entre una y otra). "
                 if len(racimos) > 1 else "") + "Todo lo que nombres se señala en el mapa.")
+            from .especiales import REGLA_ZONA_ENTERA, asegurar_zona_entera, comarcas_de
+
+            def _zona_entera(guion_, racimos=racimos):
+                for clave_, r_ in racimos:
+                    if guion_["segmentos"].get(clave_):
+                        guion_["segmentos"][clave_] = asegurar_zona_entera(guion_["segmentos"][clave_], r_)
+            g.POST_GUION[:] = [_zona_entera]
+            g.GANCHO_TEXTO += " " + REGLA_ZONA_ENTERA + (
+                " comarcas_de_la_zona: " + "; ".join(f"{z} = {', '.join(c)}" for z, c in comarcas_de(graves).items()) + "."
+                if comarcas_de(graves) else "")
             for clave, r in racimos:
                 g.GANCHO_TEXTO += (
                     f"\n- \"{clave}\" (unas {34 if clave == 'aviso' and CAMPO_PARTE[0] else 26} palabras): aviso "
