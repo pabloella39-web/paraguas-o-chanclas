@@ -1,0 +1,143 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-10",
+ "caption": "⚠️ Aviso rojo por lluvias en el sur de Ávila y el norte de Cáceres hoy.\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Serranía de Guadalajara, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Tajo y Alagón, Villuercas y Montánchez, Sierra de Madrid, Sur, Vegas y Oeste, Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Meseta cacereña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Ávila",
+ "titular": "ÁVILA Y CÁCERES: ROJO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 108.23,
+ "firma": "rojo:lluvias:2",
+ "guion": {
+  "intro": "Aviso rojo por lluvias en Ávila y Cáceres. Se esperan hasta 120 litros por metro cuadrado en 12 horas, con riesgo de daños muy graves o catastróficos.",
+  "zonas": "El aviso rojo afecta al sur de Ávila y al norte de Cáceres. Está en vigor desde hoy martes, a las nueve de la mañana, hasta las doce de la noche. Se señalan El Tiemblo, Cebreros y El Hoyo de Pinares, en Ávila. Y en Cáceres, Jaraíz de la Vera, Hervás, Losar de la Vera, Valverde del Fresno, Aldeanueva de la Vera, Cabezuela del Valle y Villanueva de la Vera. Las capitales no están dentro de la zona del aviso. Atentos por si el temporal se desvía: Cáceres, Badajoz, Salamanca, Talavera de la Reina, Toledo y Collado Villalba, con aviso amarillo. Ávila capital, sin aviso. También hay aviso amarillo por lluvia en la Sierra de Madrid, el Sistema Central de Salamanca y de Ávila, los Montes de Toledo y el Valle del Tajo.",
+  "evolucion": "Así evoluciona. El aviso arranca a las nueve de la mañana. Lo más fuerte llega por la tarde. Hacia las 4, en el norte de Cáceres, caerán unos 13 litros en una sola hora. Hacia las 6, en el sur de Ávila, el máximo será de unos 6,5 litros en una hora. El aviso rojo se mantiene hasta las doce de la noche.",
+  "lluvia": "En total, el norte de Cáceres puede superar los 100 litros por metro cuadrado. En el sur de Ávila, se esperan unos 55. Y ojo: en Salamanca y Toledo también se pueden superar los 100 litros. En Madrid caerán unos 55, y en Segovia, unos 40.",
+  "consejos": "No viajes salvo que sea estrictamente necesario. Mantente informado y sigue las indicaciones de las autoridades. Y si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva por allí."
+ },
+ "nivel_max": 3,
+ "avisos": [
+  {
+   "fenomeno": "lluvias",
+   "nivel": "rojo",
+   "zonas": [
+    "Sur de Ávila",
+    "Norte de Cáceres"
+   ],
+   "ciudades": [
+    "Ávila",
+    "Cáceres"
+   ],
+   "inicio": "2026-11-10T09:00:00+01:00",
+   "fin": "2026-11-10T23:59:59+01:00",
+   "descripcion": "Precipitación acumulada en 12 horas: 120 mm."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-10T02:01:13.519Z"
+     },
+     "success": true,
+     "platform_post_id": "7706356614311251232",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706356614311251232",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 23173956,
+     "post_title": "⚠️ Aviso rojo por lluvias en el sur de Ávila y el norte de Cáceres hoy.\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Serranía de Guadalajara, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Tajo y Alagón, Villuercas y Montánchez, Sierra de Madrid, Sur, Vegas y Oeste, Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Meseta cacereña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Ávila",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 108.234,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7706355953561815072",
+     "request_id": "a04a61f25f7f440b9071af0f28c220b5",
+     "request_id_logs": "a04a61f25f7f440b9071af0f28c220b5",
+     "job_id": "f016cf0243694e038bc3889d88ed3158",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-10T02:01:13.519Z"
+   },
+   "request_id": "a04a61f25f7f440b9071af0f28c220b5"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "aj0P8qpqaZI",
+  "url": "https://youtube.com/shorts/aj0P8qpqaZI",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-10T02:02:42.447Z"
+   },
+   "success": true,
+   "platform_post_id": "18073934951495715",
+   "post_url": "https://www.instagram.com/reel/DfiyTEBDo0Z/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 23173956,
+   "post_title": "⚠️ Aviso rojo por lluvias en el sur de Ávila y el norte de Cáceres hoy.\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Serranía de Guadalajara, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Tajo y Alagón, Villuercas y Montánchez, Sierra de Madrid, Sur, Vegas y Oeste, Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Meseta cacereña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Ávila",
+   "post_caption": "⚠️ Aviso rojo por lluvias en el sur de Ávila y el norte de Cáceres hoy.\n\n🔴 Aviso rojo por lluvia: Sur de Ávila, Norte de Cáceres, Ávila, Cáceres\n🟡 Aviso amarillo por lluvia: Serranía de Guadalajara, Sierra de San Vicente, Valle del Tajo, Montes de Toledo, Tajo y Alagón, Villuercas y Montánchez, Sierra de Madrid, Sur, Vegas y Oeste, Sistema Central de Salamanca, Sur de Salamanca, Sistema Central de Ávila, Meseta de Salamanca, Vegas del Guadiana, Meseta cacereña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Ávila",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 108.234,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "adb3fb92797a4c06be648e133223eed1",
+   "request_id_logs": "adb3fb92797a4c06be648e133223eed1",
+   "job_id": "1d03fa21ee364397933d24c4e34faaf2",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
