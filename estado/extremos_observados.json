@@ -1,18 +1,4 @@
 {
- "2026-11-05": {
-  "min": {
-   "valor": -4.9,
-   "sitio": "Puerto el Pico",
-   "zona": "Ávila",
-   "hora": "2026-11-05T22:00:00+0000"
-  },
-  "max": {
-   "valor": 24.3,
-   "sitio": "Tuineje-puerto Gran Tarajal",
-   "zona": "Las Palmas",
-   "hora": "2026-11-05T21:00:00+0000"
-  }
- },
  "2026-11-06": {
   "min": {
    "valor": -8.8,
@@ -67,6 +53,20 @@
    "sitio": "Tenerife",
    "zona": "Santa Cruz de Tenerife",
    "hora": "2026-11-09T14:00:00+0000"
+  }
+ },
+ "2026-11-10": {
+  "min": {
+   "valor": 6.3,
+   "sitio": "Ucero",
+   "zona": "Soria",
+   "hora": "2026-11-09T23:00:00+0000"
+  },
+  "max": {
+   "valor": 24.2,
+   "sitio": "Agaete-casco",
+   "zona": "Las Palmas de Gran Canaria",
+   "hora": "2026-11-10T00:00:00+0000"
   }
  }
 }

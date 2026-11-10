@@ -780,7 +780,20 @@
   "7706271917430440726",
   "7706269237840675606",
   "7706275266532033283",
-  "7706259381147534102"
+  "7706259381147534102",
+  "7706319154340659974",
+  "7706318365112009494",
+  "7706310856322515734",
+  "7706337070750663446",
+  "7706320113284940566",
+  "7706318129765745430",
+  "7706314769304765216",
+  "7706296910084965142",
+  "7706287297990198038",
+  "7706316362704634646",
+  "7706300259178513174",
+  "7706296840815313686",
+  "7706222362082394902"
  ],
  "hechas": [
   {
@@ -1277,6 +1290,39 @@
    "motor": "solo texto",
    "resumen": "Mañana en Pamplona: 19°/14°, 60 % de lluvia → paraguas.",
    "publicado": true
+  },
+  {
+   "fecha": "2026-11-10",
+   "clave": "jarandilla de la vera|2026-11-10",
+   "lugar": "Jarandilla de la Vera",
+   "usuarios": [
+    "thessalg13"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Jarandilla de la Vera: 15°/13°, 100 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-10",
+   "clave": "burgohondo|2026-11-10",
+   "lugar": "Burgohondo",
+   "usuarios": [
+    "ufjdwj"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Burgohondo: 16°/13°, 100 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-10",
+   "clave": "bilbao|2026-11-11",
+   "lugar": "Bilbao",
+   "usuarios": [
+    "mitxelcore"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Bilbao: 21°/19°, 53 % de lluvia → paraguas.",
+   "publicado": true
   }
  ],
  "v2": true,
@@ -1558,7 +1604,8 @@
   "7705993550673478422",
   "7706269237840675606",
   "7706275266532033283",
-  "7706259381147534102"
+  "7706259381147534102",
+  "7706318365112009494"
  ],
  "fallos": {
   "7701261555031114528": 1,
