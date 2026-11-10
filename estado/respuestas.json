@@ -849,7 +849,11 @@
   "7706638500149412630",
   "7706637977900991265",
   "7706651787514233603",
-  "7706638278497174304"
+  "7706638278497174304",
+  "7706653137847911190",
+  "7706657799519421206",
+  "7706652977981375254",
+  "7706654623544869654"
  ],
  "hechas": [
   {
@@ -1389,6 +1393,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Herreruela: 18°/16°, 90 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-10",
+   "clave": "jaen|2026-11-11",
+   "lugar": "Jaén",
+   "usuarios": [
+    "danifc_010"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Jaén: 20°/15°, 100 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
