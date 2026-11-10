@@ -1,0 +1,142 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-10",
+ "caption": "⚠️ Aviso rojo por viento en La Palma: rachas de hasta 130 km/h el miércoles\n\n🔴 Aviso rojo por viento: Cumbres de La Palma, Este de La Palma, Oeste de La Palma, Santa Cruz De Tenerife\n🟡 Aviso amarillo por lluvia: Vegas del Guadiana, Meseta cacereña, Villuercas y Montánchez, La Siberia extremeña, Barros y Serena, Sur de Badajoz, Tajo y Alagón, Sur de Salamanca, Sistema Central de Ávila, Sistema Central de Salamanca, Nevada y Alpujarras, Costa granadina, Ronda, Sol y Guadalhorce\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #SantaCruzDeTenerife",
+ "titular": "LA PALMA: AVISO ROJO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 69.4,
+ "firma": "rojo:vientos:3",
+ "guion": {
+  "intro": "AEMET amplía el aviso rojo a La Palma. Viento con rachas de hasta 130 kilómetros por hora. Se pueden producir daños muy graves o catastróficos.",
+  "zonas": "El aviso rojo por viento es para toda la isla de La Palma: las cumbres, todo el este y todo el oeste. Empieza el miércoles a las tres de la madrugada y dura hasta casi las doce del mediodía. Será viento del suroeste, sobre todo en las cumbres, la vertiente noroeste y la vertiente este-sureste. Con pueblos como Santa Cruz de la Palma, El Paso, Mazo, Puntallana, Barlovento, Garafía, Tijarafe, Puntagorda y Fuencaliente, entre otros. Es para toda la zona, también para los pueblos que no se nombran. Además, el aviso rojo por lluvia en el norte de Cáceres y el sur de Ávila se prolonga hasta el miércoles por la noche, hacia las once, con 120 litros en 12 horas. Y hay aviso amarillo por lluvia en zonas de Extremadura, Salamanca, Ávila, Granada y Málaga.",
+  "consejos": "No viajes salvo que sea estrictamente necesario y sigue las indicaciones de las autoridades. Si hay una emergencia, llama al 112.",
+  "cierre": "Compártelo con quien viva en La Palma."
+ },
+ "nivel_max": 3,
+ "avisos": [
+  {
+   "fenomeno": "vientos",
+   "nivel": "rojo",
+   "zonas": [
+    "Cumbres de La Palma",
+    "Este de La Palma",
+    "Oeste de La Palma"
+   ],
+   "ciudades": [
+    "Santa Cruz De Tenerife",
+    "La Palma"
+   ],
+   "inicio": "2026-11-11T03:00:00-00:00",
+   "fin": "2026-11-11T11:59:59-00:00",
+   "descripcion": "Rachas máximas: 130 km/h. Viento del SW afectando principalmente a cumbres, vertiente NW y en la vertiente E-SE."
+  }
+ ],
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-10T12:25:09.390Z"
+     },
+     "success": true,
+     "platform_post_id": "7706517546102443296",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7706517546102443296",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 10850955,
+     "post_title": "⚠️ Aviso rojo por viento en La Palma: rachas de hasta 130 km/h el miércoles\n\n🔴 Aviso rojo por viento: Cumbres de La Palma, Este de La Palma, Oeste de La Palma, Santa Cruz De Tenerife\n🟡 Aviso amarillo por lluvia: Vegas del Guadiana, Meseta cacereña, Villuercas y Montánchez, La Siberia extremeña, Barros y Serena, Sur de Badajoz, Tajo y Alagón, Sur de Salamanca, Sistema Central de Ávila, Sistema Central de Salamanca, Nevada y Alpujarras, Costa granadina, Ronda, Sol y Guadalhorce\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #SantaCruzDeTenerife",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7706517291625777184",
+     "request_id": "3619ddf7d2b04c479f70ed6804fa80c6",
+     "request_id_logs": "3619ddf7d2b04c479f70ed6804fa80c6",
+     "job_id": "344964cd93f643a586469bf330047330",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-10T12:25:09.390Z"
+   },
+   "request_id": "3619ddf7d2b04c479f70ed6804fa80c6"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "0Pb_y6GSSdE",
+  "url": "https://youtube.com/shorts/0Pb_y6GSSdE",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-10T12:26:23.942Z"
+   },
+   "success": true,
+   "platform_post_id": "18129444004850309",
+   "post_url": "https://www.instagram.com/reel/Dfj5stUDbA3/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 10850955,
+   "post_title": "⚠️ Aviso rojo por viento en La Palma: rachas de hasta 130 km/h el miércoles\n\n🔴 Aviso rojo por viento: Cumbres de La Palma, Este de La Palma, Oeste de La Palma, Santa Cruz De Tenerife\n🟡 Aviso amarillo por lluvia: Vegas del Guadiana, Meseta cacereña, Villuercas y Montánchez, La Siberia extremeña, Barros y Serena, Sur de Badajoz, Tajo y Alagón, Sur de Salamanca, Sistema Central de Ávila, Sistema Central de Salamanca, Nevada y Alpujarras, Costa granadina, Ronda, Sol y Guadalhorce\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #SantaCruzDeTenerife",
+   "post_caption": "⚠️ Aviso rojo por viento en La Palma: rachas de hasta 130 km/h el miércoles\n\n🔴 Aviso rojo por viento: Cumbres de La Palma, Este de La Palma, Oeste de La Palma, Santa Cruz De Tenerife\n🟡 Aviso amarillo por lluvia: Vegas del Guadiana, Meseta cacereña, Villuercas y Montánchez, La Siberia extremeña, Barros y Serena, Sur de Badajoz, Tajo y Alagón, Sur de Salamanca, Sistema Central de Ávila, Sistema Central de Salamanca, Nevada y Alpujarras, Costa granadina, Ronda, Sol y Guadalhorce\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #SantaCruzDeTenerife",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 69.4,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "5778d2d050414e1bb4a62627f7156189",
+   "request_id_logs": "5778d2d050414e1bb4a62627f7156189",
+   "job_id": "29e3771861bc43a0bf6ac9b93911310c",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
