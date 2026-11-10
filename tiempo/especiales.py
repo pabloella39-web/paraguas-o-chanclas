@@ -1019,6 +1019,36 @@ def avisos_relevantes(avisos: list[dict], momento: datetime, horas: int = 12) ->
 NARANJAS_CONTEXTO: list = []   # en el vídeo del ROJO: los naranjas del mismo fenómeno también se pintan y se nombran
 AMARILLOS: list = []    # avisos amarillos del mismo fenómeno en la misma zona (Lanzarote y Fuerteventura, 8/11)
 AMPLIACION: list = []   # sitios nuevos cuando AEMET amplía un aviso ya publicado hoy
+YA_AVISADO: list = []   # en una ampliación: lo que sigue en vigor y ya se contó (se pinta y se menciona por encima)
+
+
+def _partir_ampliacion(grupos, ya: set):
+    """En una ampliación, separa lo NUEVO (el vídeo va de eso) de lo que ya se contó en un vídeo anterior."""
+    def visto(z):
+        corto = z.split(" - ")[-1]
+        return z in ya or corto in ya or any(corto in y for y in ya)
+    nuevos, viejos = [], []
+    for gr in grupos:
+        zp = gr.get("zona_poligono") or list(zip(gr.get("zonas") or [], gr["poligonos"]))
+        if not zp or len(zp) != len(gr["poligonos"]):
+            nuevos.append(gr)
+            continue
+        for destino, pares in ((nuevos, [t for t in zp if not visto(t[0])]), (viejos, [t for t in zp if visto(t[0])])):
+            if pares:
+                zonas = list(dict.fromkeys(z for z, _ in pares))
+                destino.append({**gr, "zonas": zonas, "poligonos": [p for _, p in pares], "zona_poligono": pares,
+                                "ciudades": [c for c in (gr.get("ciudades") or []) if (c in ya) == (destino is viejos)]})
+    return (nuevos, viejos) if nuevos else (grupos, [])
+
+
+def _centro(gr):
+    pts = [p for pol in gr["poligonos"] for p in pol]
+    return sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts)
+
+
+def _cerca(a, b, dist: float = 3.5) -> bool:
+    (x0, y0), (x1, y1) = _centro(a), _centro(b)
+    return math.hypot((x0 - x1) * 0.77, y0 - y1) <= dist
 ISLAS = ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma", "La Gomera", "El Hierro"]
 
 
@@ -2422,6 +2452,14 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
     if datos and AMPLIACION:
         datos[0]["NOVEDAD"] = ("AEMET AMPLÍA el aviso a: " + ", ".join(AMPLIACION) + ". Empieza el vídeo con eso "
                                "(«AEMET amplía el aviso naranja a Gran Canaria») y luego nombra TODOS los sitios.")
+        if YA_AVISADO:
+            datos[0]["SIGUE_EN_VIGOR_YA_CONTADO"] = "; ".join(
+                f"{x['nivel']} por {nombre_fen(x['fenomeno'])} en " + ", ".join(sitios_aviso(x)) for x in YA_AVISADO)
+            datos[0]["nota_ya_contado"] = (
+                "Este vídeo es SOLO de las zonas NUEVAS: todo el detalle (zonas, comarcas, pueblos, horas, lluvia, "
+                "evolución) es de ellas. Lo de SIGUE_EN_VIGOR_YA_CONTADO ya tiene su vídeo: menciónalo por encima, en "
+                "UNA sola frase al final de «zonas» («y sigue el aviso rojo en el norte de Cáceres y el sur de "
+                "Ávila»), sin pueblos, cifras ni horas.")
     extra = max(0, sum(len(sitios_aviso(gr)) for gr in grupos[:4]) - 3)
     palabras["zonas"] += 3 * extra   # con muchos sitios, el bloque de zonas puede alargarse
     if datos:
@@ -2591,15 +2629,15 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                   "cierre": "COMPÁRTELO",
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
-        "capas": {"intro": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS),
-                  "zonas": _juntar_capas(_capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS, con_lista=True),
-                                         _capa_nucleos(nucleos, reservado=_caja_lista(grupos + NARANJAS_CONTEXTO + AMARILLOS))),
+        "capas": {"intro": _capa_poligonos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS),
+                  "zonas": _juntar_capas(_capa_poligonos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS, con_lista=True),
+                                         _capa_nucleos(nucleos, reservado=_caja_lista(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS))),
                   **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(
                       nucleos, reservado=getattr(lluvia_capa, "reservado", None)))} if lluvia_capa else {}),
                   **({"evolucion": _juntar_capas(evol_capa, _capa_nucleos(nucleos))} if evol_capa else {}),
                   # en «qué hacer» manda la tarjeta de consejos: sin nombres de pueblos encima
-                  "consejos": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS, consejos=consejos),
-                  "cierre": _capa_poligonos(grupos + NARANJAS_CONTEXTO + AMARILLOS)},
+                  "consejos": _capa_poligonos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS, consejos=consejos),
+                  "cierre": _capa_poligonos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS)},
         "gancho": _gancho_aviso(grupos),
         "aviso_portada": {"nivel": gr["nivel"],
                           "fenomeno": " y ".join(dict.fromkeys("oleaje" if "costeros" in x["fenomeno"] else x["fenomeno"]
@@ -2615,7 +2653,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                               for z in (gr.get("ciudades") or [x.split(" - ")[-1] for x in gr["zonas"]])[:2])),
     }
     if lejanas:   # zoom out y zoom in a cada zona lejana cuando se habla de ella; los consejos, con toda España
-        todos = grupos + NARANJAS_CONTEXTO + AMARILLOS
+        todos = grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS
         for n, r in enumerate(lejanas, 2):
             k = f"zonas{n}"
             if k not in guion["segmentos"]:
@@ -2748,6 +2786,7 @@ def main():
                 continue
             hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}.json"
             AMPLIACION[:] = []
+            YA_AVISADO[:] = []
             if hist_n.exists() and not a.demo:
                 # Ya salió el de hoy: solo se hace otro si AEMET ha AMPLIADO el aviso a sitios nuevos (Gran Canaria
                 # el 8/11/2026). Nunca más de tres vídeos del mismo nivel en un día.
@@ -2766,6 +2805,8 @@ def main():
                              "; ".join(", ".join(sitios_aviso(x)) for x in del_nivel))
                     continue
                 AMPLIACION[:] = [x for x in nuevos if x != "(rehecho)"]
+                if AMPLIACION:   # el vídeo, solo de las zonas nuevas; lo ya contado, por encima
+                    del_nivel, YA_AVISADO[:] = _partir_ampliacion(del_nivel, ya)
                 log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)
                 hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}-{len(previos) + 1}.json"
             if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
@@ -2773,6 +2814,8 @@ def main():
                 continue
             NARANJAS_CONTEXTO[:] = [x for x in grupos if nivel == "rojo" and x["nivel"] == "naranja"
                                     and x["fenomeno"] in {r["fenomeno"] for r in del_nivel}]
+            if YA_AVISADO:   # en una ampliación, solo los naranjas de alrededor de lo nuevo
+                NARANJAS_CONTEXTO[:] = [x for x in NARANJAS_CONTEXTO if any(_cerca(x, r) for r in del_nivel)]
             # Un aviso naranja o rojo SALE SÍ O SÍ: si algo falla, se reintenta cada vez con menos adornos
             meta = None
             for ajuste in ("completo", "sin mapa de lluvia", "guion de respaldo"):
