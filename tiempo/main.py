@@ -397,13 +397,16 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                 "Hay avisos en zonas DISTANTES: escribe un bloque por zona, en este orden; en pantalla se hace zoom a "
                 "cada una cuando se habla de ella (y se aleja y vuelve a acercarse entre una y otra). "
                 if len(racimos) > 1 else "") + "Todo lo que nombres se señala en el mapa.")
-            from .especiales import REGLA_ZONA_ENTERA, asegurar_zona_entera, comarcas_de
+            from .especiales import REGLA_ZONA_ENTERA, asegurar_zona_entera, comarcas_de, variar_discurso
 
             def _zona_entera(guion_, racimos=racimos):
+                variar_discurso(guion_, graves)   # sin la coletilla de «daños graves o catastróficos»
                 for clave_, r_ in racimos:
                     if guion_["segmentos"].get(clave_):
                         guion_["segmentos"][clave_] = asegurar_zona_entera(guion_["segmentos"][clave_], r_)
             g.POST_GUION[:] = [_zona_entera]
+            g.GANCHO_TEXTO += (" No uses la coletilla de AEMET «daños graves / muy graves o catastróficos»: cuenta el "
+                               "peligro con lo concreto de ese fenómeno, como posibilidad y cada día de una forma.")
             g.GANCHO_TEXTO += " " + REGLA_ZONA_ENTERA + (
                 " comarcas_de_la_zona: " + "; ".join(f"{z} = {', '.join(c)}" for z, c in comarcas_de(graves).items()) + "."
                 if comarcas_de(graves) else "")

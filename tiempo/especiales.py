@@ -2363,6 +2363,57 @@ def asegurar_zona_entera(texto: str, grupos) -> str:
     return texto
 
 
+# Que los avisos no suenen todos igual: sin la coletilla de AEMET y con una forma distinta de contar el peligro
+_COLETILLA = re.compile(r"da[ñn]os\s+(?:muy\s+)?graves(?:\s+o\s+(?:incluso\s+)?catastr[óo]ficos)?", re.I)
+_PELIGRO_CONCRETO = {
+    "lluvia": ["inundaciones y crecidas repentinas de ríos y arroyos", "calles y bajos anegados y carreteras cortadas",
+               "arroyos desbordados y balsas de agua en las carreteras", "riadas en ramblas y cauces secos"],
+    "tormenta": ["trombas de agua, granizo e inundaciones repentinas", "granizo grande, rachas muy fuertes y calles anegadas"],
+    "viento": ["caída de árboles, ramas y cornisas", "cortes de luz y objetos volando por la calle",
+               "tejados, andamios y vallas arrancados"],
+    "coster": ["olas que barren paseos marítimos y espigones", "golpes de mar muy peligrosos en puertos y playas"],
+    "nev": ["carreteras cortadas y pueblos aislados", "coches atrapados y puertos de montaña cerrados"],
+    "": ["problemas serios en carreteras y en la calle", "situaciones de peligro para quien esté al aire libre"],
+}
+_ENFOQUES = [
+    "empieza por la CIFRA más llamativa (litros, rachas, olas) y dónde",
+    "empieza por el SITIO y la HORA en que llega lo peor",
+    "empieza por lo que puede pasar en la calle (lo concreto de ese fenómeno), y luego el nivel del aviso",
+    "empieza por la novedad («AEMET activa…», «salta el aviso…») y a quién le toca",
+    "empieza con una orden clara para quien vive allí («Si estás en…, atento a partir de las…»)",
+    "empieza comparando con lo normal («el triple de lo que llueve en un mes», «viento de temporal fuerte») solo si "
+    "los datos lo permiten; si no, por la cifra",
+]
+
+
+def _peligro_concreto(fenomeno: str, n: int = 0) -> str:
+    f = _norm_txt(fenomeno)
+    lista = next((v for k, v in _PELIGRO_CONCRETO.items() if k and k in f), _PELIGRO_CONCRETO[""])
+    return lista[n % len(lista)]
+
+
+def _formulas_recientes(n: int = 8) -> list[str]:
+    """Cómo empezaron y acabaron los últimos vídeos de aviso (para no repetir la fórmula)."""
+    out = []
+    try:
+        for f in sorted(HISTORIAL.glob("aviso-*.json"), key=lambda p_: p_.stat().st_mtime)[-n:]:
+            seg = (json.loads(f.read_text(encoding="utf-8")).get("guion") or {})
+            out += [seg[k] for k in ("intro", "consejos", "cierre") if seg.get(k)]
+    except Exception:  # noqa: BLE001
+        pass
+    return out
+
+
+def variar_discurso(guion: dict, grupos) -> None:
+    """Quita la coletilla «daños (muy) graves o catastróficos» si se ha colado: en su lugar, lo concreto del fenómeno."""
+    n = len(list(HISTORIAL.glob("aviso-*.json")))
+    for k, txt in list(guion.get("segmentos", {}).items()):
+        if _COLETILLA.search(txt or ""):
+            guion["segmentos"][k] = _COLETILLA.sub(_peligro_concreto(grupos[0]["fenomeno"], n), txt, count=1)
+            guion["segmentos"][k] = _COLETILLA.sub("problemas serios", guion["segmentos"][k])
+            n += 1
+
+
 def sitios_aviso(gr) -> list[str]:
     """Los sitios que hay que nombrar: en Canarias, las islas; si no, las zonas de AEMET (todas en rojo, hasta 6 en
     naranja), sin repetir."""
@@ -2537,6 +2588,19 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
             "evolución en l/m² por zonas: cuánto se lleva a media tarde, cuánto por la noche y el total al final "
             "(«a las seis de la tarde ya se rondan los 60 litros en el norte de Cáceres; al acabar el día, más de "
             "100»). Cifras redondas, de estos datos.")
+    if datos:
+        n_prev = len(list(HISTORIAL.glob("aviso-*.json")))
+        datos[0]["VARIEDAD"] = {
+            "regla": (
+                "Cada vídeo de aviso tiene que sonar DISTINTO a los anteriores. PROHIBIDA la coletilla de AEMET «se "
+                "pueden producir daños graves / muy graves o catastróficos» y sus variantes: no la uses nunca. El "
+                "peligro se cuenta con lo CONCRETO de ese fenómeno, dicho como posibilidad y con tus palabras (por "
+                "ejemplo: " + "; ".join(_peligro_concreto(grupos[0]["fenomeno"], n_prev + i) for i in range(2))
+                + "), cada vez de una manera. Cambia también el arranque, el orden de la primera frase, los verbos "
+                "(«se esperan», «pueden caer», «AEMET prevé», «llegan»…), los consejos y la despedida."),
+            "enfoque_de_este_video": _ENFOQUES[n_prev % len(_ENFOQUES)],
+            "NO_REPITAS_estas_formulas_de_los_ultimos_videos": _formulas_recientes(),
+        }
     if not plantilla:
         try:
             if rojo:
@@ -2546,14 +2610,16 @@ def guion_aviso(grupos, hoy: date, factor: float, presenta: str, plantilla: bool
                     "afectado con nombre (y los núcleos señalados), desde cuándo y hasta cuándo. En «evolucion», hora a "
                     "hora y en orden: cuándo empieza a llover fuerte, la HORA PUNTA en cada zona con los LITROS EN UNA "
                     "HORA, y cuándo afloja. En «lluvia», el total acumulado por zona (de mayor a menor) y las provincias "
-                    "vecinas con cantidades altas. Explica qué significa (riesgo de crecidas, arroyos, carreteras) solo "
-                    "si lo dice AEMET en la descripción o la instrucción. Frases claras, sin relleno.")
+                    "vecinas con cantidades altas. Explica qué puede significar en la práctica (crecidas, arroyos, "
+                    "carreteras…) con lo propio de ese fenómeno y como posibilidad, sin inventar hechos ni cifras. "
+                    "Frases claras, sin relleno.")
             gg = _claude_json(None, None, PROMPT_AVISO.format(titular=titular_avisos(
                                   [c for gr in grupos for c in gr.get("ciudades", [])], grupos[0]["nivel"]) or "CIUDAD", presenta=presenta, fecha=g.fecha_larga(hoy),
                                                   avisos=json.dumps(datos, ensure_ascii=False, indent=1),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values())))
             if all(gg["segmentos"].get(s) for s in orden):
                 gg.update(origen="claude", orden=orden)
+                variar_discurso(gg, grupos)
                 _completar_sitios(gg, grupos)
                 # cada bloque de zonas, con las comarcas de SU zona (no las de la otra punta de España)
                 rac = RACIMOS_AVISO[0] if len(RACIMOS_AVISO[0]) > 1 else [grupos]

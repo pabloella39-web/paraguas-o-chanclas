@@ -128,3 +128,8 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   las rachas de viento hora a hora (y la trayectoria si hay borrasca o DANA identificada). El texto cuenta por dónde
   entra, cómo avanza y a qué zonas va tocando y cuándo. (De momento no en avisos solo de Canarias.)
 - Ampliaciones: lo ya contado va en el tramo «sigue», con zoom out de la zona nueva y zoom in a la anterior.
+
+- AVISOS, VARIEDAD: prohibida la coletilla «se pueden producir daños graves / muy graves o catastróficos». El peligro
+  se cuenta con lo concreto del fenómeno (crecidas, árboles caídos, olas…), como posibilidad, y cada vídeo de una
+  forma: cambia el arranque, los verbos, los consejos y la despedida (se pasan al guion las fórmulas de los últimos
+  vídeos para no repetirlas, y un enfoque distinto en cada uno).
