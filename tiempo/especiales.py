@@ -3260,17 +3260,34 @@ def main():
             if YA_AVISADO:   # en una ampliación, solo los naranjas de alrededor de lo nuevo
                 NARANJAS_CONTEXTO[:] = [x for x in NARANJAS_CONTEXTO if any(_cerca(x, r) for r in del_nivel)]
             # Un aviso naranja o rojo SALE SÍ O SÍ: si algo falla, se reintenta cada vez con menos adornos
-            meta = None
+            meta = reserva = None
             for ajuste in ("completo", "sin mapa de lluvia", "guion de respaldo"):
                 try:
                     if ajuste == "sin mapa de lluvia":
                         os.environ["SIN_CAMPO_AVISO"] = "1"
                     if ajuste == "guion de respaldo":
                         os.environ["PERMITIR_PLANTILLA"] = "1"
-                    meta = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
+                    m_ = video_aviso(del_nivel, hoy, Path(a.salida), a.demo, sufijo=nivel)
+                    # Control de calidad también en los avisos: si el vídeo sale mal (fallo grave), se rehace con el
+                    # siguiente ajuste en vez de publicarlo así. Si ningún intento sale limpio, se publica el último
+                    # que se pudo montar: un aviso naranja o rojo no se queda sin salir.
+                    try:
+                        from . import control
+                        m_["control"] = control.revisar(Path(m_["video"]))
+                        control.reiniciar()
+                    except Exception as e:  # noqa: BLE001
+                        log.warning("Control de calidad no disponible: %s", e)
+                    reserva = m_
+                    if (m_.get("control") or {}).get("graves") and ajuste != "guion de respaldo" and not a.demo:
+                        log.error("El vídeo del aviso %s no pasa el control (%s): se rehace (%s)", nivel,
+                                  "; ".join(m_["control"]["graves"]), ajuste)
+                        continue
+                    meta = m_
                     break
                 except Exception as e:  # noqa: BLE001
                     log.error("Vídeo del aviso %s falló (%s): %s → se reintenta", nivel, ajuste, e)
+            if meta is None and reserva is not None and Path(reserva["video"]).exists():
+                meta = reserva
             if meta is None:
                 (RAIZ / "aviso_fallo.txt").write_text(f"El vídeo del aviso {nivel} falló tres veces", encoding="utf-8")
                 raise RuntimeError(f"El vídeo del aviso {nivel} falló tres veces")
@@ -3305,7 +3322,7 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
     # especiales no se publica si hay un fallo grave (queda como artefacto y se avisa).
     try:
         from . import control
-        res_ = control.revisar(Path(meta["video"]))
+        res_ = meta.get("control") or control.revisar(Path(meta["video"]))
         meta["control"] = res_
         if control.bloquea(res_) and a.tipo != "avisos":
             log.error("NO se publica: %s", "; ".join(res_["graves"]))
