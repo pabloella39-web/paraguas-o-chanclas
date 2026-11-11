@@ -153,3 +153,5 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Mapas de evolución (lluvia acumulada, frentes, temporales, viento, borrascas): NUNCA llevan encima las etiquetas «AVISO ROJO · LLUVIAS», «AVISO NARANJA · VIENTO»…; esas etiquetas solo salen en el plano de las zonas pintadas y desaparecen al entrar el mapa de colores.
 
 - Vídeos de aviso con zonas lejanas (p. ej. Cáceres y La Palma): el zoom de la primera zona va a lo más grave (el rojo), no a todos los naranjas de alrededor; el mapa de lluvia acumulada siempre llena la pantalla (nunca un cuadrado sobre el mapa de España).
+
+- Bloque «zonas» de los avisos: no se queda en un solo plano. Primero, zoom al aviso principal con sus pueblos; cuando el texto pasa a los avisos de menor nivel («Naranja por…», «También hay amarillo…»), zoom out al mapa amplio con esas zonas y sus ciudades. Por eso el texto va en ese orden: primero todo lo del aviso principal y después, en frases aparte, los de menor nivel.

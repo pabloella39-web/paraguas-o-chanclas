@@ -594,7 +594,7 @@ CAJAS_CIUDAD: dict = {}   # tarjeta de cada ciudad en el fotograma actual (para 
 
 class Compositor:
     def __init__(self, prev, plan, total, fecha_txt, extremos, titular: str = "", *, datos_seg=None, vistas=None,
-                 pills=None, portada_txt=None, capas=None, sin_marcadores=(), fecha=None, estacion_override=None,
+                 pills=None, portada_txt=None, capas=None, sin_marcadores=(), partes=None, fecha=None, estacion_override=None,
                  gancho=None, dias_portada=None, satelite=None, aviso_portada=None, capas_fondo=None, capas_encima=None,
                  barra_dias=None, transiciones=None, canarias_real=()):
         """Opcionales para los vídeos especiales (fin de semana, avisos):
@@ -643,6 +643,28 @@ class Compositor:
             ini = 0 if i == 0 else max(plan[i - 1]["fin"], p["inicio"] - 0.35)
             fin = total if i == len(plan) - 1 else max(p["fin"], plan[i + 1]["inicio"] - 0.35)
             self.ventanas.append((ini, fin, p["seg"]))
+        # Bloques largos en dos planos: a partir de una fracción del bloque, zoom a otra vista (p. ej. del aviso rojo
+        # al mapa amplio cuando se pasa a contar los naranjas), para que no se quede el mismo plano medio minuto
+        for seg_, (frac, vista_, capa_) in (partes or {}).items():
+            k = next((j for j, v in enumerate(self.ventanas) if v[2] == seg_), None)
+            if k is None or not vista_ or vista_ == self.vista_de(seg_):
+                continue
+            a, b, _ = self.ventanas[k]
+            corte = a + (b - a) * frac
+            if corte - a < 4.0 or b - corte < 4.0:
+                continue
+            k2 = f"{seg_}·2"
+            self.ventanas[k:k + 1] = [(a, corte, seg_), (corte, b, k2)]
+            self.vistas[k2] = vista_
+            self.transiciones[k2] = 2.4
+            if capa_ or seg_ in self.capas:
+                self.capas[k2] = capa_ or self.capas[seg_]
+            if seg_ in self.pills:
+                self.pills[k2] = self.pills[seg_]
+            if seg_ in self.sin_marcadores:
+                self.sin_marcadores.add(k2)
+            if seg_ in self.canarias_real:
+                self.canarias_real.add(k2)
         self.cabecera = self._cabecera()
         self.fin_intro = next((b for a, b, sg in self.ventanas if sg == "intro"), 0.0)
         self.sat_ini, self.sat_dur = self.fin_intro, 6.0

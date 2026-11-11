@@ -2712,6 +2712,22 @@ def _gancho_aviso(grupos) -> dict:
     return fenomeno_del_dia(prev, grupos)
 
 
+def _corte_contexto(texto: str, nivel: str):
+    """Fracción del bloque «zonas» en la que se deja de hablar del aviso principal y se pasa a los de menor nivel
+    («Naranja por lluvias en…», «También hay amarillo…»). None si no hay ese cambio o cae muy al principio o al final."""
+    menores = {"rojo": ("naranja", "amarillo"), "naranja": ("amarillo",)}.get(nivel, ())
+    if not texto or not menores:
+        return None
+    pos = 0
+    for frase in re.split(r"(?<=[.!?…])\s+", texto):
+        f_ = frase.lower()
+        if pos and any(m in f_ for m in menores) and nivel not in f_:
+            frac = pos / len(texto)
+            return frac if 0.25 <= frac <= 0.85 else None
+        pos += len(frase) + 1
+    return None
+
+
 def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str = "") -> dict:
     salida.mkdir(parents=True, exist_ok=True)
     trabajo = salida / "trabajo"
@@ -2841,6 +2857,20 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                                               _capa_nucleos(nn, reservado=_caja_lista(r)))
         kwargs["vistas"]["consejos"] = kwargs["vistas"]["cierre"] = VISTA_GENERAL
         kwargs["transiciones"]["consejos"] = 2.4
+    corte = _corte_contexto(guion["segmentos"].get("zonas", ""), grupos[0]["nivel"])
+    if corte:   # al pasar a contar los avisos de menor nivel: zoom out a todo lo que tiene aviso (plano nuevo)
+        contexto = (RACIMOS_AVISO[0][0] if lejanas else grupos + NARANJAS_CONTEXTO) + \
+            [x for x in AMARILLOS if x.get("poligonos") and not all(la < 30 for pol in x["poligonos"] for _, la in pol)]
+        try:
+            amplia = _zona_zoom(contexto)
+        except Exception:  # noqa: BLE001
+            amplia = VISTA_GENERAL
+        todos_ = grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS
+        nn2 = nucleos_nombrados(guion["segmentos"]["zonas"], contexto)
+        nn2 += [c for c in ciudades_zoom(contexto, AMARILLOS, n_amarillo=5, n_ref=6)
+                if c["nombre"] not in {x["nombre"] for x in nn2}]
+        kwargs["partes"] = {"zonas": (corte, amplia, _juntar_capas(
+            _capa_poligonos(todos_, con_lista=True), _capa_nucleos(nn2, reservado=_caja_lista(todos_))))}
     if TEMPORAL_AVISO[0] and "temporal" in guion["segmentos"]:   # mapa amplio y vuelta a la zona, con zoom lento
         from .sistemas import VISTA_SISTEMA
         kwargs["vistas"]["temporal"] = VISTA_SISTEMA
