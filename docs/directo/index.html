@@ -59,7 +59,7 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const CIUDADES=[["A Coruña", 43.36, -8.41], ["Oviedo", 43.36, -5.85], ["Santander", 43.46, -3.81], ["Bilbao", 43.26, -2.94], ["Pamplona", 42.81, -1.65], ["Madrid", 40.42, -3.7], ["Valladolid", 41.65, -4.72], ["Salamanca", 40.97, -5.66], ["Toledo", 39.86, -4.03], ["Zaragoza", 41.65, -0.89], ["Barcelona", 41.38, 2.17], ["Valencia", 39.47, -0.38], ["Alicante", 38.34, -0.48], ["Murcia", 37.99, -1.13], ["Sevilla", 37.39, -5.98], ["Málaga", 36.72, -4.42], ["Granada", 37.18, -3.6], ["Almería", 36.83, -2.46], ["Badajoz", 38.88, -6.97], ["Ceuta", 35.89, -5.32], ["Melilla", 35.29, -2.94], ["Palma", 39.57, 2.65], ["Las Palmas", 28.12, -15.43], ["S.C. Tenerife", 28.46, -16.25], ["Cáceres", 39.47, -6.37]];
-const VISTAS=[{n:"España",c:[41.3,-2.6],z:6.2,s:90},{n:"Cáceres · Ávila · Salamanca",c:[41.0,-5.6],z:7.7,s:30},{n:"España",c:[41.3,-2.6],z:6.2,s:60},{n:"Andalucía y el Estrecho",c:[38.3,-5.0],z:7.5,s:30},{n:"Canarias",c:[29.3,-15.8],z:7.3,s:22}];
+const VISTAS=[{n:"España",c:[41.3,-2.6],z:6.2,s:3600}];
 const RAW="https://raw.githubusercontent.com/pabloella39-web/paraguas-o-chanclas/main/estado/observaciones_aviso.json";
 const TZ="Europe/Madrid";
 function escala(){const k=Math.min(innerWidth/1080,innerHeight/1920);const l=document.getElementById("lienzo");l.style.transform="translateX(-50%) scale("+k+")"}
@@ -84,7 +84,7 @@ for(const [n,la,lo] of CIUDADES){L.marker([la,lo],{pane:"ciu",interactive:false,
 // ---- Radar real (RainViewer: mosaico de radares, una imagen cada 10 min) ----
 let cuadros=[],capas={},idx=0,ultima=0,cola=[],hostR="";
 function reintento(capa){capa.on("tileerror",e=>{const t=e.tile;t._n=(t._n||0)+1;if(t._n>8)return;const u=capa.getTileUrl(e.coords);setTimeout(()=>{if(t.parentNode){t.src="";t.src=u}},2500*t._n+Math.random()*3000)})}
-function despacha(){const f=cola.shift();if(!f||capas[f.path])return;const c=L.tileLayer(hostR+f.path+"/256/{z}/{x}/{y}/2/1_1.png",{pane:"radar",opacity:0,maxNativeZoom:7,maxZoom:10,tileSize:256,updateWhenZooming:false,updateWhenIdle:true,keepBuffer:0});reintento(c);c._ok=false;c.on("loading",()=>{c._ok=false});c.on("load",()=>{c._ok=true});c.addTo(mapa);capas[f.path]=c}
+function despacha(){const f=cola.shift();if(!f||capas[f.path])return;const c=L.tileLayer(hostR+f.path+"/256/{z}/{x}/{y}/2/1_1.png",{pane:"radar",opacity:0,maxNativeZoom:7,maxZoom:10,tileSize:256,updateWhenZooming:false,keepBuffer:2});reintento(c);c._ok=false;c.on("loading",()=>{c._ok=false});c.on("load",()=>{c._ok=true});c.addTo(mapa);capas[f.path]=c}
 setInterval(despacha,2500);
 async function cargarRadar(){
   try{const j=await (await fetch("https://api.rainviewer.com/public/weather-maps.json",{cache:"no-store"})).json();
@@ -111,7 +111,7 @@ cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,700);
 // ---- Cámara: alterna España y las zonas con aviso ----
 let v=0;function siguiente(){v=(v+1)%VISTAS.length;const w=VISTAS[v],m=document.getElementById("mapa");m.style.opacity=0;
   setTimeout(()=>{mapa.invalidateSize(false);mapa.setView(w.c,w.z,{animate:false});document.getElementById("vista").textContent=w.n;setTimeout(()=>{m.style.opacity=1},500)},600);setTimeout(siguiente,w.s*1000)}
-document.getElementById("vista").textContent=VISTAS[0].n;setTimeout(siguiente,VISTAS[0].s*1000);
+document.getElementById("vista").textContent=VISTAS[0].n;if(VISTAS.length>1)setTimeout(siguiente,VISTAS[0].s*1000);
 
 // ---- Marcadores: estaciones de AEMET en zonas con aviso ----
 function nombre(s){return s.toLowerCase().replace(/\s+/g," ").replace(/(^|[\s\-\/(.])([a-záéíóúñ])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(De|Del|La|Las|Los|El|Y)\b/g,m=>m.toLowerCase()).replace(/^./,c=>c.toUpperCase())}
