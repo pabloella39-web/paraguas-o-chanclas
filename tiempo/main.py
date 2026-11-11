@@ -334,6 +334,34 @@ def planificar(bloques, wavs, durs):
     return plan, total
 
 
+def _nota_aviso_ya_publicado(hoy: date) -> str:
+    """Si hoy ya se han publicado vídeos de aviso, el parte no compite con ellos: abre con otra cosa y remite al aviso."""
+    try:
+        from datetime import datetime as _dt
+        from zoneinfo import ZoneInfo
+        dias = {_dt.now(ZoneInfo("Europe/Madrid")).date().isoformat(), hoy.isoformat()}
+        titulares = []
+        for d in sorted(dias):
+            for ruta in sorted((RAIZ / "historial_especiales").glob(f"aviso-{d}*.json")):
+                h = json.loads(ruta.read_text(encoding="utf-8"))
+                if h.get("tiktok") or h.get("youtube") or h.get("instagram"):
+                    t = (h.get("caption") or h.get("titular") or "").split("\n")[0].replace("⚠️", "").strip()
+                    if t and t not in titulares:
+                        titulares.append(t)
+        if not titulares:
+            return ""
+        log.info("Ya hay %d vídeo(s) de aviso publicados: el parte abre con otra cosa", len(titulares))
+        return ("\n\nYA HAY VÍDEO DE AVISO PUBLICADO (" + " · ".join(titulares[-4:]) + "). Quien nos sigue ya lo ha "
+                "visto, así que este parte NO lo repite (esto manda sobre «Fenómeno que abre el vídeo» de arriba): el gancho, el titular y la primera línea de la descripción NO "
+                "abren con ese aviso; abren con lo que ese vídeo no cuenta y le importa a media España (el resto del "
+                "país, qué pasa después, cuándo mejora, el contraste del día). El tramo «aviso» se mantiene, con todas "
+                "sus zonas, pero contado con otras palabras y otro arranque que el vídeo del aviso, y termina "
+                "remitiendo a él en una frase corta («el detalle, en el vídeo del aviso que tienes en el perfil»).")
+    except Exception as e:  # noqa: BLE001
+        log.warning("No se pudo comprobar si ya hay vídeo de aviso publicado: %s", e)
+        return ""
+
+
 def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     salida.mkdir(parents=True, exist_ok=True)
     trabajo = salida / "trabajo"
@@ -429,7 +457,8 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
                     + ". Atentas también, por si se desvía: "
                     + ", ".join(c["nombre"] for c in ciudades_zoom(r, [], n_amarillo=0, n_ref=5))
                     + " (con su nivel). Cuándo y lo más grave que se espera, con un consejo corto.")
-        gra = [c["nombre"] for c in prev if c.get("granizo")][:3]
+            g.GANCHO_TEXTO += _nota_aviso_ya_publicado(hoy)
+        gra =[c["nombre"] for c in prev if c.get("granizo")][:3]
         if gra:
             g.GANCHO_TEXTO += (f" POSIBLE GRANIZO en {', '.join(gra)} (sale en el mapa): menciónalo con prudencia "
                                "('no se descarta granizo') y un consejo (el coche a cubierto).")

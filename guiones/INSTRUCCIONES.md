@@ -160,3 +160,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Plano de las zonas de un aviso: además de colores y ciudades, en cada sitio sale el icono animado del fenómeno con la cifra oficial de AEMET (rachas en km/h, litros, olas…). Solo las más altas y repartidas.
 - Los mapas de colores (evolución, acumulado) no se pintan durante un zoom: entran con el plano ya quieto (si no, se ve un cuadrado).
 - Rehacer un vídeo de aviso con el mismo texto: en lanzar_especial.txt, «avisos publicar rehacer mismo-guion solo-naranja» (o solo-rojo).
+
+- PARTE EN DÍAS CON VÍDEO DE AVISO YA PUBLICADO (el prompt lo trae en «YA HAY VÍDEO DE AVISO PUBLICADO»): el parte no compite con el aviso. Gancho, titular y primera línea de la descripción NO abren con ese aviso: abren con lo que el aviso no cuenta (el resto de España, qué viene después, cuándo mejora). El tramo «aviso» se mantiene con todas sus zonas, contado con otras palabras, y remite al vídeo del aviso en una frase. Motivo: los partes del 9 y 10 nov, que abrían con el mismo aviso rojo ya publicado en 2-3 vídeos, se quedaron en 2.000-5.000 vistas con buena retención.
+
+- HORA DEL PARTE: se publica a las 20:30. Una corrección que obligue a resubirlo más tarde de las 21:00 solo se hace si el fallo es grave (dato o aviso equivocado); los fallos de imagen se corrigen para el día siguiente, porque un parte resubido tarde pierde casi todo el alcance (6 y 9 nov).
