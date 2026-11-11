@@ -155,6 +155,6 @@ function gracias(){const g=document.getElementById("gracias");g.style.opacity=0;
 gracias();setInterval(gracias,12000);
 
 // ---- Se recarga sola cuando se publica una versión nueva de la página ----
-let ver=null;async function version(){try{const t=await (await fetch("version.txt?t="+Date.now(),{cache:"no-store"})).text();if(ver===null)ver=t;else if(t!==ver)location.reload()}catch(e){}}
+let ver=null;async function version(){try{const t=await (await fetch("version.txt?t="+Date.now(),{cache:"no-store"})).text();if(ver===null)ver=t;else if(t!==ver)location.replace(location.pathname+"?v="+encodeURIComponent(t.trim())+"-"+Date.now())}catch(e){}}
 version();setInterval(version,60000);
 </script></body></html>
