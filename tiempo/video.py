@@ -892,7 +892,8 @@ class Compositor:
             # tras un zoom lento, la capa sigue donde iba (sin volver a aparecer de cero)
             self.capas[seg_real](capa, mapa.Proyeccion(self.vista_de(seg), ANCHO, MAPA_H),
                                  dt - (T - TRANSICION) + (0.6 if T > TRANSICION else 0))
-        elif en_trans and seg_real in self.capas and seg_real in self.transiciones:
+        elif en_trans and seg_real in self.capas and seg_real in self.transiciones \
+                and not getattr(self.capas[seg_real], "solo_en_plano", False):
             # durante el zoom lento la capa (zonas pintadas, lluvia) acompaña al mapa; los nombres, al final
             self.capas[seg_real](capa, mapa.Proyeccion(vista_t, ANCHO, MAPA_H), min(dt, TRANSICION * 0.99))
         # Extremos del día en el bloque general

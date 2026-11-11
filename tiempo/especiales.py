@@ -1110,6 +1110,8 @@ def agrupar(avisos: list[dict]) -> list[dict]:
         if a["poligono"]:
             gr["poligonos"].append(a["poligono"])
             gr.setdefault("zona_poligono", []).append((a["zona"], a["poligono"]))
+        if a.get("descripcion"):   # la cifra oficial de cada zona (rachas, litros, olas…), para rotularla en el mapa
+            gr.setdefault("zona_dato", {})[a["zona"]] = a["descripcion"]
     return sorted(grupos.values(), key=lambda gr: (-NIVELES[gr["nivel"]], -len(gr.get("ciudades", [])),
                                                    -len(gr["zonas"])))
 
@@ -1209,8 +1211,41 @@ def _zona_zoom(grupos):
             return _encuadre(min(c[0] for c in cajas), max(c[1] for c in cajas), min(c[2] for c in cajas),
                              max(c[3] for c in cajas), True, margen=(0.12, 0.25))
     # Península: la zona con aviso y las colindantes alrededor, para ver si la lluvia (o lo que sea) también les llega
-    return _encuadre(min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts),
-                     max(p[1] for p in pts), False, margen=(0.9, 0.7), minimo=(3.0, 2.3))
+    v = _encuadre(min(p[0] for p in pts), max(p[0] for p in pts), min(p[1] for p in pts),
+                  max(p[1] for p in pts), False, margen=(0.9, 0.7), minimo=(3.0, 2.3))
+    try:
+        return _despejar_arriba(v)
+    except Exception as e:  # noqa: BLE001
+        log.warning("No se pudo despejar la esquina de los rótulos: %s", e)
+        return v
+
+
+def _despejar_arriba(v, alto_px: int = 266, ancho_px: int = 650):
+    """En las vistas amplias (media España o más), baja el mapa lo justo (y, si hace falta, lo aleja un poco) para que
+    los rótulos de arriba a la izquierda («AVISO NARANJA · VIENTOS», el marcador de litros) caigan sobre el mar y no
+    tapen Galicia. Con zoom a una comarca no cambia nada: ahí hay tierra por todas partes."""
+    from .mapa import Proyeccion, provincias
+    tierra = [p for pv in provincias() for a in pv["anillos"] for p in a if 35.9 <= p[1] and p[0] > -9.6]
+    if not tierra:
+        return v
+    pr0 = Proyeccion(v, ANCHO, MAPA_H)
+    if MAPA_H / pr0.s < 6.5:
+        return v   # zoom a una zona: hay tierra por todas partes, no hay mar al que mover los rótulos
+    cx, cy = (v[0] + v[1]) / 2, (v[2] + v[3]) / 2
+    for n in range(10):
+        f_ = 1.0 + 0.04 * n
+        w = (cx - (v[1] - v[0]) / 2 * f_, cx + (v[1] - v[0]) / 2 * f_, cy - (v[3] - v[2]) / 2 * f_, cy + (v[3] - v[2]) / 2 * f_)
+        pr = Proyeccion(w, ANCHO, MAPA_H)
+        en = [pr(lo, la) for lo, la in tierra]
+        tapada = [y for x, y in en if 0 <= x < ancho_px and 0 <= y < alto_px]
+        if not tapada:
+            return w if n else v
+        hueco = MAPA_H - 100 - max(y for _, y in en)   # sitio libre por abajo (sobre la leyenda)
+        falta = alto_px - min(tapada)
+        if falta <= hueco or n == 9:
+            d = max(0.0, min(falta, hueco)) / pr.s
+            return (w[0], w[1], w[2] + d, w[3] + d)
+    return v
 
 
 def _visible(z, margen=0.35):
@@ -1501,6 +1536,78 @@ def _capa_nucleos(nucleos, color=(255, 255, 255), reservado=None):
             d.rounded_rectangle(caja, radius=h / 2, fill=(8, 20, 45, int(225 * s)))
             d.text(((caja[0] + caja[2]) / 2, (caja[1] + caja[3]) / 2), txt, font=f, fill=(255, 255, 255, a),
                    anchor="mm")
+    return dibujar
+
+
+def _dato_corto(fen: str, desc: str) -> str:
+    """«112 km/h», «60 l/m² en 12 h», «olas 5 m»: la cifra oficial de AEMET de una zona, en corto."""
+    d = dato_aviso({"fenomeno": fen, "descripciones": [desc]}) if desc else ""
+    for a, b in (("RACHAS DE ", ""), ("OLAS DE ", "olas "), (" METROS", " m"), (" HORAS", " h"), (" HORA", " h"),
+                 (" EN ", " en "), ("L/M²", "l/m²"), ("KM/H", "km/h"), (" CM DE NIEVE", " cm"), ("HASTA ", ""),
+                 ("MÍNIMAS DE ", "")):
+        d = d.replace(a, b)
+    return d
+
+
+def _capa_datos(grupos, vista, nucleos=(), evitar=(), maximo: int = 6):
+    """Datos sobre el mapa de las zonas: en cada sitio, el icono animado del fenómeno y su cifra (rachas en km/h,
+    litros, olas…). Solo las más altas y bien repartidas, sin tapar las ciudades señaladas. Lleva .cajas (su sitio)."""
+    from .mapa import Proyeccion, fase_de, icono, lonlat_mapa
+    from .video import TRANSICION
+    pr0 = Proyeccion(vista, ANCHO, MAPA_H)
+    f = fuente("Black", 30)
+    cand = []
+    for gr in grupos:
+        datos = gr.get("zona_dato") or {}
+        for z, pol in gr.get("zona_poligono") or []:
+            txt = _dato_corto(gr["fenomeno"], datos.get(z) or "") if pol else ""
+            m = re.search(r"\d+", txt)
+            if not m:
+                continue
+            lo, la = sum(q[0] for q in pol) / len(pol), sum(q[1] for q in pol) / len(pol)
+            x, y = pr0(*lonlat_mapa(lo, la, la < 30))
+            cand.append((NIVELES[gr["nivel"]], int(m.group()), x, y + MAPA_Y0, txt, gr))
+    cand.sort(key=lambda c: (-c[0], -c[1]))
+    ocupadas = list(evitar)
+    for c in list(nucleos)[:14]:
+        px, py = pr0.ciudad(c)
+        ocupadas.append((px - 56, py + MAPA_Y0 - 26, px + 56, py + MAPA_Y0 + 26))
+    fichas = []
+    for niv, val, x, y, txt, gr in cand:
+        if len(fichas) >= maximo:
+            break
+        if any(g_["fenomeno"] == gr["fenomeno"] and math.hypot(x - x_, y - y_) < 180 for x_, y_, _, _, g_, _ in fichas):
+            continue   # ya hay una cifra de lo mismo al lado
+        w, h = 62 + f.getlength(txt) + 22, 60
+        for dx, dy in ((0, 0), (0, -64), (0, 64), (-120, 0), (120, 0), (-100, -64), (100, 64), (0, -125), (0, 125)):
+            caja = (x + dx - w / 2, y + dy - h / 2, x + dx + w / 2, y + dy + h / 2)
+            if caja[0] < 14 or caja[2] > ANCHO - 14 or caja[1] < MAPA_Y0 + 14 or caja[3] > MAPA_Y0 + MAPA_H - 30:
+                continue
+            if any(caja[0] < b[2] + 8 and caja[2] + 8 > b[0] and caja[1] < b[3] + 8 and caja[3] + 8 > b[1]
+                   for b in ocupadas):
+                continue
+            fichas.append((x, y, caja, txt, gr, len(fichas)))
+            ocupadas.append(caja)
+            break
+
+    def dibujar(capa, pr, dt):
+        if tuple(pr.vista) != tuple(vista):
+            return   # durante el zoom todavía no: aparecen con el plano ya quieto
+        d = ImageDraw.Draw(capa)
+        for _, _, caja, txt, gr, k in fichas:
+            s_ = min(1.0, max(0.0, (dt - TRANSICION - 0.5 - k * 0.22) / 0.3))
+            if s_ <= 0:
+                continue
+            a = int(255 * s_)
+            col = COLOR_NIVEL[gr["nivel"]]
+            d.rounded_rectangle(caja, radius=22, fill=(8, 20, 45, int(238 * s_)), outline=col + (a,), width=4)
+            ic = icono(ICONO_AVISO.get(gr["fenomeno"].lower(), "lluvia"), 46, fase_de(dt, k * 0.37))
+            if s_ < 1:
+                ic = ic.copy()
+                ic.putalpha(ic.getchannel("A").point(lambda v_: int(v_ * s_)))
+            capa.alpha_composite(ic, (int(caja[0] + 10), int(caja[1] + 7)))
+            d.text((caja[0] + 62, (caja[1] + caja[3]) / 2), txt, font=f, fill=(255, 255, 255, a), anchor="lm")
+    dibujar.cajas = [c[2] for c in fichas]
     return dibujar
 
 
@@ -2712,6 +2819,35 @@ def _gancho_aviso(grupos) -> dict:
     return fenomeno_del_dia(prev, grupos)
 
 
+def _guion_fijo(hoy: date, nivel: str):
+    """Con MISMO_GUION=1 (lanzado a mano), el texto del último vídeo de ese nivel publicado hoy, tal cual."""
+    if not os.environ.get("MISMO_GUION"):
+        return None
+    try:
+        f = sorted(HISTORIAL.glob(f"aviso-{hoy.isoformat()}-{nivel}*.json"))[-1]
+        m = json.loads(f.read_text(encoding="utf-8"))
+        seg = m["guion"]
+        log.info("Se rehace con el mismo guion de %s", f.name)
+        return {"segmentos": dict(seg), "orden": list(seg), "titular": m.get("titular"),
+                "caption": (m.get("caption") or "").split("\n")[0] or None, "origen": "mismo guion"}
+    except Exception as e:  # noqa: BLE001
+        log.warning("No se pudo recuperar el guion anterior: %s", e)
+        return None
+
+
+def _zonas_con_datos(pintados, con_dato, vista, nucleos, lista=None):
+    """El plano de las zonas: avisos pintados con sus etiquetas, las ciudades señaladas y, en cada sitio, el icono
+    animado y la cifra oficial (rachas, litros, olas…), para que el mapa cuente algo más que colores."""
+    hueco = _caja_lista(lista if lista is not None else pintados)
+    try:
+        datos = _capa_datos(con_dato, vista, nucleos, evitar=hueco)
+    except Exception as e:  # noqa: BLE001
+        log.warning("Cifras sobre el mapa no disponibles: %s", e)
+        return _juntar_capas(_capa_poligonos(pintados, con_lista=True), _capa_nucleos(nucleos, reservado=hueco))
+    return _juntar_capas(_capa_poligonos(pintados, con_lista=True),
+                         _capa_nucleos(nucleos, reservado=hueco + datos.cajas), datos)
+
+
 def _corte_contexto(texto: str, nivel: str):
     """Fracción del bloque «zonas» en la que se deja de hablar del aviso principal y se pasa a los de menor nivel
     («Naranja por lluvias en…», «También hay amarillo…»). None si no hay ese cambio o cae muy al principio o al final."""
@@ -2766,8 +2902,9 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     if YA_AVISADO:   # ampliación: tramo corto con lo ya contado
         dur_aviso = (dur_aviso[0], dur_aviso[1] + 12.0, dur_aviso[2] + 8.0)
     with duracion(*dur_aviso):  # vídeo flash (algo más largo si lleva el mapa de lluvia)
+        fijo = _guion_fijo(hoy, sufijo)   # rehacer un vídeo con el MISMO texto (solo cambian los mapas)
         guion, plan, total, trozos, motor = locutar(
-            lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
+            lambda f, pl: fijo or guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
     lejanas = RACIMOS_AVISO[0][1:]
     # con zonas lejanas, el zoom va a lo más grave de la primera (los naranjas de alrededor son contexto): es además
@@ -2816,8 +2953,8 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
                   "promesa": "COMPÁRTELO CON QUIEN VIVA ALLÍ", "cierre_1": "COMPÁRTELO",
                   "cierre_2": "con quien viva en esas zonas", "cierre_3": "Sígueme · avisos al momento"},
         "capas": {"intro": _capa_poligonos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS),
-                  "zonas": _juntar_capas(_capa_poligonos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS, con_lista=True),
-                                         _capa_nucleos(nucleos, reservado=_caja_lista(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS))),
+                  "zonas": _zonas_con_datos(grupos + NARANJAS_CONTEXTO + YA_AVISADO + AMARILLOS,
+                                            grupos + NARANJAS_CONTEXTO, zona, nucleos),
                   **({"lluvia": _juntar_capas(lluvia_capa, _capa_nucleos(
                       nucleos, reservado=getattr(lluvia_capa, "reservado", None)))} if lluvia_capa else {}),
                   **({"evolucion": _juntar_capas(evol_capa, _capa_nucleos(nucleos))} if evol_capa else {}),
@@ -2853,10 +2990,12 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
             kwargs["sin_marcadores"] += (k,)
             kwargs["transiciones"][k] = 3.4
             kwargs["pills"][k] = f"AVISO {max(r, key=lambda x: NIVELES[x['nivel']])['nivel'].upper()}"
-            kwargs["capas"][k] = _juntar_capas(_capa_poligonos(todos, con_lista=True),
-                                              _capa_nucleos(nn, reservado=_caja_lista(r)))
+            kwargs["capas"][k] = _zonas_con_datos(todos, r, kwargs["vistas"][k], nn, lista=r)
         kwargs["vistas"]["consejos"] = kwargs["vistas"]["cierre"] = VISTA_GENERAL
         kwargs["transiciones"]["consejos"] = 2.4
+    for k_ in ("evolucion", "lluvia"):   # mapas de colores: con el plano ya quieto (durante el zoom se veía un cuadrado)
+        if k_ in kwargs["capas"]:
+            kwargs["capas"][k_].solo_en_plano = True
     corte = _corte_contexto(guion["segmentos"].get("zonas", ""), grupos[0]["nivel"])
     if corte:   # al pasar a contar los avisos de menor nivel: zoom out a todo lo que tiene aviso (plano nuevo)
         contexto = (RACIMOS_AVISO[0][0] if lejanas else grupos + NARANJAS_CONTEXTO) + \
@@ -2869,8 +3008,9 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
         nn2 = nucleos_nombrados(guion["segmentos"]["zonas"], contexto)
         nn2 += [c for c in ciudades_zoom(contexto, AMARILLOS, n_amarillo=5, n_ref=6)
                 if c["nombre"] not in {x["nombre"] for x in nn2}]
-        kwargs["partes"] = {"zonas": (corte, amplia, _juntar_capas(
-            _capa_poligonos(todos_, con_lista=True), _capa_nucleos(nn2, reservado=_caja_lista(todos_))))}
+        pa_, pz_ = (amplia[1] - amplia[0]), (zona[1] - zona[0])
+        if pa_ >= pz_ * 1.25:   # solo si de verdad se abre el plano (si no, sería un zoom que no cuenta nada)
+            kwargs["partes"] = {"zonas": (corte, amplia, _zonas_con_datos(todos_, contexto, amplia, nn2))}
     if TEMPORAL_AVISO[0] and "temporal" in guion["segmentos"]:   # mapa amplio y vuelta a la zona, con zoom lento
         from .sistemas import VISTA_SISTEMA
         kwargs["vistas"]["temporal"] = VISTA_SISTEMA
@@ -2898,7 +3038,7 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
     with duracion(*dur_aviso):
         video = _producir(f"aviso_{hoy.isoformat()}" + (f"_{sufijo}" if sufijo else ""), guion, plan, total, trozos, kwargs, [], None,
                           g.fecha_larga(hoy).upper(), salida, trabajo)
-    caption = caption_aviso(grupos, guion.get("caption") if guion.get("origen") == "claude" else None)
+    caption = caption_aviso(grupos, guion.get("caption") if guion.get("origen") in ("claude", "mismo guion") else None)
     return {"tipo": "aviso", "fecha": hoy.isoformat(), "video": str(video), "caption": caption,
             "titular": guion.get("titular"), "motor_voz": motor, "origen_guion": guion.get("origen"),
             "duracion": round(voz.duracion(video), 2), "firma": firma(grupos), "guion": guion["segmentos"],
@@ -3006,7 +3146,7 @@ def main():
         # Un vídeo por nivel y día: uno con todos los rojos y otro con todos los naranjas
         for nivel in ("rojo", "naranja"):
             del_nivel = [x for x in grupos if x["nivel"] == nivel]
-            if not del_nivel:
+            if not del_nivel or os.environ.get("SOLO_NIVEL", nivel) != nivel:
                 continue
             hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}.json"
             AMPLIACION[:] = []
@@ -3023,7 +3163,7 @@ def main():
                 nuevos = list(dict.fromkeys(c for x in del_nivel for c in sitios_aviso(x) + (x.get("ciudades") or [])
                                             if c not in ya and not any(c in z for z in ya)))
                 if os.environ.get("REHACER"):   # a mano: rehacer el vídeo de hoy (zoom más cerca, etc.)
-                    nuevos = nuevos or ["(rehecho)"]
+                    nuevos = ["(rehecho)"] if os.environ.get("MISMO_GUION") else (nuevos or ["(rehecho)"])
                 # Tope de tres vídeos al día solo para los naranjas: un ROJO en una zona nueva sale siempre
                 if not nuevos or (nivel != "rojo" and len(previos) >= 3 and not os.environ.get("REHACER")):
                     log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos). En vigor: %s", nivel,
@@ -3041,7 +3181,7 @@ def main():
                     log.info("Ya contado, comprobado: %s", " | ".join(CAMBIOS_YA_AVISADO))
                 log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)
                 hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}-{len(previos) + 1}.json"
-            if not a.demo and not AMPLIACION and _repetido(del_nivel, hoy, nivel):
+            if not a.demo and not AMPLIACION and not os.environ.get("REHACER") and _repetido(del_nivel, hoy, nivel):
                 log.info("Aviso %s ya contado ayer (mismo fenómeno y zona): no se repite el vídeo", nivel)
                 continue
             NARANJAS_CONTEXTO[:] = [x for x in grupos if nivel == "rojo" and x["nivel"] == "naranja"

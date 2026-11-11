@@ -155,3 +155,8 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Vídeos de aviso con zonas lejanas (p. ej. Cáceres y La Palma): el zoom de la primera zona va a lo más grave (el rojo), no a todos los naranjas de alrededor; el mapa de lluvia acumulada siempre llena la pantalla (nunca un cuadrado sobre el mapa de España).
 
 - Bloque «zonas» de los avisos: no se queda en un solo plano. Primero, zoom al aviso principal con sus pueblos; cuando el texto pasa a los avisos de menor nivel («Naranja por…», «También hay amarillo…»), zoom out al mapa amplio con esas zonas y sus ciudades. Por eso el texto va en ese orden: primero todo lo del aviso principal y después, en frases aparte, los de menor nivel.
+
+- Planos amplios (media España o más): los rótulos de arriba a la izquierda («AVISO NARANJA · VIENTOS», el marcador de litros) nunca tapan Galicia: el mapa se baja y se aleja lo justo para que caigan sobre el mar.
+- Plano de las zonas de un aviso: además de colores y ciudades, en cada sitio sale el icono animado del fenómeno con la cifra oficial de AEMET (rachas en km/h, litros, olas…). Solo las más altas y repartidas.
+- Los mapas de colores (evolución, acumulado) no se pintan durante un zoom: entran con el plano ya quieto (si no, se ve un cuadrado).
+- Rehacer un vídeo de aviso con el mismo texto: en lanzar_especial.txt, «avisos publicar rehacer mismo-guion solo-naranja» (o solo-rojo).
