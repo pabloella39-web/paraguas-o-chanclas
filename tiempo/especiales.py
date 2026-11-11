@@ -2754,11 +2754,13 @@ def video_aviso(grupos, hoy: date, salida: Path, demo: bool = False, sufijo: str
             lambda f, pl: guion_aviso(grupos, hoy, f, VOCES[tipo_voz]["presenta"], pl), trabajo, tipo_voz, demo)
     # Primero el mapa entero (como siempre) y después zoom sobre la zona, con sus principales núcleos señalados
     lejanas = RACIMOS_AVISO[0][1:]
-    zona = _zona_zoom(RACIMOS_AVISO[0][0] if lejanas else grupos)
+    # con zonas lejanas, el zoom va a lo más grave de la primera (los naranjas de alrededor son contexto): es además
+    # justo lo que cubre el mapa de lluvia, que así llena la pantalla en vez de quedarse como un cuadrado
+    zona = _zona_zoom(principal if lejanas else grupos)
     graves_n, otras = nucleos_afectados(grupos, n=10), ciudades_zoom(grupos, AMARILLOS)
     if lejanas:   # los núcleos de la primera zona (las demás tienen su propio tramo)
-        graves_n = nucleos_afectados(RACIMOS_AVISO[0][0], n=10)
-        otras = ciudades_zoom(RACIMOS_AVISO[0][0], AMARILLOS)
+        graves_n = nucleos_afectados(principal, n=10)
+        otras = ciudades_zoom(principal, AMARILLOS)
     # orden de prioridad (el primero nunca se queda sin sitio): los 4 mayores con aviso, las ciudades grandes con
     # amarillo (Madrid no puede faltar), el resto con aviso y, al final, las de referencia
     # primero las ciudades principales que se ven (capitales y de más de 50.000), luego los núcleos de la zona

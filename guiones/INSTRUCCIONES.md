@@ -151,3 +151,5 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Tramo «aviso» del parte: tras las zonas, el mapa de lluvia NO es una imagen fija: sale el acumulado creciendo hora a hora, con el reloj, los litros que lleva cada zona y la cifra total al final (igual que en los vídeos de aviso).
 
 - Mapas de evolución (lluvia acumulada, frentes, temporales, viento, borrascas): NUNCA llevan encima las etiquetas «AVISO ROJO · LLUVIAS», «AVISO NARANJA · VIENTO»…; esas etiquetas solo salen en el plano de las zonas pintadas y desaparecen al entrar el mapa de colores.
+
+- Vídeos de aviso con zonas lejanas (p. ej. Cáceres y La Palma): el zoom de la primera zona va a lo más grave (el rojo), no a todos los naranjas de alrededor; el mapa de lluvia acumulada siempre llena la pantalla (nunca un cuadrado sobre el mapa de España).
