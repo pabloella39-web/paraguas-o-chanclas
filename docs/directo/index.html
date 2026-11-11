@@ -115,8 +115,23 @@ document.getElementById("vista").textContent=VISTAS[0].n;if(VISTAS.length>1)setT
 
 // ---- Marcadores: estaciones de AEMET en zonas con aviso ----
 function nombre(s){return s.toLowerCase().replace(/\s+/g," ").replace(/(^|[\s\-\/(.])([a-záéíóúñ])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(De|Del|La|Las|Los|El|Y)\b/g,m=>m.toLowerCase()).replace(/^./,c=>c.toUpperCase())}
-function filas(el,tit,lista,nota){el.innerHTML="<h3>"+tit+"</h3>"+(lista.length?lista.map(([n,x])=>"<div><span>"+nombre(n)+"</span><b>"+x+"</b></div>").join(""):"<div><span>Sin datos todavía</span></div>")+"<small>"+nota+"</small>"}
+function filas(el,tit,lista,nota){el.innerHTML="<h3>"+tit+"</h3>"+(lista.length?lista.map(([n,x])=>"<div><span>"+nombre(n).replace(/[<>&"]/g,"")+"</span><b>"+x+"</b></div>").join(""):"<div><span>Sin datos todavía</span></div>")+"<small>"+nota+"</small>"}
+const VIVO="https://raw.githubusercontent.com/pabloella39-web/paraguas-o-chanclas/directo-datos/datos.json";
+let zonasAviso=null;
+async function cargarVivo(){
+  const j=await (await fetch(VIVO+"?t="+Math.floor(Date.now()/120000),{cache:"no-store"})).json();
+  if(Date.now()-new Date(j.actualizado).getTime()>45*60000)throw 0;      // datos viejos: mejor los de reserva
+  const h=j.obs_hasta?fmtH.format(new Date(j.obs_hasta)):"--";const nota="Estaciones de AEMET · datos hasta las "+h;
+  filas(document.getElementById("plluvia"),"Lluvia recogida hoy (l/m²)",(j.lluvia||[]).slice(0,3),nota);
+  filas(document.getElementById("pviento"),"Racha máxima hoy (km/h)",(j.viento||[]).slice(0,3),nota);
+  avisos=(j.avisos||[]).filter(a=>!a.fin||new Date(a.fin).getTime()>Date.now());
+  if(!zonasAviso){mapa.createPane("zonas").style.zIndex=420;zonasAviso=L.layerGroup().addTo(mapa)}
+  zonasAviso.clearLayers();
+  for(const a of avisos)for(const pol of a.poligonos||[])L.polygon(pol,{pane:"zonas",interactive:false,fill:false,color:a.nivel==="rojo"?"#ff2030":"#ff8a00",weight:a.nivel==="rojo"?4:2.5,opacity:.95}).addTo(zonasAviso);
+  return true;
+}
 async function cargarObs(){
+  try{if(await cargarVivo())return}catch(e){}
   try{const o=await (await fetch(RAW+"?t="+Math.floor(Date.now()/300000),{cache:"no-store"})).json();
     const hoy=fmtD.format(new Date());const ll={},vi={};let tope="";
     for(const x of o){const d=new Date(x.fint.replace("+0000","Z"));if(fmtD.format(d)!==hoy)continue;
@@ -126,20 +141,21 @@ async function cargarObs(){
     filas(document.getElementById("plluvia"),"Lluvia recogida hoy (l/m²)",Object.entries(ll).filter(e=>e[1]>=1).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,x])=>[n,x.toFixed(0)]),nota);
     filas(document.getElementById("pviento"),"Racha máxima hoy (km/h)",Object.entries(vi).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,x])=>[n,Math.round(x*3.6)]),nota);
   }catch(e){}
+  try{await cargarAvisosReserva()}catch(e){}
 }
-cargarObs();setInterval(cargarObs,300000);
+cargarObs().then(()=>cinta());setInterval(cargarObs,120000);
 
 // ---- Cinta de avisos ----
 let avisos=[],ia=0;
-async function cargarAvisos(){try{const j=await (await fetch("avisos.json?t="+Math.floor(Date.now()/300000),{cache:"no-store"})).json();const ah=Date.now();
+async function cargarAvisosReserva(){try{const j=await (await fetch("avisos.json?t="+Math.floor(Date.now()/300000),{cache:"no-store"})).json();const ah=Date.now();
   avisos=j.avisos.filter(a=>!a.fin||new Date(a.fin).getTime()>ah).sort((a,b)=>(a.nivel==="rojo"?0:1)-(b.nivel==="rojo"?0:1))}catch(e){}}
 const FEN={lluvias:"lluvia",vientos:"viento",costeros:"oleaje",tormentas:"tormentas",nevadas:"nieve"};
 function cinta(){const c=document.getElementById("cinta");if(!avisos.length){c.style.background="#26324f";c.innerHTML="<b>AVISOS</b><span>Sin avisos naranjas ni rojos activos</span>";return}
-  const a=avisos[ia%avisos.length];ia++;const z=a.zonas.slice(0,3).join(" · ")+(a.zonas.length>3?" y "+(a.zonas.length-3)+" más":"");
+  const esc=t=>String(t).replace(/[<>&"]/g,"");const a=avisos[ia%avisos.length];ia++;const z=a.zonas.slice(0,3).map(esc).join(" · ")+(a.zonas.length>3?" y "+(a.zonas.length-3)+" más":"");
   const fin=a.fin?" · hasta "+new Intl.DateTimeFormat("es-ES",{timeZone:TZ,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(a.fin)):"";
   c.style.background=a.nivel==="rojo"?"var(--rojo)":"var(--nar)";c.style.color=a.nivel==="rojo"?"#fff":"#0c0e16";
   c.innerHTML="<b>"+a.nivel.toUpperCase()+" · "+(FEN[a.fenomeno]||a.fenomeno).toUpperCase()+"</b><span>"+z+fin+"</span>"}
-cargarAvisos().then(cinta);setInterval(cargarAvisos,300000);setInterval(cinta,8000);
+setInterval(cinta,8000);
 
 // ---- Melodía de fondo (pistas propias del canal, en rotación) ----
 const PISTAS=[1,2,3,4,5].map(n=>"musica/pista"+n+".mp3");let ip=Math.floor(Math.random()*PISTAS.length);
