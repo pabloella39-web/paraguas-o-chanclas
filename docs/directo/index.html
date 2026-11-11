@@ -25,13 +25,13 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 #reloj b{display:block;font-weight:900;font-size:46px}
 #reloj span{display:block;font-weight:600;font-size:24px;color:#c8d2e6;margin-top:2px}
 #barra{height:8px;border-radius:4px;background:#3c4664;margin:8px 0 6px;overflow:hidden}#barra i{display:block;height:100%;background:var(--ama);width:0}
-#marc{position:absolute;top:392px;left:30px;z-index:800;width:520px;display:flex;flex-direction:column;gap:12px}
-.panel{background:rgba(12,14,22,.94);border:2px solid #3c4664;border-radius:24px;padding:14px 20px}
-.panel h3{color:var(--ama);font-weight:800;font-size:22px;margin-bottom:6px;text-transform:uppercase}
-.panel div{display:flex;justify-content:space-between;font-weight:600;font-size:27px;line-height:1.38}
+#marc{position:absolute;top:388px;left:24px;z-index:800;width:470px;display:flex;flex-direction:column;gap:12px}
+.panel{background:rgba(12,14,22,.94);border:2px solid #3c4664;border-radius:22px;padding:10px 18px}
+.panel h3{color:var(--ama);font-weight:800;font-size:20px;margin-bottom:6px;text-transform:uppercase}
+.panel div{display:flex;justify-content:space-between;font-weight:600;font-size:24px;line-height:1.32}
 .panel div b{font-weight:900;color:#ffaaaa;margin-left:12px}
 .panel div span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.panel small{display:block;color:#aab4cc;font-weight:600;font-size:18px;margin-top:4px}
+.panel small{display:block;color:#aab4cc;font-weight:600;font-size:16px;margin-top:4px}
 #ley{position:absolute;top:1452px;left:24px;right:24px;z-index:800;background:rgba(13,18,36,.94);border-radius:18px;padding:10px 16px;font-weight:800;font-size:24px}
 #ley .g{height:22px;border-radius:6px;margin:6px 0 4px;background:linear-gradient(90deg,#dfdfdf,#9bea8f,#58ff42,#47c278,#4793f9,#0c59ff,#6153c1,#ff93a3,#ff3f35,#c20511,#ffeb0a,#ff9811,#a84c06,#dda8ff)}
 #ley .t{display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:#c8d2e6}
@@ -56,7 +56,7 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const CIUDADES=[["A Coruña", 43.36, -8.41], ["Oviedo", 43.36, -5.85], ["Santander", 43.46, -3.81], ["Bilbao", 43.26, -2.94], ["Pamplona", 42.81, -1.65], ["Madrid", 40.42, -3.7], ["Valladolid", 41.65, -4.72], ["Salamanca", 40.97, -5.66], ["Toledo", 39.86, -4.03], ["Zaragoza", 41.65, -0.89], ["Barcelona", 41.38, 2.17], ["Valencia", 39.47, -0.38], ["Alicante", 38.34, -0.48], ["Murcia", 37.99, -1.13], ["Sevilla", 37.39, -5.98], ["Málaga", 36.72, -4.42], ["Granada", 37.18, -3.6], ["Almería", 36.83, -2.46], ["Badajoz", 38.88, -6.97], ["Ceuta", 35.89, -5.32], ["Melilla", 35.29, -2.94], ["Palma", 39.57, 2.65], ["Las Palmas", 28.12, -15.43], ["S.C. Tenerife", 28.46, -16.25], ["Cáceres", 39.47, -6.37], ["Ávila", 40.66, -4.7], ["Plasencia", 40.03, -6.09]];
-const VISTAS=[{n:"España",c:[41.6,-3.2],z:6.45,s:55},{n:"Cáceres · Ávila · Salamanca",c:[41.0,-5.6],z:7.7,s:30},{n:"España",c:[41.6,-3.2],z:6.45,s:40},{n:"Andalucía y el Estrecho",c:[38.3,-5.0],z:7.5,s:30},{n:"Canarias",c:[29.3,-15.8],z:7.3,s:22}];
+const VISTAS=[{n:"España",c:[41.3,-2.6],z:6.2,s:55},{n:"Cáceres · Ávila · Salamanca",c:[41.0,-5.6],z:7.7,s:30},{n:"España",c:[41.3,-2.6],z:6.2,s:40},{n:"Andalucía y el Estrecho",c:[38.3,-5.0],z:7.5,s:30},{n:"Canarias",c:[29.3,-15.8],z:7.3,s:22}];
 const RAW="https://raw.githubusercontent.com/pabloella39-web/paraguas-o-chanclas/main/estado/observaciones_aviso.json";
 const TZ="Europe/Madrid";
 function escala(){const k=Math.min(innerWidth/1080,innerHeight/1920);const l=document.getElementById("lienzo");l.style.transform="translateX(-50%) scale("+k+")"}
@@ -109,8 +109,8 @@ async function cargarObs(){
       if(x.fint>tope)tope=x.fint;ll[x.ubi]=(ll[x.ubi]||0)+(x.prec||0);vi[x.ubi]=Math.max(vi[x.ubi]||0,x.vmax||0)}
     const h=tope?fmtH.format(new Date(tope.replace("+0000","Z"))):"--";
     const nota="Estaciones AEMET en zonas con aviso · hasta las "+h;
-    filas(document.getElementById("plluvia"),"Lluvia recogida hoy (l/m²)",Object.entries(ll).filter(e=>e[1]>=1).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([n,x])=>[n,x.toFixed(0)]),nota);
-    filas(document.getElementById("pviento"),"Racha máxima hoy (km/h)",Object.entries(vi).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([n,x])=>[n,Math.round(x*3.6)]),nota);
+    filas(document.getElementById("plluvia"),"Lluvia recogida hoy (l/m²)",Object.entries(ll).filter(e=>e[1]>=1).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,x])=>[n,x.toFixed(0)]),nota);
+    filas(document.getElementById("pviento"),"Racha máxima hoy (km/h)",Object.entries(vi).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,x])=>[n,Math.round(x*3.6)]),nota);
   }catch(e){}
 }
 cargarObs();setInterval(cargarObs,300000);
