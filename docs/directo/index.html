@@ -21,6 +21,7 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 .leaflet-container{background:#0e2350;font-family:inherit}
 .ciu{white-space:nowrap;transform:translate(-50%,-135%);background:rgba(12,14,22,.88);color:#fff;font-weight:800;font-size:20px;padding:2px 10px;border-radius:14px;display:inline-block}
 .pto{width:12px;height:12px;border-radius:50%;background:var(--ama);border:3px solid #0c0e16;transform:translate(-50%,-50%)}
+.leaflet-radar-pane .leaflet-layer{transition:opacity .4s linear}
 #reloj{position:absolute;top:392px;right:30px;z-index:800;background:var(--neg);border-radius:24px;padding:12px 22px 14px;text-align:right;box-shadow:0 6px 18px rgba(0,0,0,.4)}
 #reloj b{display:block;font-weight:900;font-size:46px}
 #reloj span{display:block;font-weight:600;font-size:24px;color:#c8d2e6;margin-top:2px}
@@ -88,7 +89,7 @@ function despacha(){const f=cola.shift();if(!f||capas[f.path])return;const c=L.t
 setInterval(despacha,2500);
 async function cargarRadar(){
   try{const j=await (await fetch("https://api.rainviewer.com/public/weather-maps.json",{cache:"no-store"})).json();
-    const lista=(j.radar&&j.radar.past||[]).slice(-8);if(!lista.length)throw 0;hostR=j.host;
+    const lista=(j.radar&&j.radar.past||[]).slice(-12);if(!lista.length)throw 0;hostR=j.host;
     const vivos=new Set(lista.map(f=>f.path));
     for(const p in capas){if(!vivos.has(p)){mapa.removeLayer(capas[p]);delete capas[p]}}
     cola=lista.filter(f=>!capas[f.path]).reverse();          // primero la imagen más reciente
@@ -99,14 +100,14 @@ let visible=null;
 function pintar(){
   let listos=cuadros.filter(f=>capas[f.path]&&capas[f.path]._ok);
   if(!listos.length){const alguno=cuadros.filter(f=>capas[f.path]);if(!alguno.length)return;listos=[alguno[alguno.length-1]]}
-  idx=(idx+1)%(listos.length+7);                      // repasa la última hora y se queda ~11 s en la imagen más reciente
+  idx=(idx+1)%(listos.length+2);                      // repasa la última hora y se queda ~11 s en la imagen más reciente
   const k=Math.min(idx,listos.length-1),f=listos[k];
   if(visible!==f.path){for(const p in capas)capas[p].setOpacity(p===f.path?0.85:0);visible=f.path}
   const min=Math.max(0,Math.round((Date.now()-ultima)/60000));
   document.getElementById("rad").textContent="Radar "+fmtH.format(new Date(f.time*1000))+" · última hace "+min+" min";
   document.querySelector("#barra i").style.width=(100*(k+1)/listos.length)+"%";
 }
-cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,700);
+cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,600);
 
 // ---- Cámara: alterna España y las zonas con aviso ----
 let v=0;function siguiente(){v=(v+1)%VISTAS.length;const w=VISTAS[v],m=document.getElementById("mapa");m.style.opacity=0;
