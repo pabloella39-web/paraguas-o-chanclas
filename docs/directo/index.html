@@ -84,7 +84,7 @@ for(const [n,la,lo] of CIUDADES){L.marker([la,lo],{pane:"ciu",interactive:false,
 // ---- Radar real (RainViewer: mosaico de radares, una imagen cada 10 min) ----
 let cuadros=[],capas={},idx=0,ultima=0,cola=[],hostR="";
 function reintento(capa){capa.on("tileerror",e=>{const t=e.tile;t._n=(t._n||0)+1;if(t._n>8)return;const u=capa.getTileUrl(e.coords);setTimeout(()=>{if(t.parentNode){t.src="";t.src=u}},2500*t._n+Math.random()*3000)})}
-function despacha(){const f=cola.shift();if(!f||capas[f.path])return;const c=L.tileLayer(hostR+f.path+"/256/{z}/{x}/{y}/2/1_1.png",{pane:"radar",opacity:0,maxNativeZoom:7,maxZoom:10,tileSize:256,updateWhenZooming:false,updateWhenIdle:true,keepBuffer:0});reintento(c);c.addTo(mapa);capas[f.path]=c}
+function despacha(){const f=cola.shift();if(!f||capas[f.path])return;const c=L.tileLayer(hostR+f.path+"/256/{z}/{x}/{y}/2/1_1.png",{pane:"radar",opacity:0,maxNativeZoom:7,maxZoom:10,tileSize:256,updateWhenZooming:false,updateWhenIdle:true,keepBuffer:0});reintento(c);c._ok=false;c.on("loading",()=>{c._ok=false});c.on("load",()=>{c._ok=true});c.addTo(mapa);capas[f.path]=c}
 setInterval(despacha,2500);
 async function cargarRadar(){
   try{const j=await (await fetch("https://api.rainviewer.com/public/weather-maps.json",{cache:"no-store"})).json();
@@ -95,16 +95,18 @@ async function cargarRadar(){
     cuadros=lista;ultima=lista[lista.length-1].time*1000;despacha();
   }catch(e){document.getElementById("rad").textContent="Radar: sin conexión, reintentando…"}
 }
+let visible=null;
 function pintar(){
-  const listos=cuadros.filter(f=>capas[f.path]);if(!listos.length)return;
-  idx=(idx+1)%(listos.length+5);                       // se queda unos pasos en la última imagen
+  let listos=cuadros.filter(f=>capas[f.path]&&capas[f.path]._ok);
+  if(!listos.length){const alguno=cuadros.filter(f=>capas[f.path]);if(!alguno.length)return;listos=[alguno[alguno.length-1]]}
+  idx=(idx+1)%(listos.length+16);                      // repasa la última hora y se queda ~11 s en la imagen más reciente
   const k=Math.min(idx,listos.length-1),f=listos[k];
-  for(const p in capas)capas[p].setOpacity(p===f.path?0.85:0);
+  if(visible!==f.path){for(const p in capas)capas[p].setOpacity(p===f.path?0.85:0);visible=f.path}
   const min=Math.max(0,Math.round((Date.now()-ultima)/60000));
   document.getElementById("rad").textContent="Radar "+fmtH.format(new Date(f.time*1000))+" · última hace "+min+" min";
   document.querySelector("#barra i").style.width=(100*(k+1)/listos.length)+"%";
 }
-cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,800);
+cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,700);
 
 // ---- Cámara: alterna España y las zonas con aviso ----
 let v=0;function siguiente(){v=(v+1)%VISTAS.length;const w=VISTAS[v],m=document.getElementById("mapa");m.style.opacity=0;
