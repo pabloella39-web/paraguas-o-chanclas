@@ -32,8 +32,8 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 .panel div b{font-weight:900;color:#ffaaaa;margin-left:12px}
 .panel div span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .panel small{display:block;color:#aab4cc;font-weight:600;font-size:16px;margin-top:4px}
-#ley{position:absolute;top:1452px;left:24px;right:24px;z-index:800;background:rgba(13,18,36,.94);border-radius:18px;padding:10px 16px;font-weight:800;font-size:24px}
-#ley .g{height:22px;border-radius:6px;margin:6px 0 4px;background:linear-gradient(90deg,#dfdfdf,#9bea8f,#58ff42,#47c278,#4793f9,#0c59ff,#6153c1,#ff93a3,#ff3f35,#c20511,#ffeb0a,#ff9811,#a84c06,#dda8ff)}
+#ley{position:absolute;top:1424px;left:24px;right:24px;z-index:800;background:rgba(13,18,36,.94);border-radius:18px;padding:10px 16px;font-weight:800;font-size:24px}
+#ley .g{height:22px;border-radius:6px;margin:6px 0 4px;background:linear-gradient(90deg,#8f8672,#7fd0ee,#39a0e6,#1f6fd1,#ffe95a,#ffc21f,#ff8a1a,#e0261b,#a3122a)}
 #ley .t{display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:#c8d2e6}
 #cinta{position:absolute;top:1540px;left:30px;right:30px;height:74px;border-radius:26px;display:flex;align-items:center;padding:0 24px;font-size:28px;font-weight:600;overflow:hidden;white-space:nowrap;z-index:800;background:var(--rojo)}
 #cinta b{font-weight:900;font-size:31px;margin-right:18px}
@@ -49,13 +49,13 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
   <div class="panel" id="pviento"><h3>Racha máxima hoy (km/h)</h3><div><span>Cargando…</span></div></div>
  </div>
  <div id="reloj"><b id="hora">--:--</b><div id="barra"><i></i></div><span id="rad">Radar: cargando…</span><span id="vista"></span></div>
- <div id="ley">LLUVIA AHORA (RADAR)<div class="g"></div><div class="t"><span>débil</span><span>moderada</span><span>fuerte</span><span>muy fuerte</span><span>granizo</span></div></div>
+ <div id="ley">LLUVIA AHORA (RADAR)<div class="g"></div><div class="t"><span>llovizna</span><span>débil</span><span>moderada</span><span>fuerte</span><span>muy fuerte</span></div></div>
  <div id="cinta"><b>AVISOS</b><span>Cargando avisos de AEMET…</span></div>
  <div id="pie">Radar: RainViewer (red de radares de AEMET) · Estaciones y avisos: AEMET · Mapa: Natural Earth<br>El radar llega con unos 10 minutos de retraso. Emergencias: 112.</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-const CIUDADES=[["A Coruña", 43.36, -8.41], ["Oviedo", 43.36, -5.85], ["Santander", 43.46, -3.81], ["Bilbao", 43.26, -2.94], ["Pamplona", 42.81, -1.65], ["Madrid", 40.42, -3.7], ["Valladolid", 41.65, -4.72], ["Salamanca", 40.97, -5.66], ["Toledo", 39.86, -4.03], ["Zaragoza", 41.65, -0.89], ["Barcelona", 41.38, 2.17], ["Valencia", 39.47, -0.38], ["Alicante", 38.34, -0.48], ["Murcia", 37.99, -1.13], ["Sevilla", 37.39, -5.98], ["Málaga", 36.72, -4.42], ["Granada", 37.18, -3.6], ["Almería", 36.83, -2.46], ["Badajoz", 38.88, -6.97], ["Ceuta", 35.89, -5.32], ["Melilla", 35.29, -2.94], ["Palma", 39.57, 2.65], ["Las Palmas", 28.12, -15.43], ["S.C. Tenerife", 28.46, -16.25], ["Cáceres", 39.47, -6.37], ["Ávila", 40.66, -4.7], ["Plasencia", 40.03, -6.09]];
+const CIUDADES=[["A Coruña", 43.36, -8.41], ["Oviedo", 43.36, -5.85], ["Santander", 43.46, -3.81], ["Bilbao", 43.26, -2.94], ["Pamplona", 42.81, -1.65], ["Madrid", 40.42, -3.7], ["Valladolid", 41.65, -4.72], ["Salamanca", 40.97, -5.66], ["Toledo", 39.86, -4.03], ["Zaragoza", 41.65, -0.89], ["Barcelona", 41.38, 2.17], ["Valencia", 39.47, -0.38], ["Alicante", 38.34, -0.48], ["Murcia", 37.99, -1.13], ["Sevilla", 37.39, -5.98], ["Málaga", 36.72, -4.42], ["Granada", 37.18, -3.6], ["Almería", 36.83, -2.46], ["Badajoz", 38.88, -6.97], ["Ceuta", 35.89, -5.32], ["Melilla", 35.29, -2.94], ["Palma", 39.57, 2.65], ["Las Palmas", 28.12, -15.43], ["S.C. Tenerife", 28.46, -16.25], ["Cáceres", 39.47, -6.37]];
 const VISTAS=[{n:"España",c:[41.3,-2.6],z:6.2,s:55},{n:"Cáceres · Ávila · Salamanca",c:[41.0,-5.6],z:7.7,s:30},{n:"España",c:[41.3,-2.6],z:6.2,s:40},{n:"Andalucía y el Estrecho",c:[38.3,-5.0],z:7.5,s:30},{n:"Canarias",c:[29.3,-15.8],z:7.3,s:22}];
 const RAW="https://raw.githubusercontent.com/pabloella39-web/paraguas-o-chanclas/main/estado/observaciones_aviso.json";
 const TZ="Europe/Madrid";
