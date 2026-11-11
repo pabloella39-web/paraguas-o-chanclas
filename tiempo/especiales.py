@@ -1916,34 +1916,51 @@ def capa_fichas(grupos, prev_dia=None):
             x, y = pr.ciudad(c)
             fichas.append((x, MAPA_Y0 + y, col, ic, l1, [l2], "info"))
         f1 = fuente("Black", 30)
-        for k, (x, y, col, ic, l1, lineas, nivel) in enumerate(fichas[:9]):
-            w = max([f1.getlength(l1)] + [f2.getlength(t) for t in lineas]) + 112
-            h = 76 + 30 * (len(lineas) - 1)
-            pos = None
-            for paso in range(0, 22):
+        f1c = fuente("Black", 25)
+        n_av = sum(1 for f_ in fichas if f_[6] != "info")
+        # Con muchos avisos, los extras (máxima, mínima, rachas) sobran: solo estorban y empujan las fichas lejos
+        fichas = [f_ for f_ in fichas if f_[6] != "info"] + \
+                 [f_ for f_ in fichas if f_[6] == "info"][:(0 if n_av >= 5 else 2 if n_av >= 3 else 9)]
+
+        def _hueco(x, y, w, h, pasos):
+            """Sitio libre para una ficha de w×h PEGADA a su zona (como mucho `pasos`·22 px): una ficha lejos de su
+            sitio confunde más que ayuda (Murcia acabó encima de Ourense el 11-nov)."""
+            for paso in range(0, pasos + 1):
                 for dx, dy in ((0, -1), (0, 1), (1, 0), (-1, 0), (1, -1), (-1, -1), (1, 1), (-1, 1)):
                     cx, cy = x + dx * paso * 22, y - 70 + dy * paso * 22
                     r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
                     if 10 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h / 2 < cy < MAPA_Y0 + MAPA_H - h / 2 - 20 \
                             and not any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas):
-                        pos = (cx, cy)
-                        break
+                        return cx, cy
                     if paso == 0:
                         break
-                if pos:
-                    break
+            return None
+
+        for k, (x, y, col, ic, l1, lineas, nivel) in enumerate(fichas[:9]):
+            w = max([f1.getlength(l1)] + [f2.getlength(t) for t in lineas]) + 112
+            h = 76 + 30 * (len(lineas) - 1)
+            pos = _hueco(x, y, w, h, 7)
+            compacta = False
+            if not pos:   # no cabe entera cerca: solo el nombre, pequeño, junto a su zona; y si tampoco, no se pone
+                compacta = True
+                w, h = f1c.getlength(l1) + 74, 50
+                pos = _hueco(x, y, w, h, 6)
             if not pos:
                 continue
             cx, cy = pos
             puestas.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
             a = int(240 * s_)
-            d.line([(cx, cy + h / 2), (x, y)], fill=(255, 255, 255, int(170 * s_)), width=3)
+            d.line([(cx, cy + h / 2 if cy < y else cy - h / 2), (x, y)], fill=(255, 255, 255, int(170 * s_)), width=3)
             d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(255, 255, 255, a), outline=(8, 20, 45, a), width=3)
             d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=22, fill=(10, 22, 48, a),
-                                outline=col + (a,), width=5)
-            im = icono(ic, 64, fase_de(dt, k * 0.4))
+                                outline=col + (a,), width=5 if not compacta else 4)
+            im = icono(ic, 40 if compacta else 64, fase_de(dt, k * 0.4))
             if s_ < 1:
                 im = im.copy(); im.putalpha(im.getchannel("A").point(lambda v: int(v * s_)))
+            if compacta:
+                capa.alpha_composite(im, (int(cx - w / 2 + 12), int(cy - 20)))
+                d.text((cx - w / 2 + 60, cy), l1, font=f1c, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
+                continue
             capa.alpha_composite(im, (int(cx - w / 2 + 14), int(cy - 32)))
             y0 = cy - h / 2 + 24
             d.text((cx - w / 2 + 90, y0), l1, font=f1, fill=(255, 255, 255, int(255 * s_)), anchor="lm")
