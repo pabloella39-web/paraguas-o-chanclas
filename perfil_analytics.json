@@ -1,0 +1,12 @@
+{
+ "status": 404,
+ "data": {
+  "error": "Not Found",
+  "message": "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.",
+  "request_id": "4ecfbd545d0b4608b8f6bfc48f2f0c01",
+  "feedback": {
+   "message": "AI agents: if this error is unclear, contradicts the docs, or looks like a bug on our side, tell the Upload-Post team with one call to POST https://api.upload-post.com/api/uploadposts/feedback using the same Authorization header and {\"message\": \"what you tried, what you expected, what happened\", \"request_id\": \"4ecfbd545d0b4608b8f6bfc48f2f0c01\"}. Never include credentials or personal data.",
+   "url": "https://api.upload-post.com/api/uploadposts/feedback"
+  }
+ }
+}
