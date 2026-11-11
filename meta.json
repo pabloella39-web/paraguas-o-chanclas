@@ -1,0 +1,21 @@
+{
+ "tipo": "resto",
+ "fecha": "2026-11-11",
+ "video": "/home/runner/work/paraguas-o-chanclas/paraguas-o-chanclas/salida_especial/resto_2026-11-12.mp4",
+ "caption": "Jueves de paraguas, viernes de tender y domingo fresquito… ¿qué plan tienes? ☔🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 12: máx. 26° · lluvia en Oviedo, Pamplona\n🌧️ Viernes 13: máx. 24° · lluvia en Bilbao, Ceuta\n🌧️ Sábado 14: máx. 25° · lluvia en Ceuta, Badajoz\n🌧️ Domingo 15: máx. 24° · lluvia en A Coruña, Oviedo\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "JUEVES DE AGUA Y VIENTO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 148.53,
+ "guion": {
+  "intro": "Mañana se moja casi toda España. Lluvia, rachas de 100 kilómetros por hora y olas de 5 metros. Te guardo para el final qué día tender la ropa y cuál no.",
+  "avisos_jueves": "Mañana, aviso naranja por rachas de 100 en La Mancha, Montes de Toledo, el interior de Valencia y Castellón, el noroeste de Murcia y Ceuta. Naranja por lluvia en La Palma y el Pirineo oscense, y por olas de 5 metros en Almería, Mallorca y Menorca. También aviso naranja por lluvia en Cumbres de La Palma. También aviso naranja por viento en Alcaraz y Segura, Gúdar y Maestrazgo, Valle del Almanzora y Los Vélez, Interior sur de Castellón, Interior norte de Valencia y Interior sur de Valencia. También aviso naranja por oleaje en Poniente y Almería Capital, Levante almeriense, Sierra Tramontana y Levante mallorquín.",
+  "jueves": "Mañana jueves, paraguas de norte a sur. Fíjate en el verde del mapa: Tarragona se lleva 25 litros por metro cuadrado, Huesca 24 y Barcelona 21, y ahí todos los modelos coinciden. En el norte, Pontevedra y Vigo pasan de 20 litros, Pamplona suma 12 y Santander, 9. Madrid, 7 litros y 16 grados, así que chaqueta y paraguas.",
+  "avisos_viernes": "El viernes sigue el naranja por olas en la Tramontana y el sur de Mallorca, y amarillo por lluvia en la costa de Asturias, Cantabria y el sur de Ourense. También aviso naranja por oleaje en Sierra Tramontana.",
+  "viernes": "El viernes respira el Mediterráneo, seco de Barcelona a Almería y perfecto para tender. Donde no, en A Coruña, con 30 litros, y en Valladolid, con 10.",
+  "sabado": "El sábado, la lluvia baja al oeste y al sur. En Sevilla, unos 10 litros, y aquí no hay duda entre los modelos, y también posibles chubascos en Badajoz, Valladolid y Salamanca. Si tienes plan al aire libre, mejor en Valencia o Almería, con 23 grados.",
+  "domingo": "El domingo llega el fresco. Oviedo, la capital más fría, baja a 8 grados, y Navarredonda de Gredos, en Ávila, a 4. En A Coruña vuelven 11 litros, con olas de 3 metros en las Rías Baixas, así que lejos de diques y paseos.",
+  "general": "Lo prometido. Para tender la ropa, el viernes, seco en todo el Mediterráneo y con 24 grados en Alicante. Para no tender, el jueves, con lluvia en casi toda España y rachas de 100.",
+  "cierre": "¿Paraguas o chanclas este finde? Te leo. Y síguenos para el tiempo de cada día."
+ }
+}
