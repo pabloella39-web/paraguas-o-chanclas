@@ -131,4 +131,12 @@ function cinta(){const c=document.getElementById("cinta");if(!avisos.length){c.s
   c.style.background=a.nivel==="rojo"?"var(--rojo)":"var(--nar)";c.style.color=a.nivel==="rojo"?"#fff":"#0c0e16";
   c.innerHTML="<b>"+a.nivel.toUpperCase()+" · "+(FEN[a.fenomeno]||a.fenomeno).toUpperCase()+"</b><span>"+z+fin+"</span>"}
 cargarAvisos().then(cinta);setInterval(cargarAvisos,300000);setInterval(cinta,8000);
+
+// ---- Melodía de fondo (pistas propias del canal, en rotación) ----
+const PISTAS=[1,2,3,4,5].map(n=>"musica/pista"+n+".mp3");let ip=Math.floor(Math.random()*PISTAS.length);
+const VOL=Math.min(1,Math.max(0,parseFloat(new URLSearchParams(location.search).get("vol")||"0.35")));
+const au=new Audio();au.volume=VOL;au.preload="auto";
+function pista(){au.src=PISTAS[ip%PISTAS.length];ip++;au.play().catch(()=>{})}
+au.addEventListener("ended",pista);au.addEventListener("error",()=>setTimeout(pista,3000));
+if(VOL>0){pista();addEventListener("click",()=>{if(au.paused)au.play().catch(()=>{})})}
 </script></body></html>
