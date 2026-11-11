@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Temporal en directo</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ama:#ffc425;--neg:#0c0e16;--azul:#0b1a3a;--rojo:#e12832;--nar:#f08214}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,system-ui,sans-serif}
+#lienzo{position:absolute;left:50%;top:0;width:1080px;height:1920px;transform-origin:top center;background:linear-gradient(#0b1a3a,#10244f 60%,#2b3350);overflow:hidden;color:#fff}
+#cab{position:absolute;top:150px;left:0;right:0;text-align:center;z-index:900}
+#cab .c{color:var(--ama);font-weight:800;font-size:34px;letter-spacing:.5px}
+#cab .f{font-weight:900;font-size:60px;line-height:1.05;text-transform:uppercase;text-shadow:0 4px 0 rgba(0,0,0,.35)}
+#pills{position:absolute;top:286px;left:40px;right:40px;display:flex;gap:16px;z-index:900}
+.pill{height:64px;border-radius:32px;padding:0 26px;font-weight:900;font-size:36px;display:flex;align-items:center;white-space:nowrap}
+#vivo{background:var(--rojo)}#vivo i{width:24px;height:24px;border-radius:50%;background:#fff;margin-right:14px;animation:p 1.2s infinite}
+@keyframes p{0%,60%{opacity:1}61%,100%{opacity:.15}}
+#tema{background:var(--ama);color:var(--neg);flex:1;justify-content:center;overflow:hidden}
+#mapa{position:absolute;top:372px;left:0;width:1080px;height:1150px;background:#0a1730}
+.leaflet-container{background:#0a1730;font-family:inherit}
+.ciu{white-space:nowrap;transform:translate(-50%,-135%);background:rgba(12,14,22,.88);color:#fff;font-weight:800;font-size:22px;padding:3px 12px;border-radius:16px;display:inline-block}
+.pto{width:12px;height:12px;border-radius:50%;background:var(--ama);border:3px solid #0c0e16;transform:translate(-50%,-50%)}
+#reloj{position:absolute;top:392px;right:30px;z-index:800;background:var(--neg);border-radius:24px;padding:12px 22px 14px;text-align:right;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+#reloj b{display:block;font-weight:900;font-size:46px}
+#reloj span{display:block;font-weight:600;font-size:24px;color:#c8d2e6;margin-top:2px}
+#barra{height:8px;border-radius:4px;background:#3c4664;margin:8px 0 6px;overflow:hidden}#barra i{display:block;height:100%;background:var(--ama);width:0}
+#marc{position:absolute;top:392px;left:30px;z-index:800;width:520px;display:flex;flex-direction:column;gap:12px}
+.panel{background:rgba(12,14,22,.94);border:2px solid #3c4664;border-radius:24px;padding:14px 20px}
+.panel h3{color:var(--ama);font-weight:800;font-size:22px;margin-bottom:6px;text-transform:uppercase}
+.panel div{display:flex;justify-content:space-between;font-weight:600;font-size:27px;line-height:1.38}
+.panel div b{font-weight:900;color:#ffaaaa;margin-left:12px}
+.panel div span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel small{display:block;color:#aab4cc;font-weight:600;font-size:18px;margin-top:4px}
+#ley{position:absolute;top:1452px;left:24px;right:24px;z-index:800;background:rgba(13,18,36,.94);border-radius:18px;padding:10px 16px;font-weight:800;font-size:24px}
+#ley .g{height:22px;border-radius:6px;margin:6px 0 4px;background:linear-gradient(90deg,#dfdfdf,#9bea8f,#58ff42,#47c278,#4793f9,#0c59ff,#6153c1,#ff93a3,#ff3f35,#c20511,#ffeb0a,#ff9811,#a84c06,#dda8ff)}
+#ley .t{display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:#c8d2e6}
+#cinta{position:absolute;top:1540px;left:30px;right:30px;height:74px;border-radius:26px;display:flex;align-items:center;padding:0 24px;font-size:28px;font-weight:600;overflow:hidden;white-space:nowrap;z-index:800;background:var(--rojo)}
+#cinta b{font-weight:900;font-size:31px;margin-right:18px}
+#pie{position:absolute;top:1630px;left:36px;right:36px;font-weight:600;font-size:22px;color:#b4bed6;line-height:1.35}
+.leaflet-control-attribution{font-size:13px;background:rgba(12,14,22,.6)!important;color:#aab!important}.leaflet-control-attribution a{color:#ccd!important}
+</style></head><body>
+<div id="lienzo">
+ <div id="cab"><div class="c">PARAGUAS O CHANCLAS</div><div class="f" id="fecha"></div></div>
+ <div id="pills"><div class="pill" id="vivo"><i></i>EN DIRECTO</div><div class="pill" id="tema">TEMPORAL · RADAR REAL</div></div>
+ <div id="mapa"></div>
+ <div id="marc">
+  <div class="panel" id="plluvia"><h3>Lluvia recogida hoy (l/m²)</h3><div><span>Cargando…</span></div></div>
+  <div class="panel" id="pviento"><h3>Racha máxima hoy (km/h)</h3><div><span>Cargando…</span></div></div>
+ </div>
+ <div id="reloj"><b id="hora">--:--</b><div id="barra"><i></i></div><span id="rad">Radar: cargando…</span><span id="vista"></span></div>
+ <div id="ley">LLUVIA AHORA (RADAR)<div class="g"></div><div class="t"><span>débil</span><span>moderada</span><span>fuerte</span><span>muy fuerte</span><span>granizo</span></div></div>
+ <div id="cinta"><b>AVISOS</b><span>Cargando avisos de AEMET…</span></div>
+ <div id="pie">Radar: RainViewer (red de radares de AEMET) · Estaciones y avisos: AEMET · Mapa: © OpenStreetMap, © CARTO<br>El radar llega con unos 10 minutos de retraso. Emergencias: 112.</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const CIUDADES=[["A Coruña", 43.36, -8.41], ["Oviedo", 43.36, -5.85], ["Santander", 43.46, -3.81], ["Bilbao", 43.26, -2.94], ["Pamplona", 42.81, -1.65], ["Madrid", 40.42, -3.7], ["Valladolid", 41.65, -4.72], ["Salamanca", 40.97, -5.66], ["Toledo", 39.86, -4.03], ["Zaragoza", 41.65, -0.89], ["Barcelona", 41.38, 2.17], ["Valencia", 39.47, -0.38], ["Alicante", 38.34, -0.48], ["Murcia", 37.99, -1.13], ["Sevilla", 37.39, -5.98], ["Málaga", 36.72, -4.42], ["Granada", 37.18, -3.6], ["Almería", 36.83, -2.46], ["Badajoz", 38.88, -6.97], ["Ceuta", 35.89, -5.32], ["Melilla", 35.29, -2.94], ["Palma", 39.57, 2.65], ["Las Palmas", 28.12, -15.43], ["S.C. Tenerife", 28.46, -16.25], ["Cáceres", 39.47, -6.37], ["Ávila", 40.66, -4.7], ["Plasencia", 40.03, -6.09]];
+const VISTAS=[{n:"España",c:[41.6,-3.2],z:6.45,s:55},{n:"Cáceres · Ávila · Salamanca",c:[41.0,-5.6],z:7.7,s:30},{n:"España",c:[41.6,-3.2],z:6.45,s:40},{n:"Andalucía y el Estrecho",c:[38.3,-5.0],z:7.5,s:30},{n:"Canarias",c:[29.3,-15.8],z:7.3,s:22}];
+const RAW="https://raw.githubusercontent.com/pabloella39-web/paraguas-o-chanclas/main/estado/observaciones_aviso.json";
+const TZ="Europe/Madrid";
+function escala(){const k=Math.min(innerWidth/1080,innerHeight/1920);const l=document.getElementById("lienzo");l.style.transform="translateX(-50%) scale("+k+")"}
+addEventListener("resize",escala);escala();
+const fmtH=new Intl.DateTimeFormat("es-ES",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});
+const fmtF=new Intl.DateTimeFormat("es-ES",{timeZone:TZ,weekday:"long",day:"numeric",month:"long"});
+const fmtD=new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"});
+function tic(){const a=new Date();document.getElementById("hora").textContent="AHORA · "+fmtH.format(a);document.getElementById("fecha").textContent=fmtF.format(a).replace(",","")}
+setInterval(tic,1000);tic();
+
+const mapa=L.map("mapa",{zoomControl:false,attributionControl:true,zoomSnap:0,zoomAnimation:true,fadeAnimation:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,keyboard:false,touchZoom:false}).setView(VISTAS[0].c,VISTAS[0].z);
+mapa.attributionControl.setPrefix("");
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:10,attribution:"© OpenStreetMap © CARTO · Radar: RainViewer"}).addTo(mapa);
+mapa.createPane("radar").style.zIndex=350;mapa.createPane("ciu").style.zIndex=650;
+for(const [n,la,lo] of CIUDADES){L.marker([la,lo],{pane:"ciu",interactive:false,icon:L.divIcon({className:"",html:'<div class="pto"></div><div class="ciu">'+n+'</div>',iconSize:[0,0]})}).addTo(mapa)}
+
+// ---- Radar real (RainViewer: mosaico de radares, una imagen cada 10 min) ----
+let cuadros=[],capas={},idx=0,ultima=0;
+async function cargarRadar(){
+  try{const j=await (await fetch("https://api.rainviewer.com/public/weather-maps.json",{cache:"no-store"})).json();
+    const lista=(j.radar&&j.radar.past||[]).slice(-12);if(!lista.length)throw 0;
+    const vivos=new Set(lista.map(f=>f.path));
+    for(const p in capas){if(!vivos.has(p)){mapa.removeLayer(capas[p]);delete capas[p]}}
+    for(const f of lista){if(!capas[f.path]){capas[f.path]=L.tileLayer(j.host+f.path+"/256/{z}/{x}/{y}/2/1_1.png",{pane:"radar",opacity:0,maxNativeZoom:7,maxZoom:10,tileSize:256,updateWhenZooming:false,keepBuffer:1}).addTo(mapa)}}
+    cuadros=lista;ultima=lista[lista.length-1].time*1000;
+  }catch(e){document.getElementById("rad").textContent="Radar: sin conexión, reintentando…"}
+}
+function pintar(){
+  if(!cuadros.length)return;
+  idx=(idx+1)%(cuadros.length+5);                       // se queda unos pasos en la última imagen
+  const k=Math.min(idx,cuadros.length-1),f=cuadros[k];
+  for(const p in capas)capas[p].setOpacity(p===f.path?0.82:0);
+  const min=Math.max(0,Math.round((Date.now()-ultima)/60000));
+  document.getElementById("rad").textContent="Radar "+fmtH.format(new Date(f.time*1000))+" · última hace "+min+" min";
+  document.querySelector("#barra i").style.width=(100*(k+1)/cuadros.length)+"%";
+}
+cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,650);
+
+// ---- Cámara: alterna España y las zonas con aviso ----
+let v=0;function siguiente(){v=(v+1)%VISTAS.length;const w=VISTAS[v];mapa.flyTo(w.c,w.z,{duration:3.5});document.getElementById("vista").textContent=w.n;setTimeout(siguiente,w.s*1000)}
+document.getElementById("vista").textContent=VISTAS[0].n;setTimeout(siguiente,VISTAS[0].s*1000);
+
+// ---- Marcadores: estaciones de AEMET en zonas con aviso ----
+function nombre(s){return s.toLowerCase().replace(/\s+/g," ").replace(/(^|[\s\-\/(.])([a-záéíóúñ])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(De|Del|La|Las|Los|El|Y)\b/g,m=>m.toLowerCase()).replace(/^./,c=>c.toUpperCase())}
+function filas(el,tit,lista,nota){el.innerHTML="<h3>"+tit+"</h3>"+(lista.length?lista.map(([n,x])=>"<div><span>"+nombre(n)+"</span><b>"+x+"</b></div>").join(""):"<div><span>Sin datos todavía</span></div>")+"<small>"+nota+"</small>"}
+async function cargarObs(){
+  try{const o=await (await fetch(RAW+"?t="+Math.floor(Date.now()/300000),{cache:"no-store"})).json();
+    const hoy=fmtD.format(new Date());const ll={},vi={};let tope="";
+    for(const x of o){const d=new Date(x.fint.replace("+0000","Z"));if(fmtD.format(d)!==hoy)continue;
+      if(x.fint>tope)tope=x.fint;ll[x.ubi]=(ll[x.ubi]||0)+(x.prec||0);vi[x.ubi]=Math.max(vi[x.ubi]||0,x.vmax||0)}
+    const h=tope?fmtH.format(new Date(tope.replace("+0000","Z"))):"--";
+    const nota="Estaciones AEMET en zonas con aviso · hasta las "+h;
+    filas(document.getElementById("plluvia"),"Lluvia recogida hoy (l/m²)",Object.entries(ll).filter(e=>e[1]>=1).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([n,x])=>[n,x.toFixed(0)]),nota);
+    filas(document.getElementById("pviento"),"Racha máxima hoy (km/h)",Object.entries(vi).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([n,x])=>[n,Math.round(x*3.6)]),nota);
+  }catch(e){}
+}
+cargarObs();setInterval(cargarObs,300000);
+
+// ---- Cinta de avisos ----
+let avisos=[],ia=0;
+async function cargarAvisos(){try{const j=await (await fetch("avisos.json?t="+Math.floor(Date.now()/300000),{cache:"no-store"})).json();const ah=Date.now();
+  avisos=j.avisos.filter(a=>!a.fin||new Date(a.fin).getTime()>ah).sort((a,b)=>(a.nivel==="rojo"?0:1)-(b.nivel==="rojo"?0:1))}catch(e){}}
+const FEN={lluvias:"lluvia",vientos:"viento",costeros:"oleaje",tormentas:"tormentas",nevadas:"nieve"};
+function cinta(){const c=document.getElementById("cinta");if(!avisos.length){c.style.background="#26324f";c.innerHTML="<b>AVISOS</b><span>Sin avisos naranjas ni rojos activos</span>";return}
+  const a=avisos[ia%avisos.length];ia++;const z=a.zonas.slice(0,3).join(" · ")+(a.zonas.length>3?" y "+(a.zonas.length-3)+" más":"");
+  const fin=a.fin?" · hasta "+new Intl.DateTimeFormat("es-ES",{timeZone:TZ,weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(a.fin)):"";
+  c.style.background=a.nivel==="rojo"?"var(--rojo)":"var(--nar)";c.style.color=a.nivel==="rojo"?"#fff":"#0c0e16";
+  c.innerHTML="<b>"+a.nivel.toUpperCase()+" · "+(FEN[a.fenomeno]||a.fenomeno).toUpperCase()+"</b><span>"+z+fin+"</span>"}
+cargarAvisos().then(cinta);setInterval(cargarAvisos,300000);setInterval(cinta,8000);
+</script></body></html>
