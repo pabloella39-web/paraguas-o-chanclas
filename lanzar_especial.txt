@@ -1,2 +1,2 @@
-avisos publicar rehacer mismo-guion solo-naranja
-# naranja corregido 0450
+resto publicar rehacer
+# fichas pegadas a su zona y ciudades que rotan 2100

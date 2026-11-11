@@ -871,6 +871,12 @@ def la_semana(domingo: date, salida: Path, demo: bool = False) -> dict:
     # todos los días con las ciudades extra para rellenar huecos (Asturias, León, Ourense, La Mancha...)
     mapa_dias = {d: g.prev_para_mapa(prevs[d], [guion["segmentos"].get(d, "")], EXTRAS_DIA.get(d) or EXTRA_SEMANA)
                  for d in _dias()}
+    # Cada día, ciudades distintas en el mapa (las fijas y las que nombra el guion salen siempre)
+    for k_, d_ in enumerate(_dias()):
+        txt_ = guion["segmentos"].get(d_, "")
+        for c_ in mapa_dias[d_]:
+            c_["_turno"] = (k_, len(_dias()))
+            c_["_fija"] = c_["nombre"].replace("S.C. Tenerife", "Santa Cruz de Tenerife") in txt_   # la nombra la voz
     kwargs = {
         "satelite": sat,
         "capas_fondo": _con_lluvia(_capas_dias()), "capas_encima": _capas_encima_dias(), "barra_dias": BARRA[0],
@@ -3139,6 +3145,10 @@ def main():
         global MODO_SEMANA
         MODO_SEMANA = a.tipo
         hist = HISTORIAL / f"{a.tipo}-{hoy.isoformat()}.json"
+        if hist.exists() and not a.demo and os.environ.get("REHACER"):
+            # a mano («resto publicar rehacer»): se rehace con el mismo guion (guiones/<tipo>-<fecha>.json sigue ahí)
+            log.info("Se rehace el vídeo de %s con el mismo guion", a.tipo)
+            hist.rename(hist.with_name(hist.stem + "-anterior.json"))
         if hist.exists() and not a.demo:
             log.info("El vídeo de %s ya está hecho", a.tipo)
             return

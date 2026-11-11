@@ -523,6 +523,17 @@ def marcador(c: dict, estilo: str, fase: int = 0) -> Image.Image:
                              round(racha) if racha else None)
 
 
+def _turno_dia(c) -> float:
+    """Vídeos de varios días: cada ciudad (menos las fijas) tiene «su» día, para que en el mapa de cada día salgan
+    ciudades distintas y no las mismas los cuatro días. La ciudad lleva «_turno» = (día, n.º de días)."""
+    t = c.get("_turno")
+    if not t:
+        return 0.0
+    import zlib
+    k, n = t
+    return 420.0 if zlib.crc32(c["nombre"].encode("utf-8")) % max(n, 1) == k else -260.0
+
+
 def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
     """Devuelve [(imagen, (x, y), (px, py), ciudad)] ya colocados sin solaparse."""
     items = []
@@ -590,7 +601,8 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
                 return resto.pop(0)
             from . import rotacion   # hueco más grande, con preferencia por las que llevan días sin salir
             lejos = max(resto, key=lambda it: min(math.hypot(it[2][0] - o[2][0], it[2][1] - o[2][1]) for o in out)
-                        + 250 * rotacion.bonus(it[3]["nombre"]) + (150 if rotacion.es_capital(it[3]["nombre"]) else 0))
+                        + 250 * rotacion.bonus(it[3]["nombre"]) + (150 if rotacion.es_capital(it[3]["nombre"]) else 0)
+                        + _turno_dia(it[3]))
             resto.remove(lejos)
             return lejos
 
@@ -600,6 +612,11 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
                 break
             im, caja, (px, py), c = it_
             w, h = caja[2], caja[3]
+            # vídeos de varios días: la ciudad a la que hoy no le toca solo entra si rellena un hueco de verdad
+            if _turno_dia(c) < 0 and not c.get("_fija") and c["nombre"] not in SIEMPRE_EN_MAPA \
+                    and c["nombre"] not in extremos and c["nombre"] not in ISLAS_Y_CIUDADES_AUTONOMAS \
+                    and any(math.hypot(px - o[2][0], py - o[2][1]) < 110 for o in out):
+                continue
             # las islas (Baleares, Canarias) y Ceuta y Melilla no tienen tierra alrededor: ahí sí vale el mar
             # las grandes de costa (con su nombre escrito) pueden asomar al mar: así dejan sitio en tierra a sus
             # vecinas (Lleida y Tarragona junto a Barcelona, Santander junto a Bilbao…)
