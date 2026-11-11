@@ -17,7 +17,7 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 #vivo{background:var(--rojo)}#vivo i{width:24px;height:24px;border-radius:50%;background:#fff;margin-right:14px;animation:p 1.2s infinite}
 @keyframes p{0%,60%{opacity:1}61%,100%{opacity:.15}}
 #tema{background:var(--ama);color:var(--neg);flex:1;justify-content:center;overflow:hidden}
-#mapa{position:absolute;top:372px;left:0;width:1080px;height:1150px;background:#0e2350}
+#mapa{transition:opacity .5s;position:absolute;top:372px;left:0;width:1080px;height:1150px;background:#0e2350}
 .leaflet-container{background:#0e2350;font-family:inherit}
 .ciu{white-space:nowrap;transform:translate(-50%,-135%);background:rgba(12,14,22,.88);color:#fff;font-weight:800;font-size:22px;padding:3px 12px;border-radius:16px;display:inline-block}
 .pto{width:12px;height:12px;border-radius:50%;background:var(--ama);border:3px solid #0c0e16;transform:translate(-50%,-50%)}
@@ -104,7 +104,8 @@ function pintar(){
 cargarRadar();setInterval(cargarRadar,120000);setInterval(pintar,650);
 
 // ---- Cámara: alterna España y las zonas con aviso ----
-let v=0;function siguiente(){v=(v+1)%VISTAS.length;const w=VISTAS[v];mapa.flyTo(w.c,w.z,{duration:3.5});document.getElementById("vista").textContent=w.n;setTimeout(siguiente,w.s*1000)}
+let v=0;function siguiente(){v=(v+1)%VISTAS.length;const w=VISTAS[v],m=document.getElementById("mapa");m.style.opacity=0;
+  setTimeout(()=>{mapa.invalidateSize(false);mapa.setView(w.c,w.z,{animate:false});document.getElementById("vista").textContent=w.n;setTimeout(()=>{m.style.opacity=1},500)},600);setTimeout(siguiente,w.s*1000)}
 document.getElementById("vista").textContent=VISTAS[0].n;setTimeout(siguiente,VISTAS[0].s*1000);
 
 // ---- Marcadores: estaciones de AEMET en zonas con aviso ----
@@ -147,4 +148,8 @@ if(VOL>0){pista();addEventListener("click",()=>{if(au.paused)au.play().catch(()=
 const MSJ=["<b>¡GRACIAS!</b> por vuestros regalos y por compartir el directo","<b>GRACIAS</b> por acompañarnos durante el temporal","<b>SÍGUENOS</b> para el parte de cada día a las 20:30","<b>¡GRACIAS!</b> a quienes apoyáis el canal con regalos"];let im=0;
 function gracias(){const g=document.getElementById("gracias");g.style.opacity=0;setTimeout(()=>{g.innerHTML=MSJ[im%MSJ.length];im++;g.style.opacity=1},600)}
 gracias();setInterval(gracias,12000);
+
+// ---- Se recarga sola cuando se publica una versión nueva de la página ----
+let ver=null;async function version(){try{const t=await (await fetch("version.txt?t="+Date.now(),{cache:"no-store"})).text();if(ver===null)ver=t;else if(t!==ver)location.reload()}catch(e){}}
+version();setInterval(version,60000);
 </script></body></html>
