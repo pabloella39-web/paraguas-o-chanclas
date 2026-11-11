@@ -592,11 +592,13 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
         repeler = {VECINA_GRANDE[it[3]["nombre"]]: it[2] for it in turno if it[3]["nombre"] in VECINA_GRANDE}
         resto = [it for it in items if it not in primeras]
 
+        aplazadas, aplazadas_vistas = [], set()
+
         def siguiente():
             if primeras:
                 return primeras.pop(0)
             if not resto:
-                return None
+                return aplazadas.pop(0) if aplazadas else None
             if not out:
                 return resto.pop(0)
             from . import rotacion   # hueco más grande, con preferencia por las que llevan días sin salir
@@ -615,7 +617,9 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
             # vídeos de varios días: la ciudad a la que hoy no le toca solo entra si rellena un hueco de verdad
             if _turno_dia(c) < 0 and not c.get("_fija") and c["nombre"] not in SIEMPRE_EN_MAPA \
                     and c["nombre"] not in extremos and c["nombre"] not in ISLAS_Y_CIUDADES_AUTONOMAS \
+                    and id(c) not in aplazadas_vistas \
                     and any(math.hypot(px - o[2][0], py - o[2][1]) < 110 for o in out):
+                aplazadas_vistas.add(id(c)); aplazadas.append(it_)   # al final, si aún queda sitio, también entra
                 continue
             # las islas (Baleares, Canarias) y Ceuta y Melilla no tienen tierra alrededor: ahí sí vale el mar
             # las grandes de costa (con su nombre escrito) pueden asomar al mar: así dejan sitio en tierra a sus

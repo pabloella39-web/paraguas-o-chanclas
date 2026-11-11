@@ -1928,20 +1928,49 @@ def capa_fichas(grupos, prev_dia=None):
         fichas = [f_ for f_ in fichas if f_[6] != "info"] + \
                  [f_ for f_ in fichas if f_[6] == "info"][:(0 if n_av >= 5 else 2 if n_av >= 3 else 9)]
 
+        def _corta(p, q, r, m=4):
+            """¿El segmento p-q pasa por dentro del rectángulo r (con margen m)?"""
+            x0, y0, x1, y1 = r[0] - m, r[1] - m, r[2] + m, r[3] + m
+            (ax, ay), (bx, by) = p, q
+            t0, t1 = 0.0, 1.0
+            for d_, lo, hi, o in ((bx - ax, x0, x1, ax), (by - ay, y0, y1, ay)):   # recorte de Liang-Barsky
+                if abs(d_) < 1e-9:
+                    if not lo <= o <= hi:
+                        return False
+                    continue
+                ta, tb = (lo - o) / d_, (hi - o) / d_
+                if ta > tb:
+                    ta, tb = tb, ta
+                t0, t1 = max(t0, ta), min(t1, tb)
+                if t0 > t1:
+                    return False
+            return True
+
+        anclas = [(f_[0], f_[1]) for f_ in fichas[:9]]   # el punto que señala cada ficha: nadie lo tapa
+        lineas_puestas = []                              # líneas ya trazadas: ninguna ficha se les pone encima
+        fichas_puestas = []                              # fichas ya colocadas: ninguna línea las cruza
+
         def _hueco(x, y, w, h, pasos):
             """Sitio libre para una ficha de w×h PEGADA a su zona (como mucho `pasos`·22 px): una ficha lejos de su
-            sitio confunde más que ayuda (Murcia acabó encima de Ourense el 11-nov)."""
+            sitio confunde más que ayuda (Murcia acabó encima de Ourense el 11-nov). Ni pisa otra ficha, ni tapa el
+            punto que señala otra, ni su línea cruza otra ficha, ni se pone encima de la línea de otra."""
             for paso in range(0, pasos + 1):
                 for dx, dy in ((0, -1), (0, 1), (1, 0), (-1, 0), (1, -1), (-1, -1), (1, 1), (-1, 1)):
                     cx, cy = x + dx * paso * 22, y - 70 + dy * paso * 22
                     r = (cx - w / 2 - 6, cy - h / 2 - 6, cx + w / 2 + 6, cy + h / 2 + 6)
+                    borde = (cx, cy + h / 2 if cy < y else cy - h / 2)
                     if 10 + w / 2 < cx < ANCHO - 140 - w / 2 and MAPA_Y0 + h / 2 < cy < MAPA_Y0 + MAPA_H - h / 2 - 20 \
-                            and not any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas):
+                            and not any(r[0] < b[2] and r[2] > b[0] and r[1] < b[3] and r[3] > b[1] for b in puestas) \
+                            and not any((ax, ay) != (x, y) and r[0] - 8 < ax < r[2] + 8 and r[1] - 8 < ay < r[3] + 8
+                                        for ax, ay in anclas) \
+                            and not any(_corta(borde, (x, y), b) for b in fichas_puestas) \
+                            and not any(_corta(p_, q_, r, 0) for p_, q_ in lineas_puestas):
                         return cx, cy
                     if paso == 0:
                         break
             return None
 
+        colocadas = []
         for k, (x, y, col, ic, l1, lineas, nivel) in enumerate(fichas[:9]):
             w = max([f1.getlength(l1)] + [f2.getlength(t) for t in lineas]) + 112
             h = 76 + 30 * (len(lineas) - 1)
@@ -1954,10 +1983,20 @@ def capa_fichas(grupos, prev_dia=None):
             if not pos:
                 continue
             cx, cy = pos
-            puestas.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
-            a = int(240 * s_)
-            d.line([(cx, cy + h / 2 if cy < y else cy - h / 2), (x, y)], fill=(255, 255, 255, int(170 * s_)), width=3)
-            d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(255, 255, 255, a), outline=(8, 20, 45, a), width=3)
+            caja = (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
+            puestas.append(caja)
+            fichas_puestas.append(caja)
+            borde = (cx, cy + h / 2 if cy < y else cy - h / 2)
+            dentro = caja[0] <= x <= caja[2] and caja[1] <= y <= caja[3]   # la ficha está encima de su punto: sin línea
+            if not dentro:
+                lineas_puestas.append((borde, (x, y)))
+            colocadas.append((k, x, y, col, ic, l1, lineas, cx, cy, w, h, compacta, borde, dentro))
+        a = int(240 * s_)
+        for k, x, y, col, ic, l1, lineas, cx, cy, w, h, compacta, borde, dentro in colocadas:   # primero las líneas
+            if not dentro:
+                d.line([borde, (x, y)], fill=(255, 255, 255, int(170 * s_)), width=3)
+                d.ellipse([x - 7, y - 7, x + 7, y + 7], fill=(255, 255, 255, a), outline=(8, 20, 45, a), width=3)
+        for k, x, y, col, ic, l1, lineas, cx, cy, w, h, compacta, borde, dentro in colocadas:   # y encima, las fichas
             d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=22, fill=(10, 22, 48, a),
                                 outline=col + (a,), width=5 if not compacta else 4)
             im = icono(ic, 40 if compacta else 64, fase_de(dt, k * 0.4))

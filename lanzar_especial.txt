@@ -1,2 +1,2 @@
 resto publicar rehacer
-# fichas pegadas a su zona y ciudades que rotan 2100
+# fichas sin pisarse ni cruzar lineas, ciudades que rotan 2105
