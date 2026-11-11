@@ -1,0 +1,128 @@
+{
+ "tipo": "resto",
+ "fecha": "2026-11-11",
+ "caption": "Jueves de paraguas, viernes de tender y domingo fresquito… ¿qué plan tienes? ☔🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 12: máx. 26° · lluvia en Oviedo, Pamplona\n🌧️ Viernes 13: máx. 24° · lluvia en Bilbao, Ceuta\n🌧️ Sábado 14: máx. 25° · lluvia en Ceuta, Badajoz\n🌧️ Domingo 15: máx. 24° · lluvia en A Coruña, Oviedo\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "JUEVES DE AGUA Y VIENTO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 148.53,
+ "guion": {
+  "intro": "Mañana se moja casi toda España. Lluvia, rachas de 100 kilómetros por hora y olas de 5 metros. Te guardo para el final qué día tender la ropa y cuál no.",
+  "avisos_jueves": "Mañana, aviso naranja por rachas de 100 en La Mancha, Montes de Toledo, el interior de Valencia y Castellón, el noroeste de Murcia y Ceuta. Naranja por lluvia en La Palma y el Pirineo oscense, y por olas de 5 metros en Almería, Mallorca y Menorca. También aviso naranja por lluvia en Cumbres de La Palma. También aviso naranja por viento en Alcaraz y Segura, Gúdar y Maestrazgo, Valle del Almanzora y Los Vélez, Interior sur de Castellón, Interior norte de Valencia y Interior sur de Valencia. También aviso naranja por oleaje en Poniente y Almería Capital, Levante almeriense, Sierra Tramontana y Levante mallorquín.",
+  "jueves": "Mañana jueves, paraguas de norte a sur. Fíjate en el verde del mapa: Tarragona se lleva 25 litros por metro cuadrado, Huesca 24 y Barcelona 21, y ahí todos los modelos coinciden. En el norte, Pontevedra y Vigo pasan de 20 litros, Pamplona suma 12 y Santander, 9. Madrid, 7 litros y 16 grados, así que chaqueta y paraguas.",
+  "avisos_viernes": "El viernes sigue el naranja por olas en la Tramontana y el sur de Mallorca, y amarillo por lluvia en la costa de Asturias, Cantabria y el sur de Ourense. También aviso naranja por oleaje en Sierra Tramontana.",
+  "viernes": "El viernes respira el Mediterráneo, seco de Barcelona a Almería y perfecto para tender. Donde no, en A Coruña, con 30 litros, y en Valladolid, con 10.",
+  "sabado": "El sábado, la lluvia baja al oeste y al sur. En Sevilla, unos 10 litros, y aquí no hay duda entre los modelos, y también posibles chubascos en Badajoz, Valladolid y Salamanca. Si tienes plan al aire libre, mejor en Valencia o Almería, con 23 grados.",
+  "domingo": "El domingo llega el fresco. Oviedo, la capital más fría, baja a 8 grados, y Navarredonda de Gredos, en Ávila, a 4. En A Coruña vuelven 11 litros, con olas de 3 metros en las Rías Baixas, así que lejos de diques y paseos.",
+  "general": "Lo prometido. Para tender la ropa, el viernes, seco en todo el Mediterráneo y con 24 grados en Alicante. Para no tender, el jueves, con lluvia en casi toda España y rachas de 100.",
+  "cierre": "¿Paraguas o chanclas este finde? Te leo. Y síguenos para el tiempo de cada día."
+ },
+ "primer_comentario": "¿Desde qué pueblo nos ves? Te contesto con tu previsión de mañana 🌦️👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-11T20:18:16.267Z"
+     },
+     "success": true,
+     "platform_post_id": "7707010430790569249",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7707010430790569249",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 20766428,
+     "post_title": "Jueves de paraguas, viernes de tender y domingo fresquito… ¿qué plan tienes? ☔🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 12: máx. 26° · lluvia en Oviedo, Pamplona\n🌧️ Viernes 13: máx. 24° · lluvia en Bilbao, Ceuta\n🌧️ Sábado 14: máx. 25° · lluvia en Ceuta, Badajoz\n🌧️ Domingo 15: máx. 24° · lluvia en A Coruña, Oviedo\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 148.534,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7707010248342751265",
+     "first_comment_posted": true,
+     "request_id": "be1cb416206543c1b4e23aa48331f875",
+     "request_id_logs": "be1cb416206543c1b4e23aa48331f875",
+     "job_id": "ec0bdac6b4704defb867214566276d38",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-11T20:18:16.267Z"
+   },
+   "request_id": "be1cb416206543c1b4e23aa48331f875"
+  }
+ },
+ "tipo_youtube": "semana",
+ "youtube": {
+  "id": "oh9tCkKEpPI",
+  "url": "https://youtube.com/shorts/oh9tCkKEpPI",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-11T20:19:41.219Z"
+   },
+   "success": true,
+   "platform_post_id": "18240889327320600",
+   "post_url": "https://www.instagram.com/reel/DfnUo3zFPOx/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 20766428,
+   "post_title": "Jueves de paraguas, viernes de tender y domingo fresquito… ¿qué plan tienes? ☔🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 12: máx. 26° · lluvia en Oviedo, Pamplona\n🌧️ Viernes 13: máx. 24° · lluvia en Bilbao, Ceuta\n🌧️ Sábado 14: máx. 25° · lluvia en Ceuta, Badajoz\n🌧️ Domingo 15: máx. 24° · lluvia en A Coruña, Oviedo\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "post_caption": "Jueves de paraguas, viernes de tender y domingo fresquito… ¿qué plan tienes? ☔🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 12: máx. 26° · lluvia en Oviedo, Pamplona\n🌧️ Viernes 13: máx. 24° · lluvia en Bilbao, Ceuta\n🌧️ Sábado 14: máx. 25° · lluvia en Ceuta, Badajoz\n🌧️ Domingo 15: máx. 24° · lluvia en A Coruña, Oviedo\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 148.534,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "3d9555c8c1cd4ce1bbad06b3920a1508",
+   "request_id_logs": "3d9555c8c1cd4ce1bbad06b3920a1508",
+   "job_id": "e71b6e7daeb2455eae2a8db9eee5818c",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
