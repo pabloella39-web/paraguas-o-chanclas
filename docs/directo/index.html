@@ -37,7 +37,9 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
 #ley .t{display:flex;justify-content:space-between;font-size:20px;font-weight:700;color:#c8d2e6}
 #cinta{position:absolute;top:1540px;left:30px;right:30px;height:74px;border-radius:26px;display:flex;align-items:center;padding:0 24px;font-size:28px;font-weight:600;overflow:hidden;white-space:nowrap;z-index:800;background:var(--rojo)}
 #cinta b{font-weight:900;font-size:31px;margin-right:18px}
-#pie{position:absolute;top:1630px;left:36px;right:36px;font-weight:600;font-size:22px;color:#b4bed6;line-height:1.35}
+#gracias{position:absolute;top:1628px;left:30px;right:30px;height:62px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;z-index:800;background:#0c0e16;border:3px solid var(--ama);color:#fff;transition:opacity .6s}
+#gracias b{color:var(--ama);margin-right:12px}
+#pie{position:absolute;top:1706px;left:36px;right:36px;font-weight:600;font-size:22px;color:#b4bed6;line-height:1.35}
 .leaflet-control-attribution{font-size:13px;background:rgba(12,14,22,.6)!important;color:#aab!important}.leaflet-control-attribution a{color:#ccd!important}
 </style></head><body>
 <div id="lienzo">
@@ -51,6 +53,7 @@ html,body{height:100%;background:#050912;overflow:hidden;font-family:Inter,syste
  <div id="reloj"><b id="hora">--:--</b><div id="barra"><i></i></div><span id="rad">Radar: cargando…</span><span id="vista"></span></div>
  <div id="ley">LLUVIA AHORA (RADAR)<div class="g"></div><div class="t"><span>llovizna</span><span>débil</span><span>moderada</span><span>fuerte</span><span>muy fuerte</span></div></div>
  <div id="cinta"><b>AVISOS</b><span>Cargando avisos de AEMET…</span></div>
+ <div id="gracias"></div>
  <div id="pie">Radar: RainViewer (red de radares de AEMET) · Estaciones y avisos: AEMET · Mapa: Natural Earth<br>El radar llega con unos 10 minutos de retraso. Emergencias: 112.</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -139,4 +142,9 @@ const au=new Audio();au.volume=VOL;au.preload="auto";
 function pista(){au.src=PISTAS[ip%PISTAS.length];ip++;au.play().catch(()=>{})}
 au.addEventListener("ended",pista);au.addEventListener("error",()=>setTimeout(pista,3000));
 if(VOL>0){pista();addEventListener("click",()=>{if(au.paused)au.play().catch(()=>{})})}
+
+// ---- Cinta de agradecimientos (rota con otros mensajes) ----
+const MSJ=["<b>¡GRACIAS!</b> por vuestros regalos y por compartir el directo","<b>GRACIAS</b> por acompañarnos durante el temporal","<b>SÍGUENOS</b> para el parte de cada día a las 20:30","<b>¡GRACIAS!</b> a quienes apoyáis el canal con regalos"];let im=0;
+function gracias(){const g=document.getElementById("gracias");g.style.opacity=0;setTimeout(()=>{g.innerHTML=MSJ[im%MSJ.length];im++;g.style.opacity=1},600)}
+gracias();setInterval(gracias,12000);
 </script></body></html>
