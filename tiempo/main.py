@@ -622,6 +622,17 @@ def main():
         from .repo import subir
         subir([RAIZ / "docs" / "hoy.json"], f"Texto del parte del {hoy.isoformat()}")
 
+    if not a.demo:   # control de calidad antes de publicar: con un fallo grave el parte no sale (y se avisa)
+        try:
+            from . import control
+            res_ = control.revisar(Path(meta["video"]), dur_max=DURACION_MAX + 50)
+            meta["control"] = res_
+            if control.bloquea(res_):
+                log.error("NO se publica: %s", "; ".join(res_["graves"]))
+                meta["no_publicado"] = "; ".join(res_["graves"])
+                a.publicar = False
+        except Exception as e:  # noqa: BLE001
+            log.warning("Control de calidad no disponible: %s", e)
     from . import uploadpost
     from .tiktok import hay_credenciales
     faltan = hay_credenciales() if a.publicar else []

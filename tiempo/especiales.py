@@ -1981,6 +1981,11 @@ def capa_fichas(grupos, prev_dia=None):
                 w, h = f1c.getlength(l1) + 74, 50
                 pos = _hueco(x, y, w, h, 6)
             if not pos:
+                try:
+                    from . import control
+                    control.anotar("aviso", f"la ficha de {l1} no cabe junto a su zona y no se pone")
+                except Exception:  # noqa: BLE001
+                    pass
                 continue
             cx, cy = pos
             caja = (cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2)
@@ -3296,6 +3301,19 @@ def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
     if a.demo:
         return
     _guardar_texto(meta, titulo)
+    # Control de calidad antes de publicar. Los avisos naranjas y rojos salen SIEMPRE (solo se anota); el resto de
+    # especiales no se publica si hay un fallo grave (queda como artefacto y se avisa).
+    try:
+        from . import control
+        res_ = control.revisar(Path(meta["video"]))
+        meta["control"] = res_
+        if control.bloquea(res_) and a.tipo != "avisos":
+            log.error("NO se publica: %s", "; ".join(res_["graves"]))
+            meta["no_publicado"] = "; ".join(res_["graves"])
+            a.publicar = False
+        control.reiniciar()
+    except Exception as e:  # noqa: BLE001
+        log.warning("Control de calidad no disponible: %s", e)
     if a.publicar:
         if a.esperar and a.tipo in ("finde", "semana", "resto"):
             from .horario import TZ

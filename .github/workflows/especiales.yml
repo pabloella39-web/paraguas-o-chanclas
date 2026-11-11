@@ -5,16 +5,19 @@ on:
     # Avisos de AEMET: se comprueban cada hora (si hay naranjas o rojos nuevos, vídeo especial)
     - cron: "23 5-21 * * *"
     # Fin de semana: viernes por la noche, a las 20:30 de Madrid (hace también de parte del sábado)
+    - cron: "11 17 * * 5"
     - cron: "41 17 * * 5"
     - cron: "11 18 * * 5"
     - cron: "41 18 * * 5"
     - cron: "11 19 * * 5"
     # La semana que viene: domingo por la noche (sale a las 20:30 de Madrid y hace también de parte del lunes)
+    - cron: "11 17 * * 0"
     - cron: "41 17 * * 0"
     - cron: "11 18 * * 0"
     - cron: "41 18 * * 0"
     - cron: "11 19 * * 0"
     # Lo que queda de semana (+ finde): miércoles por la noche, a las 20:30 de Madrid (hace también de parte del jueves)
+    - cron: "11 17 * * 3"
     - cron: "41 17 * * 3"
     - cron: "11 18 * * 3"
     - cron: "41 18 * * 3"
@@ -62,6 +65,7 @@ jobs:
             grep -qi esperar lanzar_especial.txt && P="$P --esperar"
             grep -qi rehacer lanzar_especial.txt && echo "REHACER=1" >> $GITHUB_ENV
             grep -qi mismo-guion lanzar_especial.txt && echo "MISMO_GUION=1" >> $GITHUB_ENV
+            grep -qi sin-control lanzar_especial.txt && echo "OMITIR_CONTROL=1" >> $GITHUB_ENV
             grep -qi solo-naranja lanzar_especial.txt && echo "SOLO_NIVEL=naranja" >> $GITHUB_ENV
             grep -qi solo-rojo lanzar_especial.txt && echo "SOLO_NIVEL=rojo" >> $GITHUB_ENV
           else
@@ -148,5 +152,6 @@ jobs:
           fallo=0
           if [ -f aviso_voz.txt ]; then echo "::error::$(cat aviso_voz.txt)"; fallo=1; fi
           if [ -f aviso_instagram.txt ]; then echo "::error::$(cat aviso_instagram.txt)"; fallo=1; fi
+          if [ -f aviso_control.txt ]; then echo "::error::$(cat aviso_control.txt)"; grep -q "^NO PUBLICADO" aviso_control.txt && fallo=1; fi
           if [ -f aviso_fallo.txt ]; then echo "::error::$(cat aviso_fallo.txt)"; fallo=1; fi
           exit $fallo

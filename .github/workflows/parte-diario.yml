@@ -153,4 +153,5 @@ jobs:
           fallo=0
           if [ -f aviso_voz.txt ]; then echo "::error::$(cat aviso_voz.txt)"; fallo=1; fi
           if [ -f aviso_instagram.txt ]; then echo "::error::$(cat aviso_instagram.txt)"; fallo=1; fi
+          if [ -f aviso_control.txt ]; then echo "::error::$(cat aviso_control.txt)"; grep -q "^NO PUBLICADO" aviso_control.txt && fallo=1; fi
           exit $fallo

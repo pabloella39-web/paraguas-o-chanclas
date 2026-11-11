@@ -661,6 +661,13 @@ def marcadores(prev, pr: Proyeccion, estilo: str, area, _turno=True):
         puestas_n = {c["nombre"] for *_, c in out}
         if turno and any(it[3]["nombre"] in SIEMPRE_EN_MAPA and it[3]["nombre"] not in puestas_n for it in items):
             return marcadores(prev, pr, estilo, area, _turno=False)   # las siete grandes no pueden faltar nunca
+        try:   # vídeos de varios días: el control de calidad comprueba que cada día salgan ciudades distintas
+            dias_ = {c["_turno"][0] for *_, c in out if c.get("_turno")}
+            if len(dias_) == 1:
+                from . import control
+                control.CIUDADES_DIA.setdefault(dias_.pop(), set()).update(c["nombre"] for *_, c in out)
+        except Exception:  # noqa: BLE001
+            pass
         try:
             rotacion.registrar(c["nombre"] for *_, c in out)
         except Exception:  # noqa: BLE001
