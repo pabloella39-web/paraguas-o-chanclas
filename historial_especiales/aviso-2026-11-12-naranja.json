@@ -1,0 +1,152 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-12",
+ "caption": "⚠️ Aviso naranja por oleaje en Baleares y Almería: olas de hasta 4 metros\n\n🟠 Aviso naranja por oleaje: Poniente y Almería Capital, Levante almeriense, Sierra Tramontana, Sur de Mallorca, Levante mallorquín, Menorca, Almería\n🟡 Aviso amarillo por oleaje: Costa granadina, Axarquía, Melilla, Ibiza y Formentera, Norte y nordeste de Mallorca, Litoral de Barcelona, Litoral norte de Tarragona, Litoral sur de Tarragona, Valle del Guadalentín, Lorca y Águilas, Campo de Cartagena y Mazarrón, Litoral norte de Alicante, Litoral sur de Alicante, Litoral norte de Castellón, Litoral sur de Castellón\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Almería",
+ "titular": "BALEARES: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 73.9,
+ "firma": "naranja:costeros:6",
+ "guion": {
+  "intro": "Aviso naranja por oleaje en Baleares y Almería. Olas de 3 a 4 metros que pueden barrer espigones y paseos marítimos.",
+  "zonas": "Desde la una de la madrugada de hoy hasta las seis de la mañana del viernes, con viento del oeste de hasta 74 kilómetros por hora. Afecta a toda la Sierra Tramontana, todo el sur de Mallorca, todo el Levante mallorquín y toda Menorca, con Peguera, Can Pastilla y Colònia de Sant Jordi, entre otros. El aviso es para toda la zona, también para los pueblos que no se nombran. Atentos en Ibiza, con aviso amarillo.",
+  "zonas2": "Y nos vamos a Almería: mismo aviso naranja, desde la una de la madrugada de hoy hasta las seis del viernes, en todo el Poniente y Almería Capital y en todo el Levante almeriense, con Adra, entre otros. Amarillo en Melilla y el litoral mediterráneo. El aviso es para toda la zona, también para los pueblos que no nombramos.",
+  "temporal": "La lluvia empieza a medianoche en Valencia, Teruel y Murcia, con 8 litros en una hora, y avanza hacia el norte y Galicia. El jueves por la tarde, rachas de 93 kilómetros por hora en Valencia, Teruel y Murcia; el viernes de madrugada, 76 en Baleares.",
+  "consejos": "Prepárate y sigue la última predicción. Si hay una emergencia, llama al 112.",
+  "cierre": "Pásalo a tus conocidos en Baleares y Almería."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "costeros",
+   "nivel": "naranja",
+   "zonas": [
+    "Costa - Poniente y Almería Capital",
+    "Costa - Levante almeriense",
+    "Costa - Sierra Tramontana",
+    "Costa - Sur de Mallorca",
+    "Costa - Levante mallorquín",
+    "Costa - Menorca"
+   ],
+   "ciudades": [
+    "Almería"
+   ],
+   "inicio": "2026-11-12T01:00:00+01:00",
+   "fin": "2026-11-13T05:59:59+01:00",
+   "descripcion": "Viento del oeste y suroeste de 50 a 74 km/h (fuerza 7 u 8) y olas de 3 a 4 m."
+  }
+ ],
+ "control": {
+  "graves": [],
+  "avisos": [
+   "plano casi quieto durante 20 s (desde el 0:10)"
+  ]
+ },
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-12T03:16:48.570Z"
+     },
+     "success": true,
+     "platform_post_id": "7707118267038518560",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7707118267038518560",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 16241136,
+     "post_title": "⚠️ Aviso naranja por oleaje en Baleares y Almería: olas de hasta 4 metros\n\n🟠 Aviso naranja por oleaje: Poniente y Almería Capital, Levante almeriense, Sierra Tramontana, Sur de Mallorca, Levante mallorquín, Menorca, Almería\n🟡 Aviso amarillo por oleaje: Costa granadina, Axarquía, Melilla, Ibiza y Formentera, Norte y nordeste de Mallorca, Litoral de Barcelona, Litoral norte de Tarragona, Litoral sur de Tarragona, Valle del Guadalentín, Lorca y Águilas, Campo de Cartagena y Mazarrón, Litoral norte de Alicante, Litoral sur de Alicante, Litoral norte de Castellón, Litoral sur de Castellón\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #Almería",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 73.9,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7707117723192412192",
+     "request_id": "abad45f9303243d196b946041f3b2dec",
+     "request_id_logs": "abad45f9303243d196b946041f3b2dec",
+     "job_id": "9a264517ff3d44f8976fbd1fbdb75cb7",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-12T03:16:48.570Z"
+   },
+   "request_id": "abad45f9303243d196b946041f3b2dec"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "fozXVFwdHUY",
+  "url": "https://youtube.com/shorts/fozXVFwdHUY",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-12T03:19:26.364Z"
+   },
+   "success": true,
+   "platform_post_id": "18138290287629840",
+   "post_url": "https://www.instagram.com/reel/DfoEo7kHeeg/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 16241136,
+   "post_title": "⚠️ Aviso naranja por oleaje en Baleares y Almería: olas de hasta 4 metros\n\n🟠 Aviso naranja por oleaje: Poniente y Almería Capital, Levante almeriense, Sierra Tramontana, Sur de Mallorca, Levante mallorquín, Menorca, Almería\n🟡 Aviso amarillo por oleaje: Costa granadina, Axarquía, Melilla, Ibiza y Formentera, Norte y nordeste de Mallorca, Litoral de Barcelona, Litoral norte de Tarragona, Litoral sur de Tarragona, Valle del Guadalentín, Lorca y Águilas, Campo de Cartagena y Mazarrón, Litoral norte de Alicante, Litoral sur de Alicante, Litoral norte de Castellón, Litoral sur de Castellón\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Almería",
+   "post_caption": "⚠️ Aviso naranja por oleaje en Baleares y Almería: olas de hasta 4 metros\n\n🟠 Aviso naranja por oleaje: Poniente y Almería Capital, Levante almeriense, Sierra Tramontana, Sur de Mallorca, Levante mallorquín, Menorca, Almería\n🟡 Aviso amarillo por oleaje: Costa granadina, Axarquía, Melilla, Ibiza y Formentera, Norte y nordeste de Mallorca, Litoral de Barcelona, Litoral norte de Tarragona, Litoral sur de Tarragona, Valle del Guadalentín, Lorca y Águilas, Campo de Cartagena y Mazarrón, Litoral norte de Alicante, Litoral sur de Alicante, Litoral norte de Castellón, Litoral sur de Castellón\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #Almería",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 73.9,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "89259a242d9445049f4b1b7b9d6cbd2f",
+   "request_id_logs": "89259a242d9445049f4b1b7b9d6cbd2f",
+   "job_id": "3ad06e7fe7f84b9e9e96088ad7dd0699",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
