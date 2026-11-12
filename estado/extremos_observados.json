@@ -1,18 +1,4 @@
 {
- "2026-11-07": {
-  "min": {
-   "valor": -4.0,
-   "sitio": "San Pedro Manrique",
-   "zona": "Soria",
-   "hora": "2026-11-07T04:00:00+0000"
-  },
-  "max": {
-   "valor": 31.9,
-   "sitio": "la Aldea de San Nicolas",
-   "zona": "Las Palmas",
-   "hora": "2026-11-07T14:00:00+0000"
-  }
- },
  "2026-11-08": {
   "min": {
    "valor": -2.4,
@@ -67,6 +53,20 @@
    "sitio": "Las Palmas de Gc. Plaza de la Feria",
    "zona": "Las Palmas",
    "hora": "2026-11-11T14:00:00+0000"
+  }
+ },
+ "2026-11-12": {
+  "min": {
+   "valor": 5.3,
+   "sitio": "Pajares - Valgrande",
+   "zona": "Asturias",
+   "hora": "2026-11-12T05:00:00+0000"
+  },
+  "max": {
+   "valor": 39.9,
+   "sitio": "Palencia-granja Viñalta",
+   "zona": "Palencia",
+   "hora": "2026-11-11T23:00:00+0000"
   }
  }
 }
