@@ -1,0 +1,131 @@
+{
+ "fecha": "2026-11-13",
+ "duracion": 97.73,
+ "caption": "Viernes partido en dos: ¿tú empiezas el finde con paraguas o con chanclas? ☔🩴\n\nEl tiempo en España mañana, viernes 13 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Ceuta\n🔥 Máxima: 25° en Alicante\n🥶 Mínima: 9° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valladolid",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "GALICIA AGUA, ALICANTE SOL",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Viernes partido: Galicia empapada, Alicante en manga corta. Lo avisamos el miércoles y se cumple. Y no te vayas sin ver quién se lleva el frío.",
+  "aviso": "En Mallorca, el mar manda: aviso naranja por olas de 5 metros en toda la costa de Tramontana y del sur, de Peguera a Can Pastilla y la Colònia de Sant Jordi, también donde no nombro. Lejos de diques; más, en el vídeo del aviso. El aviso es para toda la zona, también para los pueblos que no nombramos.",
+  "norte": "Mira el satélite: Lugo, 29 litros, y Santiago, 25, con olas de 3 metros en las Rías Baixas. Gente de Bilbao, paraguas; Logroño, alguna gota.",
+  "sur": "Cádiz también se moja: 11 litros. Sevilla y Málaga, cuatro gotas y 23 grados. Lo de Estepona fue serio: 68 litros.",
+  "islas": "Ibiza, rachas de 80 con aviso amarillo. En Canarias, 25 grados en Las Palmas, y AEMET ve lluvia que casi ningún modelo ve.",
+  "interior": "Castilla y León, bajo el agua: León, 15 litros, y Valladolid, 6. Si eres de Madrid, lloviznas y 15 grados; Zaragoza, seca con 20.",
+  "mediterraneo": "Y el Mediterráneo, a tender: Alicante y Murcia, sol y 25 grados, y Valencia, 23. En Cataluña, Lleida al sol y Girona, alguna gota.",
+  "general": "Lo prometido: el frío se lo lleva Benasque, en Huesca, con 2 grados, y entre capitales, Pamplona y Salamanca, con 9. ¿Calor? Alicante, Murcia y Las Palmas, 25.",
+  "cierre": "¿Paraguas o chanclas en tu pueblo? Dímelo y te contesto. Sigue a Paraguas o Chanclas: paraguas al noroeste y chanclas al este."
+ },
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": "¿Acerté en tu pueblo? Cuéntame cómo está el cielo por ahí y te doy la previsión de mañana 👀",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-12T19:28:11.327Z"
+     },
+     "success": true,
+     "platform_post_id": "7707368598838218017",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7707368598838218017",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 23744641,
+     "post_title": "Viernes partido en dos: ¿tú empiezas el finde con paraguas o con chanclas? ☔🩴\n\nEl tiempo en España mañana, viernes 13 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Ceuta\n🔥 Máxima: 25° en Alicante\n🥶 Mínima: 9° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valladolid",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 97.734,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7707368385826457633",
+     "first_comment_posted": true,
+     "request_id": "b76958778046414983e54e650f8c2d1b",
+     "request_id_logs": "b76958778046414983e54e650f8c2d1b",
+     "job_id": "71d245eb6251490f9e0564382cc8a193",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-12T19:28:11.327Z"
+   },
+   "request_id": "b76958778046414983e54e650f8c2d1b"
+  }
+ },
+ "youtube": {
+  "id": "64Tezkzu_Ns",
+  "url": "https://youtube.com/shorts/64Tezkzu_Ns",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-12T19:30:56.428Z"
+   },
+   "success": true,
+   "platform_post_id": "18188833468410674",
+   "post_url": "https://www.instagram.com/reel/Dfpz1vNkXD3/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 23744641,
+   "post_title": "Viernes partido en dos: ¿tú empiezas el finde con paraguas o con chanclas? ☔🩴\n\nEl tiempo en España mañana, viernes 13 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Ceuta\n🔥 Máxima: 25° en Alicante\n🥶 Mínima: 9° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Valladolid #meteorologia",
+   "post_caption": "Viernes partido en dos: ¿tú empiezas el finde con paraguas o con chanclas? ☔🩴\n\nEl tiempo en España mañana, viernes 13 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Ceuta\n🔥 Máxima: 25° en Alicante\n🥶 Mínima: 9° en Pamplona\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Valladolid #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 97.734,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "8f9e502cda9c4f44ae1c68fe67c9651d",
+   "request_id_logs": "8f9e502cda9c4f44ae1c68fe67c9651d",
+   "job_id": "58c7b89df13648cc8f95dffff42683d4",
+   "request_total_platforms": 1
+  }
+ }
+}
