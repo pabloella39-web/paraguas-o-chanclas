@@ -937,7 +937,9 @@
   "7707384660020527894",
   "7707388949081719574",
   "7707405214987404054",
-  "7707513437014885142"
+  "7707513437014885142",
+  "7707745619637486358",
+  "7707747941163778838"
  ],
  "hechas": [
   {
@@ -1532,6 +1534,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Málaga: 23°/17°, 23 % de lluvia → chanclas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-13",
+   "clave": "cadiz|2026-11-14",
+   "lugar": "Cádiz",
+   "usuarios": [
+    "piuky"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Cádiz: 20°/18°, 100 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
