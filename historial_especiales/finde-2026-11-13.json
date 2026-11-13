@@ -1,0 +1,130 @@
+{
+ "tipo": "finde",
+ "fecha": "2026-11-13",
+ "caption": "Paraguas en media España y chanclas en el Mediterráneo… ¿terraza o sofá? ☔🩴\n\nEl tiempo del fin de semana en España, 14-15 de noviembre 🇪🇸\n☀️ Mejor plan: Alicante (25° / 24°)\n🔥 Máxima del finde: 25° en Alicante\n🌧️ Lluvia en A Coruña, Badajoz, Barcelona\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+ "titular": "MEDIA ESPAÑA SE MOJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 84.87,
+ "guion": {
+  "intro": "Paraguas en media España, chanclas en el Mediterráneo. El sábado se moja casi todo el interior y el domingo el agua se va a Galicia. Quédate, que al final te digo dónde merece la pena salir.",
+  "sabado": "Mañana sábado, lluvia en el norte, el interior y parte del sur. Fíjate en el verde del mapa, Cádiz se lleva más de 12 litros por metro cuadrado, y Santiago y Huesca, casi 8. Aviso amarillo por lluvia en el sur de Ávila, el sur de Salamanca y el norte de Cáceres. Madrid, 15 grados y paraguas, y en Cuenca, 6 litros. En Sevilla, ojo, AEMET da lluvia pero casi ningún modelo la ve. Y el Mediterráneo, seco. Gente de Alicante y Murcia, 25 grados de manga corta.",
+  "domingo": "El domingo se secan el sur y el Mediterráneo, y el agua se va a Galicia. En A Coruña, 16 litros, y aquí todos los modelos coinciden, con aviso amarillo por lluvia, rachas de 80 y olas de más de 3 metros, así que lejos de diques y paseos. Madrid baja a 12 grados.",
+  "general": "Lo prometido. Para salir, el Mediterráneo, seco todo el finde, con Alicante a 25 grados, la capital más calurosa. Y para sofá y manta, Pamplona, con 8 grados de mínima el domingo, y Puigcerdà, en Girona, con 2.",
+  "cierre": "¿Terraza o sofá este finde? Te leo. Y síguenos para el tiempo de cada día."
+ },
+ "control": {
+  "graves": [],
+  "avisos": [
+   "plano casi quieto durante 29 s (desde el 0:15)"
+  ]
+ },
+ "primer_comentario": "¿Acerté en tu pueblo? Cuéntame cómo está el cielo por ahí y te doy la previsión de mañana 👀",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-13T19:28:01.212Z"
+     },
+     "success": true,
+     "platform_post_id": "7707739645924150560",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7707739645924150560",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13082627,
+     "post_title": "Paraguas en media España y chanclas en el Mediterráneo… ¿terraza o sofá? ☔🩴\n\nEl tiempo del fin de semana en España, 14-15 de noviembre 🇪🇸\n☀️ Mejor plan: Alicante (25° / 24°)\n🔥 Máxima del finde: 25° en Alicante\n🌧️ Lluvia en A Coruña, Badajoz, Barcelona\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 84.867,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7707739464273020961",
+     "first_comment_posted": true,
+     "request_id": "e2877acdcf9c4b1880653509c70a1b6f",
+     "request_id_logs": "e2877acdcf9c4b1880653509c70a1b6f",
+     "job_id": "eec037db87a04b9db2ab34da0fbeed41",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-13T19:28:01.212Z"
+   },
+   "request_id": "e2877acdcf9c4b1880653509c70a1b6f"
+  }
+ },
+ "tipo_youtube": "finde",
+ "youtube": {
+  "id": "hhKf2yvgyoE",
+  "url": "https://youtube.com/shorts/hhKf2yvgyoE",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-13T19:29:55.486Z"
+   },
+   "success": true,
+   "platform_post_id": "17931239022182254",
+   "post_url": "https://www.instagram.com/reel/DfsYeeSDLKp/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 13082627,
+   "post_title": "Paraguas en media España y chanclas en el Mediterráneo… ¿terraza o sofá? ☔🩴\n\nEl tiempo del fin de semana en España, 14-15 de noviembre 🇪🇸\n☀️ Mejor plan: Alicante (25° / 24°)\n🔥 Máxima del finde: 25° en Alicante\n🌧️ Lluvia en A Coruña, Badajoz, Barcelona\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempofindesemana #meteorologia",
+   "post_caption": "Paraguas en media España y chanclas en el Mediterráneo… ¿terraza o sofá? ☔🩴\n\nEl tiempo del fin de semana en España, 14-15 de noviembre 🇪🇸\n☀️ Mejor plan: Alicante (25° / 24°)\n🔥 Máxima del finde: 25° en Alicante\n🌧️ Lluvia en A Coruña, Badajoz, Barcelona\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempofindesemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 84.867,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "f13a4b0b3f5345bfb0997c7cf0c4021a",
+   "request_id_logs": "f13a4b0b3f5345bfb0997c7cf0c4021a",
+   "job_id": "40de3eb7913c4b1d84065ddef9cf8884",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
