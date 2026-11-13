@@ -1,18 +1,4 @@
 {
- "2026-11-08": {
-  "min": {
-   "valor": -2.4,
-   "sitio": "Martinet",
-   "zona": "Lleida",
-   "hora": "2026-11-08T07:00:00+0000"
-  },
-  "max": {
-   "valor": 30.0,
-   "sitio": "Arucas-bañaderos",
-   "zona": "Las Palmas",
-   "hora": "2026-11-08T15:00:00+0000"
-  }
- },
  "2026-11-09": {
   "min": {
    "valor": 3.7,
@@ -67,6 +53,20 @@
    "sitio": "Córdoba",
    "zona": "Córdoba",
    "hora": "2026-11-12T13:00:00+0000"
+  }
+ },
+ "2026-11-13": {
+  "min": {
+   "valor": 2.5,
+   "sitio": "Barruera",
+   "zona": "Lleida",
+   "hora": "2026-11-13T05:00:00+0000"
+  },
+  "max": {
+   "valor": 23.7,
+   "sitio": "Cartagena",
+   "zona": "Murcia",
+   "hora": "2026-11-12T23:00:00+0000"
   }
  }
 }
