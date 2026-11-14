@@ -1,18 +1,4 @@
 {
- "2026-11-09": {
-  "min": {
-   "valor": 3.7,
-   "sitio": "Palencia-granja Viñalta",
-   "zona": "Palencia",
-   "hora": "2026-11-09T12:00:00+0000"
-  },
-  "max": {
-   "valor": 28.3,
-   "sitio": "Tenerife",
-   "zona": "Santa Cruz de Tenerife",
-   "hora": "2026-11-09T14:00:00+0000"
-  }
- },
  "2026-11-10": {
   "min": {
    "valor": -12.2,
@@ -67,6 +53,20 @@
    "sitio": "Santa Cruz de Tenerife",
    "zona": "Santa Cruz de Tenerife",
    "hora": "2026-11-13T15:00:00+0000"
+  }
+ },
+ "2026-11-14": {
+  "min": {
+   "valor": 3.8,
+   "sitio": "Arties",
+   "zona": "Lleida",
+   "hora": "2026-11-13T23:00:00+0000"
+  },
+  "max": {
+   "valor": 23.2,
+   "sitio": "Cartagena",
+   "zona": "Murcia",
+   "hora": "2026-11-13T23:00:00+0000"
   }
  }
 }
