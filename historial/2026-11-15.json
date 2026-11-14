@@ -1,0 +1,130 @@
+{
+ "fecha": "2026-11-15",
+ "duracion": 79.97,
+ "caption": "Domingo partido en dos: ¿tú sacas el paraguas o las chanclas? Dime tu ciudad ☔🩴\n\nEl tiempo en España mañana, domingo 15 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 25° en S.C. Tenerife\n🥶 Mínima: 8° en Oviedo\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #ACoruna",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "A CORUÑA, DOMINGO DE AGUA",
+ "voz": "masculina",
+ "guion": {
+  "intro": "Domingo de paraguas en A Coruña, sin excusas. Como te adelanté el viernes, el agua entra por Galicia. Al final, el frío y el calor.",
+  "norte": "Pontevedra y Vigo, hasta 30 litros, y en A Coruña, aviso amarillo por lluvia, rachas de 80 y oleaje. Gente de Oviedo y Santander, paraguas por la mañana.",
+  "interior": "Castilla y León, chubascos y rachas de 62 en Burgos. Si eres de Madrid, lloviznas y solo 13 grados. Zaragoza se moja por la tarde.",
+  "sur": "En Badajoz, AEMET ve lluvia por la tarde, pero casi ningún modelo: como mucho, cuatro gotas. El resto, seco: Sevilla, 21 grados, y Málaga, 23.",
+  "islas": "Santa Cruz de Tenerife marca 25 grados y Las Palmas 24, con alguna gota suelta. Palma y Mahón, 21 y tranquilos.",
+  "mediterraneo": "Y el Mediterráneo, de terraza: Alicante, 24 grados, Valencia, 22, y Barcelona, 20, sin una gota. Vermut al sol.",
+  "general": "Lo prometido: las capitales que amanecen más frías, Oviedo, Pamplona y Salamanca, con 8 grados, pero Benasque, en Huesca, baja a 0. ¿Calor? Tenerife, 25.",
+  "cierre": "Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas. Sigue a Paraguas o Chanclas: paraguas al norte, chanclas al este."
+ },
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": "¿Qué tal por tu ciudad? Escríbela y te digo si mañana sales con paraguas o con chanclas 👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-14T19:28:02.037Z"
+     },
+     "success": true,
+     "platform_post_id": "7708110735070514464",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7708110735070514464",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 15634170,
+     "post_title": "Domingo partido en dos: ¿tú sacas el paraguas o las chanclas? Dime tu ciudad ☔🩴\n\nEl tiempo en España mañana, domingo 15 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 25° en S.C. Tenerife\n🥶 Mínima: 8° en Oviedo\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #ACoruna",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 79.967,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7708110457378359329",
+     "first_comment_posted": true,
+     "request_id": "d2c95b381772404ab8db7bfdaa9921dc",
+     "request_id_logs": "d2c95b381772404ab8db7bfdaa9921dc",
+     "job_id": "744d9f2206354edcaba915a64a161618",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-14T19:28:02.037Z"
+   },
+   "request_id": "d2c95b381772404ab8db7bfdaa9921dc"
+  }
+ },
+ "youtube": {
+  "id": "lMjHLTh_FJw",
+  "url": "https://youtube.com/shorts/lMjHLTh_FJw",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-14T19:29:40.884Z"
+   },
+   "success": true,
+   "platform_post_id": "18643430854056545",
+   "post_url": "https://www.instagram.com/reel/Dfu9R-yFMOR/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 15634170,
+   "post_title": "Domingo partido en dos: ¿tú sacas el paraguas o las chanclas? Dime tu ciudad ☔🩴\n\nEl tiempo en España mañana, domingo 15 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 25° en S.C. Tenerife\n🥶 Mínima: 8° en Oviedo\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #ACoruna #meteorologia",
+   "post_caption": "Domingo partido en dos: ¿tú sacas el paraguas o las chanclas? Dime tu ciudad ☔🩴\n\nEl tiempo en España mañana, domingo 15 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 25° en S.C. Tenerife\n🥶 Mínima: 8° en Oviedo\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #ACoruna #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 79.967,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "c7b3d3e2c76f41b09f2b2a6dff178e32",
+   "request_id_logs": "c7b3d3e2c76f41b09f2b2a6dff178e32",
+   "job_id": "5a1564fa28114c529466bcfba45f06fd",
+   "request_total_platforms": 1
+  }
+ }
+}
