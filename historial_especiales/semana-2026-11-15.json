@@ -1,0 +1,144 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-11-15",
+ "caption": "Olas de 7 metros en Galicia y la semana pasa de manga corta a bufanda 🌊🧣\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 16: máx. 24° · lluvia en A Coruña\n☁️ Martes 17: máx. 25° · lluvia en A Coruña, Badajoz\n🌧️ Miércoles 18: máx. 27° · lluvia en A Coruña, Santander\n🌧️ Jueves 19: máx. 26° · lluvia en A Coruña, Salamanca\n☁️ Viernes 20: máx. 25° · lluvia en A Coruña\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "OLAS DE 7 METROS",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 118.37,
+ "guion": {
+  "intro": "Olas de 7 metros en Galicia el jueves. Y tierra adentro, la semana pasa de manga corta a bufanda. Al final, el mejor y el peor día.",
+  "lunes": "Mañana lunes, Galicia se moja, con aviso amarillo por lluvia en las Rías Baixas y 12 litros por metro cuadrado en Pontevedra. En la costa de A Coruña, rachas de 90 kilómetros por hora y olas de 5 metros. El resto, seco: San Sebastián a 20 grados, Madrid a 15 y Toledo a 18. Alicante y Canarias, a 24. Y chaqueta en Puigcerdà, en Girona, que amanece a 1 grado.",
+  "avisos_martes": "El martes, aviso amarillo por lluvia en el oeste de A Coruña, con hasta 60 litros, y por rachas de 90 en Asturias.",
+  "martes": "Bilbao, a 22 grados en pleno noviembre, aunque los modelos no se ponen de acuerdo con la lluvia. Algún chubasco en Zaragoza y Sevilla.",
+  "avisos_miercoles": "El miércoles, el mar se enfada, con olas de casi 7 metros en A Coruña y de 4 y medio en Cantabria. Lejos de diques y paseos.",
+  "miercoles": "Es el día más lluvioso. Fíjate en Galicia y Extremadura: 14 litros en A Coruña y 9 en Badajoz. Y Murcia, a 27 grados.",
+  "avisos_jueves": "El jueves, lo más fuerte del mar, con olas de más de 7 metros en A Coruña y de casi 6 en Cantabria.",
+  "jueves": "Paraguas en Bilbao y Santander, con 5 litros, y aquí todos los modelos coinciden. Salamanca se queda en 12 grados.",
+  "avisos_viernes": "El viernes, el mar sigue bravo, con olas de casi 6 metros en Galicia y de 4 y medio en la costa vasca.",
+  "viernes": "Se seca casi todo, pero baja el termómetro y Pamplona amanece a 6 grados. Sol en Barcelona y Palma para cerrar la semana.",
+  "general": "El mejor día, el lunes, seco en casi toda España y con 24 grados en Alicante. El peor, el miércoles, con lluvia del oeste al centro y 14 litros en A Coruña.",
+  "cierre": "¿Chaqueta o manga corta esta semana? Te leo. Y síguenos para cada día."
+ },
+ "control": {
+  "graves": [],
+  "avisos": [
+   "la ficha de ASTURIAS no cabe junto a su zona y no se pone",
+   "la ficha de PAÍS VASCO no cabe junto a su zona y no se pone",
+   "la ficha de CANTABRIA no cabe junto a su zona y no se pone",
+   "la ficha de LA RIOJA no cabe junto a su zona y no se pone",
+   "la ficha de CATALUÑA no cabe junto a su zona y no se pone",
+   "la ficha de A CORUÑA no cabe junto a su zona y no se pone",
+   "la ficha de VALLADOLID no cabe junto a su zona y no se pone",
+   "plano casi quieto durante 24 s (desde el 0:11)"
+  ]
+ },
+ "primer_comentario": "¿Qué tal por tu ciudad? Escríbela y te digo si mañana sales con paraguas o con chanclas 👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-15T19:27:41.127Z"
+     },
+     "success": true,
+     "platform_post_id": "7708481867372186912",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7708481867372186912",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 17605153,
+     "post_title": "Olas de 7 metros en Galicia y la semana pasa de manga corta a bufanda 🌊🧣\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 16: máx. 24° · lluvia en A Coruña\n☁️ Martes 17: máx. 25° · lluvia en A Coruña, Badajoz\n🌧️ Miércoles 18: máx. 27° · lluvia en A Coruña, Santander\n🌧️ Jueves 19: máx. 26° · lluvia en A Coruña, Salamanca\n☁️ Viernes 20: máx. 25° · lluvia en A Coruña\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 118.367,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7708481545660680225",
+     "first_comment_posted": true,
+     "request_id": "278681e751c34ea7a1e9059a8af3465a",
+     "request_id_logs": "278681e751c34ea7a1e9059a8af3465a",
+     "job_id": "eab3a7bfab1748d4a85aaeea9ca35549",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-15T19:27:41.127Z"
+   },
+   "request_id": "278681e751c34ea7a1e9059a8af3465a"
+  }
+ },
+ "tipo_youtube": "semana",
+ "youtube": {
+  "id": "DOZ5_pWPPoE",
+  "url": "https://youtube.com/shorts/DOZ5_pWPPoE",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-15T19:29:31.279Z"
+   },
+   "success": true,
+   "platform_post_id": "18122308030949744",
+   "post_url": "https://www.instagram.com/reel/DfxiB38lOK-/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 17605153,
+   "post_title": "Olas de 7 metros en Galicia y la semana pasa de manga corta a bufanda 🌊🧣\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 16: máx. 24° · lluvia en A Coruña\n☁️ Martes 17: máx. 25° · lluvia en A Coruña, Badajoz\n🌧️ Miércoles 18: máx. 27° · lluvia en A Coruña, Santander\n🌧️ Jueves 19: máx. 26° · lluvia en A Coruña, Salamanca\n☁️ Viernes 20: máx. 25° · lluvia en A Coruña\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "post_caption": "Olas de 7 metros en Galicia y la semana pasa de manga corta a bufanda 🌊🧣\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 16: máx. 24° · lluvia en A Coruña\n☁️ Martes 17: máx. 25° · lluvia en A Coruña, Badajoz\n🌧️ Miércoles 18: máx. 27° · lluvia en A Coruña, Santander\n🌧️ Jueves 19: máx. 26° · lluvia en A Coruña, Salamanca\n☁️ Viernes 20: máx. 25° · lluvia en A Coruña\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 118.367,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "ef3a05214b364294aa736b5a778fca8a",
+   "request_id_logs": "ef3a05214b364294aa736b5a778fca8a",
+   "job_id": "2da797d9dc4b4b4bb03e3b6983e56aa4",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
