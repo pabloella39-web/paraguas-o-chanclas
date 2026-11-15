@@ -207,6 +207,15 @@ def locutar(escribir, trabajo: Path, tipo_voz: str, demo: bool):
     return guion, plan, total, [(p["wav"], p["inicio"]) for p in plan], "edge-tts"
 
 
+def _variedad_nota() -> str:
+    """Ganchos ya usados, para que el guionista no repita fórmula (ver tiempo/variedad.py)."""
+    try:
+        from . import variedad
+        return variedad.nota()
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 def _claude_json(manual_clave, limite=None, prompt: str = None) -> dict:
     """Primero el guion escrito con el plan de Claude (tiempo/manual.py); si no llega, la API."""
     if prompt is None:  # llamada antigua: _claude_json(prompt)
@@ -319,7 +328,7 @@ def guion_finde(prev_s, prev_d, sab: date, dom: date, factor: float, presenta: s
     palabras = {k: max(8, round(v * factor)) for k, v in base.items()}
     if not plantilla:
         try:
-            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "19:50", PROMPT_FINDE.format(promesa=_prom.nota("finde", ahora().date()), presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
+            gg = _claude_json(f"finde-{ahora().date().isoformat()}", "19:50", PROMPT_FINDE.format(promesa=_variedad_nota() + _prom.nota("finde", ahora().date()), presenta=presenta, sab=g.fecha_larga(sab), dom=g.fecha_larga(dom),
                                                   datos_sab=json.dumps(_resumen(prev_s), ensure_ascii=False),
                                                   datos_dom=json.dumps(_resumen(prev_d), ensure_ascii=False),
                                                   palabras=json.dumps(palabras), total=sum(palabras.values()),
@@ -756,7 +765,7 @@ def guion_semana(prevs: dict, fechas: dict, factor: float, presenta: str, planti
         try:
             datos = {f"{d} {fechas[d].day}": _resumen(prevs[d]) for d in _dias()}
             m = MODOS_SEMANA[MODO_SEMANA]
-            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "19:50", PROMPT_SEMANA.format(promesa=_prom.nota("semana", ahora().date()), presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
+            gg = _claude_json(f"{MODO_SEMANA}-{ahora().date().isoformat()}", "19:50", PROMPT_SEMANA.format(promesa=_variedad_nota() + _prom.nota("semana", ahora().date()), presenta=presenta, datos=json.dumps(datos, ensure_ascii=False),
                                                    palabras=json.dumps(palabras), total=sum(palabras.values()),
                                                    cuando=m["cuando"], rango_txt=m["rango_txt"],
                                                    claves_dias=", ".join(f'"{d}": "..."' for d in orden[1:-2]),

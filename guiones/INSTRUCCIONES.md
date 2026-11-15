@@ -39,9 +39,15 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
   gore, con respeto a las víctimas, nunca el punto de vista de un terrorista o verdugo, sin tomar partido político.
   Tramos de 12-25 palabras; cada "imagen" es una búsqueda en inglés de una foto HISTÓRICA real de Wikimedia
   ("Berlin 1945 ruins", "Omaha Beach landing 1944"): lugar + año, sin cadáveres. No repitas temas ya contados.
-- Días de tiempo tranquilo (parte y vídeos semanales): gancho HUMANO para toda España (plan, finde, festivo,
-  Halloween, festivos autonómicos y fiestas locales del contexto, ropa, terraza o manta), nunca "cuatro gotas en una
-  ciudad"; cierre con UNA pregunta de respuesta rápida
+- VARIEDAD DE GANCHOS (15-nov-2026, obligatorio en partes y especiales): el prompt trae «GANCHOS YA USADOS». La
+  primera frase, el titular y la primera línea del texto del post no pueden parecerse a ninguno: ni estructura, ni
+  palabras clave, ni la misma pregunta. Prohibido «partido en dos», «¿paraguas o chanclas?» como apertura y «media
+  España / la otra media». Las tres llevan un dato concreto de ese día (sitio + cifra, hora o día). Motivo: del 12 al
+  14 de noviembre se repitió la fórmula tres días y los vídeos se quedaron en 1.700-9.400 visualizaciones.
+- Días de tiempo tranquilo (el prompt lo marca con «DÍA TRANQUILO»): el vídeo gira en torno a UN dato llamativo de
+  los que da el prompt, con sitio y cifra en la primera frase, retomado a mitad y en la pregunta del cierre. Se le
+  da el ángulo humano (plan, ropa, terraza o manta, festivo), pero el gancho es el dato, nunca una frase genérica ni
+  "cuatro gotas en una ciudad". La duración y los bloques NO cambian. Cierre con UNA pregunta de respuesta rápida
   que genere debate ("¿Chaqueta o manga corta mañana? Te leo."). Los comentarios son lo que reparte el vídeo.
 - Festivos nacionales y autonómicos (marcados [OBLIGATORIO] o [SIEMPRE]): se nombran SIEMPRE, ligados al tiempo.
   Fiestas locales y eventos (Halloween, San Juan…): solo si el día es tranquilo y no hay nada más relevante.

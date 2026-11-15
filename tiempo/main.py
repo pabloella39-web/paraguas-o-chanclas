@@ -375,6 +375,12 @@ def construir(hoy: date, salida: Path, demo: bool = False) -> dict:
     marcar_tormentas(prev, avisos)   # aviso por tormentas → icono de tormenta (no de lluvia) en esas ciudades
     fen = gancho_mod.fenomeno_del_dia(prev, avisos)
     g.GANCHO, g.GANCHO_TEXTO = fen, gancho_mod.para_guion(fen)
+    try:   # ganchos ya usados (para no repetirlos) y, en días tranquilos, el dato llamativo que hace de hilo
+        from . import variedad
+        g.GANCHO_TEXTO += variedad.nota() + variedad.dia_tranquilo(
+            prev, fen, "mañana" if os.environ.get("VISPERA") else "hoy")
+    except Exception as e:  # noqa: BLE001
+        log.warning("Variedad de ganchos no disponible: %s", e)
     if not demo:   # avisos de todos los niveles (coloreados en el mapa) y oleaje fuerte: también al guion
         from .especiales import texto_avisos
         from .fuentes import COSTA, nieve, oleaje, texto_nieve, texto_oleaje
