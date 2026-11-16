@@ -954,7 +954,9 @@
   "7708739836022260512",
   "7708737115530298134",
   "7708743346647450390",
-  "7708801420102779670"
+  "7708801420102779670",
+  "7708806323571835670",
+  "7708806973630186273"
  ],
  "hechas": [
   {
@@ -1560,6 +1562,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Mañana en Cádiz: 20°/18°, 100 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-16",
+   "clave": "vigo|2026-11-17",
+   "lugar": "Vigo",
+   "usuarios": [
+    "caf146"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Vigo: 18°/17°, 60 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
