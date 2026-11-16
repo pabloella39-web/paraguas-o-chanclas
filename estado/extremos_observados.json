@@ -63,10 +63,10 @@
    "hora": "2026-11-16T08:00:00+0000"
   },
   "max": {
-   "valor": 25.1,
+   "valor": 25.7,
    "sitio": "Barcelona Aeropuerto",
    "zona": "Barcelona",
-   "hora": "2026-11-16T11:00:00+0000"
+   "hora": "2026-11-16T12:00:00+0000"
   }
  }
 }
