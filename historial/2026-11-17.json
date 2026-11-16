@@ -1,0 +1,131 @@
+{
+ "fecha": "2026-11-17",
+ "duracion": 92.7,
+ "caption": "Aviso naranja en A Coruña y 26 grados en Alicante: ¿abrigo o manga corta mañana? 🌊🩴\n\nEl tiempo en España mañana, martes 17 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Badajoz\n🔥 Máxima: 26° en Alicante\n🥶 Mínima: 9° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valladolid",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "A CORUÑA, AVISO NARANJA",
+ "voz": "femenina",
+ "guion": {
+  "intro": "A Coruña, aviso naranja: nada de paseo marítimo. Lo del domingo, casi clavado: Bilbao, 21 grados. Al final, el pueblo donde más vas a tiritar.",
+  "aviso": "Aviso naranja por olas de 6 metros en toda la costa noroeste y oeste de A Coruña, con A Coruña, Fisterra u Ortigueira, entre otros: todo ese litoral, también los pueblos que no nombro. Santiago, amarillo por lluvia; Vigo y Lugo, sin aviso. Lejos de los diques.",
+  "norte": "Mira el satélite: así entra el frente. A Coruña, 8 litros y rachas de 70. Gente de Bilbao, lloviznas por la mañana y tarde seca.",
+  "interior": "Valladolid se moja por la mañana. En Toledo, AEMET ve lluvia segura y casi ningún modelo. Y en la Ibérica riojana, aviso amarillo por rachas de 90.",
+  "sur": "Gente de Badajoz, lluvia por la mañana con 24 grados, y Sevilla, cuatro gotas por la tarde. Málaga, sol y 24.",
+  "islas": "Canarias, de manga corta: Las Palmas y Santa Cruz de Tenerife, 25 grados y sol. Palma, 22 y alguna gota por la noche.",
+  "mediterraneo": "Y el Mediterráneo, de terraza: Alicante, 26 grados, y Barcelona, 21 y seca, con aviso amarillo por oleaje en Girona y Almería.",
+  "general": "Lo prometido: Granada, la capital más fría, con 9 grados, pero Griegos, en Teruel, baja a 4. Y el calor, para Alicante, con 26.",
+  "cierre": "¿Chaqueta o manga corta mañana? Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas. Sigue a Paraguas o Chanclas."
+ },
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": "¿Llueve, hace sol o ni fu ni fa por tu pueblo? Dímelo y te cuento lo de mañana 🌤️",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-16T19:28:18.582Z"
+     },
+     "success": true,
+     "platform_post_id": "7708853087317822752",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7708853087317822752",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 22398779,
+     "post_title": "Aviso naranja en A Coruña y 26 grados en Alicante: ¿abrigo o manga corta mañana? 🌊🩴\n\nEl tiempo en España mañana, martes 17 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Badajoz\n🔥 Máxima: 26° en Alicante\n🥶 Mínima: 9° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #Valladolid",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 92.7,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7708852595120719904",
+     "first_comment_posted": true,
+     "request_id": "a815f5b865464e86a9a2ff6624122ec6",
+     "request_id_logs": "a815f5b865464e86a9a2ff6624122ec6",
+     "job_id": "a19f534c27864f138707d7726ed1cbbe",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-16T19:28:18.582Z"
+   },
+   "request_id": "a815f5b865464e86a9a2ff6624122ec6"
+  }
+ },
+ "youtube": {
+  "id": "vhT0tIZeJqQ",
+  "url": "https://youtube.com/shorts/vhT0tIZeJqQ",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-16T19:29:56.604Z"
+   },
+   "success": true,
+   "platform_post_id": "18121748785991839",
+   "post_url": "https://www.instagram.com/reel/Df0G6ZZgNMZ/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 22398779,
+   "post_title": "Aviso naranja en A Coruña y 26 grados en Alicante: ¿abrigo o manga corta mañana? 🌊🩴\n\nEl tiempo en España mañana, martes 17 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Badajoz\n🔥 Máxima: 26° en Alicante\n🥶 Mínima: 9° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Valladolid #meteorologia",
+   "post_caption": "Aviso naranja en A Coruña y 26 grados en Alicante: ¿abrigo o manga corta mañana? 🌊🩴\n\nEl tiempo en España mañana, martes 17 de noviembre 🇪🇸\n🌧️ Lluvia en Valladolid y Badajoz\n🔥 Máxima: 26° en Alicante\n🥶 Mínima: 9° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #Valladolid #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 92.7,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "add6d4eada034ae586776f81e0142983",
+   "request_id_logs": "add6d4eada034ae586776f81e0142983",
+   "job_id": "1cc3ffff5eea41559c3e966283cadd6e",
+   "request_total_platforms": 1
+  }
+ }
+}
