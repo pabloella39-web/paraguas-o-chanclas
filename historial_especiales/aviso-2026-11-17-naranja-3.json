@@ -1,0 +1,143 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-17",
+ "caption": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral cántabro\n\n🟠 Aviso naranja por oleaje: Litoral cántabro\n🟡 Aviso amarillo por oleaje: Gipuzkoa litoral, Bizkaia litoral\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas",
+ "titular": "CANTABRIA: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 57.1,
+ "firma": "naranja:costeros:1",
+ "guion": {
+  "intro": "AEMET amplía el aviso naranja a Cantabria. Olas de 5 a 6 metros pueden golpear puertos y paseos marítimos.",
+  "zonas": "Es para todo el litoral cántabro, desde las siete de la tarde de hoy hasta la medianoche del miércoles. Atentos Santander, Bilbao y Vitoria, sin aviso. Aviso amarillo por oleaje en Gipuzkoa y Bizkaia. El aviso es para toda la zona, también para los pueblos que no nombramos.",
+  "temporal": "La lluvia empieza en Galicia y el miércoles por la noche llega a Álava, Vizcaya y Navarra, con 10 litros en una hora. Rachas de 94 kilómetros por hora en Asturias hoy; el miércoles, 81 en Cantabria y 102 en Galicia.",
+  "sigue": "Y recuerda: sigue el aviso naranja por oleaje en Galicia y Asturias, sin cambios, con olas de 5 a 6 metros.",
+  "consejos": "Mantente preparado y revisa la predicción de AEMET. Si hay una emergencia, llama al 112.",
+  "cierre": "Reenvíaselo a tus contactos de Cantabria."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "costeros",
+   "nivel": "naranja",
+   "zonas": [
+    "Costa - Litoral cántabro"
+   ],
+   "ciudades": [],
+   "inicio": "2026-11-17T19:00:00+01:00",
+   "fin": "2026-11-18T23:59:59+01:00",
+   "descripcion": "Mar combinada del Oeste o Noroeste de 5 a 6 m. Viento del Suroeste de 50 a 61 km/h (fuerza 7)."
+  }
+ ],
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-17T14:33:33.749Z"
+     },
+     "success": true,
+     "platform_post_id": "7709148239940832544",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7709148239940832544",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13825912,
+     "post_title": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral cántabro\n\n🟠 Aviso naranja por oleaje: Litoral cántabro\n🟡 Aviso amarillo por oleaje: Gipuzkoa litoral, Bizkaia litoral\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 57.1,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7709148069161502753",
+     "request_id": "6da0ef78077045ecac7d9ccc13fcbb3f",
+     "request_id_logs": "6da0ef78077045ecac7d9ccc13fcbb3f",
+     "job_id": "0a85ed086b794faf9f93a14fc21574e0",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-17T14:33:33.749Z"
+   },
+   "request_id": "6da0ef78077045ecac7d9ccc13fcbb3f"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "PXDcxJ1bEu0",
+  "url": "https://youtube.com/shorts/PXDcxJ1bEu0",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-17T14:34:48.442Z"
+   },
+   "success": true,
+   "platform_post_id": "18101806766084287",
+   "post_url": "https://www.instagram.com/reel/Df2J9iMCHyR/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 13825912,
+   "post_title": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral cántabro\n\n🟠 Aviso naranja por oleaje: Litoral cántabro\n🟡 Aviso amarillo por oleaje: Gipuzkoa litoral, Bizkaia litoral\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #meteorologia",
+   "post_caption": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral cántabro\n\n🟠 Aviso naranja por oleaje: Litoral cántabro\n🟡 Aviso amarillo por oleaje: Gipuzkoa litoral, Bizkaia litoral\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 57.1,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "d8d0013f2af2434088ed4ac84c1e8e2c",
+   "request_id_logs": "d8d0013f2af2434088ed4ac84c1e8e2c",
+   "job_id": "69218ca30b9e48f881520cddadd69056",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
