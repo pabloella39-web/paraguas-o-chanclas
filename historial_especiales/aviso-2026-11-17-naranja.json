@@ -1,0 +1,151 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-17",
+ "caption": "⚠️ Aviso naranja por oleaje en Galicia: olas de hasta 6 metros desde esta tarde\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, A Mariña, Suroeste de A Coruña, Rias Baixas, Miño de Pontevedra, A Coruña\n🟡 Aviso amarillo por oleaje: Litoral occidental asturiano\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #ACoruña",
+ "titular": "GALICIA: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 64.37,
+ "firma": "naranja:costeros:6",
+ "guion": {
+  "intro": "Olas de 6 metros: aviso naranja en Galicia. Pueden romper con fuerza contra diques, muelles y paseos.",
+  "zonas": "Desde hoy martes a las siete de la tarde hasta el miércoles a medianoche. Es para toda la zona: noroeste, oeste y suroeste de A Coruña, A Mariña, Rías Baixas y Miño de Pontevedra, también para los pueblos que no se nombran. Con A Coruña, Ribeira, Sanxenxo, Fisterra y Rianxo, entre otros. Atentos Vigo, Santiago, Lugo, Ourense y Oviedo, sin aviso. Aviso amarillo por oleaje en el litoral occidental asturiano.",
+  "temporal": "La lluvia, débil en Galicia, avanza hacia el este: el miércoles por la mañana llega a Álava, Vizcaya y Navarra, con hasta 6 litros en una hora por la noche. El viento sopla fuerte desde la madrugada con rachas de 101 kilómetros por hora en Pontevedra y Ourense. El miércoles por la noche vuelve con 103 en Asturias.",
+  "consejos": "Prepárate y no te acerques a la costa. Y si hay una emergencia, llama al 112.",
+  "cierre": "Pásaselo a tus contactos de la costa gallega."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "costeros",
+   "nivel": "naranja",
+   "zonas": [
+    "Costa - Noroeste de A Coruña",
+    "Costa - Oeste de A Coruña",
+    "Costa - A Mariña",
+    "Costa - Suroeste de A Coruña",
+    "Costa - Rias Baixas",
+    "Costa - Miño de Pontevedra"
+   ],
+   "ciudades": [
+    "A Coruña"
+   ],
+   "inicio": "2026-11-17T19:00:00+01:00",
+   "fin": "2026-11-18T23:59:59+01:00",
+   "descripcion": "Mar combinada del Oeste o Noroeste de 5 a 6 m. Viento del Suroeste de 50 a 61 km/h (fuerza 7)."
+  }
+ ],
+ "control": {
+  "graves": [],
+  "avisos": [
+   "plano casi quieto durante 24 s (desde el 0:10)"
+  ]
+ },
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-17T09:24:08.239Z"
+     },
+     "success": true,
+     "platform_post_id": "7709068423682182432",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7709068423682182432",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 12688779,
+     "post_title": "⚠️ Aviso naranja por oleaje en Galicia: olas de hasta 6 metros desde esta tarde\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, A Mariña, Suroeste de A Coruña, Rias Baixas, Miño de Pontevedra, A Coruña\n🟡 Aviso amarillo por oleaje: Litoral occidental asturiano\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #ACoruña",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 64.367,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7709068044601067553",
+     "request_id": "6bbc1535b49342b5a4b1d62386b3a05d",
+     "request_id_logs": "6bbc1535b49342b5a4b1d62386b3a05d",
+     "job_id": "8ddc09a2f5ef4ed1945aeb0a451ab75e",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-17T09:24:08.239Z"
+   },
+   "request_id": "6bbc1535b49342b5a4b1d62386b3a05d"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "Ag_2mIOB7Hg",
+  "url": "https://youtube.com/shorts/Ag_2mIOB7Hg",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-17T09:26:10.398Z"
+   },
+   "success": true,
+   "platform_post_id": "18133844153510406",
+   "post_url": "https://www.instagram.com/reel/Df1mpQRFPCh/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 12688779,
+   "post_title": "⚠️ Aviso naranja por oleaje en Galicia: olas de hasta 6 metros desde esta tarde\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, A Mariña, Suroeste de A Coruña, Rias Baixas, Miño de Pontevedra, A Coruña\n🟡 Aviso amarillo por oleaje: Litoral occidental asturiano\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #ACoruña",
+   "post_caption": "⚠️ Aviso naranja por oleaje en Galicia: olas de hasta 6 metros desde esta tarde\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, A Mariña, Suroeste de A Coruña, Rias Baixas, Miño de Pontevedra, A Coruña\n🟡 Aviso amarillo por oleaje: Litoral occidental asturiano\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #ACoruña",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 64.367,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "c23f1f320747437d80322c9bf3b1aaf9",
+   "request_id_logs": "c23f1f320747437d80322c9bf3b1aaf9",
+   "job_id": "7a8b1d308706411fa41dca8088d86e5c",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
