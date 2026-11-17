@@ -1,0 +1,144 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-17",
+ "caption": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral de Asturias\n\n🟠 Aviso naranja por oleaje: Litoral occidental asturiano, Litoral oriental asturiano\n🟡 Aviso amarillo por oleaje: Litoral cántabro\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas",
+ "titular": "ASTURIAS: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 61.73,
+ "firma": "naranja:costeros:2",
+ "guion": {
+  "intro": "Asturias: AEMET amplía el aviso naranja por oleaje. Olas de 5 a 6 metros pueden barrer puertos y paseos marítimos.",
+  "zonas": "Desde las siete de la tarde de hoy hasta el miércoles a medianoche, en todo el litoral occidental y oriental asturiano. El aviso es para toda la zona, también donde no se nombra, como Tapia de Casariego. Atentos Oviedo, Santander, Burgos, León y Ourense, sin aviso. Amarillo por oleaje en el litoral cántabro.",
+  "temporal": "La lluvia, floja, empieza en Galicia y el miércoles llega a Álava, Vizcaya y Navarra, con hasta 6 litros en una hora por la noche. El viento golpea Asturias: 96 kilómetros por hora esta tarde y 103 el miércoles por la noche.",
+  "sigue": "Y recuerda: sigue el aviso naranja por oleaje en la costa gallega, sin cambios, con olas de 5 a 6 metros.",
+  "consejos": "Ve preparado, aléjate del mar y consulta la predicción actualizada. Si hay una emergencia, llama al 112.",
+  "cierre": "Mándaselo a quien tengas en Asturias."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "costeros",
+   "nivel": "naranja",
+   "zonas": [
+    "Costa - Litoral occidental asturiano",
+    "Costa - Litoral oriental asturiano"
+   ],
+   "ciudades": [],
+   "inicio": "2026-11-17T19:00:00+01:00",
+   "fin": "2026-11-18T23:59:59+01:00",
+   "descripcion": "Mar combinada del Oeste o Noroeste de 5 a 6 m. Viento del Suroeste de 50 a 61 km/h (fuerza 7)."
+  }
+ ],
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-17T11:11:29.302Z"
+     },
+     "success": true,
+     "platform_post_id": "7709096137025654049",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7709096137025654049",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13816379,
+     "post_title": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral de Asturias\n\n🟠 Aviso naranja por oleaje: Litoral occidental asturiano, Litoral oriental asturiano\n🟡 Aviso amarillo por oleaje: Litoral cántabro\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 61.734,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7709096009816885280",
+     "request_id": "440f9451048c473fa759a8dae87d7edb",
+     "request_id_logs": "440f9451048c473fa759a8dae87d7edb",
+     "job_id": "f06008ff5d47431cae6c555df83393dd",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-17T11:11:29.302Z"
+   },
+   "request_id": "440f9451048c473fa759a8dae87d7edb"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "bjEJOay3GZc",
+  "url": "https://youtube.com/shorts/bjEJOay3GZc",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-17T11:13:12.687Z"
+   },
+   "success": true,
+   "platform_post_id": "18425593558152807",
+   "post_url": "https://www.instagram.com/reel/Df1y4hQDmmd/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 13816379,
+   "post_title": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral de Asturias\n\n🟠 Aviso naranja por oleaje: Litoral occidental asturiano, Litoral oriental asturiano\n🟡 Aviso amarillo por oleaje: Litoral cántabro\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #meteorologia",
+   "post_caption": "⚠️ AEMET amplía el aviso naranja por oleaje al litoral de Asturias\n\n🟠 Aviso naranja por oleaje: Litoral occidental asturiano, Litoral oriental asturiano\n🟡 Aviso amarillo por oleaje: Litoral cántabro\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 61.734,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "8d7ccb4be2414471b3a1aacf951a318f",
+   "request_id_logs": "8d7ccb4be2414471b3a1aacf951a318f",
+   "job_id": "c7e03c9c620742749d6a8b5d222a8d6d",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
