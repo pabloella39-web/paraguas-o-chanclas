@@ -1,0 +1,131 @@
+{
+ "fecha": "2026-11-18",
+ "duracion": 100.37,
+ "caption": "Madrid se moja por la tarde y Murcia sube a 30 grados: ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 18 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Badajoz\n🔥 Máxima: 30° en Murcia\n🥶 Mínima: 11° en Salamanca\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #ACoruna",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "MADRID: TARDE DE PARAGUAS",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Madrid, mañana por la tarde, paraguas. Lo que te anticipé el domingo, confirmado: Extremadura, empapada. Y aguanta, que al final va el sitio más caluroso.",
+  "aviso": "Olas de hasta 7 metros y aviso naranja en toda la costa de A Coruña, A Mariña, Rías Baixas, Miño de Pontevedra, Asturias, Cantabria, Bizkaia y Gipuzkoa, con pueblos como Fisterra o Sanxenxo, entre otros: vale para todo ese litoral. Ni diques ni paseos; el detalle, en el vídeo del aviso. El aviso es para toda la zona, también para los pueblos que no nombramos.",
+  "norte": "Mira el satélite: así entra el frente. Vigo y Pontevedra, hasta 20 litros por metro cuadrado. Gente de Santander, lo fuerte llega de madrugada.",
+  "interior": "Gente de Madrid, por la tarde la lluvia va al 90 por ciento. Toledo recoge 13 litros, y Salamanca, rachas de 75 kilómetros por hora.",
+  "sur": "Extremadura se lleva el cubo: Cáceres, 22 litros por metro cuadrado, con aviso amarillo en el norte, y Badajoz, 13. Sevilla, lluvia floja todo el día.",
+  "islas": "Canarias, a lo suyo: Las Palmas y Santa Cruz de Tenerife, 26 grados y ni una gota. Palma, cuatro gotas por la mañana.",
+  "mediterraneo": "Y las chanclas, al Mediterráneo: Valencia, 26 grados, y Alicante, 28. Gente de Murcia, sol de terraza. Barcelona, seca hasta la noche.",
+  "general": "Lo prometido: el calor, para Murcia, con 30 grados. Y para tiritar, Salamanca entre las capitales, con 11, y Benasque, en Huesca, con 5.",
+  "cierre": "¿Desde qué ciudad nos ves? Te leo, y sigue a Paraguas o Chanclas. Mañana, paraguas en Madrid y chanclas en Murcia."
+ },
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": "Gente de los pueblos: ¡vuestro momento! Escribid vuestro pueblo y os digo el tiempo de mañana 🙌",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-17T19:28:51.973Z"
+     },
+     "success": true,
+     "platform_post_id": "7709224302503120160",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7709224302503120160",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 24510709,
+     "post_title": "Madrid se moja por la tarde y Murcia sube a 30 grados: ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 18 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Badajoz\n🔥 Máxima: 30° en Murcia\n🥶 Mínima: 11° en Salamanca\n\n#eltiempo #tiempomañana #paraguasochanclas #lluvia #ACoruna",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 100.367,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7709224056125573153",
+     "first_comment_posted": true,
+     "request_id": "7aa1320857954afcb1639d22e3e39024",
+     "request_id_logs": "7aa1320857954afcb1639d22e3e39024",
+     "job_id": "d60597a432ec40f3acd57e7b8ac898e0",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-17T19:28:51.973Z"
+   },
+   "request_id": "7aa1320857954afcb1639d22e3e39024"
+  }
+ },
+ "youtube": {
+  "id": "gX0p432Pl7k",
+  "url": "https://youtube.com/shorts/gX0p432Pl7k",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-17T19:31:27.652Z"
+   },
+   "success": true,
+   "platform_post_id": "18120347002798868",
+   "post_url": "https://www.instagram.com/reel/Df2r6NLGcut/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 24510709,
+   "post_title": "Madrid se moja por la tarde y Murcia sube a 30 grados: ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 18 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Badajoz\n🔥 Máxima: 30° en Murcia\n🥶 Mínima: 11° en Salamanca\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #ACoruna #meteorologia",
+   "post_caption": "Madrid se moja por la tarde y Murcia sube a 30 grados: ¿tú qué sacas mañana? ☔🩴\n\nEl tiempo en España mañana, miércoles 18 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Badajoz\n🔥 Máxima: 30° en Murcia\n🥶 Mínima: 11° en Salamanca\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #ACoruna #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 100.367,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "334b1114e95041b9b12b4fabf7759c5c",
+   "request_id_logs": "334b1114e95041b9b12b4fabf7759c5c",
+   "job_id": "75f50f63592348c4adf91e881731c440",
+   "request_total_platforms": 1
+  }
+ }
+}
