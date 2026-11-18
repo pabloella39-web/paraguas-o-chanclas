@@ -1,0 +1,138 @@
+{
+ "tipo": "resto",
+ "fecha": "2026-11-18",
+ "caption": "Olas de 7 metros el jueves y un viernes seco para salir… ¿qué plan tienes? 🌊🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 19: máx. 25° · lluvia en A Coruña, Oviedo\n☁️ Viernes 20: máx. 26° · lluvia en A Coruña\n☁️ Sábado 21: máx. 26° · lluvia en A Coruña, Valladolid\n🌧️ Domingo 22: máx. 25° · lluvia en Valladolid, Salamanca\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "OLAS DE 7 METROS",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 149.4,
+ "guion": {
+  "intro": "Olas de 7 metros mañana en el Cantábrico. Y lluvia de Vigo a Madrid, con un viernes de respiro en medio. Atento al final: te digo el día que más te va a fastidiar.",
+  "avisos_jueves": "Mañana, aviso naranja por olas de hasta 7 metros en toda la costa de Galicia, Asturias, Cantabria y el País Vasco. Amarillo por rachas de 90 en el litoral cántabro y vasco, y por lluvia en el interior de Pontevedra y Ourense. También aviso naranja por oleaje en Gipuzkoa litoral, Bizkaia litoral, Noroeste de A Coruña, Oeste de A Coruña, Suroeste de A Coruña, A Mariña, Rias Baixas, Miño de Pontevedra, Litoral occidental asturiano y Litoral oriental asturiano.",
+  "jueves": "Mañana jueves, el agua manda en el norte. Fíjate en el verde del mapa: Pontevedra recoge 17 litros por metro cuadrado, Vigo 16 y Santiago 10, así que paraguas grande y lejos de diques y paseos. En el interior, Madrid suma 4 litros con 16 grados, y Guadalajara y Cuenca rondan los 7.",
+  "avisos_viernes": "El viernes sigue el naranja por olas de 7 metros en Galicia, Asturias, Cantabria y el litoral vasco, y amarillo por olas de 5 metros en Rías Baixas. También aviso naranja por oleaje en Litoral occidental asturiano, Litoral oriental asturiano, Litoral cántabro, Noroeste de A Coruña, Oeste de A Coruña, Suroeste de A Coruña, A Mariña, Miño de Pontevedra, Gipuzkoa litoral y Bizkaia litoral.",
+  "viernes": "El viernes respira casi toda España. Seco de Bilbao a Málaga, ideal para tender. Eso sí, Madrid baja a 13 grados, chaqueta. Solo A Coruña pilla algo de lluvia.",
+  "sabado": "El sábado vuelve el agua al norte y al oeste. A Coruña se lleva 19 litros, y aquí no hay duda, coinciden todos los modelos. Valladolid suma 16 litros y Oviedo 15. Si tienes plan al aire libre, mejor en Granada o Murcia, con 23 grados y sol.",
+  "domingo": "El domingo, más chubascos en Bilbao y Santander, con olas de casi 4 metros en Cantabria. Llega el frío: Valladolid, la capital más fría, baja a 6 grados, y Navarredonda de Gredos, en Ávila, a 0. Y en Canarias, Las Palmas sigue en 25 grados.",
+  "general": "Lo prometido. El que más te va a fastidiar, el jueves, con lluvia en medio país y olas de 7 metros. El mejor, el viernes, seco casi en toda España y con 22 grados en Alicante.",
+  "cierre": "¿Viernes de terraza o de sofá? Te leo. Y síguenos para el tiempo de cada día."
+ },
+ "control": {
+  "graves": [],
+  "avisos": [
+   "la ficha de ASTURIAS no cabe junto a su zona y no se pone",
+   "la ficha de CANTABRIA no cabe junto a su zona y no se pone",
+   "la ficha de CATALUÑA no cabe junto a su zona y no se pone",
+   "la ficha de PAÍS VASCO no cabe junto a su zona y no se pone",
+   "plano casi quieto durante 27 s (desde el 0:11)"
+  ]
+ },
+ "primer_comentario": "Gente de los pueblos: ¡vuestro momento! Escribid vuestro pueblo y os digo el tiempo de mañana 🙌",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-18T19:28:24.140Z"
+     },
+     "success": true,
+     "platform_post_id": "7709595170051804449",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7709595170051804449",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 23137110,
+     "post_title": "Olas de 7 metros el jueves y un viernes seco para salir… ¿qué plan tienes? 🌊🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 19: máx. 25° · lluvia en A Coruña, Oviedo\n☁️ Viernes 20: máx. 26° · lluvia en A Coruña\n☁️ Sábado 21: máx. 26° · lluvia en A Coruña, Valladolid\n🌧️ Domingo 22: máx. 25° · lluvia en Valladolid, Salamanca\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 149.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7709594927616886817",
+     "first_comment_posted": true,
+     "request_id": "b6273480efe34f8194595483b736928b",
+     "request_id_logs": "b6273480efe34f8194595483b736928b",
+     "job_id": "797ab40f5f7644fa92a5553b30920c08",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-18T19:28:24.140Z"
+   },
+   "request_id": "b6273480efe34f8194595483b736928b"
+  }
+ },
+ "tipo_youtube": "semana",
+ "youtube": {
+  "id": "seBcvsl8fkI",
+  "url": "https://youtube.com/shorts/seBcvsl8fkI",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-18T19:30:07.215Z"
+   },
+   "success": true,
+   "platform_post_id": "18133697053844183",
+   "post_url": "https://www.instagram.com/reel/Df5QgOdDuy9/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 23137110,
+   "post_title": "Olas de 7 metros el jueves y un viernes seco para salir… ¿qué plan tienes? 🌊🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 19: máx. 25° · lluvia en A Coruña, Oviedo\n☁️ Viernes 20: máx. 26° · lluvia en A Coruña\n☁️ Sábado 21: máx. 26° · lluvia en A Coruña, Valladolid\n🌧️ Domingo 22: máx. 25° · lluvia en Valladolid, Salamanca\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "post_caption": "Olas de 7 metros el jueves y un viernes seco para salir… ¿qué plan tienes? 🌊🧺\n\nLo que queda de semana y el finde en España 🇪🇸\n🌧️ Jueves 19: máx. 25° · lluvia en A Coruña, Oviedo\n☁️ Viernes 20: máx. 26° · lluvia en A Coruña\n☁️ Sábado 21: máx. 26° · lluvia en A Coruña, Valladolid\n🌧️ Domingo 22: máx. 25° · lluvia en Valladolid, Salamanca\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 149.4,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "59b5c1cc958d4e0785b8f45307b1ca59",
+   "request_id_logs": "59b5c1cc958d4e0785b8f45307b1ca59",
+   "job_id": "d002ec7386ed4b41bebb83426a0c17b5",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
