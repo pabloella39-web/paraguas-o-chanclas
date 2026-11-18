@@ -1,0 +1,156 @@
+{
+ "tipo": "aviso",
+ "fecha": "2026-11-19",
+ "caption": "⚠️ Aviso naranja por oleaje en Galicia y el Cantábrico hasta el viernes\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, Suroeste de A Coruña, A Mariña, Rias Baixas, Miño de Pontevedra, Litoral occidental asturiano, Litoral oriental asturiano, Litoral cántabro, Gipuzkoa litoral, Bizkaia litoral, A Coruña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #ACoruña",
+ "titular": "GALICIA: AVISO NARANJA",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 69.9,
+ "firma": "naranja:costeros:11",
+ "guion": {
+  "intro": "Salta el aviso naranja por oleaje en Galicia. Olas de 6 a 8 metros, con golpes de mar peligrosos en puertos y playas.",
+  "zonas": "Desde el miércoles a las diez hasta el viernes a las tres de la tarde. Afecta a todo el litoral del noroeste, oeste y suroeste de A Coruña, A Mariña, Rías Baixas, Miño de Pontevedra, toda la costa asturiana, Cantabria, Gipuzkoa y Bizkaia. Con A Coruña, Sanxenxo, Fisterra y Tapia de Casariego, entre otros. El aviso es para toda la zona, también para los pueblos que no se nombran. Atentos en Bilbao y Oviedo, sin aviso. También afecta a Litoral occidental asturiano, Litoral oriental asturiano y Litoral cántabro.",
+  "temporal": "La lluvia llega el jueves por la tarde a Gipuzkoa y el viernes a Galicia, con 4 litros en una hora por la noche. El viento sopla con rachas de 108 kilómetros por hora en Asturias el jueves por la tarde, 107 en Vizcaya, y de 81 en Galicia el viernes por la noche.",
+  "consejos": "Mantente preparado y pendiente de la predicción de AEMET. En una emergencia, llama al 112.",
+  "cierre": "Reenvíaselo a quien esté en el litoral norte."
+ },
+ "nivel_max": 2,
+ "avisos": [
+  {
+   "fenomeno": "costeros",
+   "nivel": "naranja",
+   "zonas": [
+    "Costa - Noroeste de A Coruña",
+    "Costa - Oeste de A Coruña",
+    "Costa - Suroeste de A Coruña",
+    "Costa - A Mariña",
+    "Costa - Rias Baixas",
+    "Costa - Miño de Pontevedra",
+    "Costa - Litoral occidental asturiano",
+    "Costa - Litoral oriental asturiano",
+    "Costa - Litoral cántabro",
+    "Costa - Gipuzkoa litoral",
+    "Costa - Bizkaia litoral"
+   ],
+   "ciudades": [
+    "A Coruña"
+   ],
+   "inicio": "2026-11-18T10:00:00+01:00",
+   "fin": "2026-11-20T14:59:59+01:00",
+   "descripcion": "Mar combinada del Oeste o Noroeste de 6 a 8 m. Viento del Suroeste de 50 a 61 km/h (fuerza 7), temporalmente 62 a 74 km/h (fuerza 8) por la noche al norte de Cabo Vilán."
+  }
+ ],
+ "control": {
+  "graves": [],
+  "avisos": [
+   "plano casi quieto durante 31 s (desde el 0:10)"
+  ]
+ },
+ "primer_comentario": null,
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-18T23:54:43.559Z"
+     },
+     "success": true,
+     "platform_post_id": "7709663862110424353",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7709663862110424353",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 13713526,
+     "post_title": "⚠️ Aviso naranja por oleaje en Galicia y el Cantábrico hasta el viernes\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, Suroeste de A Coruña, A Mariña, Rias Baixas, Miño de Pontevedra, Litoral occidental asturiano, Litoral oriental asturiano, Litoral cántabro, Gipuzkoa litoral, Bizkaia litoral, A Coruña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\n#aviso #AEMET #eltiempo #paraguasochanclas #ACoruña",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.9,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7709663515296106528",
+     "request_id": "2f0f1b550f464aa6b90f7e7d784aca7a",
+     "request_id_logs": "2f0f1b550f464aa6b90f7e7d784aca7a",
+     "job_id": "8b22a36025034a7da43178c66ab1c8f2",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-18T23:54:43.559Z"
+   },
+   "request_id": "2f0f1b550f464aa6b90f7e7d784aca7a"
+  }
+ },
+ "tipo_youtube": "aviso",
+ "youtube": {
+  "id": "Ehn8vdeeFZw",
+  "url": "https://youtube.com/shorts/Ehn8vdeeFZw",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-18T23:56:40.170Z"
+   },
+   "success": true,
+   "platform_post_id": "17998410960100264",
+   "post_url": "https://www.instagram.com/reel/Df5vEzCDsd0/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 13713526,
+   "post_title": "⚠️ Aviso naranja por oleaje en Galicia y el Cantábrico hasta el viernes\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, Suroeste de A Coruña, A Mariña, Rias Baixas, Miño de Pontevedra, Litoral occidental asturiano, Litoral oriental asturiano, Litoral cántabro, Gipuzkoa litoral, Bizkaia litoral, A Coruña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #ACoruña",
+   "post_caption": "⚠️ Aviso naranja por oleaje en Galicia y el Cantábrico hasta el viernes\n\n🟠 Aviso naranja por oleaje: Noroeste de A Coruña, Oeste de A Coruña, Suroeste de A Coruña, A Mariña, Rias Baixas, Miño de Pontevedra, Litoral occidental asturiano, Litoral oriental asturiano, Litoral cántabro, Gipuzkoa litoral, Bizkaia litoral, A Coruña\nℹ️ Fuente: AEMET. Sigue las indicaciones de Protección Civil. Emergencias: 112.\nMapa de núcleos: GeoNames (CC BY 4.0).\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#avisoaemet #eltiempo #previsiondeltiempo #tiempoespaña #ACoruña",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 69.9,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "4c29402c48a141e1b2b5d5daf02c92c0",
+   "request_id_logs": "4c29402c48a141e1b2b5d5daf02c92c0",
+   "job_id": "a580bb4246784bbd85b368cca186e51e",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
