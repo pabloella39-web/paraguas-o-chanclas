@@ -1042,7 +1042,8 @@
   "7709517952781288214",
   "7709537478819431201",
   "7709553802957292310",
-  "7709596704237241110"
+  "7709596704237241110",
+  "7709607468502582038"
  ],
  "hechas": [
   {
@@ -1659,6 +1660,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Mañana en Vigo: 18°/17°, 60 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-18",
+   "clave": "aviles|2026-11-19",
+   "lugar": "Avilés",
+   "usuarios": [
+    "ainii03.14"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Avilés: 16°/13°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
