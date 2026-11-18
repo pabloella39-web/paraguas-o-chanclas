@@ -57,16 +57,16 @@
  },
  "2026-11-18": {
   "min": {
-   "valor": 5.0,
+   "valor": 4.9,
    "sitio": "Soto de Valdeón (automatica)",
    "zona": "León",
-   "hora": "2026-11-18T08:00:00+0000"
+   "hora": "2026-11-18T09:00:00+0000"
   },
   "max": {
-   "valor": 25.4,
+   "valor": 27.0,
    "sitio": "Águilas",
    "zona": "Murcia",
-   "hora": "2026-11-18T04:00:00+0000"
+   "hora": "2026-11-18T09:00:00+0000"
   }
  }
 }
