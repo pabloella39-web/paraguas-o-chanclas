@@ -57,15 +57,15 @@
  },
  "2026-11-20": {
   "min": {
-   "valor": 1.4,
-   "sitio": "Benasque",
-   "zona": "Huesca",
-   "hora": "2026-11-19T23:00:00+0000"
+   "valor": -0.9,
+   "sitio": "Barruera",
+   "zona": "Lleida",
+   "hora": "2026-11-20T05:00:00+0000"
   },
   "max": {
-   "valor": 20.6,
-   "sitio": "Lanzarote",
-   "zona": "Las Palmas",
+   "valor": 23.4,
+   "sitio": "Puerto de Mogán",
+   "zona": "Telde",
    "hora": "2026-11-19T23:00:00+0000"
   }
  }
