@@ -1,0 +1,133 @@
+{
+ "tipo": "finde",
+ "fecha": "2026-11-20",
+ "caption": "Santiago, 35 litros el sábado, y Murcia, 24 grados al sol los dos días ☔☀️\n\nEl tiempo del fin de semana en España, 21-22 de noviembre 🇪🇸\n☀️ Mejor plan: S.C. Tenerife (26° / 25°)\n🔥 Máxima del finde: 26° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Badajoz, Bilbao\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+ "titular": "35 LITROS EN SANTIAGO",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 109.33,
+ "guion": {
+  "intro": "Mañana caen 35 litros en Santiago. El agua barre el noroeste y el domingo llegan olas de 4 metros al Cantábrico. Y al final, dónde está el mejor plan del finde.",
+  "sabado": "Mañana sábado, el noroeste se empapa. Fíjate en el amarillo del mapa, Santiago, Ourense y Vigo pasan de 34 litros por metro cuadrado, con aviso amarillo por rachas de 80 en Rías Baixas y por lluvia en el sur de Lugo. En Castilla y León, León suma 33 y Valladolid 28, y aquí no hay duda, coinciden todos los modelos. Gente de Burgos, 11 grados y paraguas grande. En Extremadura, aviso amarillo en el norte de Cáceres, y Badajoz recoge 10 litros. Madrid, 14 grados y algo de agua. En Castilla-La Mancha, en cambio, Toledo y Albacete casi se libran, con 18 y 20 grados. Y el Mediterráneo y Andalucía, secos, con Murcia y Granada a 24.",
+  "avisos_domingo": "El domingo, aviso naranja por olas de 4 metros en el litoral de Cantabria, Bizkaia y Gipuzkoa, así que lejos de diques y paseos. Amarillo por rachas de 80 en Barcelona. También aviso naranja por oleaje en Litoral cántabro.",
+  "domingo": "El domingo para casi toda la lluvia y entra el frío. Bilbao aún recoge 6 litros. Salamanca, la capital más fría, baja a 4 grados, y Navarredonda de Gredos, en Ávila, a 0. En Granada, AEMET ve lluvia, pero casi ningún modelo.",
+  "general": "Lo prometido. El mejor plan, en Murcia, seca y a 24 grados los dos días, y en Canarias, con Santa Cruz de Tenerife a 26 y Maspalomas a 27. Y para sofá y manta, León, con 33 litros y 10 grados el sábado.",
+  "cierre": "¿Manta o paseo este finde? Te leo. Y síguenos para el tiempo de cada día."
+ },
+ "control": {
+  "graves": [],
+  "avisos": [
+   "la ficha de ASTURIAS no cabe junto a su zona y no se pone",
+   "la ficha de C. VALENCIANA no cabe junto a su zona y no se pone",
+   "plano casi quieto durante 41 s (desde el 0:14)"
+  ]
+ },
+ "primer_comentario": "📍 Escribe tu pueblo y te digo si mañana toca paraguas o chanclas 👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-20T19:28:00.171Z"
+     },
+     "success": true,
+     "platform_post_id": "7710337372075920672",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7710337372075920672",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 16293772,
+     "post_title": "Santiago, 35 litros el sábado, y Murcia, 24 grados al sol los dos días ☔☀️\n\nEl tiempo del fin de semana en España, 21-22 de noviembre 🇪🇸\n☀️ Mejor plan: S.C. Tenerife (26° / 25°)\n🔥 Máxima del finde: 26° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Badajoz, Bilbao\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 109.334,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7710337076063111201",
+     "first_comment_posted": true,
+     "request_id": "1df966e1e6e44ded8cb44b1a3a05f090",
+     "request_id_logs": "1df966e1e6e44ded8cb44b1a3a05f090",
+     "job_id": "b0006a680a094f6ba46c87a661d5acd0",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-20T19:28:00.171Z"
+   },
+   "request_id": "1df966e1e6e44ded8cb44b1a3a05f090"
+  }
+ },
+ "tipo_youtube": "finde",
+ "youtube": {
+  "id": "YOQzqqD8Srw",
+  "url": "https://youtube.com/shorts/YOQzqqD8Srw",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-20T19:29:16.301Z"
+   },
+   "success": true,
+   "platform_post_id": "18577748440073364",
+   "post_url": "https://www.instagram.com/reel/Df-aDC-iOx9/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 16293772,
+   "post_title": "Santiago, 35 litros el sábado, y Murcia, 24 grados al sol los dos días ☔☀️\n\nEl tiempo del fin de semana en España, 21-22 de noviembre 🇪🇸\n☀️ Mejor plan: S.C. Tenerife (26° / 25°)\n🔥 Máxima del finde: 26° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Badajoz, Bilbao\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempofindesemana #meteorologia",
+   "post_caption": "Santiago, 35 litros el sábado, y Murcia, 24 grados al sol los dos días ☔☀️\n\nEl tiempo del fin de semana en España, 21-22 de noviembre 🇪🇸\n☀️ Mejor plan: S.C. Tenerife (26° / 25°)\n🔥 Máxima del finde: 26° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Badajoz, Bilbao\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempofindesemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 109.334,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "2d4cdca12f954568a9919669925728f8",
+   "request_id_logs": "2d4cdca12f954568a9919669925728f8",
+   "job_id": "0377c8786ce5407f8372fa30f14b5b55",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
