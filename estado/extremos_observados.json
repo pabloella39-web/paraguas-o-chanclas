@@ -57,16 +57,16 @@
  },
  "2026-11-20": {
   "min": {
-   "valor": -0.9,
-   "sitio": "Barruera",
+   "valor": -1.3,
+   "sitio": "Martinet",
    "zona": "Lleida",
-   "hora": "2026-11-20T05:00:00+0000"
+   "hora": "2026-11-20T07:00:00+0000"
   },
   "max": {
-   "valor": 23.4,
-   "sitio": "Puerto de Mogán",
-   "zona": "Telde",
-   "hora": "2026-11-19T23:00:00+0000"
+   "valor": 24.4,
+   "sitio": "Las Palmas de Gran Canaria",
+   "zona": "Las Palmas",
+   "hora": "2026-11-20T07:00:00+0000"
   }
  }
 }
