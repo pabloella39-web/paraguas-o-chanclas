@@ -2,16 +2,17 @@ name: Parte diario del tiempo
 
 on:
   schedule:
-    # El parte de MAÑANA se publica esta noche a las 20:30 (Madrid) en TikTok y YouTube. GitHub solo usa UTC y a veces
-    # retrasa ejecuciones: varios intentos; tiempo.horario deja pasar el primero entre las 17:00 y las 20:20 de Madrid
-    # si el parte de mañana no existe. La ejecución publica los datos (rama pendiente/parte-FECHA) y espera hasta las
-    # 19:50 el guion escrito por la tarea programada de Claude (plan, sin API); si no llega, API de respaldo.
-    - cron: "20 15 * * *"
-    - cron: "50 15 * * *"
-    - cron: "20 16 * * *"
-    - cron: "50 16 * * *"
-    - cron: "20 17 * * *"
-    - cron: "50 17 * * *"
+    # Desde el 20/11/2026 el parte de HOY se publica a las 7:30 (Madrid), martes, miércoles, viernes y domingo (lunes,
+    # jueves y sábado lo cubre el especial de la tarde anterior). GitHub solo usa UTC y a veces retrasa ejecuciones:
+    # varios intentos; tiempo.horario deja pasar el primero entre las 5:30 y las 7:15 de Madrid si el parte de hoy no
+    # existe. La ejecución publica los datos (rama pendiente/parte-FECHA) y espera hasta las 7:05 el guion escrito por
+    # la tarea programada de Claude de la mañana (plan, sin API); si no llega, API de respaldo.
+    - cron: "35 3 * * *"
+    - cron: "55 3 * * *"
+    - cron: "15 4 * * *"
+    - cron: "35 4 * * *"
+    - cron: "55 4 * * *"
+    - cron: "15 5 * * *"
   push:
     # Lanzar un parte a mano desde git: cambiar el archivo lanzar.txt
     branches: [main]
@@ -97,7 +98,7 @@ jobs:
         run: |
           ARGS=""
           if [ "${{ github.event_name }}" = "schedule" ] || [ -n "${{ inputs.reloj }}" ]; then
-            ARGS="--publicar --vispera --esperar"
+            ARGS="--publicar --esperar"   # desde el 20/11/2026, el parte de HOY a las 7:30
           elif [ "${{ github.event_name }}" = "push" ]; then
             ARGS="--publicar"
             # "prueba" en lanzar.txt: vídeo real subido a YouTube como privado, sin TikTok ni historial

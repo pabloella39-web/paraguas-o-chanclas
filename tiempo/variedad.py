@@ -47,8 +47,10 @@ def nota() -> str:
     return ("\n\nGANCHOS YA USADOS en los últimos vídeos (del más antiguo al más reciente):\n" + lista +
             "\nREGLA DE VARIEDAD (obligatoria): la primera frase, el titular y la PRIMERA LÍNEA del texto del post "
             "de hoy no pueden parecerse a ninguno de esos: ni la misma estructura, ni las mismas palabras clave, ni "
-            "la misma pregunta. Prohibidas las fórmulas gastadas: «partido en dos», «¿paraguas o chanclas?» como "
-            "pregunta de apertura, «media España» + «la otra media». Cada una de las tres lleva un DATO CONCRETO "
+            "la misma pregunta. Prohibidas las fórmulas gastadas: «partido en dos», «media España» + «la otra media» y, sobre "
+            "todo, la PREGUNTA DE ELEGIR ENTRE DOS COSAS («¿abrigo o manga corta?», «¿paraguas o chanclas?», «¿terraza "
+            "o sofá?», «¿qué plan tienes?»): ni en la primera frase ni en la primera línea del texto del post, que son "
+            "AFIRMACIONES con el dato. Esa pregunta solo puede ir en el cierre del vídeo. Cada una de las tres lleva un DATO CONCRETO "
             "de hoy (un sitio + una cifra, una hora o un día): nada de frases que valdrían para cualquier día.\n")
 
 

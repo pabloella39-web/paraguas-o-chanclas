@@ -141,9 +141,10 @@ Además escribe "titular": el gancho para la pantalla, en MAYÚSCULAS, de 2 a 5 
 sin emojis, con la CIUDAD o zona y el fenómeno (ej. "MADRID, HOY TE MOJAS", "MÁLAGA: RACHAS DE 80", "BARCELONA,
 AVISO NARANJA", "SEVILLA SE ACHICHARRA").
 
-Y escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), que
-interpele al público con una pregunta o reto relacionado con el tiempo de hoy, con 1 o 2 emojis y SIN
-hashtags (los hashtags y el resumen se añaden automáticamente).
+Y escribe "caption": UNA sola frase gancho para la descripción del post (máx. 90 caracteres), AFIRMATIVA, con el
+dato más llamativo del día (sitio + cifra, hora o día), con 1 o 2 emojis y SIN hashtags (los hashtags y el resumen se
+añaden automáticamente). NO es una pregunta de elegir entre dos cosas («¿abrigo o manga corta?», «¿paraguas o
+chanclas?», «¿terraza o sofá?»): esa pregunta va solo al final del vídeo.
 
 Responde SOLO con JSON válido con esta forma:
 {{"segmentos": {{"intro": "...", "general": "...", "norte": "...", "interior": "...", "mediterraneo": "...",

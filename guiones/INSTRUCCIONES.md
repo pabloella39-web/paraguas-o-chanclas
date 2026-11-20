@@ -8,7 +8,7 @@ Si no respondes a tiempo usan la API de pago (respaldo), así que **responde rá
 | clave | qué es | aparece | límite |
 |---|---|---|---|
 | `historia-AAAA-MM-DD` | (PAUSADO desde el 03/11/2026: no se publica; si aparece un pendiente, ignóralo) canal de historias: UN vídeo POV de historia (L, X, V, S, D), sale a las 21:00 | ~17:05-18:00 | 19:30 |
-| `parte-AAAA-MM-DD` | parte de MAÑANA (fecha = mañana), sale a las 20:30; NO hay los domingos, miércoles ni viernes | ~17:20-18:50 | 19:50 |
+| `parte-AAAA-MM-DD` | desde el 20/11/2026, parte de HOY (fecha = hoy), sale a las 7:30 de la MAÑANA; solo martes, miércoles, viernes y domingo (lunes, jueves y sábado lo cubre el especial de la tarde anterior). Lo escribe la tarea programada de la mañana | ~5:40-6:20 | 7:05 |
 | `semana-AAAA-MM-DD` / `resto-AAAA-MM-DD` | domingo / miércoles, sale a las 20:30 y hace también de parte de mañana (bloque del primer día largo y por zonas) | ~18:45-19:15 | 19:50 |
 | `finde-AAAA-MM-DD` | viernes, sale a las 20:30 y hace también de parte del sábado (bloque del sábado largo y por zonas) | ~18:45-19:15 | 19:50 |
 
@@ -30,7 +30,7 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 - Parte del tiempo: mira `guiones/parte-2026-10-27.json` como modelo (el dueño lo calificó de perfecto): primera
   frase gancho de ≤8 palabras (corta y seca) con ciudad y fenómeno, continuidad con lo que se dijo en el vídeo semanal si el
   prompt la trae ("Te lo dije el domingo"), promesa del final VARIADA (la fórmula del día la trae el prompt en «PROMESA DEL FINAL»; «quédate» solo de vez en cuando), interpelar a la gente
-  de dos ciudades, cierre con pregunta y "paraguas en ... y chanclas en ...". En víspera se dice "mañana", nunca "hoy".
+  de dos ciudades, cierre con pregunta y "paraguas en ... y chanclas en ...". El parte de la mañana habla de HOY ("esta tarde", "a mediodía"); los especiales de la tarde, de mañana en adelante.
   Números en cifras + "grados"/"por ciento". Nada de inventar datos ni avisos.
 - Historia (POV, desde el 28/10/2026): mira `guiones/historia-2026-10-28.json` como modelo. UN solo vídeo en
   segunda persona: primera frase con fecha + lugar + quién eres; bucle abierto (el espectador sabe lo que viene y el
@@ -169,9 +169,14 @@ Si `comprobar` dice NO VÁLIDO, corrige (sobre todo la longitud) y repite.
 
 - PARTE EN DÍAS CON VÍDEO DE AVISO YA PUBLICADO (el prompt lo trae en «YA HAY VÍDEO DE AVISO PUBLICADO»): el parte no compite con el aviso. Gancho, titular y primera línea de la descripción NO abren con ese aviso: abren con lo que el aviso no cuenta (el resto de España, qué viene después, cuándo mejora). El tramo «aviso» se mantiene con todas sus zonas, contado con otras palabras, y remite al vídeo del aviso en una frase. Motivo: los partes del 9 y 10 nov, que abrían con el mismo aviso rojo ya publicado en 2-3 vídeos, se quedaron en 2.000-5.000 vistas con buena retención.
 
-- HORA DEL PARTE: se publica a las 20:30. Una corrección que obligue a resubirlo más tarde de las 21:00 solo se hace si el fallo es grave (dato o aviso equivocado); los fallos de imagen se corrigen para el día siguiente, porque un parte resubido tarde pierde casi todo el alcance (6 y 9 nov).
+- HORA DEL PARTE: desde el 20/11/2026 se publica a las 7:30 de la mañana (los especiales siguen a las 20:30). Una corrección que obligue a resubirlo más tarde de las 9:00 solo se hace si el fallo es grave (dato o aviso equivocado); los fallos de imagen se corrigen para el día siguiente, porque un parte resubido tarde pierde casi todo el alcance (6 y 9 nov).
 
 - VÍDEOS DE VARIOS DÍAS (semana, resto, finde): el mapa de cada día enseña ciudades distintas (rotan solas; las siete fijas y las que nombra la voz salen siempre). Las fichas de avisos van pegadas a su comunidad: si no caben cerca, salen reducidas o no salen, pero nunca lejos (el 11-nov Murcia acabó sobre Ourense). Para rehacer uno ya publicado con el mismo guion: «resto publicar rehacer» en lanzar_especial.txt.
 
 - CONTROL DE CALIDAD (tiempo/control.py): antes de publicar se revisa el vídeo montado. GRAVE (no se publica; en los avisos naranjas y rojos se rehace el vídeo con el siguiente ajuste y, si ningún intento sale limpio, se publica el último: un aviso no se queda sin salir): pantalla en negro, duración fuera de límites. AVISO (se publica y queda en el historial, campo «control», y en el registro): plano casi quieto 20 s o más, mismas ciudades todos los días, ficha de aviso que no cabe junto a su zona. Cada fallo nuevo que encuentre el dueño se añade aquí como regla. Para publicar saltándose el control: «sin-control» en lanzar_especial.txt.
 - MARGEN: los especiales de miércoles, viernes y domingo empiezan a las 18:11 (antes 18:41) para que una regeneración no retrase la publicación de las 20:26.
+
+- CAMBIOS DEL 20/11/2026 (los números cayeron de ~50.000 a ~8.000 de mediana por vídeo):
+  · PARTE POR LA MAÑANA: el diario es el de HOY a las 7:30 (martes, miércoles, viernes y domingo). Los especiales (domingo, miércoles, viernes) siguen a las 20:30. Se revisa a las dos semanas (4-dic) comparando visualizaciones.
+  · UN VÍDEO POR EPISODIO: una ampliación de un aviso NARANJA ya publicado no tiene vídeo propio salvo que llegue a una ciudad muy grande (Madrid, Barcelona, Valencia, Sevilla, Zaragoza, Málaga, Murcia, Palma…); se cuenta en el siguiente parte. Tampoco se repite un aviso naranja del mismo fenómeno y zonas ya contado en los 3 días anteriores. Los ROJOS nuevos en zonas nuevas salen siempre.
+  · SIN PREGUNTA DE ELEGIR en la apertura: la primera frase, el titular y la primera línea del texto del post son AFIRMACIONES con un dato (sitio + cifra o día). Nada de «¿abrigo o manga corta?», «¿paraguas o chanclas?», «¿terraza o sofá?», «¿qué plan tienes?» al principio: esa pregunta va solo en el cierre del vídeo.

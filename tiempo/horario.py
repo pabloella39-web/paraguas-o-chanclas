@@ -25,20 +25,21 @@ def ahora():
 
 
 def debe_ejecutarse(evento: str, cron: str = "") -> bool:
-    """Desde el 27/10/2026 el parte sale la víspera a las 20:30: las ejecuciones programadas trabajan entre las 17:00 y
-    las 20:20 de Madrid si el parte de mañana aún no existe (hay varios intentos por los retrasos de GitHub)."""
+    """Desde el 20/11/2026 el parte vuelve a la MAÑANA (el de hoy, a las 7:30): las ejecuciones programadas trabajan
+    entre las 5:30 y las 7:15 de Madrid si el parte de hoy aún no existe (hay varios intentos por los retrasos de
+    GitHub). Lunes, jueves y sábado no hay parte: lo cubre el especial de la tarde anterior (semana, resto, finde)."""
     if evento != "schedule":
         return True
     t = ahora()
-    manana = RAIZ / "historial" / f"{(t.date() + timedelta(days=1)).isoformat()}.json"
-    if not ((17, 0) <= (t.hour, t.minute) <= (20, 20)):
-        print(f"Fuera de la ventana de la víspera ({t:%H:%M} en Madrid)")
+    hoy = RAIZ / "historial" / f"{t.date().isoformat()}.json"
+    if not ((5, 30) <= (t.hour, t.minute) <= (7, 15)):
+        print(f"Fuera de la ventana de la mañana ({t:%H:%M} en Madrid)")
         return False
-    if t.weekday() in (6, 2, 4):  # domingo, miércoles y viernes el especial de las 20:30 hace de parte de mañana
-        print("Domingo/miércoles/viernes: el parte de mañana va dentro del vídeo especial")
+    if t.weekday() in (0, 3, 5):  # lunes, jueves y sábado: el especial de la víspera hace de parte
+        print("Lunes/jueves/sábado: el parte de hoy fue el especial de ayer por la tarde")
         return False
-    if manana.exists():
-        print(f"El parte de mañana ya está hecho ({manana.name})")
+    if hoy.exists():
+        print(f"El parte de hoy ya está hecho ({hoy.name})")
         return False
     return True
 

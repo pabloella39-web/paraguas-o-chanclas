@@ -297,7 +297,7 @@ Bloques (palabras aproximadas por bloque: {palabras}; total ≈ {total}):
   para tener el tiempo de cada día. NUNCA digas horas de publicación.
 
 "titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, sin emojis (ej. "FINDE PASADO POR AGUA").
-"caption": una frase gancho (máx. 90 caracteres), con 1 o 2 emojis, sin hashtags.
+"caption": una frase gancho AFIRMATIVA (máx. 90 caracteres) con el dato más llamativo (sitio + cifra o día), con 1 o 2 emojis, sin hashtags; NUNCA una pregunta de elegir entre dos cosas («¿X o Y?»).
 
 Responde SOLO con JSON: {{"segmentos": {{"intro": "...", "sabado": "...", "domingo": "...", "general": "...",
 "cierre": "..."}}, "titular": "...", "caption": "..."}}"""
@@ -503,7 +503,7 @@ comentarios son lo que hace que TikTok reparta el vídeo.
 Palabras aproximadas por bloque: {palabras}; total ≈ {total}. Es crucial respetarlo.
 
 "titular": 2 a 5 palabras en MAYÚSCULAS, máx. 26 caracteres, sin emojis (ej. "SEMANA PASADA POR AGUA").
-"caption": una frase gancho (máx. 90 caracteres), con 1 o 2 emojis, sin hashtags.
+"caption": una frase gancho AFIRMATIVA (máx. 90 caracteres) con el dato más llamativo (sitio + cifra o día), con 1 o 2 emojis, sin hashtags; NUNCA una pregunta de elegir entre dos cosas («¿X o Y?»).
 
 Responde SOLO con JSON: {{"segmentos": {{"intro": "...", {claves_dias}, "general": "...", "cierre": "..."}},
 "titular": "...", "caption": "..."}}"""
@@ -3244,7 +3244,16 @@ def main():
                                             if c not in ya and not any(c in z for z in ya)))
                 if os.environ.get("REHACER"):   # a mano: rehacer el vídeo de hoy (zoom más cerca, etc.)
                     nuevos = ["(rehecho)"] if os.environ.get("MISMO_GUION") else (nuevos or ["(rehecho)"])
-                # Tope de tres vídeos al día solo para los naranjas: un ROJO en una zona nueva sale siempre
+                # Un solo vídeo por episodio (20-nov-2026: el oleaje de Galicia y el Cantábrico salió en seis vídeos en
+                # tres días y cada uno rindió menos que el anterior). Un ROJO en una zona nueva sale siempre; una
+                # ampliación NARANJA solo si llega a una ciudad muy grande (Madrid, Barcelona…): si no, se cuenta en el
+                # siguiente parte, que ya recibe todos los avisos en vigor.
+                if nuevos and nivel != "rojo" and not os.environ.get("REHACER"):
+                    from .poblaciones import MUY_GRANDES
+                    grandes = [c for c in nuevos if c in MUY_GRANDES]
+                    if not grandes:
+                        log.info("AEMET amplía el aviso naranja a %s: sin vídeo propio (se cuenta en el parte)", nuevos)
+                        nuevos = []
                 if not nuevos or (nivel != "rojo" and len(previos) >= 3 and not os.environ.get("REHACER")):
                     log.info("El vídeo de avisos %ss de hoy ya está publicado (sin sitios nuevos). En vigor: %s", nivel,
                              "; ".join(", ".join(sitios_aviso(x)) for x in del_nivel))
@@ -3262,7 +3271,7 @@ def main():
                 log.info("AEMET amplía el aviso %s a: %s → vídeo nuevo", nivel, nuevos)
                 hist_n = HISTORIAL / f"aviso-{hoy.isoformat()}-{nivel}-{len(previos) + 1}.json"
             if not a.demo and not AMPLIACION and not os.environ.get("REHACER") and _repetido(del_nivel, hoy, nivel):
-                log.info("Aviso %s ya contado ayer (mismo fenómeno y zona): no se repite el vídeo", nivel)
+                log.info("Aviso %s ya contado en los últimos 3 días (mismo fenómeno y zona): no se repite el vídeo", nivel)
                 continue
             NARANJAS_CONTEXTO[:] = [x for x in grupos if nivel == "rojo" and x["nivel"] == "naranja"
                                     and x["fenomeno"] in {r["fenomeno"] for r in del_nivel}]
@@ -3309,15 +3318,25 @@ def main():
 def _repetido(grupos, hoy: date, nivel: str) -> bool:
     """True si ayer ya se publicó un vídeo del mismo nivel, fenómeno y zona (el 4/11/2026 el segundo aviso seguido
     de Cartagena se quedó en 283 visualizaciones: la gente ya lo había visto). Un rojo nuevo sí sale siempre."""
-    ruta = HISTORIAL / f"aviso-{(hoy - timedelta(days=1)).isoformat()}-{nivel}.json"
-    try:
-        ayer = json.loads(ruta.read_text(encoding="utf-8")).get("avisos") or []
-    except Exception:  # noqa: BLE001
+    # 20-nov-2026: se mira el episodio entero (los tres días anteriores y todos los vídeos de cada día), no solo el
+    # primer vídeo de ayer: el oleaje del Cantábrico volvió a salir el jueves de madrugada tras tres vídeos el martes.
+    if nivel == "rojo":
         return False
-    if nivel == "rojo" or not ayer:
+    ayer = []
+    for k in (1, 2, 3):
+        for ruta in HISTORIAL.glob(f"aviso-{(hoy - timedelta(days=k)).isoformat()}-{nivel}*.json"):
+            if "anterior" in ruta.name:
+                continue
+            try:
+                ayer += json.loads(ruta.read_text(encoding="utf-8")).get("avisos") or []
+            except Exception:  # noqa: BLE001
+                pass
+    if not ayer:
         return False
-    vistos = {(x["fenomeno"], c) for x in ayer for c in (x.get("ciudades") or [])}
-    return all(gr.get("ciudades") and all((gr["fenomeno"], c) in vistos for c in gr["ciudades"]) for gr in grupos)
+    vistos = {(x["fenomeno"], c) for x in ayer for c in (x.get("ciudades") or []) + (x.get("zonas") or [])}
+    return all((gr.get("ciudades") or gr.get("zonas")) and
+               all((gr["fenomeno"], c) in vistos for c in (gr.get("ciudades") or gr.get("zonas")))
+               for gr in grupos)
 
 
 def _cerrar(meta: dict, titulo: str, hist: Path, a, hoy: date):
