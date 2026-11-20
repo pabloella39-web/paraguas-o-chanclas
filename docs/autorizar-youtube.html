@@ -28,7 +28,7 @@
     const cid = document.getElementById('cid').value.trim(); if (!cid) return;
     location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({client_id: cid,
       redirect_uri: 'https://pabloella39-web.github.io/paraguas-o-chanclas/callback.html', response_type: 'code',
-      scope: 'https://www.googleapis.com/auth/youtube.upload', access_type: 'offline', prompt: 'consent', state: 'youtube'});
+      scope: 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/yt-analytics.readonly', access_type: 'offline', prompt: 'consent', state: 'youtube'});
   };
 </script>
 </body>

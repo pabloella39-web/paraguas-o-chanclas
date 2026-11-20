@@ -24,7 +24,9 @@ log = logging.getLogger(__name__)
 ESTADO = RAIZ / "estado" / "youtube_token.enc"
 ESTADOS = {"tiempo": ESTADO, "historias": RAIZ / "estado" / "youtube_token_historias.enc"}
 REDIRECT_URI = "https://pabloella39-web.github.io/paraguas-o-chanclas/callback.html"
-SCOPE = "https://www.googleapis.com/auth/youtube.upload"
+# upload para publicar; readonly y analytics para leer las estadísticas de los vídeos (desde el 20-nov-2026)
+SCOPE = ("https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly "
+         "https://www.googleapis.com/auth/yt-analytics.readonly")
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 
 
@@ -113,20 +115,39 @@ def subir_con_reintentos(video: Path, titulo: str, descripcion: str, etiquetas: 
 
 
 def textos(caption: str, titular: str | None, fecha_txt: str, tipo: str = "hoy") -> tuple[str, str, list[str]]:
-    """Título (pensado para el buscador de YouTube: lo que la gente escribe), descripción y etiquetas."""
-    gancho = caption.split("\n", 1)[0].strip() or "¿Paraguas o chanclas?"   # frase gancho (mayúsculas normales)
-    busqueda = {"manana": f"El tiempo para mañana, {fecha_txt}, en España",
-                "hoy": f"El tiempo hoy, {fecha_txt}, en España",
-                "semana": f"El tiempo de la semana en España ({fecha_txt})",
-                "finde": f"El tiempo del fin de semana en España ({fecha_txt})",
-                "aviso": f"Aviso de AEMET: {fecha_txt}"}.get(tipo, f"El tiempo en España, {fecha_txt}")
-    titulo = f"{busqueda} | {gancho}"
+    """Título, descripción y etiquetas para YouTube Shorts (20-nov-2026).
+
+    En Shorts el título se ve cortado (~40-50 caracteres) encima del vídeo: va PRIMERO el gancho con el dato y
+    después la búsqueda corta ("El tiempo hoy en España"), sin la fecha larga, que se comía todo el sitio visible y
+    deja el título viejo al día siguiente. La fecha y las palabras de búsqueda largas van en la descripción.
+    YouTube enseña encima del título los TRES PRIMEROS hashtags de la descripción: van al principio los de búsqueda
+    (#eltiempo, #tiempohoy…) y la ciudad del día, no los de TikTok."""
+    import re as _re
+    gancho = caption.split("\n", 1)[0].strip() or "¿Paraguas o chanclas?"
+    gancho = _re.sub(r"[\U0001F000-\U0001FAFF\u2600-\u27BF\uFE0F]", "", gancho).strip(" ·|-")   # sin emojis
+    corta, larga, h2 = {
+        "manana": ("El tiempo mañana en España", f"El tiempo para mañana, {fecha_txt}, en España", "#tiempomañana"),
+        "hoy": ("El tiempo hoy en España", f"El tiempo hoy, {fecha_txt}, en España", "#tiempohoy"),
+        "semana": ("El tiempo de la semana", f"El tiempo de la semana en España ({fecha_txt})", "#tiemposemana"),
+        "finde": ("El tiempo del finde", f"El tiempo del fin de semana en España ({fecha_txt})", "#findesemana"),
+        "aviso": ("Aviso AEMET", f"Aviso de AEMET: {fecha_txt}", "#avisoaemet"),
+    }.get(tipo, ("El tiempo en España", f"El tiempo en España, {fecha_txt}", "#tiempohoy"))
+    titulo = f"{gancho} | {corta}"
     if len(titulo) > 100:
-        sitio = 100 - len(busqueda) - 4
-        corto = gancho[:sitio].rsplit(" ", 1)[0].rstrip(",.;:") if sitio > 20 else ""
-        titulo = f"{busqueda} | {corto}…" if corto else busqueda[:100]
-    hashtags = [w.lstrip("#") for w in caption.split() if w.startswith("#")]
-    descripcion = (caption + "\n\nPrevisión diaria del tiempo en España con datos de AEMET y Open-Meteo "
-                   "(CC BY 4.0). Voz generada con IA.\nSuscríbete para tener el tiempo de cada día ☂️🩴")
-    etiquetas = ["el tiempo", "tiempo España", "previsión del tiempo", "AEMET", "meteorología", "shorts"] + hashtags
+        sitio = 100 - len(corta) - 4
+        g2 = gancho[:sitio].rsplit(" ", 1)[0].rstrip(",.;:¿?") if sitio > 20 else ""
+        titulo = f"{g2}… | {corta}" if g2 else corta
+    tiktok = [w for w in caption.split() if w.startswith("#")]
+    genericos = {"#eltiempo", "#tiempomañana", "#tiempohoy", "#tiemposemana", "#paraguasochanclas", "#lluvia",
+                 "#fyp", "#parati", "#foryou"}
+    ciudades = [w for w in tiktok if w.lower() not in genericos][:2]
+    hashtags = list(dict.fromkeys(["#eltiempo", h2, "#aemet"] + ciudades + ["#tiempoespaña", "#paraguasochanclas"]))
+    cuerpo = "\n".join(l for l in caption.split("\n") if not l.strip().startswith("#")).strip()
+    descripcion = (f"{larga}.\n\n{cuerpo}\n\nCada mañana a las 7:30, el tiempo del día en España; los domingos y "
+                   "miércoles, la semana; los viernes, el finde; y los avisos naranjas y rojos de AEMET en cuanto salen. "
+                   "Datos de AEMET y Open-Meteo (CC BY 4.0). Voz generada con IA.\n"
+                   "Suscríbete para tener el tiempo de cada día ☂️🩴\n\n" + " ".join(hashtags))
+    etiquetas = list(dict.fromkeys(
+        ["el tiempo", corta.lower(), "tiempo España", "previsión del tiempo", "AEMET", "meteorología",
+         "pronóstico del tiempo"] + [f"el tiempo en {c.lstrip('#')}" for c in ciudades]))
     return titulo, descripcion, etiquetas
