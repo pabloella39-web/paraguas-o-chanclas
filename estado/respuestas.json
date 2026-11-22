@@ -1058,7 +1058,11 @@
   "7710610625383138070",
   "7710883062352413462",
   "7710903691898143510",
-  "7710998116271522582"
+  "7710998116271522582",
+  "7711104835073147670",
+  "7711098353337877281",
+  "7711095529408594721",
+  "7711092538933150486"
  ],
  "hechas": [
   {
@@ -1686,6 +1690,39 @@
    ],
    "motor": "solo texto",
    "resumen": "Mañana en Avilés: 16°/13°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-22",
+   "clave": "murcia|2026-11-23",
+   "lugar": "Murcia",
+   "usuarios": [
+    "finiysusnietos"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Murcia: 21°/6°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-22",
+   "clave": "asturias|2026-11-23",
+   "lugar": "Oviedo",
+   "usuarios": [
+    "naviega"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Oviedo: 14°/7°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-22",
+   "clave": "valencia|2026-11-23",
+   "lugar": "Valencia",
+   "usuarios": [
+    "majore060"
+   ],
+   "motor": "solo texto",
+   "resumen": "Mañana en Valencia: 20°/8°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
