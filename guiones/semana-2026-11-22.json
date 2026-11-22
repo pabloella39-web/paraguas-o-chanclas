@@ -1,0 +1,15 @@
+{
+ "segmentos": {
+  "intro": "Madrid pierde 4 grados de golpe el martes. Y el norte se lleva la lluvia y olas de casi 5 metros. Al final te digo qué día merece salir y cuál quedarse en casa.",
+  "lunes": "Mañana lunes, seco en casi toda España. En el norte, alguna llovizna en San Sebastián y olas de 3 metros en Cantabria. El interior amanece a 0 grados en Ávila y a 1 en Cuenca, así que abrigo temprano. Sol en Elche y Cádiz, con 20 y 21 grados, aviso amarillo por olas de 3 metros en el norte de Mallorca y Menorca, y 25 grados en Las Palmas.",
+  "martes": "El martes llega el bajón, con Madrid, Valladolid y Salamanca en 9 grados y lluvia del noroeste al centro. Fíjate en el verde del mapa, en Galicia, con 18 litros en A Coruña, y ahí todos los modelos coinciden.",
+  "avisos_miercoles": "El miércoles, olas de 4 metros y medio en Cantabria y de casi 4 en A Coruña y la costa vasca. Nada de acercarse a los diques.",
+  "miercoles": "Santander, el más mojado, con 13 litros, aunque los modelos no se ponen de acuerdo. Y Granada se queda en 12 grados.",
+  "jueves": "El jueves, Valladolid amanece a 2 grados y con niebla, la capital más fría de la semana. Paraguas en Bilbao, con casi 6 litros, y en Oviedo, con 5. En Canarias, posibles chubascos en Las Palmas.",
+  "viernes": "El viernes se despeja casi todo. Sol en Valencia, Málaga y Zaragoza, buen día para tender la ropa, aunque Pamplona amanece a 2 grados y hay nieblas en Badajoz y Toledo.",
+  "general": "El día para salir, el lunes, seco en casi toda España y con 25 grados en Las Palmas, la capital más cálida. El de quedarse en casa, el martes, con frío y 18 litros en A Coruña.",
+  "cierre": "¿Chaqueta o abrigo el martes? Te leo. Y síguenos para cada día."
+ },
+ "titular": "MADRID, DE 13 A 9 GRADOS",
+ "caption": "Madrid cae a 9 grados el martes y A Coruña se lleva 18 litros 🥶☔"
+}
