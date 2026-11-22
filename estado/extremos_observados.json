@@ -1,18 +1,4 @@
 {
- "2026-11-17": {
-  "min": {
-   "valor": 3.1,
-   "sitio": "Baza Cruz Roja",
-   "zona": "Granada",
-   "hora": "2026-11-17T05:00:00+0000"
-  },
-  "max": {
-   "valor": 26.9,
-   "sitio": "Anaga-col. Rep. Argentina",
-   "zona": "Santa Cruz de Tenerife",
-   "hora": "2026-11-17T16:00:00+0000"
-  }
- },
  "2026-11-18": {
   "min": {
    "valor": 4.9,
@@ -67,6 +53,20 @@
    "sitio": "Santa Cruz de Tenerife",
    "zona": "Santa Cruz de Tenerife",
    "hora": "2026-11-21T16:00:00+0000"
+  }
+ },
+ "2026-11-22": {
+  "min": {
+   "valor": 1.5,
+   "sitio": "Pajares - Valgrande",
+   "zona": "Asturias",
+   "hora": "2026-11-22T03:00:00+0000"
+  },
+  "max": {
+   "valor": 23.7,
+   "sitio": "San Sebastián de la Gomera",
+   "zona": "Santa Cruz de Tenerife",
+   "hora": "2026-11-22T00:00:00+0000"
   }
  }
 }
