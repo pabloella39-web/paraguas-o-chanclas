@@ -1,0 +1,134 @@
+{
+ "tipo": "semana",
+ "fecha": "2026-11-22",
+ "caption": "Madrid cae a 9 grados el martes y A Coruña se lleva 18 litros 🥶☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 23: máx. 25° · lluvia en Santander\n🌧️ Martes 24: máx. 24° · lluvia en A Coruña, Oviedo\n☁️ Miércoles 25: máx. 23° · lluvia en Santander, A Coruña\n☁️ Jueves 26: máx. 21° · lluvia en Santander, Bilbao\n☁️ Viernes 27: máx. 22°\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+ "titular": "MADRID, DE 13 A 9 GRADOS",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 107.83,
+ "guion": {
+  "intro": "Madrid pierde 4 grados de golpe el martes. Y el norte se lleva la lluvia y olas de casi 5 metros. Al final te digo qué día merece salir y cuál quedarse en casa.",
+  "lunes": "Mañana lunes, seco en casi toda España. En el norte, alguna llovizna en San Sebastián y olas de 3 metros en Cantabria. El interior amanece a 0 grados en Ávila y a 1 en Cuenca, así que abrigo temprano. Sol en Elche y Cádiz, con 20 y 21 grados, aviso amarillo por olas de 3 metros en el norte de Mallorca y Menorca, y 25 grados en Las Palmas.",
+  "martes": "El martes llega el bajón, con Madrid, Valladolid y Salamanca en 9 grados y lluvia del noroeste al centro. Fíjate en el verde del mapa, en Galicia, con 18 litros en A Coruña, y ahí todos los modelos coinciden.",
+  "avisos_miercoles": "El miércoles, olas de 4 metros y medio en Cantabria y de casi 4 en A Coruña y la costa vasca. Nada de acercarse a los diques.",
+  "miercoles": "Santander, el más mojado, con 13 litros, aunque los modelos no se ponen de acuerdo. Y Granada se queda en 12 grados.",
+  "jueves": "El jueves, Valladolid amanece a 2 grados y con niebla, la capital más fría de la semana. Paraguas en Bilbao, con casi 6 litros, y en Oviedo, con 5. En Canarias, posibles chubascos en Las Palmas.",
+  "viernes": "El viernes se despeja casi todo. Sol en Valencia, Málaga y Zaragoza, buen día para tender la ropa, aunque Pamplona amanece a 2 grados y hay nieblas en Badajoz y Toledo.",
+  "general": "El día para salir, el lunes, seco en casi toda España y con 25 grados en Las Palmas, la capital más cálida. El de quedarse en casa, el martes, con frío y 18 litros en A Coruña.",
+  "cierre": "¿Chaqueta o abrigo el martes? Te leo. Y síguenos para cada día."
+ },
+ "control": {
+  "graves": [],
+  "avisos": [
+   "plano casi quieto durante 22 s (desde el 0:11)"
+  ]
+ },
+ "primer_comentario": "☔ o 🩴 Dime tu ciudad y te digo cuál te toca mañana",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-22T19:28:19.680Z"
+     },
+     "success": true,
+     "platform_post_id": "7711079464876182816",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7711079464876182816",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 18270077,
+     "post_title": "Madrid cae a 9 grados el martes y A Coruña se lleva 18 litros 🥶☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 23: máx. 25° · lluvia en Santander\n🌧️ Martes 24: máx. 24° · lluvia en A Coruña, Oviedo\n☁️ Miércoles 25: máx. 23° · lluvia en Santander, A Coruña\n☁️ Jueves 26: máx. 21° · lluvia en Santander, Bilbao\n☁️ Viernes 27: máx. 22°\n\n#eltiempo #tiempomañana #tiemposemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 107.834,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7711079128216324129",
+     "first_comment_posted": true,
+     "request_id": "db6f5cfb196c4a06b44f712642e5d21a",
+     "request_id_logs": "db6f5cfb196c4a06b44f712642e5d21a",
+     "job_id": "7d933837b23a4b829f1274148555ca5c",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-22T19:28:19.680Z"
+   },
+   "request_id": "db6f5cfb196c4a06b44f712642e5d21a"
+  }
+ },
+ "tipo_youtube": "semana",
+ "youtube": {
+  "id": "s4DxJFAdZDA",
+  "url": "https://youtube.com/shorts/s4DxJFAdZDA",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-22T19:29:40.433Z"
+   },
+   "success": true,
+   "platform_post_id": "18099728774439777",
+   "post_url": "https://www.instagram.com/reel/DgDjrONicyW/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 18270077,
+   "post_title": "Madrid cae a 9 grados el martes y A Coruña se lleva 18 litros 🥶☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 23: máx. 25° · lluvia en Santander\n🌧️ Martes 24: máx. 24° · lluvia en A Coruña, Oviedo\n☁️ Miércoles 25: máx. 23° · lluvia en Santander, A Coruña\n☁️ Jueves 26: máx. 21° · lluvia en Santander, Bilbao\n☁️ Viernes 27: máx. 22°\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "post_caption": "Madrid cae a 9 grados el martes y A Coruña se lleva 18 litros 🥶☔\n\nEl tiempo de la semana que viene en España 🇪🇸\n☁️ Lunes 23: máx. 25° · lluvia en Santander\n🌧️ Martes 24: máx. 24° · lluvia en A Coruña, Oviedo\n☁️ Miércoles 25: máx. 23° · lluvia en Santander, A Coruña\n☁️ Jueves 26: máx. 21° · lluvia en Santander, Bilbao\n☁️ Viernes 27: máx. 22°\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiemposemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 107.834,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "cb1f77bd5c9740efae5bb9dd2c63a51b",
+   "request_id_logs": "cb1f77bd5c9740efae5bb9dd2c63a51b",
+   "job_id": "aca1592058c14b909eae87e59ca64adb",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
