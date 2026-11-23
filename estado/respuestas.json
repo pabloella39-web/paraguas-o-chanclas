@@ -1075,7 +1075,8 @@
   "7711141419851416352",
   "7711289858849587990",
   "7711288955563508502",
-  "7711297398530065160"
+  "7711297398530065160",
+  "7711318390518776597"
  ],
  "hechas": [
   {
@@ -1747,6 +1748,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Madrid: 13°/2°, 0 % de lluvia → ni uno ni otro: chaqueta.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-23",
+   "clave": "alicante|2026-11-23",
+   "lugar": "Alicante",
+   "usuarios": [
+    "richard.g75"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Alicante: 20°/11°, 0 % de lluvia → ni uno ni otro: chaqueta.",
    "publicado": true
   }
  ],
