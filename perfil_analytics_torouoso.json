@@ -1,0 +1,175 @@
+{
+ "status": 200,
+ "data": {
+  "tiktok": {
+   "followers": 26,
+   "reach": 3461,
+   "impressions": 3819,
+   "profileViews": 12,
+   "reach_timeseries": [
+    {
+     "date": "2026-10-25",
+     "value": 766
+    },
+    {
+     "date": "2026-10-26",
+     "value": 573
+    },
+    {
+     "date": "2026-10-27",
+     "value": 229
+    },
+    {
+     "date": "2026-10-28",
+     "value": 535
+    },
+    {
+     "date": "2026-10-29",
+     "value": 226
+    },
+    {
+     "date": "2026-10-30",
+     "value": 379
+    },
+    {
+     "date": "2026-10-31",
+     "value": 747
+    },
+    {
+     "date": "2026-11-01",
+     "value": 705
+    },
+    {
+     "date": "2026-11-02",
+     "value": 868
+    },
+    {
+     "date": "2026-11-03",
+     "value": 379
+    },
+    {
+     "date": "2026-11-04",
+     "value": 6
+    },
+    {
+     "date": "2026-11-05",
+     "value": 1
+    },
+    {
+     "date": "2026-11-06",
+     "value": 4
+    },
+    {
+     "date": "2026-11-07",
+     "value": 5
+    },
+    {
+     "date": "2026-11-08",
+     "value": 6
+    },
+    {
+     "date": "2026-11-09",
+     "value": 15
+    },
+    {
+     "date": "2026-11-10",
+     "value": 2
+    },
+    {
+     "date": "2026-11-11",
+     "value": 1
+    },
+    {
+     "date": "2026-11-12",
+     "value": 0
+    },
+    {
+     "date": "2026-11-13",
+     "value": 2
+    },
+    {
+     "date": "2026-11-14",
+     "value": 1
+    },
+    {
+     "date": "2026-11-15",
+     "value": 1
+    },
+    {
+     "date": "2026-11-16",
+     "value": 0
+    },
+    {
+     "date": "2026-11-17",
+     "value": 0
+    },
+    {
+     "date": "2026-11-18",
+     "value": 0
+    },
+    {
+     "date": "2026-11-19",
+     "value": 1
+    },
+    {
+     "date": "2026-11-20",
+     "value": 2
+    },
+    {
+     "date": "2026-11-21",
+     "value": 0
+    },
+    {
+     "date": "2026-11-22",
+     "value": 0
+    },
+    {
+     "date": "2026-11-23",
+     "value": 0
+    }
+   ],
+   "likes": 127,
+   "comments": 5,
+   "shares": 1,
+   "video_count": 5,
+   "following": 0,
+   "metric_type": "views",
+   "period_totals": {
+    "window_days": 30,
+    "posts": 5,
+    "views": 3819,
+    "likes": 89,
+    "comments": 5,
+    "shares": 1
+   },
+   "coverage": {
+    "window_days": 30,
+    "posts_counted": 5,
+    "posts_total": 5,
+    "truncated": false,
+    "pages_read": 1,
+    "pages_from_cache": false,
+    "impressions_posts": 5,
+    "counts": "period_totals"
+   },
+   "available_metrics": [
+    "followers",
+    "impressions",
+    "likes",
+    "comments",
+    "shares",
+    "video_count",
+    "following",
+    "profileViews"
+   ],
+   "metric_labels": {
+    "impressions": "Video Views",
+    "profileViews": "Profile Views (30d)"
+   },
+   "primary_impressions_field": "impressions",
+   "as_of": "2026-11-23T08:20:16.729058Z",
+   "next_refresh_at": "2026-11-23T08:30:16.729058Z",
+   "views_field": "impressions"
+  }
+ }
+}
