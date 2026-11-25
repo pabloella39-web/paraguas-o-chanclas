@@ -1097,7 +1097,11 @@
   "7712024536070652711",
   "7712018735364490006",
   "7712018690812216066",
-  "7712030388961772310"
+  "7712030388961772310",
+  "7712044859163312935",
+  "7712044822051504918",
+  "7712040183792665366",
+  "7712023863899915047"
  ],
  "hechas": [
   {
@@ -1791,6 +1795,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Langreo: 15°/7°, 83 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-25",
+   "clave": "santander|2026-11-25",
+   "lugar": "Santander",
+   "usuarios": [
+    "antoniosalgueromancera"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Santander: 14°/9°, 95 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
