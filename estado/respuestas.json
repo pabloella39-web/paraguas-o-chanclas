@@ -1103,7 +1103,9 @@
   "7712040183792665366",
   "7712023863899915047",
   "7712090889552298754",
-  "7712100825422791446"
+  "7712100825422791446",
+  "7712113175806640918",
+  "7712119314900714262"
  ],
  "hechas": [
   {
@@ -1808,6 +1810,17 @@
    ],
    "motor": "solo texto",
    "resumen": "Hoy en Santander: 14°/9°, 95 % de lluvia → paraguas.",
+   "publicado": true
+  },
+  {
+   "fecha": "2026-11-25",
+   "clave": "ponteareas|2026-11-25",
+   "lugar": "Ponteareas",
+   "usuarios": [
+    "anatrebas"
+   ],
+   "motor": "solo texto",
+   "resumen": "Hoy en Ponteareas: 12°/9°, 80 % de lluvia → paraguas.",
    "publicado": true
   }
  ],
