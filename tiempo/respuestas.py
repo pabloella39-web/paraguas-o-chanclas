@@ -319,12 +319,52 @@ def detectar(coms: list[dict]) -> list[dict]:
     return [q for q in clasificar(coms) if q.get("tipo") == "pregunta" and q.get("lugar")]
 
 
-FRASES_CIUDAD = [  # saludo variado + ficha con emojis
+FRASES_CIUDAD = [  # saludo variado (25-nov-2026: más variedad, antes solo cuatro y la misma ficha siempre)
     "¡Hola, {sitio}! 👋 {ficha}",
     "¡Saludos a {sitio}! 🙌 {ficha}",
     "¡Gracias por vernos desde {sitio}! 😊 {ficha}",
     "¡Va por ti, {sitio}! 💪 {ficha}",
+    "Apuntado, {sitio} 📝 {ficha}",
+    "¡Marchando el tiempo de {sitio}! 🍽️ {ficha}",
+    "{sitio}, allá va 👇 {ficha}",
+    "¡Qué alegría leer a gente de {sitio}! {ficha}",
+    "Mirado el radar para {sitio} 📡 {ficha}",
+    "¡Buena elección, {sitio}! 😄 {ficha}",
+    "{sitio} en el mapa 📍 {ficha}",
+    "¡Un abrazo hasta {sitio}! 🤗 {ficha}",
+    "Para {sitio}, esto es lo que hay ☝️ {ficha}",
+    "¡Hecho, {sitio}! {ficha}",
 ]
+FICHAS = [   # la misma información, cuatro formas de decirla
+    "{cuando}: {ico} {tmax}°/{tmin}° y {lluvia} % de lluvia → {veredicto}",
+    "{cuando} {ico} máx. {tmax}°, mín. {tmin}°, 💧{lluvia} % · {veredicto}",
+    "{ico} {cuando_min} entre {tmin} y {tmax} grados, lluvia al {lluvia} %: {veredicto}",
+    "{cuando}, {tmax}° de máxima {ico} ({tmin}° al amanecer, 💧{lluvia} %) → {veredicto}",
+]
+VEREDICTOS = {
+    "PARAGUAS": ["¡paraguas! ☔", "toca paraguas ☂️", "que no se te olvide el paraguas ☔", "día de paraguas y botas 🌧️",
+                 "paraguas en la mochila ☂️"],
+    "CHANCLAS": ["¡chanclas! 🩴", "modo chanclas activado 🩴", "chanclas y gafas de sol 😎", "día de terraza ☀️🩴",
+                 "manga corta sin miedo 👕"],
+    "BOTAS Y BUFANDA": ["¡botas y bufanda! 🧣", "abrigo gordo y bufanda 🧣", "día de nieve: botas ❄️🥾"],
+    "NI UNO NI OTRO: CHAQUETA": ["¡chaqueta! 🧥", "ni paraguas ni chanclas: chaqueta 🧥", "chaqueta a mano 🧥",
+                                 "capas: chaqueta por si acaso 🧥", "sudadera y listo 🧥"],
+}
+NOTAS = [   # (condición, coletillas) — se añade una si cabe, según el dato del día
+    (lambda p: p["tmin"] <= 2, ["Ojo a la helada al amanecer 🥶", "Rasca de madrugada, ¡abrígate! 🥶"]),
+    (lambda p: p["tmax"] - p["tmin"] >= 14, ["Día de cebolla: capas 🧅", "Mucho salto de la mañana a la tarde"]),
+    (lambda p: p["lluvia"] >= 85, ["Hoy no se libra nadie 💦", "Lluvia casi segura"]),
+    (lambda p: p["tmax"] >= 28, ["¡Calor en pleno otoño! 🔥", "Hace más calor de lo normal 🔥"]),
+    (lambda p: p["lluvia"] <= 5 and p["tmax"] >= 18, ["Buen día para tender 👕", "Ni una nube que temer"]),
+]
+
+
+def _elige(lista: list, clave: str, salto: int = 0):
+    """Elección estable pero repartida (por el id del comentario), distinta para cada parte del mensaje."""
+    import zlib
+    return lista[(zlib.crc32(clave.encode()) + salto * 7919) % len(lista)]
+
+
 ICONO_EMOJI = {"sol": "☀️", "sol_nubes": "🌤️", "nubes": "☁️", "lluvia": "🌧️", "chubascos": "🌦️", "tormenta": "⛈️",
                "nieve": "❄️", "niebla": "🌫️"}
 EMOJI_VEREDICTO = {"PARAGUAS": "☔", "CHANCLAS": "🩴", "BOTAS Y BUFANDA": "🧣"}
@@ -387,8 +427,19 @@ def texto_varios_dias(sitio: dict, dias: list[date], q: dict) -> str | None:
                       + (f" 💧{p['lluvia']}%" if p["lluvia"] >= 40 else ""))
         notas.append((p["lluvia"], -p["tmax"], d))
     mejor = min(notas)[2]
-    txt = f"📍{sitio['nombre']}: " + " · ".join(partes)
-    cola = f" → el mejor, el {['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'][mejor.weekday()]} 😉"
+    peor = max(notas)[2]
+    clave = str(q.get("id", "")) + sitio["nombre"]
+    dia_n = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+    cabeza = _elige([f"📍{sitio['nombre']}: ", f"{sitio['nombre']}, día a día 👇 ", f"Para {sitio['nombre']}: ",
+                     f"¡Hola, {sitio['nombre']}! ", f"{sitio['nombre']} 📅 "], clave)
+    txt = cabeza + " · ".join(partes)
+    colas = [f" → el mejor, el {dia_n[mejor.weekday()]} 😉", f" → para planes, el {dia_n[mejor.weekday()]} 👌",
+             f" → el {dia_n[mejor.weekday()]}, el día bueno ☀️"]
+    if min(notas)[0] >= 50:   # llueve todos los días: no hay «día bueno»
+        colas = [" → paraguas todos los días ☔", " → semana de paraguas 🌧️", " → no guardes el paraguas ☂️"]
+    elif max(notas)[0] >= 50 and peor != mejor:
+        colas += [f" → paraguas el {dia_n[peor.weekday()]} ☔", f" → ojo al {dia_n[peor.weekday()]} 🌧️"]
+    cola = _elige(colas, clave, 1)
     return (txt + cola) if len(txt + cola) <= 150 else txt[:150]
 
 
@@ -412,12 +463,24 @@ def texto_ciudad(q: dict, hoy_: datetime) -> str | None:
         log.warning("Previsión rara para %s (%s/%s): no se contesta", sitio["nombre"], p["tmax"], p["tmin"])
         return None
     ver = veredicto(p)
-    corto = {"NI UNO NI OTRO: CHAQUETA": "chaqueta"}.get(ver, ver.lower())
     cuando = "Hoy" if dia == hoy_.date() else "Mañana"
-    ficha = (f"📍{cuando} {ICONO_EMOJI.get(p['icono'], '🌤️')} {p['tmax']}° / {p['tmin']}° · 💧{p['lluvia']} % "
-             f"→ ¡{corto}! {EMOJI_VEREDICTO.get(ver, '🧥')}")
-    n = int(q["id"][-3:]) if q["id"][-3:].isdigit() else 0
-    return FRASES_CIUDAD[n % len(FRASES_CIUDAD)].format(sitio=sitio["nombre"], ficha=ficha)[:150]
+    clave = str(q.get("id", "")) + sitio["nombre"]
+    ficha = _elige(FICHAS, clave, 1).format(
+        cuando=cuando, cuando_min=cuando.lower(), ico=ICONO_EMOJI.get(p["icono"], "🌤️"), tmax=p["tmax"],
+        tmin=p["tmin"], lluvia=p["lluvia"], veredicto=_elige(VEREDICTOS.get(ver, VEREDICTOS["NI UNO NI OTRO: CHAQUETA"]),
+                                                             clave, 2))
+    txt = _elige(FRASES_CIUDAD, clave).format(sitio=sitio["nombre"], ficha=ficha)
+    for cond, coletillas in NOTAS:
+        try:
+            if cond(p):
+                extra = f"{txt}. {_elige(coletillas, clave, 3)}" if not txt.endswith((".", "!")) else \
+                    f"{txt} {_elige(coletillas, clave, 3)}"
+                if len(extra) <= 150:
+                    txt = extra
+                break
+        except Exception:  # noqa: BLE001
+            pass
+    return txt[:150]
 
 
 # ================================================================ previsión (Open-Meteo)
