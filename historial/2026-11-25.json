@@ -1,0 +1,132 @@
+{
+ "fecha": "2026-11-25",
+ "duracion": 110.47,
+ "caption": "Santander recoge 38 litros hoy y el Cantábrico levanta olas de 6 metros 🌊☔\n\nEl tiempo en España hoy, miércoles 25 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 23° en Las Palmas\n🥶 Mínima: 3° en Valladolid\n\n#eltiempo #tiempohoy #paraguasochanclas #lluvia #ACoruna",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "SANTANDER: 38 LITROS",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Santander, 38 litros y olas de 6 metros. Lo del domingo, confirmado: el triple de agua. Al final, dónde más vas a tiritar hoy.",
+  "aviso": "AEMET mantiene aviso naranja por olas de 6 metros en todo el litoral cántabro y en toda la costa de Bizkaia y Gipuzkoa, también en los pueblos que no nombro. Santander, Bilbao y San Sebastián: hoy, nada de diques ni paseos marítimos. Pamplona y Vitoria, sin aviso.",
+  "sistema": "La culpable es una DANA, una bolsa de aire muy frío en altura que baja del norte de la península hacia el noreste. Lo más fuerte de la lluvia, entre las 12 del mediodía y las 7 de la tarde, con hasta 100 litros en los puntos más castigados y rachas de hasta 125 kilómetros por hora. Y el jueves de madrugada ya se aleja por el noreste.",
+  "norte": "Mira el satélite: así entra el agua. Rachas de 91 en Santander, 29 litros en San Sebastián y 26 en Bilbao. Si eres de A Coruña, 20 litros.",
+  "islas": "En Canarias, Las Palmas se moja desde media mañana, y en Santa Cruz de Tenerife AEMET da lluvia que casi ningún modelo ve.",
+  "sur": "Gente de Sevilla, seco y 19 grados. Granada, 13, casi clavado a lo del domingo, y aviso amarillo por viento en su costa.",
+  "interior": "Madrid, lo mojado fue de madrugada: hoy, seco y 11 grados, con aviso amarillo por nieve en su sierra. Y Cuenca no pasa de 7.",
+  "mediterraneo": "Barcelona, algún chubasco por la mañana y 16 grados. Valencia, sol y 18, y Murcia y Alicante llegan a 20.",
+  "general": "¿El frío de verdad? Valladolid y Salamanca, con 3 grados; pero gana Benasque, en Huesca, con 2 bajo cero. Calor: Las Palmas y Santa Cruz, 23, y Maspalomas, 25.",
+  "cierre": "¿Acerté el domingo con Santander? Te leo. Sigue a Paraguas o Chanclas: hoy, paraguas en el norte y chanclas en Murcia."
+ },
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": "¿Qué tal por tu ciudad? Escríbela y te digo si mañana sales con paraguas o con chanclas 👇",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-25T06:27:43.261Z"
+     },
+     "success": true,
+     "platform_post_id": "7711991661156502823",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7711991661156502823",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 28719756,
+     "post_title": "Santander recoge 38 litros hoy y el Cantábrico levanta olas de 6 metros 🌊☔\n\nEl tiempo en España hoy, miércoles 25 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 23° en Las Palmas\n🥶 Mínima: 3° en Valladolid\n\n#eltiempo #tiempohoy #paraguasochanclas #lluvia #ACoruna",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 110.467,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7711991228459599911",
+     "first_comment_posted": true,
+     "request_id": "3e4a6762548344f1b55bbfe60dac8419",
+     "request_id_logs": "3e4a6762548344f1b55bbfe60dac8419",
+     "job_id": "1cdb3d6d49c14d579900cf93e57e839b",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-25T06:27:43.261Z"
+   },
+   "request_id": "3e4a6762548344f1b55bbfe60dac8419"
+  }
+ },
+ "youtube": {
+  "id": "nMX6kv2Boy4",
+  "url": "https://youtube.com/shorts/nMX6kv2Boy4",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-25T06:30:00.074Z"
+   },
+   "success": true,
+   "platform_post_id": "18130749940892050",
+   "post_url": "https://www.instagram.com/reel/DgJ41UTB4In/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 28719756,
+   "post_title": "Santander recoge 38 litros hoy y el Cantábrico levanta olas de 6 metros 🌊☔\n\nEl tiempo en España hoy, miércoles 25 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 23° en Las Palmas\n🥶 Mínima: 3° en Valladolid\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempohoy #meteorologia",
+   "post_caption": "Santander recoge 38 litros hoy y el Cantábrico levanta olas de 6 metros 🌊☔\n\nEl tiempo en España hoy, miércoles 25 de noviembre 🇪🇸\n🌧️ Lluvia en A Coruña y Oviedo\n🔥 Máxima: 23° en Las Palmas\n🥶 Mínima: 3° en Valladolid\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempohoy #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 110.467,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "adcfe985b0d84803b562ad5de1152cf3",
+   "request_id_logs": "adcfe985b0d84803b562ad5de1152cf3",
+   "job_id": "4f921035c1934398b0e5b8b84a0b97cf",
+   "request_total_platforms": 1
+  }
+ }
+}
