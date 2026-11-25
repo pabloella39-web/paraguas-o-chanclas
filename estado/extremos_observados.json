@@ -1,18 +1,4 @@
 {
- "2026-11-20": {
-  "min": {
-   "valor": -1.3,
-   "sitio": "Martinet",
-   "zona": "Lleida",
-   "hora": "2026-11-20T07:00:00+0000"
-  },
-  "max": {
-   "valor": 27.0,
-   "sitio": "Tejeda Casco",
-   "zona": "Las Palmas",
-   "hora": "2026-11-20T12:00:00+0000"
-  }
- },
  "2026-11-21": {
   "min": {
    "valor": 0.7,
@@ -67,6 +53,20 @@
    "sitio": "Lanzarote",
    "zona": "Las Palmas",
    "hora": "2026-11-24T15:00:00+0000"
+  }
+ },
+ "2026-11-25": {
+  "min": {
+   "valor": -0.3,
+   "sitio": "Degaña Coto Cortés",
+   "zona": "Asturias",
+   "hora": "2026-11-24T23:00:00+0000"
+  },
+  "max": {
+   "valor": 24.0,
+   "sitio": "San Sebastián de la Gomera",
+   "zona": "Santa Cruz de Tenerife",
+   "hora": "2026-11-24T23:00:00+0000"
   }
  }
 }
