@@ -1,0 +1,130 @@
+{
+ "fecha": "2026-11-27",
+ "duracion": 69.4,
+ "caption": "Las Palmas, 90 % de lluvia esta tarde, y Benasque amanece a 9 bajo cero ☔🥶\n\nEl tiempo en España hoy, viernes 27 de noviembre 🇪🇸\n🌧️ Lluvia en Las Palmas y Bilbao\n🔥 Máxima: 23° en S.C. Tenerife\n🥶 Mínima: 0° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempohoy #paraguasochanclas #lluvia #Grancanaria",
+ "portada_ms": 0,
+ "origen_guion": "manual",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "titular": "LAS PALMAS SE MOJA HOY",
+ "voz": "femenina",
+ "guion": {
+  "intro": "Las Palmas, esta tarde sacas el paraguas. En el resto, sol, como avisamos el miércoles. Y al final, dónde toca abrigo.",
+  "islas": "Gente de Las Palmas, 90 por ciento de lluvia por la tarde y unos 3 litros. Y aviso amarillo por lluvia en el este de La Palma.",
+  "norte": "Si eres de Bilbao, AEMET da lluvia esta mañana, pero los modelos lo ven seco. Olas de 3 metros en A Coruña, y Logroño, 14 grados.",
+  "sur": "Gente de Badajoz, niebla esta mañana con aviso amarillo en las Vegas del Guadiana, y por la tarde, alguna gota. Málaga, 19 grados.",
+  "interior": "En el interior, frío: Burgos y León no pasan de 9 grados, y Zaragoza, rachas de 41 kilómetros por hora.",
+  "mediterraneo": "El Mediterráneo, día de tender: Murcia, 20 grados. Eso sí, olas de 3 metros en el Ampurdán y el sur de Tarragona, con aviso amarillo.",
+  "general": "Lo prometido: el calor, en Santa Cruz de Tenerife, con 23 grados. El abrigo, en Granada, con 0, y en Benasque, Huesca, con 9 bajo cero.",
+  "cierre": "¿Chaqueta o abrigo? Dime tu pueblo y te digo si toca paraguas o chanclas. Y sigue a Paraguas o Chanclas: hoy, paraguas en Las Palmas."
+ },
+ "control": {
+  "graves": [],
+  "avisos": []
+ },
+ "primer_comentario": "¿Llueve, hace sol o ni fu ni fa por tu pueblo? Dímelo y te cuento lo de mañana 🌤️",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-27T06:27:31.108Z"
+     },
+     "success": true,
+     "platform_post_id": "7712733824899157281",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7712733824899157281",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 14450177,
+     "post_title": "Las Palmas, 90 % de lluvia esta tarde, y Benasque amanece a 9 bajo cero ☔🥶\n\nEl tiempo en España hoy, viernes 27 de noviembre 🇪🇸\n🌧️ Lluvia en Las Palmas y Bilbao\n🔥 Máxima: 23° en S.C. Tenerife\n🥶 Mínima: 0° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\n#eltiempo #tiempohoy #paraguasochanclas #lluvia #Grancanaria",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 69.4,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7712732495288141857",
+     "first_comment_posted": true,
+     "request_id": "a9bfd09b90e94c52a9e2cbd1a630ac5c",
+     "request_id_logs": "a9bfd09b90e94c52a9e2cbd1a630ac5c",
+     "job_id": "21ff79445c074d36817a7895b7aebd40",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-27T06:27:31.108Z"
+   },
+   "request_id": "a9bfd09b90e94c52a9e2cbd1a630ac5c"
+  }
+ },
+ "youtube": {
+  "id": "ePtsUdkcxYI",
+  "url": "https://youtube.com/shorts/ePtsUdkcxYI",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-27T06:28:57.100Z"
+   },
+   "success": true,
+   "platform_post_id": "17974353357186675",
+   "post_url": "https://www.instagram.com/reel/DgPCT39SPGM/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 14450177,
+   "post_title": "Las Palmas, 90 % de lluvia esta tarde, y Benasque amanece a 9 bajo cero ☔🥶\n\nEl tiempo en España hoy, viernes 27 de noviembre 🇪🇸\n🌧️ Lluvia en Las Palmas y Bilbao\n🔥 Máxima: 23° en S.C. Tenerife\n🥶 Mínima: 0° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempohoy #meteorologia",
+   "post_caption": "Las Palmas, 90 % de lluvia esta tarde, y Benasque amanece a 9 bajo cero ☔🥶\n\nEl tiempo en España hoy, viernes 27 de noviembre 🇪🇸\n🌧️ Lluvia en Las Palmas y Bilbao\n🔥 Máxima: 23° en S.C. Tenerife\n🥶 Mínima: 0° en Granada\n📍 Dime tu pueblo en comentarios y te digo si toca paraguas o chanclas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempohoy #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 69.4,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "e5978fb9b6c947e6b5910d8b6fdb787b",
+   "request_id_logs": "e5978fb9b6c947e6b5910d8b6fdb787b",
+   "job_id": "e9f4f094978644448325959918bfc335",
+   "request_total_platforms": 1
+  }
+ }
+}
