@@ -1,18 +1,4 @@
 {
- "2026-11-22": {
-  "min": {
-   "valor": -2.0,
-   "sitio": "Puerto el Pico",
-   "zona": "Ávila",
-   "hora": "2026-11-22T22:00:00+0000"
-  },
-  "max": {
-   "valor": 27.6,
-   "sitio": "Vallehermoso-dama",
-   "zona": "San Cristóbal de La Laguna",
-   "hora": "2026-11-22T14:00:00+0000"
-  }
- },
  "2026-11-23": {
   "min": {
    "valor": -5.6,
@@ -67,6 +53,20 @@
    "sitio": "Vallehermoso-dama",
    "zona": "San Cristóbal de La Laguna",
    "hora": "2026-11-26T12:00:00+0000"
+  }
+ },
+ "2026-11-27": {
+  "min": {
+   "valor": -3.5,
+   "sitio": "Cañadas Del Nerpio",
+   "zona": "Albacete",
+   "hora": "2026-11-27T00:00:00+0000"
+  },
+  "max": {
+   "valor": 21.6,
+   "sitio": "Puerto de Mogán",
+   "zona": "Telde",
+   "hora": "2026-11-26T23:00:00+0000"
   }
  }
 }
