@@ -1,0 +1,130 @@
+{
+ "tipo": "finde",
+ "fecha": "2026-11-27",
+ "caption": "Bilbao a 20 grados el sábado y Madrid se queda en 11 ☀️🧥\n\nEl tiempo del fin de semana en España, 28-29 de noviembre 🇪🇸\n☀️ Mejor plan: Melilla (20° / 20°)\n🔥 Máxima del finde: 23° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Bilbao, Las Palmas\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+ "titular": "BILBAO 20, MADRID 11",
+ "motor_voz": "elevenlabs (eleven_v4)",
+ "origen_guion": "claude",
+ "duracion": 106.93,
+ "guion": {
+  "intro": "Bilbao, 20 grados mañana; Madrid, solo 11. El sábado el norte presume de sol, y el domingo vuelve el agua al Cantábrico. Al final, el sitio con el mejor tiempo del finde.",
+  "sabado": "Mañana sábado, sol en casi toda España, menos en Galicia. Santiago y Pontevedra recogen 8 litros por metro cuadrado y A Coruña 5, con olas de hasta 3,4 metros en las Rías Baixas y la costa coruñesa, así que lejos de diques y paseos. En el Cantábrico, día de primavera, con 20 grados en Bilbao, 19 en Oviedo y 18 en Santander. Gente de Burgos y León, nubes y 11 y 10 grados, abrigo. Madrid se queda gris y en 11. Granada es la capital más fría, con 2 grados al amanecer, y Sabiñánigo, en Huesca, baja a 0. En la Comunidad Valenciana, sol y 19 grados en Valencia y Alicante. Murcia llega a 21 y Sevilla a 20. Aviso amarillo por niebla en las Vegas del Guadiana y La Siberia extremeña. Y en Canarias, amarillo por lluvia en el este de La Palma, mientras que en Las Palmas AEMET ve chubascos, pero casi ningún modelo.",
+  "domingo": "El domingo cambia el norte. Santander suma 12 litros, Oviedo 9 y Bilbao 8, y en Oviedo no hay duda, coinciden todos los modelos. Bilbao pierde 6 grados de golpe. En Pamplona, AEMET ve lluvia, pero casi ningún modelo. Niebla con aviso amarillo en las Vegas del Guadiana y en Tajo y Alagón. El resto de España, seco.",
+  "general": "Lo prometido. El mejor tiempo del finde, en Murcia y Málaga, con sol y entre 19 y 21 grados los dos días, y Santa Cruz de Tenerife, la más cálida, con 23. Y para manta, Santander el domingo, con 12 litros.",
+  "cierre": "¿Bufanda o chaqueta mañana? Te leo, y síguenos para el tiempo de cada día."
+ },
+ "control": {
+  "graves": [],
+  "avisos": [
+   "plano casi quieto durante 52 s (desde el 0:13)"
+  ]
+ },
+ "primer_comentario": "¿Llueve, hace sol o ni fu ni fa por tu pueblo? Dímelo y te cuento lo de mañana 🌤️",
+ "tiktok": {
+  "via": "upload-post",
+  "respuesta": {
+   "status": "completed",
+   "completed": 1,
+   "total": 1,
+   "results": [
+    {
+     "user_email": "tiempotiktok39@gmail.com",
+     "profile_username": "paraguasochanclas",
+     "platform": "tiktok",
+     "media_type": "video",
+     "upload_timestamp": {
+      "$date": "2026-11-27T19:27:31.858Z"
+     },
+     "success": true,
+     "platform_post_id": "7712934842295520551",
+     "post_url": "https://www.tiktok.com/@paraguasochanclas/video/7712934842295520551",
+     "error_message": null,
+     "error_signature": null,
+     "error_code": null,
+     "failure_stage": null,
+     "media_size_bytes": 16660487,
+     "post_title": "Bilbao a 20 grados el sábado y Madrid se queda en 11 ☀️🧥\n\nEl tiempo del fin de semana en España, 28-29 de noviembre 🇪🇸\n☀️ Mejor plan: Melilla (20° / 20°)\n🔥 Máxima del finde: 23° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Bilbao, Las Palmas\n\n#eltiempo #finde #tiempofindesemana #paraguasochanclas",
+     "post_caption": "",
+     "is_async": true,
+     "dashboard": false,
+     "source": "api",
+     "client": "python_generic",
+     "client_version": null,
+     "video_was_transcoded": false,
+     "changes": [],
+     "prevalidation_metadata": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30.0,
+      "duration": 106.934,
+      "container": "mov,mp4,m4a,3gp,3g2,mj2",
+      "video_codec": "h264",
+      "audio_codec": "aac"
+     },
+     "target_linkedin_page_id": null,
+     "original_publish_id": "v_pub_url~v2.7712934661558650919",
+     "first_comment_posted": true,
+     "request_id": "b4e00edbc7fa407d9264c0b91e5000dd",
+     "request_id_logs": "b4e00edbc7fa407d9264c0b91e5000dd",
+     "job_id": "799a0de4c7b54f2d9067117d635eaf4f",
+     "request_total_platforms": 1
+    }
+   ],
+   "external_id": null,
+   "last_update": {
+    "$date": "2026-11-27T19:27:31.858Z"
+   },
+   "request_id": "b4e00edbc7fa407d9264c0b91e5000dd"
+  }
+ },
+ "tipo_youtube": "finde",
+ "youtube": {
+  "id": "DFA0AZmczPE",
+  "url": "https://youtube.com/shorts/DFA0AZmczPE",
+  "canal": "Paraguas o Chanclas"
+ },
+ "instagram": {
+  "via": "upload-post",
+  "respuesta": {
+   "user_email": "tiempotiktok39@gmail.com",
+   "profile_username": "default",
+   "platform": "instagram",
+   "media_type": "video",
+   "upload_timestamp": {
+    "$date": "2026-11-27T19:29:32.098Z"
+   },
+   "success": true,
+   "platform_post_id": "18347055724258649",
+   "post_url": "https://www.instagram.com/reel/DgQbpeyzZor/",
+   "error_message": null,
+   "error_signature": null,
+   "error_code": null,
+   "failure_stage": null,
+   "media_size_bytes": 16660487,
+   "post_title": "Bilbao a 20 grados el sábado y Madrid se queda en 11 ☀️🧥\n\nEl tiempo del fin de semana en España, 28-29 de noviembre 🇪🇸\n☀️ Mejor plan: Melilla (20° / 20°)\n🔥 Máxima del finde: 23° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Bilbao, Las Palmas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempofindesemana #meteorologia",
+   "post_caption": "Bilbao a 20 grados el sábado y Madrid se queda en 11 ☀️🧥\n\nEl tiempo del fin de semana en España, 28-29 de noviembre 🇪🇸\n☀️ Mejor plan: Melilla (20° / 20°)\n🔥 Máxima del finde: 23° en S.C. Tenerife\n🌧️ Lluvia en A Coruña, Bilbao, Las Palmas\n\nPrevisión del tiempo en España con datos de AEMET · Sigue la cuenta para el parte de cada día\n\n#eltiempo #previsiondeltiempo #tiempoespaña #tiempofindesemana #meteorologia",
+   "is_async": true,
+   "dashboard": false,
+   "source": "api",
+   "client": "python_generic",
+   "client_version": null,
+   "video_was_transcoded": false,
+   "changes": [],
+   "prevalidation_metadata": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30.0,
+    "duration": 106.934,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "video_codec": "h264",
+    "audio_codec": "aac"
+   },
+   "target_linkedin_page_id": null,
+   "request_id": "230857d06c2b4c06b73d7de91788baca",
+   "request_id_logs": "230857d06c2b4c06b73d7de91788baca",
+   "job_id": "c7503224783146fcab1b12e88df08e07",
+   "request_total_platforms": 1
+  }
+ },
+ "voz": "masculina"
+}
