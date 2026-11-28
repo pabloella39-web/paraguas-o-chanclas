@@ -1,18 +1,4 @@
 {
- "2026-11-23": {
-  "min": {
-   "valor": -5.6,
-   "sitio": "Puerto el Pico",
-   "zona": "Ávila",
-   "hora": "2026-11-23T08:00:00+0000"
-  },
-  "max": {
-   "valor": 28.1,
-   "sitio": "la Aldea de San Nicolas",
-   "zona": "Las Palmas",
-   "hora": "2026-11-23T16:00:00+0000"
-  }
- },
  "2026-11-24": {
   "min": {
    "valor": -3.2,
@@ -67,6 +53,20 @@
    "sitio": "Vallehermoso-dama",
    "zona": "San Cristóbal de La Laguna",
    "hora": "2026-11-27T15:00:00+0000"
+  }
+ },
+ "2026-11-28": {
+  "min": {
+   "valor": -2.5,
+   "sitio": "Llorac",
+   "zona": "Tarragona",
+   "hora": "2026-11-27T23:00:00+0000"
+  },
+  "max": {
+   "valor": 21.5,
+   "sitio": "Mogan (puerto Rico)",
+   "zona": "Las Palmas",
+   "hora": "2026-11-27T23:00:00+0000"
   }
  }
 }
